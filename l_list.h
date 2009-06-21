@@ -9,10 +9,10 @@
 #ifndef __l_list_h__
 #define __l_list_h__
 
-/* Linked-list element */
-struct l_list_elt{
+/* Linked-list node */
+struct l_list_node{
 	void *data;
-	struct l_list_elt *next;
+	struct l_list_node *next;
 };
 
 #endif /* Not __l_list_h__ */

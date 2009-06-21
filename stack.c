@@ -12,7 +12,7 @@ Stack * Stack_new(unsigned int num_bytes)
 		fprintf(stderr, "Erreur allocation mémoire\n");
 		exit(-1);
 	}
-	S->first = NULL;
+	S->head = NULL;
 	S->num_bytes = num_bytes;
 
 	return S;
@@ -21,35 +21,36 @@ Stack * Stack_new(unsigned int num_bytes)
 
 void Stack_push(Stack *S, void *data)
 {
-	stack_elt *s;
+	l_list_node *ll_node;
 
-	s = malloc(sizeof(stack_elt));
-	if(s == NULL){
+	ll_node = malloc(sizeof(struct l_list_node));
+	if(ll_node == NULL){
 		fprintf(stderr, "Erreur allocation mémoire\n");
 		exit(-1);
 	}
 	if(data == NULL){
-		fprintf(stderr, "Attention, tentative d'insertion d'élément NULL dans la pile\n");
+		fprintf(stderr, "Attention, tentative d'insertion d'élément NULL"
+			"dans la pile\n");
 		return;
 	}
 
-	s->data = malloc(S->num_bytes);
-	if(s->data == NULL){
+	ll_node->data = malloc(S->num_bytes);
+	if(ll_node->data == NULL){
 		fprintf(stderr, "Erreur allocation mémoire\n");
 		exit(-1);
 	}
-	memcpy(s->data, data, S->num_bytes);
+	memcpy(ll_node->data, data, S->num_bytes);
 
 	/* Ajout du nouvel élément en haut de la pile */
-	s->next = S->first;
-	S->first = s;
+	ll_node->next = S->head;
+	S->head = ll_node;
 }
 
 void Stack_pop(Stack *S, void *dest)
 {
-	stack_elt *tmp;
+	l_list_node *ll_node;
 	
-	if(S->first == NULL){
+	if(S->head == NULL){
 		printf("Pile vide\n");
 		return;
 	}
@@ -58,7 +59,7 @@ void Stack_pop(Stack *S, void *dest)
 	/* Suppression du premier élément de la pile */
 	tmp = S->first;
 	S->first = S->first->next;
-	free(tmp->data);
+ 	free(tmp->data);
 	free(tmp);
 }
 
