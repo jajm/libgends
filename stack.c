@@ -19,47 +19,60 @@ Stack * Stack_new(unsigned int num_bytes)
 }
 
 
-void Stack_push(Stack *S, void *data)
+int Stack_push(Stack *S, void *data)
 {
-	l_list_node *ll_node;
+	struct l_list_node *ll_node;
 
 	ll_node = malloc(sizeof(struct l_list_node));
 	if(ll_node == NULL){
 		fprintf(stderr, "Erreur allocation mémoire\n");
-		exit(-1);
+		return -1;
 	}
 	if(data == NULL){
 		fprintf(stderr, "Attention, tentative d'insertion d'élément NULL"
 			"dans la pile\n");
-		return;
+		return -1;
 	}
-
+	
 	ll_node->data = malloc(S->num_bytes);
 	if(ll_node->data == NULL){
 		fprintf(stderr, "Erreur allocation mémoire\n");
 		exit(-1);
 	}
+
+	/* Data copy */
 	memcpy(ll_node->data, data, S->num_bytes);
 
-	/* Ajout du nouvel élément en haut de la pile */
+	/* Push the newly created stack element to the top of the stack */
+	/* The top of the stack is the head of the list */
 	ll_node->next = S->head;
 	S->head = ll_node;
+
+	return 0;
 }
 
-void Stack_pop(Stack *S, void *dest)
+int Stack_pop(Stack *S, void *dest)
 {
-	l_list_node *ll_node;
+	struct l_list_node *ll_node;
 	
 	if(S->head == NULL){
 		printf("Pile vide\n");
-		return;
+		return -1;
 	}
-	memcpy(dest, S->first->data, S->num_bytes);
+	if(dest == NULL){
+		printf("dest == NULL\n");
+		return -1;
+	}
+
+	/* Data copy */
+	memcpy(dest, S->head->data, S->num_bytes);
 	
-	/* Suppression du premier élément de la pile */
-	tmp = S->first;
-	S->first = S->first->next;
- 	free(tmp->data);
-	free(tmp);
+	/* Pop (remove) the copied data from stack */
+	ll_node = S->head;
+	S->head = S->head->next;
+ 	free(ll_node->data);
+	free(ll_node);
+
+	return 0;
 }
 
