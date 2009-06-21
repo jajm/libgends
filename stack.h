@@ -1,13 +1,10 @@
 #ifndef __stack_h__
 #define __stack_h__
 
-typedef struct _stack_elt{
-	void *data;
-	struct _stack_elt *next;
-} stack_elt;
+#include "l_list.h"
 
 typedef struct{
-	stack_elt *first;
+	struct l_list_elt *head;
 	unsigned int num_bytes;
 } Stack;
 
@@ -16,4 +13,3 @@ void Stack_push(Stack *S, void *data);
 void Stack_pop(Stack *S, void *dest);
 
 #endif /* __stack_h__ */
-
