@@ -1,15 +1,35 @@
-#include "log.h"
+#include <stdio.h>
+#include <string.h>
+#include "generic.h"
+
+typedef struct{
+	int a, b;
+	char c;
+	double d;
+} truc;
 
 int main()
 {
-	set_def_logfilenames("info.log", "warn.log", "err.log", "all.log");
-	logger_init();
+	generic_t g, h;
+	truc a, b;
 
-	Err("aaaaaaaaaaaaah");
-	Warn("oooooooooooooh");
-	Info("eeeeeeeeeeeeeh");
+	a.a = 1; a.b = 2;
+	a.c = 'c'; a.d = 4.001;
 
-	logger_destroy();
+	generic_init(&g);
+	generic_init(&h);
+
+	generic_affect(&g, sizeof(truc), &a);
+	generic_copy(&h, &g);
+	b = *((truc *)generic_data(&h));
+
+	printf("size of h : %d Bytes\n", generic_size(&h));
+	printf("value of h :\n");
+	printf("\ta = %d\n\tb = %d\n\tc = %c\n\td = %f\n",
+		b.a, b.b, b.c, b.d);
+
+	generic_delete(&h);
+	generic_delete(&g);
 
 	return 0;
 }

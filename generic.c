@@ -1,15 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "generic.h"
 
-err_code generic_new(generic_t *g, u8 size)
+err_code generic_init(generic_t *g)
 {
-	if(g == NULL || size == 0)
+	if(g == NULL)
 		return PARAM_VALUE_ERROR;
-	g->d = malloc(size);
-	if(g->d == NULL)
-		return MEM_ALLOC_ERROR;
-	g->sz = size;
+	g->d = NULL;
+	g->sz = 0;
 
 	return OK;
 }
@@ -39,14 +38,14 @@ err_code generic_copy(generic_t *to, const generic_t *from)
 u8 generic_size(const generic_t *g)
 {
 	if(g == NULL)
-		return PARAM_VALUE_ERROR;
+		return -1;
 	return g->sz;
 }
 
 void *generic_data(const generic_t *g)
 {
 	if(g == NULL)
-		return PARAM_VALUE_ERROR;
+		return NULL;
 	return g->d;
 }
 
@@ -57,5 +56,7 @@ err_code generic_delete(generic_t *g)
 	free(g->d);
 	g->d = NULL;
 	g->sz = 0;
+
+	return OK;
 }
 

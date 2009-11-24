@@ -23,20 +23,18 @@ typedef struct{
 
 /*!
  * \brief Initialise une donnée générique
- *
- * Alloue la mémoire nécessaire à l'utilisation de cette donnée générique
  * \warning \a g doit avoir une zone mémoire allouée, sous peine de crash
  * immédiat ou, au mieux, de méchants bugs
+ * \warning Toute donnée générique doit être initialisée avant d'être utilisée
  * \param g Donnée générique à initialiser
- * \param size Taille de la donnée, en octets
  * \return Un code d'erreur comme défini dans err_code.h
  */
-err_code generic_new(generic_t *g, u8 size);
+err_code generic_init(generic_t *g);
 /*!
  * \brief Affecte une valeur à une donnée générique
  *
- * La mémoire est allouée (ou désallouée) au besoin, l'appel préalable à
- * generic_new() est donc facultatif.
+ * La mémoire est allouée (ou désallouée) au besoin, mais l'appel préalable à
+ * generic_init() est obligatoire
  * \warning \a g doit avoir une zone mémoire allouée, sous peine de crash
  * immédiat ou, au mieux, de méchants bugs
  * \param g Donnée générique à modifier
@@ -79,5 +77,5 @@ void *generic_data(const generic_t *g);
  */
 err_code generic_delete(generic_t *g);
 
-#endif /* Not __generic_h__
+#endif /* Not __generic_h__ */
 
