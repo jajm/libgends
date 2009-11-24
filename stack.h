@@ -9,6 +9,8 @@
 #ifndef __stack_h__
 #define __stack_h__
 
+#include "types.h"
+#include "err_code.h"
 #include "l_list.h"
 
 typedef struct{

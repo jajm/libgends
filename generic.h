@@ -30,11 +30,6 @@ typedef struct{
 generic_t generic(u8 size, void *data);
 /*!
  * \brief Affecte une valeur à une donnée générique
- *
- * La mémoire est allouée (ou désallouée) au besoin, mais l'appel préalable à
- * generic_init() est obligatoire
- * \warning \a g doit avoir une zone mémoire allouée, sous peine de crash
- * immédiat ou, au mieux, de méchants bugs
  * \param g Donnée générique à modifier
  * \param size Taille de la valeur à affecter
  * \param data Valeur à affecter
@@ -45,13 +40,27 @@ err_code generic_affect(generic_t *g, u8 size, void *data);
  * \brief Copie de donnée générique
  *
  * La fonction crée une copie parfaite de \a from dans \a to
- * \warning \a to doit avoir une zone mémoire allouée, sous peine de crash
- * immédiat ou, au mieux, de méchants bugs
  * \param to Destination de la copie
  * \param from Donnée générique à copie
  * \return Un code d'erreur comme défini dans err_code.h
  */
 err_code generic_copy(generic_t *to, generic_t from);
+/*!
+ * \brief Comparaison de deux données génériques
+ *
+ * Une donnée générique g1 est strictement plus grande qu'une donnée générique
+ * g2 si :
+ * <ul>
+ * <li>g1->sz = g2->sz ET *(g1->d) = *(g2->d)</li>
+ * <li>g1->sz \f$ \neq \f$ g2->sz ET g1->d[0..m] > g2->d[0..m], m =
+ * min{g1->sz,g2->sz}</li>
+ * </ul>
+ * \param g1 Première donnée générique
+ * \param g2 Deuxième donnée générique
+ * \retval 1 \a g1 = \a g2
+ * \retval 0 \a g1 \f$ \neq \f$ \a g2
+ */
+u8 generic_cmp(generic_t g1, generic_t g2);
 /*!
  * \brief Donne la taille d'une donnée générique
  * \param g Donnée générique dont la taille est voulue

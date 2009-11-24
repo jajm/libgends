@@ -1,34 +1,23 @@
 #include <stdio.h>
 #include <string.h>
 #include "generic.h"
-
-typedef struct{
-	int a, b;
-	char c;
-	double d;
-} truc;
+#include "l_list.h"
 
 int main()
 {
-	generic_t g = NULL, h = NULL;
-	truc a, b;
+	struct l_list_node *head = NULL;
+	generic_t g;
+	int a, b;
 
-	a.a = 1; a.b = 2;
-	a.c = 'c'; a.d = 4.001;
+	a = 1; b = 2;
 
-	g = generic(sizeof(truc), &a);
-	if(g == NULL) puts("a");
-	generic_copy(&h, g);
-	if(h == NULL) puts("b");
-	b = *((truc *)generic_data(h));
-
-	printf("size of h : %d Bytes\n", generic_size(h));
-	printf("value of h :\n");
-	printf("\ta = %d\n\tb = %d\n\tc = %c\n\td = %f\n",
-		b.a, b.b, b.c, b.d);
-
-	generic_free(&h);
+	llist_add(&head, -1, generic(sizeof(int), &a));
+	llist_add(&head, 0, generic(sizeof(int), &b));
+	
+	g = generic(sizeof(int), &a);
+	printf("a est a la position %d\n", llist_chk(head, g));
 	generic_free(&g);
+	llist_free(&head);
 
 	return 0;
 }

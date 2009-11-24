@@ -48,6 +48,36 @@ err_code generic_copy(generic_t *to, const generic_t from)
 	return generic_affect(to, from->sz, from->d);
 }
 
+u8 generic_cmp(generic_t g1, generic_t g2)
+{
+	/* S'ils sont tous les 2 à NULL, on dira qu'ils sont égaux */
+	if(g1 == NULL && g2 == NULL){
+		return 0;
+	/* Si l'un des deux est à NULL, c'est l'autre le plus grand */
+	}else if(g1 == NULL && g2 != NULL){
+		return -1;
+	}else if(g1 != NULL && g2 == NULL){
+		return 1;
+	/* Si aucun des 2 n'est à NULL, on compare d'abord la taille,
+	 * et ensuite la valeur des données */
+	}else if(g1 != NULL && g2 != NULL){
+		if(g1->sz == g2->sz){
+			return memcmp(g1->d, g2->d, g1->sz);
+		}else if(g1->sz < g2->sz){
+			if(memcmp(g1->d, g2->d, g1->sz) <= 0)
+				return -1;
+			else
+				return 1;
+		}else if(g1->sz > g2->sz){
+			if(memcmp(g1->d, g2->d, g2->sz) >= 0)
+				return 1;
+			else
+				return -1;
+		}
+	}
+	return 0;
+}
+
 u8 generic_size(const generic_t g)
 {
 	if(g == NULL)
