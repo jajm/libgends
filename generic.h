@@ -19,17 +19,15 @@
 typedef struct{
 	u8 sz;		/*!< Taille de la donnée, en octets */
 	void *d;	/*!< Pointeur vers la donnée */
-} generic_t;
+} *generic_t;
 
 /*!
- * \brief Initialise une donnée générique
- * \warning \a g doit avoir une zone mémoire allouée, sous peine de crash
- * immédiat ou, au mieux, de méchants bugs
- * \warning Toute donnée générique doit être initialisée avant d'être utilisée
- * \param g Donnée générique à initialiser
- * \return Un code d'erreur comme défini dans err_code.h
+ * \brief Crée une donnée générique à partir de ses arguments
+ * \param size Taille de la donnée
+ * \param data La donnée
+ * \return Un pointeur vers la structure nouvellement créée
  */
-err_code generic_init(generic_t *g);
+generic_t generic(u8 size, void *data);
 /*!
  * \brief Affecte une valeur à une donnée générique
  *
@@ -53,29 +51,27 @@ err_code generic_affect(generic_t *g, u8 size, void *data);
  * \param from Donnée générique à copie
  * \return Un code d'erreur comme défini dans err_code.h
  */
-err_code generic_copy(generic_t *to, const generic_t *from);
+err_code generic_copy(generic_t *to, generic_t from);
 /*!
  * \brief Donne la taille d'une donnée générique
  * \param g Donnée générique dont la taille est voulue
  * \return La taille de la donnée générique, en octets
  */
-u8 generic_size(const generic_t *g);
+u8 generic_size(const generic_t g);
 /*!
  * \brief Renvoie un pointeur vers la valeur de la donnée générique
  * \param g Donnée générique dont la valeur est voulue
  * \return Un pointeur vers la valeur de la donnée générique
  */
-void *generic_data(const generic_t *g);
+void *generic_data(const generic_t g);
 /*!
- * \brief Réinitialise la donnée générique à zéro
+ * \brief Libère la mémoire
  *
- * Libère la mémoire et réinitialise la taille à zéro
- * \warning \a g doit avoir une zone mémoire allouée, sous peine de crash
- * immédiat ou, au mieux, de méchants bugs
- * \param g Donnée générique à réinitialiser
+ * Libère la mémoire
+ * \param g Donnée générique à libérer
  * \return Un code d'erreur comme défini dans err_code.h
  */
-err_code generic_delete(generic_t *g);
+err_code generic_free(generic_t *g);
 
 #endif /* Not __generic_h__ */
 

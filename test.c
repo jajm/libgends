@@ -10,26 +10,25 @@ typedef struct{
 
 int main()
 {
-	generic_t g, h;
+	generic_t g = NULL, h = NULL;
 	truc a, b;
 
 	a.a = 1; a.b = 2;
 	a.c = 'c'; a.d = 4.001;
 
-	generic_init(&g);
-	generic_init(&h);
+	g = generic(sizeof(truc), &a);
+	if(g == NULL) puts("a");
+	generic_copy(&h, g);
+	if(h == NULL) puts("b");
+	b = *((truc *)generic_data(h));
 
-	generic_affect(&g, sizeof(truc), &a);
-	generic_copy(&h, &g);
-	b = *((truc *)generic_data(&h));
-
-	printf("size of h : %d Bytes\n", generic_size(&h));
+	printf("size of h : %d Bytes\n", generic_size(h));
 	printf("value of h :\n");
 	printf("\ta = %d\n\tb = %d\n\tc = %c\n\td = %f\n",
 		b.a, b.b, b.c, b.d);
 
-	generic_delete(&h);
-	generic_delete(&g);
+	generic_free(&h);
+	generic_free(&g);
 
 	return 0;
 }
