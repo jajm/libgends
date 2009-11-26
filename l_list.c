@@ -41,7 +41,9 @@ err_code llist_del(struct l_list_node **head, s16 pos)
 	
 	if(head == NULL || *head == NULL || pos < -1)
 		return PARAM_VALUE_ERROR;
-	if(pos == 0){
+	if(pos == 0 || (*head)->next == NULL){
+		/* Suppression du premier élément ou du dernier
+		 * quand la liste ne contient qu'un seul élément */
 		tmp = *head;
 		*head = tmp->next;
 		generic_free(&(tmp->d));
@@ -50,13 +52,20 @@ err_code llist_del(struct l_list_node **head, s16 pos)
 		tmp = *head;
 		i = 1;
 		while(tmp->next != NULL && i != pos){
+			tmp2 = tmp;
 			tmp = tmp->next;
 			i++;
 		}
-		tmp2 = tmp->next;
-		tmp->next = tmp2->next;
-		generic_free(&(tmp2->d));
-		free(tmp2);
+		if(tmp->next != NULL){
+			tmp2 = tmp->next;
+			tmp->next = tmp2->next;
+			generic_free(&(tmp2->d));
+			free(tmp2);
+		}else{
+			tmp2->next = NULL;
+			generic_free(&(tmp->d));
+			free(tmp);
+		}
 	}
 	return OK;
 
@@ -94,6 +103,18 @@ s16 llist_chk(struct l_list_node *head, generic_t data)
 		return -1;
 
 	return pos;
+}
+
+void llist_print(struct l_list_node *head)
+{
+	struct l_list_node *tmp;
+
+	tmp = head;
+	while(tmp != NULL){
+		printf("%p -> ", tmp->d);
+		tmp = tmp->next;
+	}
+	printf("NULL\n");
 }
 
 err_code llist_free(struct l_list_node **head)

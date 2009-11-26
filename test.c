@@ -6,17 +6,25 @@
 int main()
 {
 	struct l_list_node *head = NULL;
-	generic_t g;
-	int a, b;
+	int a, b, c;
 
-	a = 1; b = 2;
+	a = 1; b = 2; c = 3;
 
 	llist_add(&head, -1, generic(sizeof(int), &a));
-	llist_add(&head, 0, generic(sizeof(int), &b));
+	llist_add(&head, -1, generic(sizeof(int), &b));
+	llist_add(&head, -1, generic(sizeof(int), &c));
 	
-	g = generic(sizeof(int), &a);
-	printf("a est a la position %d\n", llist_chk(head, g));
-	generic_free(&g);
+	llist_print(head);
+
+	llist_del(&head, 1);
+	llist_print(head);
+	llist_del(&head, 1);
+	llist_print(head);
+	llist_del(&head, 1);
+	llist_print(head);
+	llist_del(&head, 1);
+	llist_print(head);
+
 	llist_free(&head);
 
 	return 0;

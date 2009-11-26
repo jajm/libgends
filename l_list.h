@@ -35,7 +35,14 @@ err_code llist_add(struct l_list_node **head, s16 pos, generic_t data);
 /*!
  * \brief Suppression d'un élément d'une liste
  * \param head Adresse du pointeur de tête d'une liste
- * \param pos Position de l'élément à supprimer (voir llist_add)
+ * \param pos Position de l'élément à supprimer. \a pos peut prendre les valeurs
+ * suivantes :
+ * <ul>
+ * <li>-1: Suppression du dernier élément</li>
+ * <li>0: Suppression du premier élément</li>
+ * <li>x: Suppression du x-ième élément, si x > taille(liste), suppression du
+ * dernier élément</li>
+ * </ul>
  * \return Un code d'erreur comme défini dans err_code.h
  */
 err_code llist_del(struct l_list_node **head, s16 pos);
@@ -59,6 +66,14 @@ generic_t llist_get(struct l_list_node *head, s16 pos);
  * \return -1 si l'élement recherché n'est pas dans la liste
  */
 s16 llist_chk(struct l_list_node *head, generic_t data);
+/*!
+ * \brief Affiche une liste
+ *
+ * Affiche la valeur des pointeurs dans l'ordre de la liste.
+ * Fonction test.
+ * \param head Pointeur de tête de la liste
+ */
+void llist_print(struct l_list_node *head);
 /*!
  * \brief Libération de la mémoire
  * \param head Adresse du pointeur de tête d'une liste
