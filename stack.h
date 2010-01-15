@@ -11,10 +11,10 @@
 
 #include "types.h"
 #include "err_code.h"
-#include "l_list.h"
+#include "llist.h"
 
 typedef struct{
-	struct l_list_node *head;
+	vw_llist head;
 	unsigned int num_bytes;
 } Stack;
 

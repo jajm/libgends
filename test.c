@@ -1,28 +1,30 @@
 #include <stdio.h>
 #include <string.h>
 #include "generic.h"
-#include "l_list.h"
+#include "llist.h"
 
 int main()
 {
-	struct l_list_node *head = NULL;
+	llist head = NULL;
 	int a, b, c;
 
 	a = 1; b = 2; c = 3;
 
-	llist_add(&head, -1, generic(sizeof(int), &a));
-	llist_add(&head, -1, generic(sizeof(int), &b));
-	llist_add(&head, -1, generic(sizeof(int), &c));
+	head = llist_new(sizeof(int));
+
+	llist_add(head, -1, &a);
+	llist_add(head, -1, &b);
+	llist_add(head, -1, &c);
 	
 	llist_print(head);
 
-	llist_del(&head, 1);
+	llist_del(head, 1);
 	llist_print(head);
-	llist_del(&head, 1);
+	llist_del(head, 1);
 	llist_print(head);
-	llist_del(&head, 1);
+	llist_del(head, 1);
 	llist_print(head);
-	llist_del(&head, 1);
+	llist_del(head, 1);
 	llist_print(head);
 
 	llist_free(&head);

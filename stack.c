@@ -21,7 +21,7 @@ Stack * Stack_new(unsigned int num_bytes)
 
 err_code Stack_push(Stack *S, void *data)
 {
-	return llist_add(&(S->head), 0, generic(S->num_bytes, data));
+	return vw_llist_add(&(S->head), 0, generic(S->num_bytes, data));
 }
 
 err_code Stack_pop(Stack *S, void *dest)
@@ -32,11 +32,11 @@ err_code Stack_pop(Stack *S, void *dest)
 		return PARAM_VALUE_ERROR;
 
 	/* Data copy */
-	g = llist_get(S->head, 0);
+	g = vw_llist_get(S->head, 0);
 	memmove(dest, generic_data(g), S->num_bytes);
 	
 	/* Pop (remove) the copied data from stack */
-	llist_del(&(S->head), 0);
+	vw_llist_del(&(S->head), 0);
 
 	return 0;
 }
