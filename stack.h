@@ -13,16 +13,25 @@
 #include "err_code.h"
 #include "llist.h"
 
+typedef  stack_type_t;
+
 typedef struct{
-	vw_llist head;
-	unsigned int num_bytes;
+	enum{
+		FIXED_WIDTH,
+		VARIABLE_WIDTH
+	} type;
+	union{
+		vw_llist vw;	/* Variable-width list */
+		llist fw;	/* Fixed-width list */
+	} list;
 } Stack;
 
 /* Create a new stack.
  * num_bytes	: size of a stack element
  * Returns the adress of the newly created Stack
  */
-Stack * Stack_new(unsigned int num_bytes);
+Stack * Stack_new(u32 width);
+Stack * Stack_new_vw(void);
 
 /* Push data into stack
  * S	: Stack adress
