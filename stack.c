@@ -3,41 +3,19 @@
 #include <string.h>
 #include "stack.h"
 
-Stack * Stack_new(unsigned int num_bytes)
+Stack Stack_new(u32 width)
 {
-	Stack *S;
-
-	S = malloc(sizeof(Stack));
-	if(S == NULL){
-		fprintf(stderr, "Erreur allocation mémoire\n");
-		exit(-1);
-	}
-	S->head = NULL;
-	S->num_bytes = num_bytes;
-
-	return S;
+	return NULL;
 }
 
 
-err_code Stack_push(Stack *S, void *data)
+err_code Stack_push(Stack S, void *data)
 {
-	return vw_llist_add(&(S->head), 0, generic(S->num_bytes, data));
+	return OK;
 }
 
-err_code Stack_pop(Stack *S, void *dest)
+err_code Stack_pop(Stack S, void *dest)
 {
-	generic_t g;
-	
-	if(S->head == NULL || dest == NULL)
-		return PARAM_VALUE_ERROR;
-
-	/* Data copy */
-	g = vw_llist_get(S->head, 0);
-	memmove(dest, generic_data(g), S->num_bytes);
-	
-	/* Pop (remove) the copied data from stack */
-	vw_llist_del(&(S->head), 0);
-
-	return 0;
+	return OK;
 }
 

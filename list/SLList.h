@@ -7,11 +7,11 @@
 
 typedef struct{
 	union{
-		struct fw_sllist fw;
-		struct vw_sllist vw;
+		fw_sllist fw;
+		vw_sllist vw;
 	} list;
 	llist_type_t type;
-} SLList;
+} *SLList;
 
 #endif /* Not __SLList_h__ */
 
