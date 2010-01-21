@@ -1,8 +1,8 @@
 export CC = gcc
 export CFLAGS = -g -Wall -Wextra -std=c99
-export INCLUDE := -I$(CURDIR) -I$(CURDIR)/list
+export INCLUDES := -I$(CURDIR) -I$(CURDIR)/list
 DIRS = list
-SRC = $(wildcard *.c list/*.c)
+SRC = $(wildcard *.c $(foreach dir, $(DIRS), $(dir)/*.c))
 OBJ = $(SRC:.c=.o)
 EXEC = test
 
@@ -15,7 +15,7 @@ test: $(OBJ)
 	$(CC) -o $@ $^
 
 %.o:%.c
-	$(CC) $(INCLUDE) $(CFLAGS) -o $@ -c $<
+	$(CC) $(INCLUDES) $(CFLAGS) -o $@ -c $<
 
 .PHONY: clean $(DIRS)
 

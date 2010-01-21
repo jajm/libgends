@@ -4,7 +4,7 @@ OBJ = $(SRC:.c=.o)
 all: $(OBJ)
 
 %.o: %.c
-	$(CC) $(INCLUDE) $(CFLAGS) -o $@ -c $<
+	$(CC) $(INCLUDES) $(CFLAGS) -o $@ -c $<
 
 clean:
 	rm -rf $(OBJ)

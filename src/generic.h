@@ -16,7 +16,7 @@
  *
  * Type de données générique, ie de taille variable
  */
-typedef struct{
+typedef struct _generic_t{
 	u8 sz;		/*!< Taille de la donnée, en octets */
 	void *d;	/*!< Pointeur vers la donnée */
 } *generic_t;
