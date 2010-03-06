@@ -6,15 +6,15 @@
 
 int main()
 {
-	struct error_t *error;
+	error_ptr error = NULL;
 	
-	error = malloc(sizeof(struct error_t));
-	error_init(error);
+	error_init(&error);
 
-	error_set(error, -4, "Une erreur pas banale");
+	error_set(&error, -4, "Une erreur pas banale");
+	error_set(&error, 2, "Une autre erreur");
 
 	error_print(error);
-	error_free(error);
+	error_free(&error);
 
 	return 0;
 }

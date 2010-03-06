@@ -3,59 +3,77 @@
 #include <string.h>
 #include "error.h"
 
-void error_init(struct error_t *err)
+void error_init(error_ptr *err)
 {
+	struct error_t *tmp;
+
 	if(err != NULL){
-		err->errno = 0;
-		err->errmsg = NULL;
-		err->file = NULL;
-		err->function = NULL;
-		err->line = 0;
+		tmp = *err;
+		if(tmp == NULL){
+			tmp = malloc(sizeof(struct error_t));
+			if(tmp){
+				tmp->errno = 0;
+				tmp->errmsg = NULL;
+				tmp->file = NULL;
+				tmp->function = NULL;
+				tmp->line = 0;
+			}
+			*err = tmp;
+		}else{
+			tmp->errno = 0;
+			tmp->errmsg = NULL;
+			tmp->file = NULL;
+			tmp->function = NULL;
+			tmp->line = 0;
+		}
 	}
 }
 
-void _error_set(struct error_t *err, s32 errno, const char *errmsg,
+void _error_set(error_ptr *err, s32 errno, const char *errmsg,
 	const char *file, const char *function, u32 line)
 {
 	size_t len;
+	struct error_t *tmp;
 
 	if(err != NULL){
-		err->errno = errno;
+		if(*err == NULL) error_init(err);
+		tmp = *err;
+		tmp->errno = errno;
 		if(errmsg != NULL){
 			len = strlen(errmsg);
-			err->errmsg = realloc(err->errmsg, len+1);
-			if(err->errmsg != NULL){
-				strncpy(err->errmsg, errmsg, len+1);
+			tmp->errmsg = realloc(tmp->errmsg, len+1);
+			if(tmp->errmsg != NULL){
+				strncpy(tmp->errmsg, errmsg, len+1);
 			}
 		}else{
-			free(err->errmsg);
-			err->errmsg = NULL;
+			free(tmp->errmsg);
+			tmp->errmsg = NULL;
 		}
 		if(file != NULL){
 			len = strlen(file);
-			err->file = realloc(err->file, len+1);
-			if(err->file != NULL){
-				strncpy(err->file, file, len+1);
+			tmp->file = realloc(tmp->file, len+1);
+			if(tmp->file != NULL){
+				strncpy(tmp->file, file, len+1);
 			}
 		}else{
-			free(err->file);
-			err->file = NULL;
+			free(tmp->file);
+			tmp->file = NULL;
 		}
 		if(function != NULL){
 			len = strlen(function);
-			err->function = realloc(err->function, len+1);
-			if(err->function != NULL){
-				strncpy(err->function, function, len+1);
+			tmp->function = realloc(tmp->function, len+1);
+			if(tmp->function != NULL){
+				strncpy(tmp->function, function, len+1);
 			}
 		}else{
-			free(err->function);
-			err->function = NULL;
+			free(tmp->function);
+			tmp->function = NULL;
 		}
-		err->line = line;
+		tmp->line = line;
 	}
 }
 
-void error_print(struct error_t *err)
+void error_print(const error_ptr err)
 {
 	if(err != NULL){
 		printf("Error (%d) ", err->errno);
@@ -71,12 +89,14 @@ void error_print(struct error_t *err)
 	}
 }
 
-void error_free(struct error_t *err)
+void error_free(error_ptr *err)
 {
-	if(err != NULL){
-		free(err->errmsg);
-		free(err->file);
-		free(err->function);
-		free(err);
+	if(err != NULL && *err != NULL){
+		free((*err)->errmsg);
+		free((*err)->file);
+		free((*err)->function);
+		free(*err);
 	}
+	*err = NULL;
 }
+
