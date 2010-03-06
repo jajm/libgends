@@ -156,6 +156,25 @@ u32 type_sizeof(const char *type_name)
 	return type_size;
 }
 
+void type_free(void)
+{
+	u32 i;
+	struct type_t *tmp, *tmp2;
+
+	for(i=0; i<HT_SIZE; i++){
+		if(g_types[i] != NULL){
+			tmp = g_types[i];
+			while(tmp != NULL){
+				tmp2 = tmp->next;
+				free(tmp);
+				tmp = tmp2;
+			}
+			g_types[i] = NULL;
+		}
+	}
+}
+
+
 void type_print(void)
 {
 	u32 i;

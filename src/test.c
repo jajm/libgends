@@ -2,25 +2,18 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stddef.h>
-#include "types.h"
+#include "error.h"
 
 int main()
 {
-	type_init();
-
-	type_reg("GROSSE STRUCTURE", 455);
-	type_reg(NULL, 4);
-	type_reg("ptite struct", 0);
+	struct error_t *error;
 	
-	type_print();
-	printf("\n");
-	
-	type_unreg("s16");
-	type_unreg("u16");
-	type_unreg("n'existe pas");
-	type_unreg("string");
+	error = malloc(sizeof(struct error_t));
+	error_init(error);
 
-	type_print();
+	error_set(error, -4, "Une erreur pas banale");
+
+	error_print(error);
 
 	return 0;
 }

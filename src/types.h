@@ -25,6 +25,11 @@ s8 type_reg(const char *type_name, u32 type_size);
 s8 type_unreg(const char *type_name);
 /* Obtenir la taille d'un type existant */
 u32 type_sizeof(const char *type_name);
+/* Détruire tous les types */
+void type_free(void);
+
+/* For debugging purposes */
+void type_print(void);
 
 
 #endif /* Not __types_h__ */
