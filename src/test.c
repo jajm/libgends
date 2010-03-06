@@ -2,26 +2,25 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stddef.h>
-#include "generic.h"
-#include "SLList.h"
+#include "types.h"
 
 int main()
 {
-	generic_t truc, plop;
-	void *machin;
-	char *hoho = "abcdef";
+	type_init();
 
-	truc = generic(20, "ahahahahahahahahahahahahha");
-	machin = malloc(8);
-	memcpy(machin, hoho, 8);
-	plop = machin;
-	printf("sizeof(struct _generic_t) = %d\n", sizeof(struct
-	_generic_t));
+	type_reg("GROSSE STRUCTURE", 455);
+	type_reg(NULL, 4);
+	type_reg("ptite struct", 0);
+	
+	type_print();
+	printf("\n");
+	
+	type_unreg("s16");
+	type_unreg("u16");
+	type_unreg("n'existe pas");
+	type_unreg("string");
 
-	printf("sizeof(truc) = %d\n", sizeof(truc));
-	printf("sizeof(*truc) = %d\n", sizeof(double));
-	printf("sizeof(machin) = %d\n", sizeof(machin));
-	printf("sizeof(*machin) = %d\n", sizeof(*machin));
+	type_print();
 
 	return 0;
 }

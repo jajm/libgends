@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "types.h"
@@ -84,14 +85,14 @@ s8 type_reg(const char *type_name, u32 type_size)
 		}
 		tmp2->next = malloc(sizeof(struct type_t));
 		if(tmp2->next){
-			tmp2->type_name = malloc(length+1);
-			if(tmp2->type_name){
-				strncpy(tmp2->type_name, type_name, length+1);
+			tmp2->next->type_name = malloc(length+1);
+			if(tmp2->next->type_name){
+				strncpy(tmp2->next->type_name, type_name, length+1);
 			}else{
 				free(tmp2->next);
 				return -1;
 			}
-			tmp2->type_size = type_size;
+			tmp2->next->type_size = type_size;
 		}else{
 			return -1;
 		}
@@ -153,4 +154,22 @@ u32 type_sizeof(const char *type_name)
 	}
 
 	return type_size;
+}
+
+void type_print(void)
+{
+	u32 i;
+	struct type_t *tmp;
+
+	for(i=0; i<HT_SIZE; i++){
+		tmp = g_types[i];
+		if(tmp) printf("[%d]", i);
+		while(tmp != NULL){
+			printf("\ttype_name(\"%s\"), type_size(\"%d\"), "
+				"sizeof(\"%d\")\n",
+				tmp->type_name, tmp->type_size,
+				type_sizeof(tmp->type_name));
+			tmp = tmp->next;
+		}
+	}
 }
