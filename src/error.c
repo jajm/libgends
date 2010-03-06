@@ -70,3 +70,13 @@ void error_print(struct error_t *err)
 			printf("No error message specified\n");
 	}
 }
+
+void error_free(struct error_t *err)
+{
+	if(err != NULL){
+		free(err->errmsg);
+		free(err->file);
+		free(err->function);
+		free(err);
+	}
+}

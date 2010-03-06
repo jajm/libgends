@@ -24,6 +24,8 @@ void _error_set(struct error_t *err, s32 errno, const char *errmsg,
  * Error (errno) in function at file:line: errmsg */
 void error_print(struct error_t *err);
 
+void error_free(struct error_t *err);
+
 
 #endif /* Not __error_h__ */
 

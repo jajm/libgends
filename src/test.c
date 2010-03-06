@@ -14,6 +14,7 @@ int main()
 	error_set(error, -4, "Une erreur pas banale");
 
 	error_print(error);
+	error_free(error);
 
 	return 0;
 }
