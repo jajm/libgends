@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 #include "error.h"
 
 void error_init(error_ptr *err)
@@ -29,26 +30,18 @@ void error_init(error_ptr *err)
 	}
 }
 
-void _error_set(error_ptr *err, s32 errno, const char *errmsg,
-	const char *file, const char *function, u32 line)
+void _error_set(error_ptr *err, s32 errno, const char *file,
+	const char *function, u32 line, const char *errmsg, ...)
 {
 	size_t len;
 	struct error_t *tmp;
+	char buffer[1024];
+	va_list vl;
 
 	if(err != NULL){
 		if(*err == NULL) error_init(err);
 		tmp = *err;
 		tmp->errno = errno;
-		if(errmsg != NULL){
-			len = strlen(errmsg);
-			tmp->errmsg = realloc(tmp->errmsg, len+1);
-			if(tmp->errmsg != NULL){
-				strncpy(tmp->errmsg, errmsg, len+1);
-			}
-		}else{
-			free(tmp->errmsg);
-			tmp->errmsg = NULL;
-		}
 		if(file != NULL){
 			len = strlen(file);
 			tmp->file = realloc(tmp->file, len+1);
@@ -70,6 +63,18 @@ void _error_set(error_ptr *err, s32 errno, const char *errmsg,
 			tmp->function = NULL;
 		}
 		tmp->line = line;
+		if(errmsg != NULL){
+			va_start(vl, errmsg);
+			len = vsprintf(buffer, errmsg, vl);
+			va_end(vl);
+			tmp->errmsg = realloc(tmp->errmsg, len+1);
+			if(tmp->errmsg != NULL){
+				strncpy(tmp->errmsg, buffer, len+1);
+			}
+		}else{
+			free(tmp->errmsg);
+			tmp->errmsg = NULL;
+		}
 	}
 }
 

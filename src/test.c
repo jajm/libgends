@@ -2,20 +2,32 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stddef.h>
+#include "types.h"
 #include "error.h"
+#include "generic.h"
 
 int main()
 {
 	error_ptr error = NULL;
-	
+	generic_ptr gen;
+	s8 c = 'c';
+	s8 d;
+
+	type_init();
 	error_init(&error);
 
-	error_set(&error, -4, "Une erreur pas banale");
-	error_set(&error, 2, "Une autre erreur");
-
-	error_print(error);
-	error_free(&error);
-
+	gen = generic("test", &c, &error);
+	if(!gen){
+		error_print(error);
+		return error->errno;
+	}
+	d = *(s8*)(gen->data_ptr);
+	if(d == 'c'){
+		printf("Donnée récupérée avec succès!\n");
+	}else{
+		printf("Un problème est survenu...\n");
+	}
+	
 	return 0;
 }
 
