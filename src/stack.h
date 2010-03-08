@@ -29,13 +29,13 @@ Stack Stack_new_vw(void);
  * data	: data adress
  * Returns a negative value if an error occurs, 0 otherwise.
  */
-int Stack_push(Stack S, void *data);
+s8 Stack_push(Stack S, void *data);
 
 /* Pop data from stack
  * S	: Stack adress
  * dest	: adress of an allocated memory block where data will be copied
  * Returns a negative value if an error occurs, 0 otherwise.
  */
-int Stack_pop(Stack S, void *dest);
+s8 Stack_pop(Stack S, void *dest);
 
 #endif /* __stack_h__ */

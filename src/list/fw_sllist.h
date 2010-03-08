@@ -2,8 +2,8 @@
 #define __fw_sllist_h__
 
 #include "types.h"
-#include "generic.h"
 #include "err_code.h"
+#include "generic.h"
 #include "llist.h"
 
 /************************************************
@@ -22,12 +22,12 @@ typedef struct _fw_sllist{
 
 
 fw_sllist fw_sllist_new(u32 width);
-err_code fw_sllist_add(fw_sllist l, llist_pos_t pos, void *data);
-err_code fw_sllist_del(fw_sllist l, llist_pos_t pos);
+s8 fw_sllist_add(fw_sllist l, llist_pos_t pos, void *data);
+s8 fw_sllist_del(fw_sllist l, llist_pos_t pos);
 void *fw_sllist_get(fw_sllist l, llist_pos_t pos);
 llist_pos_t fw_sllist_chk(fw_sllist l, void *data);
 void fw_sllist_print(fw_sllist l);
-err_code fw_sllist_free(fw_sllist *l);
+s8 fw_sllist_free(fw_sllist *l);
 
 #endif /* Not __fw_sllist_h__ */
 

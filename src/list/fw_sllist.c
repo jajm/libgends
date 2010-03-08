@@ -15,22 +15,22 @@ fw_sllist fw_sllist_new(u32 width)
 	return l;
 }
 
-err_code fw_sllist_add(fw_sllist l, llist_pos_t pos, void *data)
+s8 fw_sllist_add(fw_sllist l, llist_pos_t pos, void *data)
 {
 	struct fw_sllist_node *tmp, *tmp2;
 	llist_pos_t i;
 
 	if(l == NULL || pos < -1 || data == NULL)
-		return PARAM_VALUE_ERROR;
+		return ERR_PARAM;
 	
 	if(l->head == NULL || pos == 0){
 		tmp = malloc(sizeof(struct fw_sllist_node));
 		if(tmp == NULL)
-			return MEM_ALLOC_ERROR;
+			return ERR_MALLOC;
 		tmp->d = malloc(l->width);
 		if(tmp->d == NULL){
 			free(tmp);
-			return MEM_ALLOC_ERROR;
+			return ERR_MALLOC;
 		}
 		memmove(tmp->d, data, l->width);
 		tmp->next = l->head;
@@ -44,11 +44,11 @@ err_code fw_sllist_add(fw_sllist l, llist_pos_t pos, void *data)
 		}
 		tmp2 = malloc(sizeof(struct fw_sllist_node));
 		if(tmp2 == NULL)
-			return MEM_ALLOC_ERROR;
+			return ERR_MALLOC;
 		tmp2->d = malloc(l->width);
 		if(tmp2->d == NULL){
 			free(tmp2);
-			return MEM_ALLOC_ERROR;
+			return ERR_MALLOC;
 		}
 		memmove(tmp2->d, data, l->width);
 		tmp2->next = tmp->next;
@@ -57,13 +57,13 @@ err_code fw_sllist_add(fw_sllist l, llist_pos_t pos, void *data)
 	return OK;
 }
 
-err_code fw_sllist_del(fw_sllist l, llist_pos_t pos)
+s8 fw_sllist_del(fw_sllist l, llist_pos_t pos)
 {
 	struct fw_sllist_node *tmp, *tmp2;
 	llist_pos_t i;
 
 	if(l == NULL || l->head == NULL || pos < -1)
-		return PARAM_VALUE_ERROR;
+		return ERR_PARAM;
 	if(pos == 0 || l->head->next == NULL){
 		tmp = l->head;
 		l->head = tmp->next;
@@ -139,12 +139,12 @@ void fw_sllist_print(fw_sllist l)
 	printf("NULL\n");
 }
 
-err_code fw_sllist_free(fw_sllist *l)
+s8 fw_sllist_free(fw_sllist *l)
 {
 	struct fw_sllist_node *tmp, *tmp2;
 
 	if(l == NULL || *l == NULL)
-		return PARAM_VALUE_ERROR;
+		return ERR_PARAM;
 	tmp = (*l)->head;
 	while(tmp != NULL){
 		tmp2 = tmp->next;

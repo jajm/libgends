@@ -1,5 +1,5 @@
-#ifndef __log_h__
-#define __log_h__
+#ifndef __logger_h__
+#define __logger_h__
 
 #include <stdio.h>
 
@@ -10,33 +10,11 @@
 #define Warn(fmt) logger(Warning, WHERESTR fmt "\n", WHEREARG)
 #define Info(fmt) logger(Info, WHERESTR fmt "\n", WHEREARG)
 
-/* Names of files which will be used for logging */
-struct logfilenames{
-	char *info;
-	char *warn;
-	char *err;
-	char *all;
-};
-
-/* FILE structures corresponding to `logfilenames` */
-struct logfiles{
-	FILE *info;
-	FILE *warn;
-	FILE *err;
-	FILE *all;
-};
-
 enum loglevel{
 	Info,
 	Warning,
 	Error
 };
-
-/* Global Variables */
-struct logfilenames def_logfn;
-struct logfiles def_logf;
-
-/* Logging functions */
 
 /* Set default log filenames */
 int set_def_logfilenames(const char *info, const char *warn, const char *err,
@@ -47,5 +25,5 @@ int logger_destroy(void);
 
 int logger(enum loglevel level, const char *fmt, ...);
 
-#endif /* Not __log_h__ */
+#endif /* Not __logger_h__ */
 

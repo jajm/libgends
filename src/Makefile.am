@@ -1,13 +1,15 @@
 AM_CPPFLAGS = -Ilist
 AM_CFLAGS = -Wall -Wextra -std=c99
 
+SUBDIRS = list
+
 bin_PROGRAMS = test
 
-test_SOURCES = list/fw_sllist.c list/fw_sllist.h \
-		list/vw_sllist.c list/vw_sllist.h \
-		list/llist.h \
-		list/SLList.h \
-		types.h \
-		err_code.h \
+test_SOURCES = types.c types.h \
+		error.c error.h \
 		generic.c generic.h \
+		logger.c logger.h \
+		stack.c stack.h \
 		test.c
+
+test_LDADD = list/liblist.a

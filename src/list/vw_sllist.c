@@ -3,18 +3,18 @@
 #include <string.h>
 #include "vw_sllist.h"
 
-err_code vw_sllist_add(vw_sllist *l, llist_pos_t pos, generic_t data)
+s8 vw_sllist_add(vw_sllist *l, llist_pos_t pos, generic_ptr data)
 {
 	struct vw_sllist_node *tmp, *tmp2;
 	llist_pos_t i;
 
 	if(l == NULL || pos < -1 || data == NULL)
-		return PARAM_VALUE_ERROR;
+		return ERR_PARAM;
 	/* Création d'une nouvelle liste ou ajout en première position */
 	if(*l == NULL || pos == 0){
 		tmp = malloc(sizeof(struct vw_sllist_node));
 		if(tmp == NULL)
-			return MEM_ALLOC_ERROR;
+			return ERR_MALLOC;
 		tmp->d = data;
 		tmp->next = *l;
 		*l = tmp;
@@ -27,7 +27,7 @@ err_code vw_sllist_add(vw_sllist *l, llist_pos_t pos, generic_t data)
 		}
 		tmp2 = malloc(sizeof(struct vw_sllist_node));
 		if(tmp2 == NULL)
-			return MEM_ALLOC_ERROR;
+			return ERR_MALLOC;
 		tmp2->d = data;
 		tmp2->next = tmp->next;
 		tmp->next = tmp2;
@@ -35,13 +35,13 @@ err_code vw_sllist_add(vw_sllist *l, llist_pos_t pos, generic_t data)
 	return OK;
 }
 
-err_code vw_sllist_del(vw_sllist *l, llist_pos_t pos)
+s8 vw_sllist_del(vw_sllist *l, llist_pos_t pos)
 {
 	struct vw_sllist_node *tmp, *tmp2;
 	llist_pos_t i;
 	
 	if(l == NULL || *l == NULL || pos < -1)
-		return PARAM_VALUE_ERROR;
+		return ERR_PARAM;
 	if(pos == 0 || (*l)->next == NULL){
 		/* Suppression du premier élément ou du dernier
 		 * quand la liste ne contient qu'un seul élément */
@@ -72,7 +72,7 @@ err_code vw_sllist_del(vw_sllist *l, llist_pos_t pos)
 
 }
 
-generic_t vw_sllist_get(vw_sllist l, llist_pos_t pos)
+generic_ptr vw_sllist_get(vw_sllist l, llist_pos_t pos)
 {
 	struct vw_sllist_node *tmp;
 	llist_pos_t i;
@@ -89,7 +89,7 @@ generic_t vw_sllist_get(vw_sllist l, llist_pos_t pos)
 	return tmp->d;
 }
 
-llist_pos_t vw_sllist_chk(vw_sllist l, generic_t data)
+llist_pos_t vw_sllist_chk(vw_sllist l, generic_ptr data)
 {
 	struct vw_sllist_node *tmp;
 	llist_pos_t pos;
@@ -118,12 +118,12 @@ void vw_sllist_print(vw_sllist l)
 	printf("NULL\n");
 }
 
-err_code vw_sllist_free(vw_sllist *l)
+s8 vw_sllist_free(vw_sllist *l)
 {
 	struct vw_sllist_node *tmp, *tmp2;
 
 	if(l == NULL || *l == NULL)
-		return PARAM_VALUE_ERROR;
+		return ERR_PARAM;
 	tmp = *l;
 	while(tmp != NULL){
 		tmp2 = tmp->next;

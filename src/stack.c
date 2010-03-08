@@ -9,12 +9,12 @@ Stack Stack_new(u32 width)
 }
 
 
-err_code Stack_push(Stack S, void *data)
+s8 Stack_push(Stack S, void *data)
 {
 	return OK;
 }
 
-err_code Stack_pop(Stack S, void *dest)
+s8 Stack_pop(Stack S, void *dest)
 {
 	return OK;
 }

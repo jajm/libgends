@@ -2,7 +2,28 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
-#include "log.h"
+#include "logger.h"
+
+/* Names of files which will be used for logging */
+struct logfilenames{
+	char *info;
+	char *warn;
+	char *err;
+	char *all;
+};
+
+/* FILE structures corresponding to `logfilenames` */
+struct logfiles{
+	FILE *info;
+	FILE *warn;
+	FILE *err;
+	FILE *all;
+};
+
+/* Global Variables */
+struct logfilenames def_logfn;
+struct logfiles def_logf;
+
 
 int set_def_logfilenames(const char *info, const char *warn, const char *err,
 	const char *all)

@@ -16,7 +16,7 @@
  * commençant par 'vw_llist' (pour variable-width linked-list)
  */
 struct vw_sllist_node{
-	generic_t d;			/*!< La donnée, de type générique */
+	generic_ptr d;			/*!< La donnée, de type générique */
 	struct vw_sllist_node *next;	/*!< Noeud suivant */
 };
 
@@ -33,7 +33,7 @@ typedef struct vw_sllist_node *vw_sllist;
  * \param data Donnée générique à affecter au nouvel élément
  * \return Un code d'erreur comme défini dans err_code.h
  */
-err_code vw_sllist_add(vw_sllist *l, llist_pos_t pos, generic_t data);
+s8 vw_sllist_add(vw_sllist *l, llist_pos_t pos, generic_ptr data);
 
 /*!
  * \brief Suppression d'un élément d'une liste
@@ -48,7 +48,7 @@ err_code vw_sllist_add(vw_sllist *l, llist_pos_t pos, generic_t data);
  * </ul>
  * \return Un code d'erreur comme défini dans err_code.h
  */
-err_code vw_sllist_del(vw_sllist *l, llist_pos_t pos);
+s8 vw_sllist_del(vw_sllist *l, llist_pos_t pos);
 
 /*!
  * \brief Récupération de la donnée d'un élément d'une liste
@@ -56,7 +56,7 @@ err_code vw_sllist_del(vw_sllist *l, llist_pos_t pos);
  * \param pos Position de l'élément à récupérer
  * \return La donnée de l'élément choisi
  */
-generic_t vw_sllist_get(vw_sllist l, llist_pos_t pos);
+generic_ptr vw_sllist_get(vw_sllist l, llist_pos_t pos);
 
 /*!
  * \brief Vérification de la présence d'un élément dans une liste
@@ -70,7 +70,7 @@ generic_t vw_sllist_get(vw_sllist l, llist_pos_t pos);
  * recherche effectuée
  * \return -1 si l'élement recherché n'est pas dans la liste
  */
-llist_pos_t vw_sllist_chk(vw_sllist l, generic_t data);
+llist_pos_t vw_sllist_chk(vw_sllist l, generic_ptr data);
 
 /*!
  * \brief Affiche une liste
@@ -86,7 +86,7 @@ void vw_sllist_print(vw_sllist l);
  * \param l Adresse d'une liste
  * \return Un code d'erreur comme défini dans err_code.h
  */
-err_code vw_sllist_free(vw_sllist *l);
+s8 vw_sllist_free(vw_sllist *l);
 
 #endif /* Not __vw_sllist_h__ */
 
