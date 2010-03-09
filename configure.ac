@@ -1,5 +1,5 @@
 AC_PREREQ([2.65])
-AC_INIT([utils], [0.01], [diwan@frankiz.eu])
+AC_INIT([libagds], [0.01], [diwan@frankiz.eu])
 AM_INIT_AUTOMAKE([-Wall -Werror subdir-objects])
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADERS([config.h])
@@ -8,6 +8,7 @@ AC_PROG_AWK
 AC_PROG_CC
 AM_PROG_CC_C_O
 AC_PROG_INSTALL
+AC_PROG_LIBTOOL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
