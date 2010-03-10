@@ -1,92 +1,169 @@
+/*****************************************************************************
+ * Fichier           : vw_sllist.h                                           *
+ * Description Brève : Gestion d'une liste simplement chainée à largeur      *
+ *                     variable                                              *
+ * Auteur            : Julian Maurice                                        *
+ * Créé le           : 01/03/2010                                            *
+ *****************************************************************************
+ * Une liste chainée à largeur variable est une liste chainée dont les       *
+ * nœuds contiennent des données de différentes tailles.                     *
+ * C'est utile pour stocker dans une même structure des données de types     *
+ * différents.                                                               *
+ * Voir les fichiers "generic.h" et "generic.c" pour savoir comment ceci est *
+ * implémenté, ainsi que les fichiers "types.h" et "types.c".                *
+ *****************************************************************************/
+
 #ifndef __vw_sllist_h__
 #define __vw_sllist_h__
 
-#include "llist.h"
+#include "types.h"
 #include "generic.h"
-#include "err_code.h"
+#include "error.h"
 
-/*! 
- * \brief Noeud d'une liste simplement chainée à largeur variable
- *
- * Une liste simplement chainée à largeur variable est une liste simplement
- * chainée classique, mais dont la taille des éléments n'est pas fixée.
- * On peut utiliser une telle liste, par exemple, pour stocker des objets
- * (structures) différents dans une même liste.
- * Toutes les fonctions en rapport avec ce type de liste chainée ont le nom
- * commençant par 'vw_llist' (pour variable-width linked-list)
- */
+/* Noeud d'une liste simplement chainée à largeur variable */
 struct vw_sllist_node{
-	generic_ptr d;			/*!< La donnée, de type générique */
-	struct vw_sllist_node *next;	/*!< Noeud suivant */
+	generic_ptr data;
+	struct vw_sllist_node *next;
 };
 
-typedef struct vw_sllist_node *vw_sllist;
+typedef struct _vw_sllist{
+	struct vw_sllist_node *first;	/* Premier nœud */
+	struct vw_sllist_node *last;	/* Dernier nœud */
+	struct vw_sllist_node *curr;	/* Position courante */
+} *vw_sllist;
 
-/*!
- * \brief Ajout d'un élément dans une liste
- * \param l Adresse d'une liste
- * \param pos Position où insérer le nouvel élément. \a pos peut prendre les
- * valeurs suivantes :
- * - -1: Ajout en fin de liste
- * -  0: Ajout en tête de liste
- * -  x: Ajout devant le x-ième élément ( x-1 -> new_elt -> x )
- * \param data Donnée générique à affecter au nouvel élément
- * \return Un code d'erreur comme défini dans err_code.h
- */
-s8 vw_sllist_add(vw_sllist *l, llist_pos_t pos, generic_ptr data);
 
-/*!
- * \brief Suppression d'un élément d'une liste
- * \param l Adresse d'une liste
- * \param pos Position de l'élément à supprimer. \a pos peut prendre les valeurs
- * suivantes :
- * <ul>
- * <li>-1: Suppression du dernier élément</li>
- * <li>0: Suppression du premier élément</li>
- * <li>x: Suppression du x-ième élément, si x > taille(liste), suppression du
- * dernier élément</li>
- * </ul>
- * \return Un code d'erreur comme défini dans err_code.h
- */
-s8 vw_sllist_del(vw_sllist *l, llist_pos_t pos);
+/* Crée une nouvelle liste et retourne l'adresse de cette liste */
+vw_sllist vw_sllist_new(
+	error_ptr *err
+);
 
-/*!
- * \brief Récupération de la donnée d'un élément d'une liste
- * \param l Une liste
- * \param pos Position de l'élément à récupérer
- * \return La donnée de l'élément choisi
- */
-generic_ptr vw_sllist_get(vw_sllist l, llist_pos_t pos);
+/* Réinitialise la position courante au début de la liste */
+void vw_sllist_begin(
+	vw_sllist l		/* Liste à modifier */
+);
 
-/*!
- * \brief Vérification de la présence d'un élément dans une liste
- *
- * Pour vérifier la présence d'un élément, llist_chk regarde le champ data, et
- * le compare à l'argument \a data.
- * \sa generic_cmp
- * \param l Une liste
- * \param data Donnée comparative
- * \return La position du premier élément rencontré qui correspond à la
- * recherche effectuée
- * \return -1 si l'élement recherché n'est pas dans la liste
- */
-llist_pos_t vw_sllist_chk(vw_sllist l, generic_ptr data);
+/* ========================================================================= */
+/*                             Fonctions d'ajout                             */
+/* ========================================================================= */
 
-/*!
- * \brief Affiche une liste
- *
- * Affiche la valeur des pointeurs dans l'ordre de la liste.
- * Fonction test.
- * \param l Une liste
- */
-void vw_sllist_print(vw_sllist l);
+/* Ajoute un nœud à la liste en première position */
+/* Retourne l'adresse du nouveau noœud */
+struct vw_sllist_node* vw_sllist_add_first(
+	vw_sllist l,		/* Liste à modifier */
+	generic_ptr data,	/* Donnée à associer au nœud.
+				   Ne pas libérer la mémoire. */
+	error_ptr *err
+);
 
-/*!
- * \brief Libération de la mémoire
- * \param l Adresse d'une liste
- * \return Un code d'erreur comme défini dans err_code.h
- */
-s8 vw_sllist_free(vw_sllist *l);
+/* Ajoute un nœud à la liste en dernière position */
+/* Retourne l'adresse du nouveau noœud */
+struct vw_sllist_node* vw_sllist_add_last(
+	vw_sllist l,		/* Liste à modifier */
+	generic_ptr data,	/* Donnée à associer au nœud.
+				   Ne pas libérer la mémoire. */
+	error_ptr *err
+);
+
+/* Ajoute un nœud à la liste après la position courante */
+/* Retourne l'adresse du nouveau noœud */
+struct vw_sllist_node* vw_sllist_add(
+	vw_sllist l,		/* Liste à modifier */
+	generic_ptr data,	/* Donnée à associer au nœud.
+				   Ne pas libérer la mémoire */
+	error_ptr *err
+);
+
+/* ========================================================================= */
+/*                          Fonctions de suppression                         */
+/* ========================================================================= */
+
+/* Supprime le premier nœud de la liste */
+s8 vw_sllist_del_first(
+	vw_sllist l,		/* Liste à modifier */
+	error_ptr *err
+);
+
+/* Supprime le dernier nœud de la liste */
+s8 vw_sllist_del_last(
+	vw_sllist l,		/* Liste à modifier */
+	error_ptr *err
+);
+
+/* Supprime le nœud de la liste à la position courante */
+s8 vw_sllist_del(
+	vw_sllist l,		/* Liste à modifier */
+	error_ptr *err
+);
+
+/* ========================================================================= */
+/*                             Fonctions 'POP'                               */
+/*      (récupération des données et suppression du nœud dans la liste)      */
+/* ========================================================================= */
+
+/* Supprime le premier nœud de la liste */
+/* Retourne la donnée qu'il contenait */
+generic_ptr vw_sllist_pop_first(
+	vw_sllist l,		/* Liste à modifier */
+	error_ptr *err
+);
+
+/* Supprime le dernier nœud de la liste */
+/* Retourne la donnée qu'il contenait */
+generic_ptr vw_sllist_pop_last(
+	vw_sllist l,		/* Liste à modifier */
+	error_ptr *err
+);
+
+/* Supprime le nœud de la liste à la position courante */
+/* Retourne la donnée qu'il contenait */
+generic_ptr vw_sllist_pop(
+	vw_sllist l,		/* Liste à modifier */
+	error_ptr *err
+);
+
+/* ========================================================================= */
+/*                  Fonctions de récupération des données                    */
+/* ========================================================================= */
+
+/* Récupère la donnée du premier nœud de la liste */
+generic_ptr vw_sllist_get_first(
+	vw_sllist l,
+	error_ptr *err
+);
+
+/* Récupère la donnée du dernier nœud de la liste */
+generic_ptr vw_sllist_get_last(
+	vw_sllist l,
+	error_ptr *err
+);
+
+/* Récupère la donnée du nœud de la liste à la position courante */
+generic_ptr vw_sllist_get(
+	vw_sllist l,
+	error_ptr *err
+);
+
+/* ========================================================================= */
+/*                             Autres fonctions                              */
+/* ========================================================================= */
+
+/* Vérification de la présence d'un élément dans une liste */
+struct vw_sllist_node* vw_sllist_chk(
+	vw_sllist l,
+	generic_ptr data,
+	error_ptr *err
+);
+
+/* Affiche une liste */
+void vw_sllist_print(
+	vw_sllist l
+);
+
+/* Libération de la mémoire */
+void vw_sllist_free(
+	vw_sllist *l
+);
 
 #endif /* Not __vw_sllist_h__ */
 

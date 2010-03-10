@@ -2,39 +2,79 @@
 #include <stdlib.h>
 #include <string.h>
 #include "vw_sllist.h"
+#include "err_code.h"
 
-s8 vw_sllist_add(vw_sllist *l, llist_pos_t pos, generic_ptr data)
+vw_sllist vw_sllist_new(error_ptr *err)
+{
+	vw_sllist l;
+
+	l = malloc(sizeof(struct _vw_sllist));
+	if(l == NULL){
+		error_set(err, ERR_MALLOC, "Memory allocation error");
+		return NULL;
+	}
+	l->first = NULL;
+	l->last = NULL;
+	l->curr = NULL;
+	
+	error_free(err);
+	return l;
+}
+
+/* TODO */
+s8 vw_sllist_add(vw_sllist l, llist_pos_t pos, generic_ptr data, error_ptr *err)
 {
 	struct vw_sllist_node *tmp, *tmp2;
 	llist_pos_t i;
 
-	if(l == NULL || pos < -1 || data == NULL)
+	if(l == NULL || pos < -1 || data == NULL){
+		error_set(err, ERR_PARAM, "Bad parameter value");
 		return ERR_PARAM;
-	/* Création d'une nouvelle liste ou ajout en première position */
-	if(*l == NULL || pos == 0){
-		tmp = malloc(sizeof(struct vw_sllist_node));
-		if(tmp == NULL)
+	}
+	/* Création d'une nouvelle liste */
+	if(l->first == NULL){
+		l->first = malloc(sizeof(struct vw_sllist_node));
+		if(l->first == NULL){
+			error_set(err, ERR_MALLOC, "Memory allocation error");
 			return ERR_MALLOC;
-		tmp->d = data;
-		tmp->next = *l;
-		*l = tmp;
+		}
+		l->first->data = data;
+		l->first->next = NULL;
+		l->last = l->first;
+		l->curr = l->first;
+	/* Ajout en première position */
+	}else if(pos == 0){
+		tmp = malloc(sizeof(struct vw_sllist_node));
+		if(tmp == NULL){
+			error_set(err, ERR_MALLOC, "Memory allocation error");
+			return ERR_MALLOC;
+		}
+		tmp->data = data;
+		tmp->next = l->first;
+		l->first = tmp;
 	}else{
-		tmp = *l;
+		tmp = l->first;
 		i = 1;
 		while(tmp->next != NULL && i != pos){
 			tmp = tmp->next;
 			i++;
 		}
 		tmp2 = malloc(sizeof(struct vw_sllist_node));
-		if(tmp2 == NULL)
+		if(tmp2 == NULL){
+			error_set(err, ERR_MALLOC, "Memory allocation error");
 			return ERR_MALLOC;
-		tmp2->d = data;
+		}
+		tmp2->data = data;
 		tmp2->next = tmp->next;
 		tmp->next = tmp2;
+		if(tmp2->next == NULL) l->last = tmp2;
 	}
+
+	error_free(err);
 	return OK;
 }
 
+/* TODO the rest of the world */
 s8 vw_sllist_del(vw_sllist *l, llist_pos_t pos)
 {
 	struct vw_sllist_node *tmp, *tmp2;

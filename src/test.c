@@ -5,6 +5,7 @@
 #include "types.h"
 #include "error.h"
 #include "generic.h"
+#include "vw_sllist.h"
 
 struct test_t{
 	u32 i;
@@ -16,10 +17,12 @@ int main()
 {
 	error_ptr error = NULL;
 	generic_ptr gen;
-	s8 c = 'c';
-	s8 d;
+	s8 d = 97;
+	s8 *d_ptr = NULL;
 	struct test_t t;
 	struct test_t *t_ptr = NULL;
+	vw_sllist head = NULL;
+	struct vw_sllist_node *tmp;
 
 	type_init();
 	error_init(&error);
@@ -35,9 +38,20 @@ int main()
 		error_print(error);
 		return error->errno;
 	}
-	t_ptr = (struct test_t*)(gen->data_ptr);
-	
-	printf("\ni = %d\nf = %f\ns = %s\n", t_ptr->i, t_ptr->f, t_ptr->s);
+	vw_sllist_add(&head, 0, gen);
+	vw_sllist_add(&head, 0, generic("s8", &d, NULL));
+	tmp = head;
+	while(tmp != NULL){
+		if(strcmp(tmp->d->type_name, "s8") == 0){
+			d_ptr = (s8 *)(tmp->d->data_ptr);
+			printf("%c\n", *d_ptr);
+		}else if(strcmp(tmp->d->type_name, "test_t") == 0){
+			t_ptr = (struct test_t *)(tmp->d->data_ptr);
+			printf("i = %d f = %f s = %s\n",
+				t_ptr->i, t_ptr->f, t_ptr->s);
+		}
+		tmp = tmp->next;
+	}
 	
 	return 0;
 }
