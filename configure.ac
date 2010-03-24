@@ -1,6 +1,6 @@
 AC_PREREQ([2.65])
-AC_INIT([libagds], [0.01], [diwan@frankiz.eu])
-AM_INIT_AUTOMAKE([-Wall -Werror subdir-objects])
+AC_INIT([libgenty], [0.01], [diwan@frankiz.eu])
+AM_INIT_AUTOMAKE([-Wall -Werror silent-rules subdir-objects])
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADERS([config.h])
 
@@ -26,5 +26,7 @@ AC_CONFIG_FILES([
 	src/Makefile
 	src/list/Makefile
 ])
+
+AM_SILENT_RULES
 
 AC_OUTPUT

@@ -112,7 +112,7 @@ s32 generic_cmp(const generic_ptr g1, const generic_ptr g2)
 		cmp = 1;
 	/* Si aucun des 2 n'est à NULL, on compare d'abord la taille,
 	 * et ensuite la valeur des données */
-	}else if(g1 != NULL && g2 != NULL){
+	}else{
 		size1 = type_sizeof(g1->type_name);
 		size2 = type_sizeof(g2->type_name);
 		if(size1 == size2){

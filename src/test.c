@@ -5,7 +5,7 @@
 #include "types.h"
 #include "error.h"
 #include "generic.h"
-#include "vw_sllist.h"
+#include "vw_slist.h"
 
 struct test_t{
 	u32 i;
@@ -16,42 +16,26 @@ struct test_t{
 int main()
 {
 	error_ptr error = NULL;
-	generic_ptr gen;
-	s8 d = 97;
-	s8 *d_ptr = NULL;
-	struct test_t t;
-	struct test_t *t_ptr = NULL;
-	vw_sllist head = NULL;
-	struct vw_sllist_node *tmp;
+	vw_slist_ptr list;
+	struct test_t t1 = {1, 0.1, "un"}, t2 = {2, 0.2, "deux"};
 
-	type_init();
+	printf("a\n");
+
 	error_init(&error);
-
-	type_reg("test_t", sizeof(struct test_t));
-	
-	t.i = 23;
-	t.f = 9.876;
-	t.s = malloc(10);
-	t.s[0] = 'a'; t.s[1] = 'b'; t.s[9] = '\0';
-	gen = generic("test_t", &t, &error);
-	if(!gen){
+	types_init(10, &error);
+	if(type_reg("test_t", sizeof(struct test_t), &error) < 0)
 		error_print(error);
-		return error->errno;
-	}
-	vw_sllist_add(&head, 0, gen);
-	vw_sllist_add(&head, 0, generic("s8", &d, NULL));
-	tmp = head;
-	while(tmp != NULL){
-		if(strcmp(tmp->d->type_name, "s8") == 0){
-			d_ptr = (s8 *)(tmp->d->data_ptr);
-			printf("%c\n", *d_ptr);
-		}else if(strcmp(tmp->d->type_name, "test_t") == 0){
-			t_ptr = (struct test_t *)(tmp->d->data_ptr);
-			printf("i = %d f = %f s = %s\n",
-				t_ptr->i, t_ptr->f, t_ptr->s);
-		}
-		tmp = tmp->next;
-	}
+
+	list = vw_slist_new(&error);
+	if(list == NULL) error_print(error);
+	vw_slist_add_last(list, generic("test_t", &t1, NULL), &error);
+	error_print(error);
+	vw_slist_add_last(list, generic("test_t", &t2, NULL), &error);
+	error_print(error);
+	vw_slist_print(list);
+
+	types_free();
+	error_free(&error);
 	
 	return 0;
 }

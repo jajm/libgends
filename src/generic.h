@@ -1,5 +1,5 @@
-#ifndef __generic_h__
-#define __generic_h__
+#ifndef generic_h_included
+#define generic_h_included
 
 #include "types.h"
 #include "error.h"
@@ -28,5 +28,5 @@ u32 generic_size(const generic_ptr g);
 /* Libère la mémoire */
 void generic_free(generic_ptr *g);
 
-#endif /* Not __generic_h__ */
+#endif /* Not generic_h_included */
 

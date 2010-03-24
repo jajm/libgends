@@ -1,7 +1,7 @@
-#ifndef __error_h__
-#define __error_h__
+#ifndef error_h_included
+#define error_h_included
 
-#include "types.h"
+#include "basic_types.h"
 
 #define error_set(err, errno, errmsg, ...) \
 	_error_set(err, errno, __FILE__, __func__, __LINE__, \
@@ -15,6 +15,10 @@ typedef struct error_t{
 	u32 line;
 } *error_ptr;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void error_init(error_ptr *err);
 
 /* Affecte err avec les valeurs des paramètres suivants */
@@ -27,6 +31,9 @@ void error_print(const error_ptr err);
 
 void error_free(error_ptr *err);
 
+#ifdef __cplusplus
+}
+#endif
 
-#endif /* Not __error_h__ */
+#endif /* Not error_h_included */
 

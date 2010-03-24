@@ -1,13 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "fw_sllist.h"
+#include "fw_slist.h"
 
-fw_sllist fw_sllist_new(u32 width)
+fw_slist fw_slist_new(u32 width)
 {
-	fw_sllist l;
+	fw_slist l;
 
-	l = malloc(sizeof(struct _fw_sllist));
+	l = malloc(sizeof(struct _fw_slist));
 	if(l == NULL)
 		return NULL;
 	l->head = NULL;
@@ -15,22 +15,22 @@ fw_sllist fw_sllist_new(u32 width)
 	return l;
 }
 
-s8 fw_sllist_add(fw_sllist l, llist_pos_t pos, void *data)
+s8 fw_slist_add(fw_slist l, llist_pos_t pos, void *data)
 {
-	struct fw_sllist_node *tmp, *tmp2;
+	struct fw_slist_node *tmp, *tmp2;
 	llist_pos_t i;
 
 	if(l == NULL || pos < -1 || data == NULL)
-		return ERR_PARAM;
+		return -1;
 	
 	if(l->head == NULL || pos == 0){
-		tmp = malloc(sizeof(struct fw_sllist_node));
+		tmp = malloc(sizeof(struct fw_slist_node));
 		if(tmp == NULL)
-			return ERR_MALLOC;
+			return -1;
 		tmp->d = malloc(l->width);
 		if(tmp->d == NULL){
 			free(tmp);
-			return ERR_MALLOC;
+			return -1;
 		}
 		memmove(tmp->d, data, l->width);
 		tmp->next = l->head;
@@ -42,28 +42,28 @@ s8 fw_sllist_add(fw_sllist l, llist_pos_t pos, void *data)
 			tmp = tmp->next;
 			i++;
 		}
-		tmp2 = malloc(sizeof(struct fw_sllist_node));
+		tmp2 = malloc(sizeof(struct fw_slist_node));
 		if(tmp2 == NULL)
-			return ERR_MALLOC;
+			return -1;
 		tmp2->d = malloc(l->width);
 		if(tmp2->d == NULL){
 			free(tmp2);
-			return ERR_MALLOC;
+			return -1;
 		}
 		memmove(tmp2->d, data, l->width);
 		tmp2->next = tmp->next;
 		tmp->next = tmp2;
 	}
-	return OK;
+	return 0;
 }
 
-s8 fw_sllist_del(fw_sllist l, llist_pos_t pos)
+s8 fw_slist_del(fw_slist l, llist_pos_t pos)
 {
-	struct fw_sllist_node *tmp, *tmp2;
+	struct fw_slist_node *tmp, *tmp2;
 	llist_pos_t i;
 
 	if(l == NULL || l->head == NULL || pos < -1)
-		return ERR_PARAM;
+		return -1;
 	if(pos == 0 || l->head->next == NULL){
 		tmp = l->head;
 		l->head = tmp->next;
@@ -88,12 +88,12 @@ s8 fw_sllist_del(fw_sllist l, llist_pos_t pos)
 			free(tmp);
 		}
 	}
-	return OK;
+	return 0;
 }
 
-void *fw_sllist_get(fw_sllist l, llist_pos_t pos)
+void *fw_slist_get(fw_slist l, llist_pos_t pos)
 {
-	struct fw_sllist_node *tmp;
+	struct fw_slist_node *tmp;
 	llist_pos_t i;
 
 	if(l == NULL || l->head == NULL)
@@ -107,9 +107,9 @@ void *fw_sllist_get(fw_sllist l, llist_pos_t pos)
 	return tmp->d;
 }
 
-llist_pos_t fw_sllist_chk(fw_sllist l, void *data)
+llist_pos_t fw_slist_chk(fw_slist l, void *data)
 {
-	struct fw_sllist_node *tmp;
+	struct fw_slist_node *tmp;
 	llist_pos_t pos;
 
 	if(l == NULL)
@@ -125,9 +125,9 @@ llist_pos_t fw_sllist_chk(fw_sllist l, void *data)
 	return pos;
 }
 
-void fw_sllist_print(fw_sllist l)
+void fw_slist_print(fw_slist l)
 {
-	struct fw_sllist_node *tmp;
+	struct fw_slist_node *tmp;
 
 	if(l == NULL)
 		return;
@@ -139,12 +139,12 @@ void fw_sllist_print(fw_sllist l)
 	printf("NULL\n");
 }
 
-s8 fw_sllist_free(fw_sllist *l)
+s8 fw_slist_free(fw_slist *l)
 {
-	struct fw_sllist_node *tmp, *tmp2;
+	struct fw_slist_node *tmp, *tmp2;
 
 	if(l == NULL || *l == NULL)
-		return ERR_PARAM;
+		return -1;
 	tmp = (*l)->head;
 	while(tmp != NULL){
 		tmp2 = tmp->next;
@@ -155,6 +155,6 @@ s8 fw_sllist_free(fw_sllist *l)
 	free(*l);
 	*l = NULL;
 
-	return OK;
+	return 0;
 }
 

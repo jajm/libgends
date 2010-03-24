@@ -102,6 +102,6 @@ void error_free(error_ptr *err)
 		free((*err)->function);
 		free(*err);
 	}
-	*err = NULL;
+	if(err != NULL) *err = NULL;
 }
 
