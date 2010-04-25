@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: libgenty
+Description: libgenty fournit des types génériques
+Version: @VERSION@
+Libs: -L${libdir} -lgenty
+Cflags: -I${includedir}
