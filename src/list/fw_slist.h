@@ -8,7 +8,6 @@
  * 		Fixed-Width Linked List		*
  * 		TODO : Comment IT		*
  ************************************************/
-typedef s32 llist_pos_t;
 
 struct fw_slist_node{
 	void *d;

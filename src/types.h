@@ -14,20 +14,23 @@
 #define types_h_included
 
 #include "basic_types.h"
-#include "error.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* À appeler avant d'utiliser les autres fonctions */
-s8 types_init(u32 size, error_ptr *err);
+/* Retourne une valeur négative si une erreur s'est produite, 0 sinon */
+s8 types_init(u32 size);
 /* Enregistrer un nouveau type */
-s8 type_reg(const char *type_name, u32 type_size, error_ptr *err);
+/* Retourne une valeur négative si une erreur s'est produite, 0 sinon */
+s8 type_reg(const char *name, u32 size);
 /* Supprimer un type existant */
-s8 type_unreg(const char *type_name, error_ptr *err);
+/* Retourne une valeur négative si une erreur s'est produite, 0 sinon */
+s8 type_unreg(const char *name);
 /* Obtenir la taille d'un type existant */
-u32 type_sizeof(const char *type_name);
+/* Retourne 0 si une erreur s'est produite */
+u32 type_sizeof(const char *name);
 /* Détruire tous les types */
 void types_free(void);
 

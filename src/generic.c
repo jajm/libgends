@@ -5,72 +5,67 @@
 #include "error.h"
 #include "generic.h"
 
-generic_ptr generic(const char *type_name, const void *data_ptr, error_ptr *err)
+generic_t * generic(const char *type_name, const void *data_ptr)
 {
-	struct generic_t *g;
+	generic_t *g;
 	u32 data_size;
 	size_t length;
 
 	if(type_name == NULL || data_ptr == NULL){
-		error_set(err, -2, "Bad parameter value");
+		Error("Bad parameter value");
 		return NULL;
 	}
 
 	data_size = type_sizeof(type_name);
 	if(data_size == 0){
-		error_set(err, -3, "Type %s doesn't exist", type_name);
+		ErrorP("Failed to retrieve '%s' size", type_name);
 		return NULL;
 	}
 	length = strlen(type_name);
 
-	g = malloc(sizeof(struct generic_t));
+	g = malloc(sizeof(generic_t));
 	if(g == NULL){
-		error_set(err, -1, "Memory allocation error");
+		Error("Memory allocation error");
 		return NULL;
 	}
 	g->data_ptr = malloc(data_size);
 	if(g->data_ptr == NULL){
 		free(g);
-		error_set(err, -1, "Memory allocation error");
+		Error("Memory allocation error");
 		return NULL;
 	}
 	g->type_name = malloc(length+1);
 	if(g->type_name == NULL){
 		free(g->data_ptr);
 		free(g);
-		error_set(err, -1, "Memory allocation error");
+		Error("Memory allocation error");
 		return NULL;
 	}
 	memmove(g->data_ptr, data_ptr, data_size);
 	strncpy(g->type_name, type_name, length+1);
 	
-	if(err){
-		free(*err);
-		*err = NULL;
-	}
 	return g;
 }
 
-s8 generic_affect(generic_ptr *g, const char *type_name, const void *data_ptr,
-	error_ptr *err)
+s8 generic_affect(generic_t **g, const char *type_name, const void *data_ptr)
 {
 	u32 data_size;
 	size_t length;
 
 	if(g == NULL || type_name == NULL || data_ptr == NULL){
-		error_set(err, -2, "Bad parameter value");
-		return -2;
+		Error("Bad parameters");
+		return -1;
 	}
 
 	data_size = type_sizeof(type_name);
 	if(data_size == 0){
-		error_set(err, -3, "Type '%s' doesn't exist", type_name);
-		return -3;
+		ErrorP("Failed to retrieve '%s' size", type_name);
+		return -1;
 	}
 	length = strlen(type_name);
 	
 	if(*g == NULL){
-		*g = generic(type_name, data_ptr, err);
+		*g = generic(type_name, data_ptr);
 	}else if(strcmp((*g)->type_name, type_name) == 0){
 		/* Pas de réallocation à faire */
 		memmove((*g)->data_ptr, data_ptr, data_size);
@@ -80,23 +75,22 @@ s8 generic_affect(generic_ptr *g, const char *type_name, const void *data_ptr,
 		if(type_sizeof((*g)->type_name) != data_size){
 			(*g)->data_ptr = realloc((*g)->data_ptr, data_size);
 			if((*g)->data_ptr == NULL){
-				error_set(err, -1, "Memory allocation error");
+				Error("Memory allocation error");
 				return -1;
 			}
 		}
 		memmove((*g)->data_ptr, data_ptr, data_size);
 	}
 
-	error_free(err);
 	return 0;
 }
 
-s8 generic_copy(generic_ptr *to, const generic_ptr from, error_ptr *err)
+s8 generic_copy(generic_t **to, const generic_t *from)
 {
-	return generic_affect(to, from->type_name, from->data_ptr, err);
+	return generic_affect(to, from->type_name, from->data_ptr);
 }
 
-s32 generic_cmp(const generic_ptr g1, const generic_ptr g2)
+s32 generic_cmp(const generic_t *g1, const generic_t *g2)
 {
 	u32 size1, size2;
 	s32 cmp;
@@ -127,6 +121,7 @@ s32 generic_cmp(const generic_ptr g1, const generic_ptr g2)
 					cmp += memcmp(ptr, g2->data_ptr+min, diff);
 				else
 					cmp += memcmp(g1->data_ptr+min, ptr, diff);
+				free(ptr);
 			}else{
 				cmp += size1 - size2;
 			}
@@ -135,7 +130,7 @@ s32 generic_cmp(const generic_ptr g1, const generic_ptr g2)
 	return cmp;
 }
 
-u32 generic_size(const generic_ptr g)
+u32 generic_size(const generic_t *g)
 {
 	u32 data_size = 0;
 	if(g != NULL){
@@ -144,13 +139,12 @@ u32 generic_size(const generic_ptr g)
 	return data_size;
 }
 
-void generic_free(generic_ptr *g)
+void generic_free(generic_t *g)
 {
-	if(g != NULL && *g != NULL){
-		free((*g)->data_ptr);
-		free((*g)->type_name);
-		free(*g);
-		*g = NULL;
+	if(g != NULL){
+		free(g->data_ptr);
+		free(g->type_name);
+		free(g);
 	}
 }
 

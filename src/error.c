@@ -4,104 +4,110 @@
 #include <stdarg.h>
 #include "error.h"
 
-void error_init(error_ptr *err)
-{
-	struct error_t *tmp;
+typedef struct {
+	char *msg;
+	char *file;
+	char *function;
+	u32 line;
 
-	if(err != NULL){
-		tmp = *err;
-		if(tmp == NULL){
-			tmp = malloc(sizeof(struct error_t));
-			if(tmp){
-				tmp->errno = 0;
-				tmp->errmsg = NULL;
-				tmp->file = NULL;
-				tmp->function = NULL;
-				tmp->line = 0;
-			}
-			*err = tmp;
-		}else{
-			tmp->errno = 0;
-			tmp->errmsg = NULL;
-			tmp->file = NULL;
-			tmp->function = NULL;
-			tmp->line = 0;
-		}
-	}
+	char *string;	/* Error in 'function' at 'file':'line': 'msg' */
+} error_t;
+
+error_t g_error;
+
+void Error_init(void)
+{
+	g_error.msg = NULL;
+	g_error.file = NULL;
+	g_error.function = NULL;
+	g_error.line = 0;
+	g_error.string = NULL;
 }
 
-void _error_set(error_ptr *err, s32 errno, const char *file,
-	const char *function, u32 line, const char *errmsg, ...)
+void Error_at(const char *file, u32 line, const char *function,
+	 const char *msg, ...)
 {
 	size_t len;
-	struct error_t *tmp;
 	char buffer[1024];
 	va_list vl;
 
-	if(err != NULL){
-		if(*err == NULL) error_init(err);
-		tmp = *err;
-		tmp->errno = errno;
-		if(file != NULL){
-			len = strlen(file);
-			tmp->file = realloc(tmp->file, len+1);
-			if(tmp->file != NULL){
-				strncpy(tmp->file, file, len+1);
-			}
-		}else{
-			free(tmp->file);
-			tmp->file = NULL;
+	if(file != NULL){
+		len = strlen(file);
+		g_error.file = realloc(g_error.file, len+1);
+		if(g_error.file != NULL){
+			strncpy(g_error.file, file, len+1);
 		}
-		if(function != NULL){
-			len = strlen(function);
-			tmp->function = realloc(tmp->function, len+1);
-			if(tmp->function != NULL){
-				strncpy(tmp->function, function, len+1);
-			}
-		}else{
-			free(tmp->function);
-			tmp->function = NULL;
-		}
-		tmp->line = line;
-		if(errmsg != NULL){
-			va_start(vl, errmsg);
-			len = vsprintf(buffer, errmsg, vl);
-			va_end(vl);
-			tmp->errmsg = realloc(tmp->errmsg, len+1);
-			if(tmp->errmsg != NULL){
-				strncpy(tmp->errmsg, buffer, len+1);
-			}
-		}else{
-			free(tmp->errmsg);
-			tmp->errmsg = NULL;
-		}
+	}else{
+		free(g_error.file);
+		g_error.file = NULL;
 	}
+	g_error.line = line;
+	if(function != NULL){
+		len = strlen(function);
+		g_error.function = realloc(g_error.function, len+1);
+		if(g_error.function != NULL){
+			strncpy(g_error.function, function, len+1);
+		}
+	}else{
+		free(g_error.function);
+		g_error.function = NULL;
+	}
+	if(msg != NULL){
+		va_start(vl, msg);
+		len = vsprintf(buffer, msg, vl);
+		va_end(vl);
+		g_error.msg = realloc(g_error.msg, len+1);
+		if(g_error.msg != NULL){
+			strncpy(g_error.msg, buffer, len+1);
+		}
+	}else{
+		free(g_error.msg);
+		g_error.msg = NULL;
+	}
+	len = sprintf(buffer, "Error");
+	if(g_error.function)
+		len += sprintf(buffer+len, " in %s", g_error.function);
+	if(g_error.file)
+		len += sprintf(buffer+len, " at %s:%d", g_error.file,
+			g_error.line);
+	len += sprintf(buffer+len, ": ");
+	if(g_error.msg)
+		len += sprintf(buffer+len, "%s", g_error.msg);
+	else
+		len += sprintf(buffer+len, "No error message specified");
+	g_error.string = realloc(g_error.string, len+1);
+	if(g_error.string)
+		strncpy(g_error.string, buffer, len+1);
 }
 
-void error_print(const error_ptr err)
+void pError(void)
 {
-	if(err != NULL){
-		printf("Error (%d) ", err->errno);
-		if(err->function)
-			printf("in %s ", err->function);
-		if(err->file)
-			printf("at %s:%d", err->file, err->line);
-		printf(": ");
-		if(err->errmsg)
-			printf("%s\n", err->errmsg);
-		else
-			printf("No error message specified\n");
-	}
+	fflush(stdout);
+	fprintf(stderr, "%s\n", g_error.string);
 }
 
-void error_free(error_ptr *err)
+char * Error_msg(void)
 {
-	if(err != NULL && *err != NULL){
-		free((*err)->errmsg);
-		free((*err)->file);
-		free((*err)->function);
-		free(*err);
-	}
-	if(err != NULL) *err = NULL;
+	return g_error.msg;
+}
+
+char * Error_file(void)
+{
+	return g_error.file;
+}
+
+char * Error_function(void)
+{
+	return g_error.function;
+}
+
+u32 Error_line(void)
+{
+	return g_error.line;
+}
+
+char *Error_string(void)
+{
+	return g_error.string;
 }
 
