@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Fichier           : vw_slist.h                                           *
+ * Fichier           : slist.h                                           *
  * Description Brève : Gestion d'une liste simplement chainée à largeur      *
  *                     variable                                              *
  * Auteur            : Julian Maurice                                        *
@@ -13,68 +13,61 @@
  * implémenté, ainsi que les fichiers "types.h" et "types.c".                *
  *****************************************************************************/
 
-#ifndef vw_slist_h_included
-#define vw_slist_h_included
+#ifndef slist_h_included
+#define slist_h_included
 
+#include "basic_types.h"
 #include "types.h"
-#include "generic.h"
-#include "error.h"
 
 /* Noeud d'une liste simplement chainée à largeur variable */
-typedef struct vw_slist_node_s{
-	generic_t *data;
-	struct vw_slist_node_s *next;
-} vw_slist_node_t;
+typedef struct slist_node_s{
+	void *data;
+	struct slist_node_s *next;
+} slist_node_t;
 
 typedef struct{
-	vw_slist_node_t *first;	/* Premier nœud */
-	vw_slist_node_t *last;		/* Dernier nœud */
-	vw_slist_node_t *curr;		/* Position courante */
-} vw_slist_t;
+	char *type_name;
+	slist_node_t *first;	/* Premier nœud */
+	slist_node_t *last;		/* Dernier nœud */
+	slist_node_t *curr;		/* Position courante */
+} slist_t;
 
-/* Ajoute un nœud après celui donné en paramètre */
-/* Retourne l'adresse du nouveau nœud */
-vw_slist_node_t *vw_slist_node_add(
-	vw_slist_node_t *node,	/* Nœud à faire suivre du nouvel élément */
-	generic_t *data	/* Donnée à stocker dans le nouvel élément */
+/* Crée un nouveau nœud et retourne son adresse */
+slist_node_t *slist_node_new(
+	void *data	/* Donnée à stocker dans le nouvel élément */
 );
 
-/* Supprime le nœud suivant celui donné en paramètre */
-s8 vw_slist_node_del(
-	vw_slist_node_t *node	/* Nœud précédant l'élément à supprimer */
+/* Libère la mémoire occupée par un nœud */
+/* ATTENTION: Cette fonction ne met pas à jour le pointeur du nœud précédent */
+void slist_node_free(
+	slist_node_t *node,
+	free_func_t free_f
 );
-
-/* Supprime le nœud suivant celui donné en paramètre */
-/* et libère la mémoire occupée par data */
-s8 vw_slist_node_free(
-	vw_slist_node_t *node
-);
-
 
 /* Crée une nouvelle liste et retourne l'adresse de cette liste */
-vw_slist_t *vw_slist_new(void);
+slist_t *slist_new(const char *type_name);
 
 /* Réinitialise la position courante au début de la liste */
-void vw_slist_begin(
-	vw_slist_t *l		/* Liste à modifier */
+void slist_begin(
+	slist_t *l		/* Liste à modifier */
 );
 
 /* Déplace la position courante vers le nœud suivant */
 /* Retourne -1 si le nœeud suivant n'existe pas (fin de liste), 0 sinon */
-s8 vw_slist_next(
-	vw_slist_t *l
+s8 slist_next(
+	slist_t *l
 );
 
 /* Teste si la liste est vide (0 = non vide, 1 = vide) */
-s8 vw_slist_empty(
-	vw_slist_t *l
+s8 slist_empty(
+	slist_t *l
 );
 
 /* Teste si la position courante est à la fin de la liste */
 /* (après le dernier élément) */
 /* Retourne 1 si c'est la fin, 0 sinon */
-s8 vw_slist_end(
-	vw_slist_t *l
+s8 slist_end(
+	slist_t *l
 );
 
 /* ========================================================================= */
@@ -83,25 +76,25 @@ s8 vw_slist_end(
 
 /* Ajoute un nœud à la liste en première position */
 /* Retourne l'adresse du nouveau nœud */
-vw_slist_node_t *vw_slist_add_first(
-	vw_slist_t *l,		/* Liste à modifier */
-	generic_t *data		/* Donnée à associer au nœud.
+slist_node_t *slist_add_first(
+	slist_t *l,		/* Liste à modifier */
+	void *data		/* Donnée à associer au nœud.
 				   Ne pas libérer la mémoire. */
 );
 
 /* Ajoute un nœud à la liste en dernière position */
 /* Retourne l'adresse du nouveau nœud */
-vw_slist_node_t *vw_slist_add_last(
-	vw_slist_t *l,		/* Liste à modifier */
-	generic_t *data		/* Donnée à associer au nœud.
+slist_node_t *slist_add_last(
+	slist_t *l,		/* Liste à modifier */
+	void *data		/* Donnée à associer au nœud.
 				   Ne pas libérer la mémoire. */
 );
 
 /* Ajoute un nœud à la liste après la position courante */
 /* Retourne l'adresse du nouveau nœud */
-vw_slist_node_t *vw_slist_add(
-	vw_slist_t *l,		/* Liste à modifier */
-	generic_t *data		/* Donnée à associer au nœud.
+slist_node_t *slist_add(
+	slist_t *l,		/* Liste à modifier */
+	void *data		/* Donnée à associer au nœud.
 				   Ne pas libérer la mémoire */
 );
 
@@ -109,36 +102,36 @@ vw_slist_node_t *vw_slist_add(
 /*                          Fonctions de suppression                         */
 /* ========================================================================= */
 
-/* -------- Supprime un nœud sans supprimer la donnée qu'il contient ------- */
+/* --------- Supprime un nœud et renvoie la donnée qu'il contient ---------- */
 /* Supprime le premier nœud de la liste */
-s8 vw_slist_del_first(
-	vw_slist_t *l		/* Liste à modifier */
+void *slist_pop_first(
+	slist_t *l		/* Liste à modifier */
 );
 
 /* Supprime le dernier nœud de la liste */
-s8 vw_slist_del_last(
-	vw_slist_t *l		/* Liste à modifier */
+void *slist_pop_last(
+	slist_t *l		/* Liste à modifier */
 );
 
 /* Supprime le nœud de la liste à la position courante */
-s8 vw_slist_del(
-	vw_slist_t *l		/* Liste à modifier */
+void *slist_pop(
+	slist_t *l		/* Liste à modifier */
 );
 
 /* ---------- Supprime un nœud ainsi que la donnée qu'il contient ---------- */
 /* Supprime le premier nœud de la liste */
-s8 vw_slist_free_first(
-	vw_slist_t *l		/* Liste à modifier */
+s8 slist_free_first(
+	slist_t *l		/* Liste à modifier */
 );
 
 /* Supprime le dernier nœud de la liste */
-s8 vw_slist_free_last(
-	vw_slist_t *l		/* Liste à modifier */
+s8 slist_free_last(
+	slist_t *l		/* Liste à modifier */
 );
 
 /* Supprime le nœud de la liste à la position courante */
-s8 vw_slist_free(
-	vw_slist_t *l		/* Liste à modifier */
+s8 slist_free(
+	slist_t *l		/* Liste à modifier */
 );
 
 
@@ -147,62 +140,40 @@ s8 vw_slist_free(
 /* ========================================================================= */
 
 /* Récupère la donnée du premier nœud de la liste */
-generic_t *vw_slist_get_first(
-	vw_slist_t *l
+void *slist_get_first(
+	slist_t *l
 );
 
 /* Récupère la donnée du dernier nœud de la liste */
-generic_t *vw_slist_get_last(
-	vw_slist_t *l
+void *slist_get_last(
+	slist_t *l
 );
 
 /* Récupère la donnée du nœud de la liste à la position courante */
-generic_t *vw_slist_get(
-	vw_slist_t *l
+void *slist_get(
+	slist_t *l
 );
 
-/* ========================================================================= */
-/*                             Fonctions 'POP'                               */
-/*      (récupération des données et suppression du nœud dans la liste)      */
-/* ========================================================================= */
-
-/* Supprime le premier nœud de la liste */
-/* Retourne la donnée qu'il contenait */
-generic_t *vw_slist_pop_first(
-	vw_slist_t *l		/* Liste à modifier */
-);
-
-/* Supprime le dernier nœud de la liste */
-/* Retourne la donnée qu'il contenait */
-generic_t *vw_slist_pop_last(
-	vw_slist_t *l		/* Liste à modifier */
-);
-
-/* Supprime le nœud de la liste à la position courante */
-/* Retourne la donnée qu'il contenait */
-generic_t *vw_slist_pop(
-	vw_slist_t *l		/* Liste à modifier */
-);
 
 /* ========================================================================= */
 /*                             Autres fonctions                              */
 /* ========================================================================= */
 
 /* Vérification de la présence d'un élément dans une liste */
-vw_slist_node_t *vw_slist_chk(
-	vw_slist_t *l,
-	generic_t *data
+slist_node_t *slist_chk(
+	slist_t *l,
+	void *data
 );
 
 /* Affiche une liste */
-void vw_slist_print(
-	vw_slist_t *l
+void slist_print(
+	slist_t *l
 );
 
 /* Libération de la mémoire */
-void vw_slist_free_list(
-	vw_slist_t *l
+void slist_free_list(
+	slist_t *l
 );
 
-#endif /* Not vw_slist_h_included */
+#endif /* Not slist_h_included */
 

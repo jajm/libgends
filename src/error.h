@@ -6,22 +6,14 @@
  *****************************************************************************
  * Une 'erreur' est ici représentée par un message, et la                    *
  * localisation de l'erreur (fichier, ligne, fonction).                      *
- * Une fois une erreur enregistrée (par l'appel de Error_at, Error ou ErrorP)*
+ * Une fois une erreur enregistrée (par l'appel de Error_at ou Error,        *
  * elle peut être affichée par l'appel de pError.                            *
- * ErrorP concatène la dernière erreur avec la courante, en faisant suivre   *
- * celle-ci de la chaine suivante : "\n -> "                                 *
  *****************************************************************************
  * Utilisation:                                                              *
  * 	Error_init();	// Init avant la première utilisation                *
  * 	Error("malloc failed");                                              *
- *	ErrorP("creation failed");                                           *
- *	pError();                                                            *
- *	// Affiche, à supposer qu'on soit dans la fonction main, dans main.c *
- *	// "Error in main at main.c:17: creation failed"                     *
- *	// " -> Error in main at main.c:16: malloc failed"                   *
  *	Error_at("doc.xml", NULL, 42, "Invalid syntax");                     *
  * 	pError();                                                            *
- *	// "Error at doc.xml:42: Invalid syntax"                             *
  *****************************************************************************/
 
 #ifndef error_h_included

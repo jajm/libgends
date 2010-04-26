@@ -15,22 +15,27 @@
 
 #include "basic_types.h"
 
+typedef void (*free_func_t)(void *);
+typedef s32 (*cmp_func_t)(void *, void *);
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* À appeler avant d'utiliser les autres fonctions */
-/* Retourne une valeur négative si une erreur s'est produite, 0 sinon */
 s8 types_init(u32 size);
 /* Enregistrer un nouveau type */
-/* Retourne une valeur négative si une erreur s'est produite, 0 sinon */
-s8 type_reg(const char *name, u32 size);
+s8 type_reg(const char *name, u32 size, free_func_t free, cmp_func_t cmp);
 /* Supprimer un type existant */
-/* Retourne une valeur négative si une erreur s'est produite, 0 sinon */
 s8 type_unreg(const char *name);
 /* Obtenir la taille d'un type existant */
-/* Retourne 0 si une erreur s'est produite */
 u32 type_sizeof(const char *name);
+/* Récupère un pointeur vers la fonction de libération */
+/* ou NULL si aucune fonction n'est enregistrée */
+free_func_t type_free_func(const char *name);
+/* Récupère un pointeur vers la fonction de comparaison */
+/* ou NULL si aucune fonction n'est enregistrée */
+cmp_func_t type_cmp_func(const char *name);
 /* Détruire tous les types */
 void types_free(void);
 
