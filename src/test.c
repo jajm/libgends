@@ -89,7 +89,7 @@ int main()
 	}
 	
 	//for(i=0; i<10; i++) generic_free(g[i]);
-	slist_free_list(list);
+	slist_free(list);
 
 	types_free();
 

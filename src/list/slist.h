@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Fichier           : slist.h                                           *
+ * Fichier           : slist.h                                               *
  * Description Brève : Gestion d'une liste simplement chainée à largeur      *
  *                     variable                                              *
  * Auteur            : Julian Maurice                                        *
@@ -25,50 +25,48 @@ typedef struct slist_node_s{
 	struct slist_node_s *next;
 } slist_node_t;
 
+/* Ajoute un nœud contenant data après node
+ * Si node == NULL, crée un nouveau nœud seul
+ * Retourne l'adresse du nouveau nœud */
+slist_node_t *slist_node_add_after(slist_node_t *node, void *data);
+/* Retourne un pointeur vers la donnée de node */
+void *slist_node_get(slist_node_t *node);
+/* Supprime le nœud node dans la liste head et fait pointer data vers la donnée
+ * Retourne l'adresse du nœud précédant node (NULL pour le premier nœud) */
+slist_node_t *slist_node_pop(slist_node_t **head, slist_node_t *node,
+	void **data);
+/* Supprime le nœud node dans la liste head et libère la mémoire occupée par
+ * la donnée à l'aide de free_f. Si free_f == NULL, utilise free()
+ * Retourne l'adresse du nœud précédant node (NULL pour le premier nœud) */
+slist_node_t *slist_node_del(slist_node_t **head, slist_node_t *node,
+	free_func_t free_f);
+
+
 typedef struct{
 	char *type_name;
 	slist_node_t *first;	/* Premier nœud */
-	slist_node_t *last;		/* Dernier nœud */
-	slist_node_t *curr;		/* Position courante */
+	slist_node_t *last;	/* Dernier nœud */
+	slist_node_t *curr;	/* Position courante */
 } slist_t;
 
-/* Crée un nouveau nœud et retourne son adresse */
-slist_node_t *slist_node_new(
-	void *data	/* Donnée à stocker dans le nouvel élément */
-);
-
-/* Libère la mémoire occupée par un nœud */
-/* ATTENTION: Cette fonction ne met pas à jour le pointeur du nœud précédent */
-void slist_node_free(
-	slist_node_t *node,
-	free_func_t free_f
-);
 
 /* Crée une nouvelle liste et retourne l'adresse de cette liste */
 slist_t *slist_new(const char *type_name);
 
 /* Réinitialise la position courante au début de la liste */
-void slist_begin(
-	slist_t *l		/* Liste à modifier */
-);
+void slist_begin(slist_t *l);
 
-/* Déplace la position courante vers le nœud suivant */
-/* Retourne -1 si le nœeud suivant n'existe pas (fin de liste), 0 sinon */
-s8 slist_next(
-	slist_t *l
-);
+/* Déplace la position courante vers le nœud suivant
+ * Retourne -1 si le nœeud suivant n'existe pas (fin de liste), 0 sinon */
+s8 slist_next(slist_t *l);
 
 /* Teste si la liste est vide (0 = non vide, 1 = vide) */
-s8 slist_empty(
-	slist_t *l
-);
+s8 slist_empty(slist_t *l);
 
 /* Teste si la position courante est à la fin de la liste */
 /* (après le dernier élément) */
 /* Retourne 1 si c'est la fin, 0 sinon */
-s8 slist_end(
-	slist_t *l
-);
+s8 slist_end(slist_t *l);
 
 /* ========================================================================= */
 /*                             Fonctions d'ajout                             */
@@ -104,35 +102,23 @@ slist_node_t *slist_add(
 
 /* --------- Supprime un nœud et renvoie la donnée qu'il contient ---------- */
 /* Supprime le premier nœud de la liste */
-void *slist_pop_first(
-	slist_t *l		/* Liste à modifier */
-);
+void *slist_pop_first(slist_t *l);
 
 /* Supprime le dernier nœud de la liste */
-void *slist_pop_last(
-	slist_t *l		/* Liste à modifier */
-);
+void *slist_pop_last(slist_t *l);
 
 /* Supprime le nœud de la liste à la position courante */
-void *slist_pop(
-	slist_t *l		/* Liste à modifier */
-);
+void *slist_pop(slist_t *l);
 
 /* ---------- Supprime un nœud ainsi que la donnée qu'il contient ---------- */
 /* Supprime le premier nœud de la liste */
-s8 slist_free_first(
-	slist_t *l		/* Liste à modifier */
-);
+s8 slist_del_first(slist_t *l);
 
 /* Supprime le dernier nœud de la liste */
-s8 slist_free_last(
-	slist_t *l		/* Liste à modifier */
-);
+s8 slist_del_last(slist_t *l);
 
 /* Supprime le nœud de la liste à la position courante */
-s8 slist_free(
-	slist_t *l		/* Liste à modifier */
-);
+s8 slist_del(slist_t *l);
 
 
 /* ========================================================================= */
@@ -140,19 +126,13 @@ s8 slist_free(
 /* ========================================================================= */
 
 /* Récupère la donnée du premier nœud de la liste */
-void *slist_get_first(
-	slist_t *l
-);
+void *slist_get_first(slist_t *l);
 
 /* Récupère la donnée du dernier nœud de la liste */
-void *slist_get_last(
-	slist_t *l
-);
+void *slist_get_last(slist_t *l);
 
 /* Récupère la donnée du nœud de la liste à la position courante */
-void *slist_get(
-	slist_t *l
-);
+void *slist_get(slist_t *l);
 
 
 /* ========================================================================= */
@@ -160,20 +140,10 @@ void *slist_get(
 /* ========================================================================= */
 
 /* Vérification de la présence d'un élément dans une liste */
-slist_node_t *slist_chk(
-	slist_t *l,
-	void *data
-);
-
-/* Affiche une liste */
-void slist_print(
-	slist_t *l
-);
+slist_node_t *slist_chk(slist_t *l, void *data);
 
 /* Libération de la mémoire */
-void slist_free_list(
-	slist_t *l
-);
+void slist_free(slist_t *l);
 
 #endif /* Not slist_h_included */
 
