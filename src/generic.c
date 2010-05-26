@@ -92,7 +92,7 @@ s8 generic_copy(generic_t **to, const generic_t *from)
 
 s32 generic_cmp(const generic_t *g1, const generic_t *g2)
 {
-	cmp_func_t cmp_f;
+	func_ptr_t cmp_f;
 	u32 size1, size2;
 	s32 cmp;
 	void *ptr;
@@ -108,7 +108,7 @@ s32 generic_cmp(const generic_t *g1, const generic_t *g2)
 	/* Si aucun des deux n'est à NULL, qu'ils sont du même type,
 	 * et qu'ils possèdent une fonction de comparaison, on utilise
 	 * cette dernière */
-	}else if((cmp_f = type_cmp_func(g1->type_name)) != NULL
+	}else if((cmp_f = type_get_func(g1->type_name, "cmp")) != NULL
 	  && strcmp(g1->type_name, g2->type_name) == 0){
 		cmp = cmp_f(g1->data_ptr, g2->data_ptr);
 	/* Sinon, on compare d'abord la taille,
@@ -148,10 +148,10 @@ u32 generic_size(const generic_t *g)
 
 void generic_free(generic_t *g)
 {
-	free_func_t free_f;
+	func_ptr_t free_f;
 
 	if(g != NULL){
-		free_f = type_free_func(g->type_name);
+		free_f = type_get_func(g->type_name, "free");
 		if(free_f) free_f(g->data_ptr);
 		else free(g->data_ptr);
 		free(g->type_name);

@@ -39,7 +39,7 @@ slist_node_t *slist_node_pop(slist_node_t **head, slist_node_t *node,
  * la donnée à l'aide de free_f. Si free_f == NULL, utilise free()
  * Retourne l'adresse du nœud précédant node (NULL pour le premier nœud) */
 slist_node_t *slist_node_del(slist_node_t **head, slist_node_t *node,
-	free_func_t free_f);
+	func_ptr_t free_f);
 
 
 typedef struct{

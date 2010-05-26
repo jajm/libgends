@@ -71,7 +71,7 @@ void dlist_node_pop(dlist_node_t *node, void **data)
 	free(node);
 }
 
-void dlist_node_del(dlist_node_t *node, free_func_t free_f)
+void dlist_node_del(dlist_node_t *node, func_ptr_t free_f)
 {
 	if(node != NULL){
 		if(node->prev) node->prev->next = node->next;
@@ -298,7 +298,7 @@ void *dlist_pop(dlist_t *l)
 
 s8 dlist_del_first(dlist_t *l)
 {
-	free_func_t free_f;
+	func_ptr_t free_f;
 	dlist_node_t *next;
 
 	assert(l != NULL);
@@ -307,7 +307,7 @@ s8 dlist_del_first(dlist_t *l)
 		return -1;
 	}
 
-	free_f = type_free_func(l->type_name);
+	free_f = type_get_func(l->type_name, "free");
 	next = l->first->next;
 	dlist_node_del(l->first, free_f);
 	if(l->first == l->last) l->last = NULL;
@@ -319,7 +319,7 @@ s8 dlist_del_first(dlist_t *l)
 
 s8 dlist_del_last(dlist_t *l)
 {
-	free_func_t free_f;
+	func_ptr_t free_f;
 	dlist_node_t *prev;
 
 	assert(l != NULL);
@@ -328,7 +328,7 @@ s8 dlist_del_last(dlist_t *l)
 		return -1;
 	}
 
-	free_f = type_free_func(l->type_name);
+	free_f = type_get_func(l->type_name, "free");
 	prev = l->last->prev;
 	dlist_node_del(l->last, free_f);
 	if(l->first == l->last) l->first = NULL;
@@ -340,7 +340,7 @@ s8 dlist_del_last(dlist_t *l)
 
 s8 dlist_del(dlist_t *l)
 {
-	free_func_t free_f;
+	func_ptr_t free_f;
 	dlist_node_t *prev, *next;
 
 	assert(l != NULL);
@@ -349,7 +349,7 @@ s8 dlist_del(dlist_t *l)
 		return -1;
 	}
 
-	free_f = type_free_func(l->type_name);
+	free_f = type_get_func(l->type_name, "free");
 	prev = l->curr->prev;
 	next = l->curr->next;
 	dlist_node_del(l->curr, free_f);
@@ -383,7 +383,7 @@ void *dlist_get(dlist_t *l)
 
 dlist_node_t *dlist_chk(dlist_t *l, void *data)
 {
-	cmp_func_t cmp_f;
+	func_ptr_t cmp_f;
 	dlist_node_t *node = NULL;
 	dlist_node_t *tmp;
 	u32 type_size;
@@ -391,7 +391,7 @@ dlist_node_t *dlist_chk(dlist_t *l, void *data)
 	assert(l != NULL);
 	assert(data != NULL);
 
-	cmp_f = type_cmp_func(l->type_name);
+	cmp_f = type_get_func(l->type_name, "cmp");
 	type_size = type_sizeof(l->type_name);
 	tmp = l->first;
 	while(tmp){
@@ -409,10 +409,10 @@ dlist_node_t *dlist_chk(dlist_t *l, void *data)
 void dlist_free(dlist_t *l)
 {
 	dlist_node_t *tmp, *tmp2;
-	free_func_t free_f;
+	func_ptr_t free_f;
 
 	if(l != NULL){
-		free_f = type_free_func(l->type_name);
+		free_f = type_get_func(l->type_name, "free");
 		tmp = l->first;
 		while(tmp){
 			tmp2 = tmp->next;

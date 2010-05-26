@@ -60,7 +60,7 @@ slist_node_t *slist_node_pop(slist_node_t **head, slist_node_t *node,
 }
 
 slist_node_t *slist_node_del(slist_node_t **head, slist_node_t *node,
-	free_func_t free_f)
+	func_ptr_t free_f)
 {
 	void *data;
 	slist_node_t *prev;
@@ -286,7 +286,7 @@ void *slist_pop(slist_t *l)
 s8 slist_del_first(slist_t *l)
 {
 	slist_node_t *next, *first;
-	free_func_t free_f;
+	func_ptr_t free_f;
 
 	assert(l != NULL);
 	
@@ -297,7 +297,7 @@ s8 slist_del_first(slist_t *l)
 	
 	first = l->first;
 	next = first->next;
-	free_f = type_free_func(l->type_name);
+	free_f = type_get_func(l->type_name, "free");
 	slist_node_del(&first, l->first, free_f);
 
 	if(l->curr == l->first) l->curr = next;
@@ -310,7 +310,7 @@ s8 slist_del_first(slist_t *l)
 s8 slist_del_last(slist_t *l)
 {
 	slist_node_t *prev, *first;
-	free_func_t free_f;
+	func_ptr_t free_f;
 
 	assert(l != NULL);
 	
@@ -319,7 +319,7 @@ s8 slist_del_last(slist_t *l)
 		return -1;
 	}
 	
-	free_f = type_free_func(l->type_name);
+	free_f = type_get_func(l->type_name, "free");
 	first = l->first;
 	prev = slist_node_del(&first, l->last, free_f);
 	if(l->curr == l->last) l->curr = NULL;
@@ -332,7 +332,7 @@ s8 slist_del_last(slist_t *l)
 s8 slist_del(slist_t *l)
 {
 	slist_node_t *first, *prev, *next;
-	free_func_t free_f;
+	func_ptr_t free_f;
 
 	assert(l != NULL);
 
@@ -340,7 +340,7 @@ s8 slist_del(slist_t *l)
 		Error("Current position not set or at the end of the list");
 		return -1;
 	}
-	free_f = type_free_func(l->type_name);
+	free_f = type_get_func(l->type_name, "free");
 	first = l->first;
 	next = l->curr->next;
 	prev = slist_node_del(&first, l->curr, free_f);
@@ -375,7 +375,7 @@ void *slist_get(slist_t *l)
 
 slist_node_t *slist_chk(slist_t *l, void *data)
 {
-	cmp_func_t cmp_f;
+	func_ptr_t cmp_f;
 	slist_node_t *node = NULL;
 	slist_node_t *tmp;
 	u32 type_size;
@@ -383,7 +383,7 @@ slist_node_t *slist_chk(slist_t *l, void *data)
 	assert(l != NULL);
 	assert(data != NULL);
 	
-	cmp_f = type_cmp_func(l->type_name);
+	cmp_f = type_get_func(l->type_name, "cmp");
 	type_size = type_sizeof(l->type_name);
 	tmp = l->first;
 	while(tmp){
@@ -401,10 +401,10 @@ slist_node_t *slist_chk(slist_t *l, void *data)
 void slist_free(slist_t *l)
 {
 	slist_node_t *tmp, *tmp2;
-	free_func_t free_f;
+	func_ptr_t free_f;
 
 	if(l != NULL){
-		free_f = type_free_func(l->type_name);
+		free_f = type_get_func(l->type_name, "free");
 		tmp = l->first;
 		while(tmp != NULL){
 			tmp2 = tmp->next;

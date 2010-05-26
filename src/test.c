@@ -7,6 +7,7 @@
 #include "generic.h"
 #include "slist.h"
 #include "dlist.h"
+#include "funcs.h"
 
 typedef struct{
 	int a;
@@ -39,6 +40,13 @@ s32 test_cmp(test_t *t1, test_t *t2)
 	return 0;
 }
 
+u32 tesf(void *v, int b, int c)
+{
+	int *a = v;
+	printf("%d %d\n", c, INT32_MAX);
+	return *a+b+c;
+}
+
 #define MAX 199
 int main()
 {
@@ -52,6 +60,9 @@ int main()
 	if((types_init(0)) < 0)
 		pError();
 	
+	type_reg("test", sizeof(test_t));
+	
+
 	list = dlist_new("u32");
 	for(i=0; i<MAX; i++){
 		tab[i] = malloc(sizeof(u32));
@@ -61,7 +72,6 @@ int main()
 	
 	dlist_begin(list);
 	while(!dlist_end(list)){
-		dlist_del(list);
 		i_ptr = (u32 *)dlist_get(list);
 		if(i_ptr == NULL) pError();
 		printf("%i ", *i_ptr);

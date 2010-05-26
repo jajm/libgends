@@ -23,7 +23,7 @@ void *dlist_node_get(dlist_node_t *node);
 void dlist_node_pop(dlist_node_t *node, void **data);
 /* Supprime le nœud node et libère la mémoire occupée par la donnée
  * à l'aide de free_f */
-void dlist_node_del(dlist_node_t *node, free_func_t free_f);
+void dlist_node_del(dlist_node_t *node, func_ptr_t free_f);
 
 
 typedef struct {

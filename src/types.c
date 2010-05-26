@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#include <assert.h>
 #include "error.h"
 #include "types.h"
 
@@ -10,19 +11,16 @@
 typedef struct{
 	char *name;
 	u32 size;
-	free_func_t free_f;
-	cmp_func_t cmp_f;
+	funcs_t funcs;
 } type_t;
 
-type_t *type_new(const char *name, u32 size, free_func_t free_f, cmp_func_t cmp_f)
+type_t *type_new(const char *name, u32 size)
 {
 	type_t *t = NULL;
 	size_t len;
 	
-	if(name == NULL || size == 0){
-		Error("Bad parameters");
-		return NULL;
-	}
+	assert(name != NULL);
+	assert(size > 0);
 	
 	if( (t = malloc(sizeof(type_t))) == NULL){
 		Error("Memory allocation error");
@@ -37,8 +35,6 @@ type_t *type_new(const char *name, u32 size, free_func_t free_f, cmp_func_t cmp_
 	}
 	strncpy(t->name, name, len+1);
 	t->size = size;
-	t->free_f = free_f;
-	t->cmp_f = cmp_f;
 
 	return t;
 }
@@ -207,22 +203,22 @@ s8 types_init(u32 size)
 		g_types->types[i] = NULL;
 	
 	/* Types par défaut */
-	type_reg("u8", sizeof(u8), NULL, NULL);
-	type_reg("u16", sizeof(u16), NULL, NULL);
-	type_reg("u32", sizeof(u32), NULL, NULL);
-	type_reg("u64", sizeof(u64), NULL, NULL);
-	type_reg("s8", sizeof(s8), NULL, NULL);
-	type_reg("s16", sizeof(s16), NULL, NULL);
-	type_reg("s32", sizeof(s32), NULL, NULL);
-	type_reg("s64", sizeof(s64), NULL, NULL);
-	type_reg("float", sizeof(float), NULL, NULL);
-	type_reg("double", sizeof(double), NULL, NULL);
-	type_reg("char", sizeof(char), NULL, NULL);
+	type_reg("u8", sizeof(u8));
+	type_reg("u16", sizeof(u16));
+	type_reg("u32", sizeof(u32));
+	type_reg("u64", sizeof(u64));
+	type_reg("s8", sizeof(s8));
+	type_reg("s16", sizeof(s16));
+	type_reg("s32", sizeof(s32));
+	type_reg("s64", sizeof(s64));
+	type_reg("float", sizeof(float));
+	type_reg("double", sizeof(double));
+	type_reg("char", sizeof(char));
 
 	return 0;
 }
 
-s8 type_reg(const char *name, u32 size, free_func_t free, cmp_func_t cmp)
+s8 type_reg(const char *name, u32 size)
 {
 	u32 hash;
 	type_t *type;
@@ -232,7 +228,7 @@ s8 type_reg(const char *name, u32 size, free_func_t free, cmp_func_t cmp)
 		return -1;
 	}
 
-	if( (type = type_new(name, size, free, cmp)) == NULL){
+	if( (type = type_new(name, size)) == NULL){
 		ErrorP("Type creation failed");
 		return -1;
 	}
@@ -244,6 +240,50 @@ s8 type_reg(const char *name, u32 size, free_func_t free, cmp_func_t cmp)
 	}
 	
 	return 0;
+}
+
+s8 type_reg_func(const char *name, const char *func_name, func_ptr_t func_ptr)
+{
+	u32 hash;
+	type_t *type;
+
+	assert(name != NULL);
+	assert(func_name != NULL);
+	assert(func_ptr != NULL);
+	
+	hash = type_hash(name);
+	type = typelist_get(g_types->types[hash], name);
+	if(type){
+		funcs_add(&type->funcs, func_new(func_name, func_ptr));
+	}else{
+		ErrorP("Failed to find type '%s'", name);
+		return -1;
+	}
+
+	return 0;
+}
+
+func_ptr_t type_get_func(const char *name, const char *func_name)
+{
+	u32 hash;
+	type_t *type;
+	func_ptr_t func_ptr = NULL;
+
+	assert(name != NULL);
+	assert(func_name != NULL);
+
+	hash = type_hash(name);
+	type = typelist_get(g_types->types[hash], name);
+	if(type){
+		if(type->funcs)
+			func_ptr = funcs_get_ptr(type->funcs, func_name);
+		else
+			Error("No functions associated with type %s", name);
+	}else{
+		ErrorP("Failed to find type '%s'", name);
+	}
+
+	return func_ptr;
 }
 
 s8 type_unreg(const char *name)
@@ -263,6 +303,23 @@ s8 type_unreg(const char *name)
 	if( (typelist_del(&g_types->types[hash], name)) < 0){
 		ErrorP("Deleting type '%s' from hash table failed", name);
 		return -1;
+	}
+
+	return 0;
+}
+
+s8 type_unreg_func(const char *name, const char *func_name)
+{
+	u32 hash;
+	type_t *type;
+
+	assert(name != NULL);
+	assert(func_name != NULL);
+	
+	hash = type_hash(name);
+	type = typelist_get(g_types->types[hash], name);
+	if(type){
+		funcs_del(&(type->funcs), func_name);
 	}
 
 	return 0;
@@ -296,46 +353,6 @@ u32 type_sizeof(const char *name)
 	if(size == 0) Error("Type '%s' doesn't exist");
 
 	return size;
-}
-
-free_func_t type_free_func(const char *name)
-{
-	type_t *t;
-	u32 hash;
-
-	if(name == NULL){
-		Error("Bad parameters");
-		return NULL;
-	}
-
-	hash = type_hash(name);
-	t = typelist_get(g_types->types[hash], name);
-	if(t == NULL){
-		Error("Type '%s' doesn't exist");
-		return NULL;
-	}
-
-	return t->free_f;
-}
-
-cmp_func_t type_cmp_func(const char *name)
-{
-	type_t *t;
-	u32 hash;
-
-	if(name == NULL){
-		Error("Bad parameters");
-		return NULL;
-	}
-
-	hash = type_hash(name);
-	t = typelist_get(g_types->types[hash], name);
-	if(t == NULL){
-		Error("Type '%s' doesn't exist", name);
-		return NULL;
-	}
-
-	return t->cmp_f;
 }
 
 void types_free(void)
