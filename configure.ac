@@ -1,16 +1,16 @@
 AC_PREREQ([2.65])
-AC_INIT([libgenty], [0.1], [diwan@frankiz.eu])
+AC_INIT([libgends], [0.1], [diwan@frankiz.eu])
 AM_INIT_AUTOMAKE([-Wall -Werror silent-rules subdir-objects])
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADERS([config.h])
 
 # Libtool version info
-LIBGENTY_CUR=0
-LIBGENTY_REV=0
-LIBGENTY_AGE=0
-AC_SUBST(LIBGENTY_CUR)
-AC_SUBST(LIBGENTY_REV)
-AC_SUBST(LIBGENTY_AGE)
+LIBGENDS_CUR=0
+LIBGENDS_REV=0
+LIBGENDS_AGE=0
+AC_SUBST(LIBGENDS_CUR)
+AC_SUBST(LIBGENDS_REV)
+AC_SUBST(LIBGENDS_AGE)
 
 # Check for programs
 AC_PROG_AWK
@@ -32,7 +32,7 @@ AC_CHECK_FUNCS([memmove])
 
 AC_CONFIG_FILES([
 	Makefile
-	libgenty.pc
+	libgends.pc
 	src/Makefile
 	src/list/Makefile
 ])
