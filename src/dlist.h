@@ -1,8 +1,8 @@
 #ifndef dlist_h_included
 #define dlist_h_included
 
-#include "basic_types.h"
-#include "types.h"
+#include "core/basic_types.h"
+#include "core/types.h"
 
 typedef struct dlist_node_s {
 	struct dlist_node_s *prev;

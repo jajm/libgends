@@ -2,12 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stddef.h>
-#include "error.h"
-#include "types.h"
+#include "core/error.h"
+#include "core/types.h"
 #include "generic.h"
 #include "slist.h"
 #include "dlist.h"
-#include "funcs.h"
+#include "core/funcs.h"
 
 typedef struct{
 	int a;

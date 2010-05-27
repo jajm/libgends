@@ -34,7 +34,7 @@ AC_CONFIG_FILES([
 	Makefile
 	libgends.pc
 	src/Makefile
-	src/list/Makefile
+	src/core/Makefile
 ])
 
 AM_SILENT_RULES

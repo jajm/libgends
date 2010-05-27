@@ -2,8 +2,8 @@
 #include <string.h>
 #include <assert.h>
 #include "slist.h"
-#include "types.h"
-#include "error.h"
+#include "core/types.h"
+#include "core/error.h"
 
 slist_node_t *slist_node_add_after(slist_node_t *node, void *data)
 {

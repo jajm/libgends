@@ -2,8 +2,8 @@
 #include <string.h>
 #include <assert.h>
 #include "dlist.h"
-#include "types.h"
-#include "error.h"
+#include "core/types.h"
+#include "core/error.h"
 
 dlist_node_t *dlist_node_add_before(dlist_node_t *node, void *data)
 {
