@@ -11,7 +11,7 @@
 #ifndef generic_h_included
 #define generic_h_included
 
-#include "core/basic_types.h"
+#include "basic_types.h"
 
 typedef struct{
 	char *type_name;	/* Type de la donnée */

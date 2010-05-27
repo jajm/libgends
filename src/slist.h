@@ -16,8 +16,8 @@
 #ifndef slist_h_included
 #define slist_h_included
 
-#include "core/basic_types.h"
-#include "core/types.h"
+#include "basic_types.h"
+#include "types.h"
 
 /* Noeud d'une liste simplement chainée à largeur variable */
 typedef struct slist_node_s{
@@ -144,6 +144,8 @@ slist_node_t *slist_chk(slist_t *l, void *data);
 
 /* Libération de la mémoire */
 void slist_free(slist_t *l);
+
+void slist_destroy(slist_t *l);
 
 #endif /* Not slist_h_included */
 

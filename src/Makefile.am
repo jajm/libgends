@@ -1,9 +1,10 @@
+AM_CPPFLAGS = -Icore
 AM_CFLAGS = -Wall -Wextra -Werror -std=c99
 
 SUBDIRS = core
 
 nobase_pkginclude_HEADERS = core/types.h core/error.h core/funcs.h \
-			generic.h slist.h dlist.h
+			generic.h slist.h dlist.h stack.h
 lib_LTLIBRARIES = libgends.la
 noinst_PROGRAMS = test
 

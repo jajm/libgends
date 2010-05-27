@@ -2,8 +2,8 @@
 #include <string.h>
 #include <assert.h>
 #include "dlist.h"
-#include "core/types.h"
-#include "core/error.h"
+#include "types.h"
+#include "error.h"
 
 dlist_node_t *dlist_node_add_before(dlist_node_t *node, void *data)
 {
@@ -424,3 +424,19 @@ void dlist_free(dlist_t *l)
 		free(l);
 	}
 }
+
+void dlist_destroy(dlist_t *l)
+{
+	dlist_node_t *tmp, *tmp2;
+
+	if(l != NULL){
+		tmp = l->first;
+		while(tmp){
+			tmp2 = tmp->next;
+			free(tmp);
+			tmp = tmp2;
+		}
+		free(l);
+	}
+}
+

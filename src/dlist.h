@@ -1,8 +1,8 @@
 #ifndef dlist_h_included
 #define dlist_h_included
 
-#include "core/basic_types.h"
-#include "core/types.h"
+#include "basic_types.h"
+#include "types.h"
 
 typedef struct dlist_node_s {
 	struct dlist_node_s *prev;
@@ -140,6 +140,7 @@ dlist_node_t *dlist_chk(dlist_t *l, void *data);
 /* Libération de la mémoire */
 void dlist_free(dlist_t *l);
 
+void dlist_destroy(dlist_t *l);
 
 #endif /* Not dlist_h_included */
 

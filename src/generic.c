@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "core/types.h"
-#include "core/error.h"
+#include "types.h"
+#include "error.h"
 #include "generic.h"
 
 generic_t * generic(const char *type_name, const void *data_ptr)

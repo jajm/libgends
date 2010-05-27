@@ -2,12 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stddef.h>
-#include "core/error.h"
-#include "core/types.h"
-#include "generic.h"
-#include "slist.h"
-#include "dlist.h"
-#include "core/funcs.h"
+#include "error.h"
+#include "stack.h"
 
 typedef struct{
 	int a;
@@ -50,36 +46,28 @@ u32 tesf(void *v, int b, int c)
 #define MAX 199
 int main()
 {
-	dlist_t *list;
-	u32 *tab[MAX];
-	u32 i;
-	u32 *i_ptr;
+	stack_t *S;
+	test_t *t1, *t2, *T;
 
 	Error_init();
-	
 	if((types_init(0)) < 0)
 		pError();
 	
 	type_reg("test", sizeof(test_t));
-	
+	type_reg_func("test", "free", (func_ptr_t)&test_free);
+	type_reg_func("test", "cmp", (func_ptr_t)&test_cmp);
 
-	list = dlist_new("u32");
-	for(i=0; i<MAX; i++){
-		tab[i] = malloc(sizeof(u32));
-		*tab[i] = i;
-		dlist_add_last(list, tab[i]);
-	}
-	
-	dlist_begin(list);
-	while(!dlist_end(list)){
-		i_ptr = (u32 *)dlist_get(list);
-		if(i_ptr == NULL) pError();
-		printf("%i ", *i_ptr);
-		dlist_next(list);
-	}
-	printf("\n");
-	
-	dlist_free(list);
+	S = stack_new("test");
+	t1 = test_new(2);
+	t2 = test_new(4);
+	stack_push(S, t1);
+	stack_push(S, t2);
+	T = stack_pop(S);
+	printf("%s\n", T->s);
+	/*T = stack_pop(S);
+	printf("%s\n", T->s);
+	*/stack_free(S);
+
 	types_free();
 
 	return 0;

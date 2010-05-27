@@ -2,8 +2,8 @@
 #include <string.h>
 #include <assert.h>
 #include "slist.h"
-#include "core/types.h"
-#include "core/error.h"
+#include "types.h"
+#include "error.h"
 
 slist_node_t *slist_node_add_after(slist_node_t *node, void *data)
 {
@@ -416,3 +416,19 @@ void slist_free(slist_t *l)
 		free(l);
 	}
 }
+
+void slist_destroy(slist_t *l)
+{
+	slist_node_t *tmp, *tmp2;
+
+	if(l != NULL){
+		tmp = l->first;
+		while(tmp != NULL){
+			tmp2 = tmp->next;
+			free(tmp);
+			tmp = tmp2;
+		}
+		free(l);
+	}
+}
+
