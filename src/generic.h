@@ -1,4 +1,23 @@
 /*****************************************************************************
+ * Copyright (C) 2010 Julian Maurice                                         *
+ *                                                                           *
+ * This file is part of libgends.                                            *
+ *                                                                           *
+ * libgends is free software: you can redistribute it and/or modify          *
+ * it under the terms of the GNU General Public License as published by      *
+ * the Free Software Foundation, either version 3 of the License, or         *
+ * (at your option) any later version.                                       *
+ *                                                                           *
+ * libgends is distributed in the hope that it will be useful,               *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of            *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             *
+ * GNU General Public License for more details.                              *
+ *                                                                           *
+ * You should have received a copy of the GNU General Public License         *
+ * along with libgends.  If not, see <http://www.gnu.org/licenses/>.         *
+ *****************************************************************************/
+
+/*****************************************************************************
  * Fichier		: generic.h                                          *
  * Brève Description	: Donnée générique                                   *
  * Auteur		: Julian Maurice                                     *
@@ -23,7 +42,7 @@ extern "C" {
 #endif
 
 /* Crée une donnée générique à partir des arguments */
-generic_t * generic(const char *type_name, const void *data_ptr);
+generic_t *generic(const char *type_name, const void *data_ptr);
 
 /* Affecte une valeur à une donnée générique */
 s8 generic_affect(generic_t **g, const char *type_name, const void *data_ptr);

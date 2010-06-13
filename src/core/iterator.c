@@ -1,3 +1,42 @@
+/*****************************************************************************
+ * Copyright (C) 2010 Julian Maurice                                         *
+ *                                                                           *
+ * This file is part of libgends.                                            *
+ *                                                                           *
+ * libgends is free software: you can redistribute it and/or modify          *
+ * it under the terms of the GNU General Public License as published by      *
+ * the Free Software Foundation, either version 3 of the License, or         *
+ * (at your option) any later version.                                       *
+ *                                                                           *
+ * libgends is distributed in the hope that it will be useful,               *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of            *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             *
+ * GNU General Public License for more details.                              *
+ *                                                                           *
+ * You should have received a copy of the GNU General Public License         *
+ * along with libgends.  If not, see <http://www.gnu.org/licenses/>.         *
+ *****************************************************************************/
+
+/*****************************************************************************
+ * Fichier		: iterator.h                                         *
+ * Description Brève	: Gestion d'itérateurs                               *
+ * Auteur		: Julian Maurice                                     *
+ * Crée le		: 01/06/2010                                         *
+ *****************************************************************************
+ * Les fonctions ci-dessous définissent une interface pour la création       *
+ * d'itérateurs sur n'importe quelle structure de données.                   *
+ * La création d'un itérateur requiert l'existence d'un type correspondant   *
+ * (voir types.h).                                                           *
+ * Le type de l'itérateur doit posséder les fonctions suivantes:             *
+ * - void *first(void *container);	Retourne un pointeur vers le 1er élt *
+ * - void *next(void *container, void *pointer);    Retourne un pointeur     *
+ *                                                  vers l'élt suivant       *
+ * - void *get(void *container, void *pointer);	    Retourne un pointeur     *
+ *                                                  vers la donnée           *
+ * - s8 end(void *container, void *pointer);	Retourne 1 si tous les élts  *
+ *						ont été itérés, 0 sinon      *
+ *****************************************************************************/
+
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>

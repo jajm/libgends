@@ -1,3 +1,32 @@
+/*****************************************************************************
+ * Copyright (C) 2010 Julian Maurice                                         *
+ *                                                                           *
+ * This file is part of libgends.                                            *
+ *                                                                           *
+ * libgends is free software: you can redistribute it and/or modify          *
+ * it under the terms of the GNU General Public License as published by      *
+ * the Free Software Foundation, either version 3 of the License, or         *
+ * (at your option) any later version.                                       *
+ *                                                                           *
+ * libgends is distributed in the hope that it will be useful,               *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of            *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             *
+ * GNU General Public License for more details.                              *
+ *                                                                           *
+ * You should have received a copy of the GNU General Public License         *
+ * along with libgends.  If not, see <http://www.gnu.org/licenses/>.         *
+ *****************************************************************************/
+
+/*****************************************************************************
+ * Fichier		: generic.h                                          *
+ * Brève Description	: Donnée générique                                   *
+ * Auteur		: Julian Maurice                                     *
+ * Créé le		: 01/03/2010                                         *
+ *****************************************************************************
+ * Une donnée générique associe un type (représenté par un nom unique, voir  *
+ * types.h) et un pointeur générique (void *) vers une donnée de ce type.    *
+ *****************************************************************************/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,7 +34,7 @@
 #include "error.h"
 #include "generic.h"
 
-generic_t * generic(const char *type_name, const void *data_ptr)
+generic_t *generic(const char *type_name, const void *data_ptr)
 {
 	generic_t *g;
 	u32 data_size;
@@ -125,9 +154,9 @@ s32 generic_cmp(const generic_t *g1, const generic_t *g2)
 			ptr = calloc(diff, 1);
 			if(ptr){
 				if(size1 < size2)
-					cmp += memcmp(ptr, g2->data_ptr+min, diff);
+					cmp+=memcmp(ptr,g2->data_ptr+min,diff);
 				else
-					cmp += memcmp(g1->data_ptr+min, ptr, diff);
+					cmp+=memcmp(g1->data_ptr+min,ptr,diff);
 				free(ptr);
 			}else{
 				cmp += size1 - size2;

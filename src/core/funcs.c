@@ -1,3 +1,32 @@
+/*****************************************************************************
+ * Copyright (C) 2010 Julian Maurice                                         *
+ *                                                                           *
+ * This file is part of libgends.                                            *
+ *                                                                           *
+ * libgends is free software: you can redistribute it and/or modify          *
+ * it under the terms of the GNU General Public License as published by      *
+ * the Free Software Foundation, either version 3 of the License, or         *
+ * (at your option) any later version.                                       *
+ *                                                                           *
+ * libgends is distributed in the hope that it will be useful,               *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of            *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             *
+ * GNU General Public License for more details.                              *
+ *                                                                           *
+ * You should have received a copy of the GNU General Public License         *
+ * along with libgends.  If not, see <http://www.gnu.org/licenses/>.         *
+ *****************************************************************************/
+
+/*****************************************************************************
+ * Fichier		: funcs.h                                            *
+ * Description Brève	: Liste de fonctions génériques                      *
+ * Auteur		: Julian Maurice                                     *
+ * Créé le		: 13/03/2010					     *
+ *****************************************************************************
+ * Liste de fonctions génériques (en réalité de pointeurs de fonctions de    *
+ * type intptr_t (*ptr)(void *, ...) ).                                      *
+ *****************************************************************************/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -5,6 +34,7 @@
 #include <assert.h>
 #include "error.h"
 #include "funcs.h"
+
 
 func_t *func_new(const char *func_name, func_ptr_t func_ptr)
 {
@@ -51,7 +81,6 @@ void func_free(func_t *func)
 		free(func);
 	}
 }
-
 
 func_list_node_t *funcs_add(funcs_t *head, func_t *func)
 {

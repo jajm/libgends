@@ -1,16 +1,31 @@
 /*****************************************************************************
+ * Copyright (C) 2010 Julian Maurice                                         *
+ *                                                                           *
+ * This file is part of libgends.                                            *
+ *                                                                           *
+ * libgends is free software: you can redistribute it and/or modify          *
+ * it under the terms of the GNU General Public License as published by      *
+ * the Free Software Foundation, either version 3 of the License, or         *
+ * (at your option) any later version.                                       *
+ *                                                                           *
+ * libgends is distributed in the hope that it will be useful,               *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of            *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             *
+ * GNU General Public License for more details.                              *
+ *                                                                           *
+ * You should have received a copy of the GNU General Public License         *
+ * along with libgends.  If not, see <http://www.gnu.org/licenses/>.         *
+ *****************************************************************************/
+ 
+ /****************************************************************************
  * Fichier           : slist.h                                               *
- * Description Brève : Gestion d'une liste simplement chainée à largeur      *
- *                     variable                                              *
+ * Description Brève : Gestion d'une liste simplement chainée générique      *
  * Auteur            : Julian Maurice                                        *
  * Créé le           : 01/03/2010                                            *
  *****************************************************************************
- * Une liste chainée à largeur variable est une liste chainée dont les       *
- * nœuds contiennent des données de différentes tailles.                     *
- * C'est utile pour stocker dans une même structure des données de types     *
- * différents.                                                               *
- * Voir les fichiers "generic.h" et "generic.c" pour savoir comment ceci est *
- * implémenté, ainsi que les fichiers "types.h" et "types.c".                *
+ * Une liste chainée générique peut contenir tout type de données, à partir  *
+ * du moment où un type utilisateur correspondant existe.                    *
+ * Voir types.h pour plus d'informations sur les types utilisateurs          *
  *****************************************************************************/
 
 #ifndef slist_h_included
@@ -25,6 +40,10 @@ typedef struct slist_node_s{
 	void *data;
 	struct slist_node_s *next;
 } slist_node_t;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* Ajoute un nœud contenant data après node
  * Si node == NULL, crée un nouveau nœud seul
@@ -42,6 +61,9 @@ slist_node_t *slist_node_pop(slist_node_t **head, slist_node_t *node,
 slist_node_t *slist_node_del(slist_node_t **head, slist_node_t *node,
 	func_ptr_t free_f);
 
+#ifdef __cplusplus
+}
+#endif
 
 typedef struct{
 	char *type_name;
@@ -49,6 +71,10 @@ typedef struct{
 	slist_node_t *last;	/* Dernier nœud */
 } slist_t;
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* Crée une nouvelle liste et retourne l'adresse de cette liste */
 slist_t *slist_new(const char *type_name);
@@ -141,6 +167,10 @@ void slist_free(slist_t *l);
 
 /* Détruit la liste sans libérer la mémoire des données contenues dedans */
 void slist_destroy(slist_t *l);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* Not slist_h_included */
 
