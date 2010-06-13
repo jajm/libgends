@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stddef.h>
 #include "error.h"
-#include "stack.h"
+#include "slist.h"
 
 typedef struct{
 	int a;
@@ -43,11 +43,15 @@ u32 tesf(void *v, int b, int c)
 	return *a+b+c;
 }
 
-#define MAX 199
+#define MAX 20
 int main()
 {
-	stack_t *S;
-	test_t *t1, *t2, *T;
+	slist_t *L;
+	test_t *toh = test_new(400);
+	u32 i;
+	test_t * tab[MAX];
+	test_t *T;
+	iterator_t *it;
 
 	Error_init();
 	if((types_init(0)) < 0)
@@ -55,18 +59,34 @@ int main()
 	
 	type_reg("test", sizeof(test_t));
 	type_reg_func("test", "free", (func_ptr_t)&test_free);
-	type_reg_func("test", "cmp", (func_ptr_t)&test_cmp);
 
-	S = stack_new("test");
-	t1 = test_new(2);
-	t2 = test_new(4);
-	stack_push(S, t1);
-	stack_push(S, t2);
-	T = stack_pop(S);
-	printf("%s\n", T->s);
-	/*T = stack_pop(S);
-	printf("%s\n", T->s);
-	*/stack_free(S);
+	for(i=0; i<MAX; i++){
+		tab[i] = test_new(i);
+	}
+
+	L = slist_new("test");
+	for(i=0; i<MAX; i++){
+		slist_add_last(L, tab[i]);
+	}
+
+	it = slist_iterator_new(L);
+	
+	iterator_next(it);
+	iterator_next(it);
+	iterator_next(it);
+	iterator_next(it);
+	slist_add(it, toh);
+
+	iterator_reset(it);
+	while(!iterator_end(it)){
+		T = (test_t *)iterator_get(it);
+		printf("%s\n", T->s);
+		iterator_next(it);
+	}
+	
+	iterator_free(it);
+	printf("\n");
+	slist_free(L);
 
 	types_free();
 

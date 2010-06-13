@@ -65,7 +65,7 @@ s8 typelist_add(typelist_t *tlist, type_t *type)
 	while(tmp != NULL){
 		if(strcmp(tmp->type->name, type->name) == 0){
 			Error("Type %s already exists", type->name);
-			return -1;
+			return 1;
 		}
 		tmp2 = tmp;
 		tmp = tmp->next;
@@ -220,6 +220,7 @@ s8 types_init(u32 size)
 
 s8 type_reg(const char *name, u32 size)
 {
+	s8 tla;
 	u32 hash;
 	type_t *type;
 
@@ -234,12 +235,12 @@ s8 type_reg(const char *name, u32 size)
 	}
 	
 	hash = type_hash(name);
-	if( typelist_add(&g_types->types[hash], type) < 0){
+	tla = typelist_add(&g_types->types[hash], type);
+	if(tla != 0){
 		ErrorP("Adding type '%s' to the hash table failed", name);
-		return -1;
 	}
 	
-	return 0;
+	return tla;
 }
 
 s8 type_reg_func(const char *name, const char *func_name, func_ptr_t func_ptr)

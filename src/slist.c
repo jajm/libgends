@@ -101,30 +101,8 @@ slist_t *slist_new(const char *type_name)
 
 	l->first = NULL;
 	l->last = NULL;
-	l->curr = NULL;
 	
 	return l;
-}
-
-void slist_begin(slist_t *l)
-{
-	assert(l != NULL);
-
-	l->curr = l->first;
-}
-
-s8 slist_next(slist_t *l)
-{
-	assert(l != NULL);
-
-	if(l->curr == NULL){
-		Error("Current position not set or at the end of the list");
-		return -1;
-	}
-	
-	l->curr = l->curr->next;
-
-	return 0;
 }
 
 s8 slist_empty(slist_t *l)
@@ -136,12 +114,30 @@ s8 slist_empty(slist_t *l)
 	return 0;
 }
 
-s8 slist_end(slist_t *l)
+slist_node_t *slist_first(slist_t *l)
+{
+	assert(l != NULL);
+
+	return l->first;
+}
+
+slist_node_t *slist_next(slist_t *l, slist_node_t *node)
 {
 	assert(l != NULL);
 	
-	if(l->curr == NULL)
+	if(node == NULL)
+		return NULL;
+
+	return node->next;
+}
+
+s8 slist_end(slist_t *l, slist_node_t *node)
+{
+	assert(l != NULL);
+
+	if(node == NULL)
 		return 1;
+	
 	return 0;
 }
 
@@ -183,22 +179,22 @@ slist_node_t *slist_add_last(slist_t *l, void *data)
 	return newnode;
 }
 
-slist_node_t *slist_add(slist_t *l, void *data)
+slist_node_t *slist_add(iterator_t *it, void *data)
 {
 	slist_node_t *newnode;
+	slist_t *l;
 
-	assert(l != NULL);
+	assert(it != NULL);
+	assert(it->container != NULL);
+	assert(it->pointer != NULL);
 	assert(data != NULL);
 	
-	if(l->curr == NULL){
-		Error("Current position not set or at the end of the list");
-		return NULL;
-	}
-	if((newnode = slist_node_add_after(l->curr, data)) == NULL){
+	if((newnode = slist_node_add_after(it->pointer, data)) == NULL){
 		ErrorP("Failed to create a new node");
 		return NULL;
 	}
-	if(l->last == l->curr) l->last = newnode;
+	l = (slist_t *)it->container;
+	if(it->pointer == l->last) l->last = newnode;
 
 	return newnode;
 }
@@ -222,7 +218,6 @@ void *slist_pop_first(slist_t *l)
 		ErrorP("Failed to pop the node");
 		return NULL;
 	}
-	if(l->curr == l->first) l->curr = next;
 	if(l->last == l->first) l->last = NULL;
 	l->first = first;
 
@@ -248,36 +243,32 @@ void *slist_pop_last(slist_t *l)
 		ErrorP("Failed to pop the node");
 		return NULL;
 	}
-	if(l->curr == l->last) l->curr = NULL;
 	l->last = prev;
 	l->first = first;
 
 	return data;
 }
 
-
-void *slist_pop(slist_t *l)
+void *slist_pop(iterator_t *it)
 {
-	slist_node_t *first;
-	slist_node_t *prev, *next;
 	void *data;
+	slist_t *l;
+	slist_node_t *first, *prev, *node;
 
-	assert(l != NULL);
+	assert(it != NULL);
+	assert(it->container != NULL);
+	assert(it->pointer != NULL);
 	
-	if(l->curr == NULL){
-		Error("Current position not set or at the end of the list");
-		return NULL;
-	}
-
+	l = (slist_t *)it->container;
 	first = l->first;
-	next = l->curr->next;
-	prev = slist_node_pop(&first, l->curr, &data);
+	node = it->pointer;
+	iterator_next(it);
+	prev = slist_node_pop(&first, node, &data);
 	if(data == NULL){
 		ErrorP("Failed to pop the node");
 		return NULL;
 	}
-	if(l->curr == l->last) l->last = prev;
-	l->curr = next;
+	if(node == l->last) l->last = prev;
 	l->first = first;
 
 	return data;
@@ -300,7 +291,6 @@ s8 slist_del_first(slist_t *l)
 	free_f = type_get_func(l->type_name, "free");
 	slist_node_del(&first, l->first, free_f);
 
-	if(l->curr == l->first) l->curr = next;
 	if(l->last == l->first) l->last = NULL;
 	l->first = first;
 
@@ -322,30 +312,29 @@ s8 slist_del_last(slist_t *l)
 	free_f = type_get_func(l->type_name, "free");
 	first = l->first;
 	prev = slist_node_del(&first, l->last, free_f);
-	if(l->curr == l->last) l->curr = NULL;
 	l->last = prev;
 	l->first = first;
 
 	return 0;
 }
 
-s8 slist_del(slist_t *l)
+s8 slist_del(iterator_t *it)
 {
-	slist_node_t *first, *prev, *next;
+	slist_t *l;
+	slist_node_t *prev, *first, *node;
 	func_ptr_t free_f;
 
-	assert(l != NULL);
+	assert(it != NULL);
+	assert(it->container != NULL);
+	assert(it->pointer != NULL);
 
-	if(l->curr == NULL){
-		Error("Current position not set or at the end of the list");
-		return -1;
-	}
+	l = (slist_t *)it->container;
 	free_f = type_get_func(l->type_name, "free");
 	first = l->first;
-	next = l->curr->next;
-	prev = slist_node_del(&first, l->curr, free_f);
-	if(l->curr == l->last) l->last = prev;
-	l->curr = next;
+	node = it->pointer;
+	iterator_next(it);
+	prev = slist_node_del(&first, node, free_f);
+	if(node == l->last) l->last = prev;
 	l->first = first;
 
 	return 0;
@@ -365,12 +354,35 @@ void *slist_get_last(slist_t *l)
 	return slist_node_get(l->last);
 }
 
-void *slist_get(slist_t *l)
+void *slist_get(slist_t *l, slist_node_t *node)
 {
 	assert(l != NULL);
 
-	return slist_node_get(l->curr);
+	return slist_node_get(node);
 }
+
+iterator_t *slist_iterator_new(slist_t *l)
+{
+	iterator_t *it;
+	s8 tr;
+
+	assert(l != NULL);
+
+	tr = type_reg("slist_it", sizeof(iterator_t));
+	if(tr < 0) return NULL;
+
+	if(tr == 0){
+		type_reg_func("slist_it", "first", (func_ptr_t)&slist_first);
+		type_reg_func("slist_it", "next", (func_ptr_t)&slist_next);
+		type_reg_func("slist_it", "get", (func_ptr_t)&slist_get);
+		type_reg_func("slist_it", "end", (func_ptr_t)&slist_end);
+	}
+
+	it = iterator_new("slist_it", l);
+	iterator_reset(it);
+
+	return it;
+}		
 
 
 slist_node_t *slist_chk(slist_t *l, void *data)

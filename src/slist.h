@@ -18,6 +18,7 @@
 
 #include "basic_types.h"
 #include "types.h"
+#include "iterator.h"
 
 /* Noeud d'une liste simplement chainée à largeur variable */
 typedef struct slist_node_s{
@@ -46,27 +47,24 @@ typedef struct{
 	char *type_name;
 	slist_node_t *first;	/* Premier nœud */
 	slist_node_t *last;	/* Dernier nœud */
-	slist_node_t *curr;	/* Position courante */
 } slist_t;
 
 
 /* Crée une nouvelle liste et retourne l'adresse de cette liste */
 slist_t *slist_new(const char *type_name);
 
-/* Réinitialise la position courante au début de la liste */
-void slist_begin(slist_t *l);
-
-/* Déplace la position courante vers le nœud suivant
- * Retourne -1 si le nœeud suivant n'existe pas (fin de liste), 0 sinon */
-s8 slist_next(slist_t *l);
-
 /* Teste si la liste est vide (0 = non vide, 1 = vide) */
 s8 slist_empty(slist_t *l);
 
-/* Teste si la position courante est à la fin de la liste */
-/* (après le dernier élément) */
-/* Retourne 1 si c'est la fin, 0 sinon */
-s8 slist_end(slist_t *l);
+/* Retourne l'adresse du premier nœud */
+slist_node_t *slist_first(slist_t *l);
+
+/* Retourne l'adresse du nœud suivant */
+slist_node_t *slist_next(slist_t *l, slist_node_t *node);
+
+/* Retourne 1 si node == NULL, 0 sinon */
+s8 slist_end(slist_t *l, slist_node_t *node);
+
 
 /* ========================================================================= */
 /*                             Fonctions d'ajout                             */
@@ -74,27 +72,15 @@ s8 slist_end(slist_t *l);
 
 /* Ajoute un nœud à la liste en première position */
 /* Retourne l'adresse du nouveau nœud */
-slist_node_t *slist_add_first(
-	slist_t *l,		/* Liste à modifier */
-	void *data		/* Donnée à associer au nœud.
-				   Ne pas libérer la mémoire. */
-);
+slist_node_t *slist_add_first(slist_t *l, void *data);
 
 /* Ajoute un nœud à la liste en dernière position */
 /* Retourne l'adresse du nouveau nœud */
-slist_node_t *slist_add_last(
-	slist_t *l,		/* Liste à modifier */
-	void *data		/* Donnée à associer au nœud.
-				   Ne pas libérer la mémoire. */
-);
+slist_node_t *slist_add_last(slist_t *l, void *data);
 
-/* Ajoute un nœud à la liste après la position courante */
-/* Retourne l'adresse du nouveau nœud */
-slist_node_t *slist_add(
-	slist_t *l,		/* Liste à modifier */
-	void *data		/* Donnée à associer au nœud.
-				   Ne pas libérer la mémoire */
-);
+/* Ajoute un nœud à la liste après l'itérateur */
+slist_node_t *slist_add(iterator_t *it, void *data);
+
 
 /* ========================================================================= */
 /*                          Fonctions de suppression                         */
@@ -107,8 +93,9 @@ void *slist_pop_first(slist_t *l);
 /* Supprime le dernier nœud de la liste */
 void *slist_pop_last(slist_t *l);
 
-/* Supprime le nœud de la liste à la position courante */
-void *slist_pop(slist_t *l);
+/* Supprime le nœud sur lequel pointe l'itérateur */
+void *slist_pop(iterator_t *it);
+
 
 /* ---------- Supprime un nœud ainsi que la donnée qu'il contient ---------- */
 /* Supprime le premier nœud de la liste */
@@ -117,9 +104,8 @@ s8 slist_del_first(slist_t *l);
 /* Supprime le dernier nœud de la liste */
 s8 slist_del_last(slist_t *l);
 
-/* Supprime le nœud de la liste à la position courante */
-s8 slist_del(slist_t *l);
-
+/* Supprime le nœud sur lequel pointe l'itérateur */
+s8 slist_del(iterator_t *it);
 
 /* ========================================================================= */
 /*                  Fonctions de récupération des données                    */
@@ -131,8 +117,16 @@ void *slist_get_first(slist_t *l);
 /* Récupère la donnée du dernier nœud de la liste */
 void *slist_get_last(slist_t *l);
 
-/* Récupère la donnée du nœud de la liste à la position courante */
-void *slist_get(slist_t *l);
+/* Récupère la donnée du nœud passé en paramètre */
+void *slist_get(slist_t *l, slist_node_t *node);
+
+
+/* ========================================================================= */
+/*                                Itérateurs                                 */
+/* ========================================================================= */
+
+/* Crée un itérateur */
+iterator_t *slist_iterator_new(slist_t *l);
 
 
 /* ========================================================================= */
@@ -145,6 +139,7 @@ slist_node_t *slist_chk(slist_t *l, void *data);
 /* Libération de la mémoire */
 void slist_free(slist_t *l);
 
+/* Détruit la liste sans libérer la mémoire des données contenues dedans */
 void slist_destroy(slist_t *l);
 
 #endif /* Not slist_h_included */

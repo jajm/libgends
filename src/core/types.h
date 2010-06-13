@@ -19,8 +19,12 @@ extern "C" {
 #endif
 
 /* À appeler avant d'utiliser les autres fonctions */
+/* Retourne 0, ou une valeur négative s'il y a eu une erreur */
 s8 types_init(u32 size);
 /* Enregistrer un nouveau type */
+/* Retourne une valeur négative s'il y a eu une erreur, */
+/* 	    une valeur positive si le type existe déjà, */
+/*	    0 sinon */
 s8 type_reg(const char *name, u32 size);
 /* Associer une fonction à un type */
 s8 type_reg_func(const char *name, const char *func_name, func_ptr_t func_ptr);
