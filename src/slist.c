@@ -290,8 +290,8 @@ void *slist_pop(iterator_t *it)
 	assert(it->pointer != NULL);
 	
 	l = (slist_t *)it->container;
+	node = (slist_node_t *)it->pointer;
 	first = l->first;
-	node = it->pointer;
 	iterator_next(it);
 	prev = slist_node_pop(&first, node, &data);
 	if(data == NULL){
@@ -359,9 +359,9 @@ s8 slist_del(iterator_t *it)
 	assert(it->pointer != NULL);
 
 	l = (slist_t *)it->container;
+	node = (slist_node_t *)it->pointer;
 	free_f = type_get_func(l->type_name, "free");
 	first = l->first;
-	node = it->pointer;
 	iterator_next(it);
 	prev = slist_node_del(&first, node, free_f);
 	if(node == l->last) l->last = prev;

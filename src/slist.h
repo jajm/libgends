@@ -89,6 +89,7 @@ slist_node_t *slist_first(slist_t *l);
 slist_node_t *slist_next(slist_t *l, slist_node_t *node);
 
 /* Retourne 1 si node == NULL, 0 sinon */
+/* Utilisée par les itérateurs */
 s8 slist_end(slist_t *l, slist_node_t *node);
 
 

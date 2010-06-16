@@ -22,7 +22,7 @@
 #include <string.h>
 #include <stddef.h>
 #include "error.h"
-#include "slist.h"
+#include "dlist.h"
 
 typedef struct{
 	int a;
@@ -65,7 +65,7 @@ u32 tesf(void *v, int b, int c)
 #define MAX 20
 int main()
 {
-	slist_t *L;
+	dlist_t *L;
 	test_t *toh = test_new(400);
 	u32 i;
 	test_t * tab[MAX];
@@ -83,20 +83,23 @@ int main()
 		tab[i] = test_new(i);
 	}
 
-	L = slist_new("test");
+	L = dlist_new("test");
 	for(i=0; i<MAX; i++){
-		slist_add_last(L, tab[i]);
+		dlist_add_last(L, tab[i]);
 	}
 
-	it = slist_iterator_new(L);
+	it = dlist_iterator_new(L);
 	
+	for(i=0; i<20; i++)
+		iterator_next(it);
 	iterator_next(it);
 	iterator_next(it);
 	iterator_next(it);
-	iterator_next(it);
-	slist_add(it, toh);
+	dlist_add_after(it, toh);
 
-	iterator_reset(it);
+	iterator_free(it);
+
+	it = dlist_reverse_iterator_new(L);
 	while(!iterator_end(it)){
 		T = (test_t *)iterator_get(it);
 		printf("%s\n", T->s);
@@ -105,7 +108,7 @@ int main()
 	
 	iterator_free(it);
 	printf("\n");
-	slist_free(L);
+	dlist_free(L);
 
 	types_free();
 

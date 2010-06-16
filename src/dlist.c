@@ -151,6 +151,51 @@ s8 dlist_empty(dlist_t *l)
 }
 
 
+dlist_node_t *dlist_first(dlist_t *l)
+{
+	assert(l != NULL);
+
+	return l->first;
+}
+
+dlist_node_t *dlist_last(dlist_t *l)
+{
+	assert(l != NULL);
+
+	return l->last;
+}
+
+dlist_node_t *dlist_next(dlist_t *l, dlist_node_t *node)
+{
+	assert(l != NULL);
+
+	if(node == NULL)
+		return NULL;
+	
+	return node->next;
+}
+
+dlist_node_t *dlist_prev(dlist_t *l, dlist_node_t *node)
+{
+	assert(l != NULL);
+
+	if(node == NULL)
+		return NULL;
+	
+	return node->prev;
+}
+
+s8 dlist_end(dlist_t *l, dlist_node_t *node)
+{
+	assert(l != NULL);
+
+	if(node == NULL)
+		return 1;
+	
+	return 0;
+}
+
+
 dlist_node_t *dlist_add_first(dlist_t *l, void *data)
 {
 	dlist_node_t *newnode;
@@ -181,6 +226,45 @@ dlist_node_t *dlist_add_last(dlist_t *l, void *data)
 	return newnode;
 }
 
+dlist_node_t *dlist_add_after(iterator_t *it, void *data)
+{
+	dlist_node_t *newnode;
+	dlist_t *l;
+
+	assert(it != NULL);
+	assert(it->container != NULL);
+	assert(it->pointer != NULL);
+	assert(data != NULL);
+
+	if((newnode = dlist_node_add_after(it->pointer, data)) == NULL){
+		ErrorP("Failed to create a new node");
+		return NULL;
+	}
+	l = (dlist_t *)it->container;
+	if(it->pointer == l->last) l->last = newnode;
+
+	return newnode;
+}
+
+dlist_node_t *dlist_add_before(iterator_t *it, void *data)
+{
+	dlist_node_t *newnode;
+	dlist_t *l;
+
+	assert(it != NULL);
+	assert(it->container != NULL);
+	assert(it->pointer != NULL);
+	assert(data != NULL);
+
+	if((newnode = dlist_node_add_before(it->pointer, data)) == NULL){
+		ErrorP("Failed to create a new node");
+		return NULL;
+	}
+	l = (dlist_t *)it->container;
+	if(it->pointer == l->first) l->first = newnode;
+
+	return newnode;
+}
 
 void *dlist_pop_first(dlist_t *l)
 {
@@ -228,6 +312,30 @@ void *dlist_pop_last(dlist_t *l)
 	return data;
 }
 
+void *dlist_pop(iterator_t *it)
+{
+	void *data;
+	dlist_t *l;
+	dlist_node_t *node;
+
+	assert(it != NULL);
+	assert(it->container != NULL);
+	assert(it->pointer != NULL);
+
+	l = (dlist_t *)it->container;
+	node = (dlist_node_t *)it->pointer;
+	if(l->first == node) l->first = l->first->next;
+	if(l->last == node) l->last = l->last->prev;
+	iterator_next(it);
+	dlist_node_pop(node, &data);
+	if(data == NULL){
+		ErrorP("Failed to pop the node");
+		return NULL;
+	}
+
+	return data;
+}
+
 
 s8 dlist_del_first(dlist_t *l)
 {
@@ -269,6 +377,26 @@ s8 dlist_del_last(dlist_t *l)
 	return 0;
 }
 
+s8 dlist_del(iterator_t *it)
+{
+	dlist_t *l;
+	dlist_node_t *node;
+	func_ptr_t free_f;
+
+	assert(it != NULL);
+	assert(it->container != NULL);
+	assert(it->pointer != NULL);
+
+	l = (dlist_t *)it->container;
+	node = (dlist_node_t *)it->pointer;
+	free_f = type_get_func(l->type_name, "free");
+	if(l->first == node) l->first = l->first->next;
+	if(l->last == node) l->last = l->last->prev;
+	iterator_next(it);
+	dlist_node_del(node, free_f);
+
+	return 0;
+}
 
 void *dlist_get_first(dlist_t *l)
 {
@@ -284,6 +412,59 @@ void *dlist_get_last(dlist_t *l)
 	return dlist_node_get(l->last);
 }
 
+void *dlist_get(dlist_t *l, dlist_node_t *node)
+{
+	assert(l != NULL);
+
+	return dlist_node_get(node);
+}
+
+
+iterator_t *dlist_iterator_new(dlist_t *l)
+{
+	iterator_t *it;
+	s8 tr;
+
+	assert(l != NULL);
+
+	tr = type_reg("dlist_it", sizeof(iterator_t));
+	if(tr < 0) return NULL;
+
+	if(tr == 0){
+		type_reg_func("dlist_it", "first", (func_ptr_t)&dlist_first);
+		type_reg_func("dlist_it", "next", (func_ptr_t)&dlist_next);
+		type_reg_func("dlist_it", "get", (func_ptr_t)&dlist_get);
+		type_reg_func("dlist_it", "end", (func_ptr_t)&dlist_end);
+	}
+
+	it = iterator_new("dlist_it", l);
+	iterator_reset(it);
+	
+	return it;
+}
+
+iterator_t *dlist_reverse_iterator_new(dlist_t *l)
+{
+	iterator_t *it;
+	s8 tr;
+
+	assert(l != NULL);
+
+	tr = type_reg("dlist_rit", sizeof(iterator_t));
+	if(tr < 0) return NULL;
+
+	if(tr == 0){
+		type_reg_func("dlist_rit", "first", (func_ptr_t)&dlist_last);
+		type_reg_func("dlist_rit", "next", (func_ptr_t)&dlist_prev);
+		type_reg_func("dlist_rit", "get", (func_ptr_t)&dlist_get);
+		type_reg_func("dlist_rit", "end", (func_ptr_t)&dlist_end);
+	}
+
+	it = iterator_new("dlist_rit", l);
+	iterator_reset(it);
+	
+	return it;
+}
 
 dlist_node_t *dlist_chk(dlist_t *l, void *data)
 {
