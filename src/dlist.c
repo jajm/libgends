@@ -1,3 +1,33 @@
+/*****************************************************************************
+ * Copyright (C) 2010 Julian Maurice                                         *
+ *                                                                           *
+ * This file is part of libgends.                                            *
+ *                                                                           *
+ * libgends is free software: you can redistribute it and/or modify          *
+ * it under the terms of the GNU General Public License as published by      *
+ * the Free Software Foundation, either version 3 of the License, or         *
+ * (at your option) any later version.                                       *
+ *                                                                           *
+ * libgends is distributed in the hope that it will be useful,               *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of            *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             *
+ * GNU General Public License for more details.                              *
+ *                                                                           *
+ * You should have received a copy of the GNU General Public License         *
+ * along with libgends.  If not, see <http://www.gnu.org/licenses/>.         *
+ *****************************************************************************/
+
+/*****************************************************************************
+ * Fichier		: dlist.h                                            *
+ * Description Brève	: Gestion d'une liste doublement chainée générique   *
+ * Auteur		: Julian Maurice                                     *
+ * Créé le		: 01/06/2010                                         *
+ *****************************************************************************
+ * Une liste chainée générique peut contenir tout type de données, à partir  *
+ * du moment où un type utilisateur correspondant existe.                    *
+ * Voir types.h pour plus d'informations sur les types utilisateurs          *
+ *****************************************************************************/
+
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
