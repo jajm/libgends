@@ -18,7 +18,7 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * Fichier		: iterator.h                                         *
+ * Fichier		: iterator.c                                         *
  * Description Brève	: Gestion d'itérateurs                               *
  * Auteur		: Julian Maurice                                     *
  * Crée le		: 01/06/2010                                         *

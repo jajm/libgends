@@ -18,7 +18,7 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * Fichier		: funcs.h                                            *
+ * Fichier		: funcs.c                                            *
  * Description Brève	: Liste de fonctions génériques                      *
  * Auteur		: Julian Maurice                                     *
  * Créé le		: 13/03/2010					     *

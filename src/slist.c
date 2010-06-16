@@ -18,7 +18,7 @@
  *****************************************************************************/
  
  /*****************************************************************************
- * Fichier           : slist.h                                               *
+ * Fichier           : slist.c                                               *
  * Description Brève : Gestion d'une liste simplement chainée générique      *
  * Auteur            : Julian Maurice                                        *
  * Créé le           : 01/03/2010                                            *
