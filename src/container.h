@@ -18,50 +18,50 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * Fichier		: generic.h                                          *
- * Brève Description	: Donnée générique                                   *
+ * Fichier		: container.h                                        *
+ * Brève Description	: Conteneur de donnée générique                      *
  * Auteur		: Julian Maurice                                     *
  * Créé le		: 01/03/2010                                         *
  *****************************************************************************
- * Une donnée générique associe un type (représenté par un nom unique, voir  *
- * types.h) et un pointeur générique (void *) vers une donnée de ce type.    *
+ * Un conteneur peut contenir une et une seule donnée générique, représentée *
+ * par un pointeur vers la donnée, et le nom du type de la donnée            *
  *****************************************************************************/
 
-#ifndef generic_h_included
-#define generic_h_included
+#ifndef container_h_included
+#define container_h_included
 
 #include "basic_types.h"
 
 typedef struct{
 	char *type_name;	/* Type de la donnée */
 	void *data_ptr;		/* Pointeur vers la donnée */
-} generic_t;
+} container_t;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Crée une donnée générique à partir des arguments */
-generic_t *generic(const char *type_name, const void *data_ptr);
+container_t *container(const char *type_name, const void *data_ptr);
 
 /* Affecte une valeur à une donnée générique */
-s8 generic_affect(generic_t **g, const char *type_name, const void *data_ptr);
+s8 container_affect(container_t **g, const char *type_name, const void *data_ptr);
 
 /* Copie de donnée générique */
-s8 generic_copy(generic_t **to, const generic_t *from);
+s8 container_copy(container_t **to, const container_t *from);
 
 /* Comparaison de deux données génériques */
-s32 generic_cmp(const generic_t *g1, const generic_t *g2);
+s32 container_cmp(const container_t *g1, const container_t *g2);
 
 /* Donne la taille d'une donnée générique */
-u32 generic_size(const generic_t *g);
+u32 container_size(const container_t *g);
 
 /* Libère la mémoire */
-void generic_free(generic_t *g);
+void container_free(container_t *g);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* Not generic_h_included */
+#endif /* Not container_h_included */
 

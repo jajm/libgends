@@ -18,13 +18,13 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * Fichier		: generic.c                                          *
- * Brève Description	: Donnée générique                                   *
+ * Fichier		: container.c                                        *
+ * Brève Description	: Conteneur de donnée générique                      *
  * Auteur		: Julian Maurice                                     *
  * Créé le		: 01/03/2010                                         *
  *****************************************************************************
- * Une donnée générique associe un type (représenté par un nom unique, voir  *
- * types.h) et un pointeur générique (void *) vers une donnée de ce type.    *
+ * Un conteneur peut contenir une et une seule donnée générique, représentée *
+ * par un pointeur vers la donnée, et le nom du type de la donnée            *
  *****************************************************************************/
 
 #include <stdio.h>
@@ -32,11 +32,11 @@
 #include <string.h>
 #include "types.h"
 #include "error.h"
-#include "generic.h"
+#include "container.h"
 
-generic_t *generic(const char *type_name, const void *data_ptr)
+container_t *container(const char *type_name, const void *data_ptr)
 {
-	generic_t *g;
+	container_t *g;
 	u32 data_size;
 	size_t length;
 
@@ -52,7 +52,7 @@ generic_t *generic(const char *type_name, const void *data_ptr)
 	}
 	length = strlen(type_name);
 
-	g = malloc(sizeof(generic_t));
+	g = malloc(sizeof(container_t));
 	if(g == NULL){
 		Error("Memory allocation error");
 		return NULL;
@@ -76,7 +76,7 @@ generic_t *generic(const char *type_name, const void *data_ptr)
 	return g;
 }
 
-s8 generic_affect(generic_t **g, const char *type_name, const void *data_ptr)
+s8 container_affect(container_t **g, const char *type_name, const void *data_ptr)
 {
 	u32 data_size;
 	size_t length;
@@ -94,7 +94,7 @@ s8 generic_affect(generic_t **g, const char *type_name, const void *data_ptr)
 	length = strlen(type_name);
 	
 	if(*g == NULL){
-		*g = generic(type_name, data_ptr);
+		*g = container(type_name, data_ptr);
 	}else if(strcmp((*g)->type_name, type_name) == 0){
 		/* Pas de réallocation à faire */
 		memmove((*g)->data_ptr, data_ptr, data_size);
@@ -114,12 +114,12 @@ s8 generic_affect(generic_t **g, const char *type_name, const void *data_ptr)
 	return 0;
 }
 
-s8 generic_copy(generic_t **to, const generic_t *from)
+s8 container_copy(container_t **to, const container_t *from)
 {
-	return generic_affect(to, from->type_name, from->data_ptr);
+	return container_affect(to, from->type_name, from->data_ptr);
 }
 
-s32 generic_cmp(const generic_t *g1, const generic_t *g2)
+s32 container_cmp(const container_t *g1, const container_t *g2)
 {
 	func_ptr_t cmp_f;
 	u32 size1, size2;
@@ -166,7 +166,7 @@ s32 generic_cmp(const generic_t *g1, const generic_t *g2)
 	return cmp;
 }
 
-u32 generic_size(const generic_t *g)
+u32 container_size(const container_t *g)
 {
 	u32 data_size = 0;
 	if(g != NULL){
@@ -175,7 +175,7 @@ u32 generic_size(const generic_t *g)
 	return data_size;
 }
 
-void generic_free(generic_t *g)
+void container_free(container_t *g)
 {
 	func_ptr_t free_f;
 
