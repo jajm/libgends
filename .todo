@@ -3,15 +3,7 @@
     <title>
         libGenDS TODO
     </title>
-    <note priority="high" time="1279538341">
-        Fix slist and dlist APIs
-        <note priority="medium" time="1279538421">
-            Fix slist API
-        </note>
-        <note priority="medium" time="1279538443">
-            Fix dlist API
-        </note>
-    </note>
+    <link filename="src/.todo" priority="high" time="1279628599"/>
     <note priority="low" time="1279538544">
         Write documentation
     </note>

@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<todo version="0.1.20">
+    <title>
+        Write the code
+    </title>
+    <note priority="high" time="1279628005">
+        Fix slist and dlist APIs
+        <note priority="medium" time="1279628027">
+            Fix slist API
+        </note>
+        <note priority="medium" time="1279628031">
+            Fix dlist API
+        </note>
+    </note>
+    <note priority="medium" time="1279628125">
+        Re-write stack.[hc] and queue.[hc] properly
+    </note>
+    <note priority="low" time="1279628191">
+        Implement deques
+    </note>
+    <note priority="low" time="1279628202">
+        Implement maps
+    </note>
+    <note priority="low" time="1279628207">
+        Implement sets
+    </note>
+    <note priority="low" time="1279628214">
+        Implement trees
+    </note>
+    <note priority="low" time="1279628221">
+        Implement hash tables
+    </note>
+    <note priority="low" time="1279628227">
+        Implement graphs
+    </note>
+</todo>
