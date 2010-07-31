@@ -45,21 +45,12 @@ typedef struct slist_node_s{
 extern "C" {
 #endif
 
-/* Ajoute un nœud contenant data après node
- * Si node == NULL, crée un nouveau nœud seul
- * Retourne l'adresse du nouveau nœud */
-slist_node_t *slist_node_add_after(slist_node_t *node, void *data);
-/* Retourne un pointeur vers la donnée de node */
-void *slist_node_get(slist_node_t *node);
-/* Supprime le nœud node dans la liste head et fait pointer data vers la donnée
- * Retourne l'adresse du nœud précédant node (NULL pour le premier nœud) */
-slist_node_t *slist_node_pop(slist_node_t **head, slist_node_t *node,
-	void **data);
-/* Supprime le nœud node dans la liste head et libère la mémoire occupée par
- * la donnée à l'aide de free_f. Si free_f == NULL, utilise free()
- * Retourne l'adresse du nœud précédant node (NULL pour le premier nœud) */
-slist_node_t *slist_node_del(slist_node_t **head, slist_node_t *node,
-	func_ptr_t free_f);
+/* Ré-écriture de l'API */
+
+slist_node_t *slnode_new(void *data);
+void slnode_set_data(slist_node_t *node, void *data);
+void *slnode_data(slist_node_t *node);
+void slnode_free(slist_node_t *node);
 
 #ifdef __cplusplus
 }
@@ -73,7 +64,7 @@ typedef struct{
 
 
 #ifdef __cplusplus
-extern "C" {
+extern "C" 
 #endif
 
 /* Crée une nouvelle liste et retourne l'adresse de cette liste */
@@ -97,6 +88,13 @@ s8 slist_end(slist_t *l, slist_node_t *node);
 /*                             Fonctions d'ajout                             */
 /* ========================================================================= */
 
+/* Ajoute un nœud à la liste l, après le nœud node */
+/* Si l->first==NULL, crée une nouvelle liste (node ignoré) */
+/* Si node==NULL, ajoute le nœud en première position */
+/* Échec si l==NULL ou data==NULL */
+/* Retourne l'adresse du nouveau nœud, ou NULL si échec */
+slist_node_t *slist_add(slist_t *l, slist_node_t *node, void *data);
+
 /* Ajoute un nœud à la liste en première position */
 /* Retourne l'adresse du nouveau nœud */
 slist_node_t *slist_add_first(slist_t *l, void *data);
@@ -106,14 +104,18 @@ slist_node_t *slist_add_first(slist_t *l, void *data);
 slist_node_t *slist_add_last(slist_t *l, void *data);
 
 /* Ajoute un nœud à la liste après l'itérateur */
-slist_node_t *slist_add(iterator_t *it, void *data);
+slist_node_t *slist_it_add(iterator_t *it, void *data);
 
 
 /* ========================================================================= */
 /*                          Fonctions de suppression                         */
 /* ========================================================================= */
 
-/* --------- Supprime un nœud et renvoie la donnée qu'il contient ---------- */
+
+/* --------- Supprime un nœud et renvoie la donnée qu'il contenait --------- */
+/* Supprime le nœud node dans la liste l */
+void *slist_pop(slist_t *l, slist_node_t *node);
+
 /* Supprime le premier nœud de la liste */
 void *slist_pop_first(slist_t *l);
 
@@ -121,10 +123,13 @@ void *slist_pop_first(slist_t *l);
 void *slist_pop_last(slist_t *l);
 
 /* Supprime le nœud sur lequel pointe l'itérateur */
-void *slist_pop(iterator_t *it);
+void *slist_it_pop(iterator_t *it);
 
 
 /* ---------- Supprime un nœud ainsi que la donnée qu'il contient ---------- */
+/* Supprime le nœud node dans la liste l */
+s8 slist_del(slist_t *l, slist_node_t *node);
+
 /* Supprime le premier nœud de la liste */
 s8 slist_del_first(slist_t *l);
 
@@ -132,11 +137,13 @@ s8 slist_del_first(slist_t *l);
 s8 slist_del_last(slist_t *l);
 
 /* Supprime le nœud sur lequel pointe l'itérateur */
-s8 slist_del(iterator_t *it);
+s8 slist_it_del(iterator_t *it);
 
 /* ========================================================================= */
 /*                  Fonctions de récupération des données                    */
 /* ========================================================================= */
+/* Récupère la donnée du nœud passé en paramètre */
+void *slist_get(slist_t *l, slist_node_t *node);
 
 /* Récupère la donnée du premier nœud de la liste */
 void *slist_get_first(slist_t *l);
@@ -144,9 +151,8 @@ void *slist_get_first(slist_t *l);
 /* Récupère la donnée du dernier nœud de la liste */
 void *slist_get_last(slist_t *l);
 
-/* Récupère la donnée du nœud passé en paramètre */
-void *slist_get(slist_t *l, slist_node_t *node);
-
+/* Récupère la donnée du nœud sur lequel pointe l'itérateur */
+void *slist_it_get(iterator_t *it);
 
 /* ========================================================================= */
 /*                                Itérateurs                                 */

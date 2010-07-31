@@ -35,77 +35,45 @@
 #include "types.h"
 #include "error.h"
 
-slist_node_t *slist_node_add_after(slist_node_t *node, void *data)
+
+slist_node_t *slnode_new(void *data)
 {
-	slist_node_t *newnode;
-	
+	slist_node_t *node;
+
 	assert(data != NULL);
-	newnode = malloc(sizeof(slist_node_t));
-	if(newnode == NULL){
-		Error("Memory allocation error");
-		return NULL;
-	}
-	newnode->data = data;
+
+	node = malloc(sizeof(slist_node_t));
 	if(node){
-		newnode->next = node->next;
-		node->next = newnode;
+		node->data = data;
+		node->next = NULL;
 	}else{
-		newnode->next = NULL;
+		Error("Memory allocation error");
 	}
 
-	return newnode;
+	return node;
 }
 
-void *slist_node_get(slist_node_t *node)
+
+void slnode_set_data(slist_node_t *node, void *data)
 {
 	assert(node != NULL);
+	assert(data != NULL);
+
+	node->data = data;
+}
+
+void *slnode_data(slist_node_t *node)
+{
+	assert(node != NULL);
+
 	return node->data;
 }
 
-slist_node_t *slist_node_pop(slist_node_t **head, slist_node_t *node,
-	void **data)
+
+void slnode_free(slist_node_t *node)
 {
-	slist_node_t *tmp, *ptmp = NULL;
-
-	assert(head != NULL);
-	assert(node != NULL);
-	
-	*data = NULL;
-	tmp = *head;
-	while(tmp != NULL && tmp != node){
-		ptmp = tmp;
-		tmp = tmp->next;
-	}
-	if(tmp == NULL){
-		Error("Node not found");
-		return NULL;
-	}
-
-	*data = tmp->data;
-	if(ptmp == NULL) *head = tmp->next;
-	else ptmp->next = tmp->next;
-	free(tmp);
-
-	return ptmp;
+	free(node);
 }
-
-slist_node_t *slist_node_del(slist_node_t **head, slist_node_t *node,
-	func_ptr_t free_f)
-{
-	void *data;
-	slist_node_t *prev;
-	
-	prev = slist_node_pop(head, node, &data);
-	if(data == NULL){
-		ErrorP("Failed to delete node");
-		return NULL;
-	}
-	if(free_f) free_f(data);
-	else free(data);
-
-	return prev;
-}
-
 
 
 slist_t *slist_new(const char *type_name)
@@ -171,225 +139,220 @@ s8 slist_end(slist_t *l, slist_node_t *node)
 	return 0;
 }
 
-slist_node_t *slist_add_first(slist_t *l, void *data)
+slist_node_t *slist_add(slist_t *l, slist_node_t *node, void *data)
 {
 	slist_node_t *newnode;
-	
+	slist_node_t *tmp;
+
 	assert(l != NULL);
 	assert(data != NULL);
-	
-	if((newnode = slist_node_add_after(NULL, data)) == NULL){
+
+	newnode = slnode_new(data);
+	if(newnode == NULL){
 		ErrorP("Failed to create a new node");
 		return NULL;
 	}
+	if(l->first == NULL || node == NULL){
+		/* Ajout en première position */
+		newnode->next = l->first;
+		l->first = newnode;
+	}else{
+		tmp = l->first;
+		while(tmp != NULL && tmp != node){
+			tmp = tmp->next;
+		}
+		if(tmp == NULL){
+			Error("Node (%p) not found in list"
+			" starting at %p", node, l->first);
+			slnode_free(newnode);
+			return NULL;
+		}
+		newnode->next = tmp->next;
+		tmp->next = newnode;
+	}
+	if(newnode->next == NULL) l->last = newnode;
 
-	newnode->next = l->first;
-	l->first = newnode;
-	if(l->last == NULL)
-		l->last = newnode;
-	
 	return newnode;
+}
+
+
+slist_node_t *slist_add_first(slist_t *l, void *data)
+{	
+	return slist_add(l, NULL, data);
 }
 
 slist_node_t *slist_add_last(slist_t *l, void *data)
 {
-	slist_node_t *newnode;
-
 	assert(l != NULL);
-	assert(data != NULL);
 	
-	if((newnode = slist_node_add_after(l->last, data)) == NULL){
-		ErrorP("Failed to create a new node");
-		return NULL;
-	}
-
-	if(l->first == NULL) l->first = newnode;
-	l->last = newnode;
-
-	return newnode;
+	return slist_add(l, l->last, data);
 }
 
-slist_node_t *slist_add(iterator_t *it, void *data)
+slist_node_t *slist_it_add(iterator_t *it, void *data)
 {
-	slist_node_t *newnode;
 	slist_t *l;
+	slist_node_t *node;
 
 	assert(it != NULL);
-	assert(it->container != NULL);
-	assert(it->pointer != NULL);
-	assert(data != NULL);
+
+	l = (slist_t *)it->container;
+	node = (slist_node_t *)it->pointer;
 	
-	if((newnode = slist_node_add_after(it->pointer, data)) == NULL){
-		ErrorP("Failed to create a new node");
+	return slist_add(l, node, data);
+}
+
+
+void *slist_pop(slist_t *l, slist_node_t *node)
+{
+	void *data;
+	slist_node_t *tmp, *tmp2 = NULL;
+
+	assert(l != NULL);
+	assert(node != NULL);
+
+	tmp = l->first;
+	while(tmp != NULL && tmp != node){
+		tmp2 = tmp;
+		tmp = tmp->next;
+	}
+	if(tmp == NULL){
+		Error("Failed to find the node");
 		return NULL;
 	}
-	l = (slist_t *)it->container;
-	if(it->pointer == l->last) l->last = newnode;
+	data = slnode_data(tmp);
+	if(tmp2 == NULL)
+		l->first = tmp->next;
+	else
+		tmp2->next = tmp->next;
+	if(tmp->next == NULL) l->last = tmp2;
+	slnode_free(tmp);
 
-	return newnode;
+	return data;
 }
 
 void *slist_pop_first(slist_t *l)
 {
-	void *data;
-	slist_node_t *first, *next;
-	
 	assert(l != NULL);
-	
-	if(l->first == NULL){
-		Error("Empty list");
-		return NULL;
-	}
-	
-	first = l->first;
-	next = first->next;
-	slist_node_pop(&first, l->first, &data);
-	if(data == NULL){
-		ErrorP("Failed to pop the node");
-		return NULL;
-	}
-	if(l->last == l->first) l->last = NULL;
-	l->first = first;
 
-	return data;
+	return slist_pop(l, l->first);
 }
 
 void *slist_pop_last(slist_t *l)
 {
-	void *data;
-	slist_node_t *first;
-	slist_node_t *prev;
-
 	assert(l != NULL);
-	
-	if(l->last == NULL){
-		Error("Empty list");
-		return NULL;
-	}
-	
-	first = l->first;
-	prev = slist_node_pop(&first, l->last, &data);
-	if(data == NULL){
-		ErrorP("Failed to pop the node");
-		return NULL;
-	}
-	l->last = prev;
-	l->first = first;
 
-	return data;
+	return slist_pop(l, l->last);
 }
 
-void *slist_pop(iterator_t *it)
+void *slist_it_pop(iterator_t *it)
 {
-	void *data;
 	slist_t *l;
-	slist_node_t *first, *prev, *node;
+	slist_node_t *node;
 
 	assert(it != NULL);
-	assert(it->container != NULL);
-	assert(it->pointer != NULL);
-	
+
 	l = (slist_t *)it->container;
 	node = (slist_node_t *)it->pointer;
-	first = l->first;
-	iterator_next(it);
-	prev = slist_node_pop(&first, node, &data);
-	if(data == NULL){
-		ErrorP("Failed to pop the node");
-		return NULL;
-	}
-	if(node == l->last) l->last = prev;
-	l->first = first;
 
-	return data;
+	iterator_next(it);
+
+	return slist_pop(l, node);
+}
+
+s8 slist_del(slist_t *l, slist_node_t *node)
+{
+	slist_node_t *tmp, *tmp2 = NULL;
+	func_ptr_t free_f;
+	void *data;
+
+	assert(l != NULL);
+	assert(node != NULL);
+
+	tmp = l->first;
+	while(tmp != NULL && tmp != node){
+		tmp2 = tmp;
+		tmp = tmp->next;
+	}
+	if(tmp == NULL){
+		Error("Failed to find the node");
+		return -1;
+	}
+	data = slnode_data(tmp);
+	free_f = type_get_func(l->type_name, "free");
+	if(free_f) free_f(data);
+	if(tmp2 == NULL)
+		l->first = tmp->next;
+	else
+		tmp2->next = tmp->next;
+	if(tmp->next == NULL) l->last = tmp2;
+	slnode_free(tmp);
+
+	return 0;
 }
 
 s8 slist_del_first(slist_t *l)
 {
-	slist_node_t *next, *first;
-	func_ptr_t free_f;
-
 	assert(l != NULL);
-	
-	if(l->first == NULL){
-		Error("Empty list");
-		return -1;
-	}
-	
-	first = l->first;
-	next = first->next;
-	free_f = type_get_func(l->type_name, "free");
-	slist_node_del(&first, l->first, free_f);
 
-	if(l->last == l->first) l->last = NULL;
-	l->first = first;
-
-	return 0;
+	return slist_del(l, l->first);
 }
 
 s8 slist_del_last(slist_t *l)
 {
-	slist_node_t *prev, *first;
-	func_ptr_t free_f;
-
 	assert(l != NULL);
-	
-	if(l->last == NULL){
-		Error("Empty list");
-		return -1;
-	}
-	
-	free_f = type_get_func(l->type_name, "free");
-	first = l->first;
-	prev = slist_node_del(&first, l->last, free_f);
-	l->last = prev;
-	l->first = first;
 
-	return 0;
+	return slist_del(l, l->last);
 }
 
-s8 slist_del(iterator_t *it)
+s8 slist_it_del(iterator_t *it)
 {
 	slist_t *l;
-	slist_node_t *prev, *first, *node;
-	func_ptr_t free_f;
+	slist_node_t *node;
 
 	assert(it != NULL);
-	assert(it->container != NULL);
-	assert(it->pointer != NULL);
 
 	l = (slist_t *)it->container;
 	node = (slist_node_t *)it->pointer;
-	free_f = type_get_func(l->type_name, "free");
-	first = l->first;
+
 	iterator_next(it);
-	prev = slist_node_del(&first, node, free_f);
-	if(node == l->last) l->last = prev;
-	l->first = first;
 
-	return 0;
-}
-
-void *slist_get_first(slist_t *l)
-{
-	assert(l != NULL);
-
-	return slist_node_get(l->first);
-}
-
-void *slist_get_last(slist_t *l)
-{
-	assert(l != NULL);
-
-	return slist_node_get(l->last);
+	return slist_del(l, node);
 }
 
 void *slist_get(slist_t *l, slist_node_t *node)
 {
 	assert(l != NULL);
 
-	return slist_node_get(node);
+	return slnode_data(node);
 }
+
+void *slist_get_first(slist_t *l)
+{
+	assert(l != NULL);
+
+	return slist_get(l, l->first);
+}
+
+void *slist_get_last(slist_t *l)
+{
+	assert(l != NULL);
+
+	return slist_get(l, l->last);
+}
+
+void *slist_it_get(iterator_t *it)
+{
+	slist_t *l;
+	slist_node_t *node;
+
+	assert(it != NULL);
+	
+	l = (slist_t *)it->container;
+	node = (slist_node_t *)it->pointer;
+
+	return slist_get(l, node);
+}
+
 
 iterator_t *slist_iterator_new(slist_t *l)
 {
@@ -451,8 +414,7 @@ void slist_free(slist_t *l)
 		while(tmp != NULL){
 			tmp2 = tmp->next;
 			if(free_f) free_f(tmp->data);
-			else free(tmp->data);
-			free(tmp);
+			slnode_free(tmp);
 			tmp = tmp2;
 		}
 		free(l);
@@ -467,7 +429,7 @@ void slist_destroy(slist_t *l)
 		tmp = l->first;
 		while(tmp != NULL){
 			tmp2 = tmp->next;
-			free(tmp);
+			slnode_free(tmp);
 			tmp = tmp2;
 		}
 		free(l);

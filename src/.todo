@@ -7,6 +7,12 @@
         Fix slist and dlist APIs
         <note priority="medium" time="1279628027">
             Fix slist API
+            <note priority="medium" time="1280445192" done="1280536539">
+                Find a way to update the last node pointer in slist_pop slist_del
+            </note>
+            <note priority="medium" time="1280536531">
+                Test slist API
+            </note>
         </note>
         <note priority="medium" time="1279628031">
             Fix dlist API

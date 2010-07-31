@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <todo version="0.1.20">
     <title>
-        libGenDS TODO
+        libGenDS
     </title>
-    <link filename="src/.todo" priority="high" time="1279628599"/>
+    <link filename="src/.todo" priority="high" time="0"/>
     <note priority="low" time="1279538544">
         Write documentation
     </note>
