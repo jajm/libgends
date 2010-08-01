@@ -182,7 +182,6 @@ void container_free(container_t *g)
 	if(g != NULL){
 		free_f = type_get_func(g->type_name, "free");
 		if(free_f) free_f(g->data_ptr);
-		else free(g->data_ptr);
 		free(g->type_name);
 		free(g);
 	}

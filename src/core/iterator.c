@@ -37,6 +37,7 @@
  *						ont été itérés, 0 sinon      *
  *****************************************************************************/
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
@@ -57,7 +58,7 @@ iterator_t *iterator_new(const char *type_name, void *container)
 		len = strlen(type_name);
 		it->type_name = malloc(len+1);
 		if(it->type_name){
-			strncpy(it->type_name, type_name, len);
+			strncpy(it->type_name, type_name, len+1);
 			it->container = container;
 			it->pointer = NULL;
 		}else{
