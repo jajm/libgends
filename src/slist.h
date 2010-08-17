@@ -45,11 +45,13 @@ typedef struct slist_node_s{
 extern "C" {
 #endif
 
-/* Ré-écriture de l'API */
-
+/* Crée un nouveau nœud */
 slist_node_t *slnode_new(void *data);
+/* Affecte une donnée à un nœud */
 void slnode_set_data(slist_node_t *node, void *data);
+/* Retourne la donnée associée au nœud */
 void *slnode_data(slist_node_t *node);
+/* Détruit un nœud */
 void slnode_free(slist_node_t *node);
 
 #ifdef __cplusplus
@@ -62,9 +64,8 @@ typedef struct{
 	slist_node_t *last;	/* Dernier nœud */
 } slist_t;
 
-
 #ifdef __cplusplus
-extern "C" 
+extern "C" { 
 #endif
 
 /* Crée une nouvelle liste et retourne l'adresse de cette liste */

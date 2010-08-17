@@ -36,8 +36,8 @@
 #include "iterator.h"
 
 typedef struct dlist_node_s {
-	struct dlist_node_s *prev;
 	void *data;
+	struct dlist_node_s *prev;
 	struct dlist_node_s *next;
 } dlist_node_t;
 
@@ -45,20 +45,14 @@ typedef struct dlist_node_s {
 extern "C" {
 #endif
 
-/* Ajoute un nœud contenant data avant node
- * Retourne l'adresse du nouveau nœud */
-dlist_node_t *dlist_node_add_before(dlist_node_t *node, void *data);
-/* Ajoute un nœud contenant data après node
- * Retourne l'adresse du nouveau nœud */
-dlist_node_t *dlist_node_add_after(dlist_node_t *node, void *data);
-/* Retourne un pointeur vers la donnée de node */
-void *dlist_node_get(dlist_node_t *node);
-/* Supprime le nœud node et fait pointer data vers la donnée du nœud
- * supprimé */
-void dlist_node_pop(dlist_node_t *node, void **data);
-/* Supprime le nœud node et libère la mémoire occupée par la donnée
- * à l'aide de free_f */
-void dlist_node_del(dlist_node_t *node, func_ptr_t free_f);
+/* Crée un nouveau nœud */
+dlist_node_t *dlnode_new(void *data);
+/* Affecte une donnée à un nœud */
+void dlnode_set_data(dlist_node_t *node, void *data);
+/* Retourne la donnée associée au nœud */
+void *dlnode_data(dlist_node_t *node);
+/* Détruit un nœud */
+void dlnode_free(dlist_node_t *node);
 
 #ifdef __cplusplus
 }
@@ -99,6 +93,9 @@ s8 dlist_end(dlist_t *l, dlist_node_t *node);
 /*                             Fonctions d'ajout                             */
 /* ========================================================================= */
 
+dlist_node_t *dlist_add_after(dlist_t *l, dlist_node_t *node, void *data);
+dlist_node_t *dlist_add_before(dlist_t *l, dlist_node_t *node, void *data);
+
 /* Ajoute un nœud à la liste en première position */
 /* Retourne l'adresse du nouveau nœud */
 dlist_node_t *dlist_add_first(dlist_t *l, void *data);
@@ -108,9 +105,9 @@ dlist_node_t *dlist_add_first(dlist_t *l, void *data);
 dlist_node_t *dlist_add_last(dlist_t *l, void *data);
 
 /* Ajoute un nœud à la liste après l'itérateur */
-dlist_node_t *dlist_add_after(iterator_t *it, void *data);
+dlist_node_t *dlist_it_add_after(iterator_t *it, void *data);
 /* Ajoute un nœud à la liste avant l'itérateur */
-dlist_node_t *dlist_add_before(iterator_t *it, void *data);
+dlist_node_t *dlist_it_add_before(iterator_t *it, void *data);
 
 
 /* ========================================================================= */
@@ -118,6 +115,8 @@ dlist_node_t *dlist_add_before(iterator_t *it, void *data);
 /* ========================================================================= */
 
 /* --------- Supprime un nœud et renvoie la donnée qu'il contient ---------- */
+void *dlist_pop(dlist_t *l, dlist_node_t *node);
+
 /* Supprime le premier nœud de la liste */
 void *dlist_pop_first(dlist_t *l);
 
@@ -125,10 +124,12 @@ void *dlist_pop_first(dlist_t *l);
 void *dlist_pop_last(dlist_t *l);
 
 /* Supprime le nœud sur lequel pointe l'itérateur */
-void *dlist_pop(iterator_t *it);
+void *dlist_it_pop(iterator_t *it);
 
 
 /* ---------- Supprime un nœud ainsi que la donnée qu'il contient ---------- */
+s8 dlist_del(dlist_t *l, dlist_node_t *node);
+
 /* Supprime le premier nœud de la liste */
 s8 dlist_del_first(dlist_t *l);
 
@@ -136,12 +137,15 @@ s8 dlist_del_first(dlist_t *l);
 s8 dlist_del_last(dlist_t *l);
 
 /* Supprimer le nœud sur lequel pointe l'itérateur */
-s8 dlist_del(iterator_t *it);
+s8 dlist_it_del(iterator_t *it);
 
 
 /* ========================================================================= */
 /*                  Fonctions de récupération des données                    */
 /* ========================================================================= */
+
+/* Récupère la donnée du nœud passé en paramètre */
+void *dlist_get(dlist_t *l, dlist_node_t *node);
 
 /* Récupère la donnée du premier nœud de la liste */
 void *dlist_get_first(dlist_t *l);
@@ -149,9 +153,7 @@ void *dlist_get_first(dlist_t *l);
 /* Récupère la donnée du dernier nœud de la liste */
 void *dlist_get_last(dlist_t *l);
 
-/* Récupère la donnée du nœud passé en paramètre */
-void *dlist_get(dlist_t *l, dlist_node_t *node);
-
+void *dlist_it_get(iterator_t *it);
 
 /* ========================================================================= */
 /*                               Itérateurs                                  */

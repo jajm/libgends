@@ -35,7 +35,7 @@
 #include "types.h"
 #include "error.h"
 
-dlist_node_t *dlist_node_add_before(dlist_node_t *node, void *data)
+dlist_node_t *dlnode_new(void *data)
 {
 	dlist_node_t *newnode;
 
@@ -47,71 +47,30 @@ dlist_node_t *dlist_node_add_before(dlist_node_t *node, void *data)
 		return NULL;
 	}
 	newnode->data = data;
-	newnode->next = node;
-	if(node){
-		newnode->prev = node->prev;
-		if(node->prev) node->prev->next = newnode;
-		node->prev = newnode;
-	}else{
-		newnode->prev = NULL;
-	}
-
+	newnode->next = NULL;
+	
 	return newnode;
 }
 
-dlist_node_t *dlist_node_add_after(dlist_node_t *node, void *data)
+void dlnode_set_data(dlist_node_t *node, void *data)
 {
-	dlist_node_t *newnode;
-
+	assert(node != NULL);
 	assert(data != NULL);
 
-	newnode = malloc(sizeof(dlist_node_t));
-	if(newnode == NULL){
-		Error("Memory allocation error");
-		return NULL;
-	}
-	newnode->data = data;
-	newnode->prev = node;
-	if(node){
-		newnode->next = node->next;
-		if(node->next) node->next->prev = newnode;
-		node->next = newnode;
-	}else{
-		newnode->next = NULL;
-	}
-
-	return newnode;
+	node->data = data;
 }
 
-void *dlist_node_get(dlist_node_t *node)
+void *dlnode_data(dlist_node_t *node)
 {
 	assert(node != NULL);
 
 	return node->data;
 }
 
-void dlist_node_pop(dlist_node_t *node, void **data)
+void dlnode_free(dlist_node_t *node)
 {
-	assert(node != NULL);
-	assert(data != NULL);
-
-	if(node->prev) node->prev->next = node->next;
-	if(node->next) node->next->prev = node->prev;
-	*data = node->data;
 	free(node);
 }
-
-void dlist_node_del(dlist_node_t *node, func_ptr_t free_f)
-{
-	if(node != NULL){
-		if(node->prev) node->prev->next = node->next;
-		if(node->next) node->next->prev = node->prev;
-		if(free_f) free_f(node->data);
-		else free(node->data);
-		free(node);
-	}
-}
-
 
 
 dlist_t *dlist_new(const char *type_name)
@@ -196,227 +155,224 @@ s8 dlist_end(dlist_t *l, dlist_node_t *node)
 }
 
 
-dlist_node_t *dlist_add_first(dlist_t *l, void *data)
+dlist_node_t *dlist_add_after(dlist_t *l, dlist_node_t *node, void *data)
 {
 	dlist_node_t *newnode;
-
+	
 	assert(l != NULL);
+	assert(data != NULL);
 
-	newnode = dlist_node_add_before(l->first, data);
-	if(newnode){
-		l->first = newnode;
-		if(l->last == NULL) l->last = newnode;
+	newnode = dlnode_new(data);
+	if(newnode == NULL){
+		ErrorP("Failed to create the node");
+		return NULL;
 	}
+	if(node){
+		newnode->next = node->next;
+		newnode->prev = node;
+		if(node->next != NULL)
+			node->next->prev = newnode;
+		node->next = newnode;
+	}
+	if(newnode->next == NULL) l->last = newnode;
+	if(newnode->prev == NULL) l->first = newnode;
 
 	return newnode;
+}
+
+dlist_node_t *dlist_add_before(dlist_t *l, dlist_node_t *node, void *data)
+{
+	dlist_node_t *newnode;
+	
+	assert(l != NULL);
+	assert(data != NULL);
+
+	newnode = dlnode_new(data);
+	if(newnode == NULL){
+		ErrorP("Failed to create the node");
+		return NULL;
+	}
+	if(node){
+		newnode->next = node;
+		newnode->prev = node->prev;
+		if(node->prev != NULL)
+			node->prev->next = newnode;
+		node->prev = newnode;
+	}
+	if(newnode->prev == NULL) l->first = newnode;
+	if(newnode->next == NULL) l->last = newnode;
+
+	return newnode;
+}
+
+dlist_node_t *dlist_add_first(dlist_t *l, void *data)
+{
+	assert(l != NULL);
+
+	return dlist_add_before(l, l->first, data);
 }
 
 dlist_node_t *dlist_add_last(dlist_t *l, void *data)
 {
-	dlist_node_t *newnode;
-
 	assert(l != NULL);
 
-	newnode = dlist_node_add_after(l->last, data);
-	if(newnode){
-		l->last = newnode;
-		if(l->first == NULL) l->first = newnode;
-	}
-
-	return newnode;
+	return dlist_add_after(l, l->last, data);
 }
 
-dlist_node_t *dlist_add_after(iterator_t *it, void *data)
+dlist_node_t *dlist_it_add_after(iterator_t *it, void *data)
 {
-	dlist_node_t *newnode;
+	dlist_node_t *node;
 	dlist_t *l;
 
 	assert(it != NULL);
-	assert(it->container != NULL);
-	assert(it->pointer != NULL);
 	assert(data != NULL);
 
-	if((newnode = dlist_node_add_after(it->pointer, data)) == NULL){
-		ErrorP("Failed to create a new node");
-		return NULL;
-	}
 	l = (dlist_t *)it->container;
-	if(it->pointer == l->last) l->last = newnode;
+	node = (dlist_node_t *)it->pointer;
 
-	return newnode;
+	return dlist_add_after(l, node, data);
 }
 
-dlist_node_t *dlist_add_before(iterator_t *it, void *data)
+dlist_node_t *dlist_it_add_before(iterator_t *it, void *data)
 {
-	dlist_node_t *newnode;
+	dlist_node_t *node;
 	dlist_t *l;
 
 	assert(it != NULL);
-	assert(it->container != NULL);
-	assert(it->pointer != NULL);
 	assert(data != NULL);
 
-	if((newnode = dlist_node_add_before(it->pointer, data)) == NULL){
-		ErrorP("Failed to create a new node");
-		return NULL;
-	}
 	l = (dlist_t *)it->container;
-	if(it->pointer == l->first) l->first = newnode;
+	node = (dlist_node_t *)it->pointer;
 
-	return newnode;
+	return dlist_add_before(l, node, data);
+}
+
+void *dlist_pop(dlist_t *l, dlist_node_t *node)
+{
+	void *data;
+
+	assert(l != NULL);
+	assert(node != NULL);
+
+	if(node->next) node->next->prev = node->prev;
+	else l->last = node->prev;
+	if(node->prev) node->prev->next = node->next;
+	else l->first = node->next;
+
+	data = dlnode_data(node);
+	dlnode_free(node);
+
+	return data;
 }
 
 void *dlist_pop_first(dlist_t *l)
 {
-	void *data;
-	dlist_node_t *next;
-
 	assert(l != NULL);
-	if(l->first == NULL){
-		Error("Empty list");
-		return NULL;
-	}
-	
-	next = l->first->next;
-	dlist_node_pop(l->first, &data);
-	if(data == NULL){
-		ErrorP("Failed to pop the node");
-		return NULL;
-	}
-	if(l->first == l->last) l->last = NULL;
-	l->first = next;
 
-	return data;
+	return dlist_pop(l, l->first);
 }
 
 void *dlist_pop_last(dlist_t *l)
 {
-	void *data;
-	dlist_node_t *prev;
-	
 	assert(l != NULL);
-	if(l->last == NULL){
-		Error("Empty list");
-		return NULL;
-	}
 
-	prev = l->last->prev;
-	dlist_node_pop(l->last, &data);
-	if(data == NULL){
-		ErrorP("Failed to pop the node");
-		return NULL;
-	}
-	if(l->first == l->last) l->first = NULL;
-	l->last = prev;
-
-	return data;
+	return dlist_pop(l, l->last);
 }
 
-void *dlist_pop(iterator_t *it)
+void *dlist_it_pop(iterator_t *it)
 {
-	void *data;
 	dlist_t *l;
 	dlist_node_t *node;
 
 	assert(it != NULL);
-	assert(it->container != NULL);
-	assert(it->pointer != NULL);
 
 	l = (dlist_t *)it->container;
 	node = (dlist_node_t *)it->pointer;
-	if(l->first == node) l->first = l->first->next;
-	if(l->last == node) l->last = l->last->prev;
 	iterator_next(it);
-	dlist_node_pop(node, &data);
-	if(data == NULL){
-		ErrorP("Failed to pop the node");
-		return NULL;
-	}
 
-	return data;
+	return dlist_pop(l, node);
 }
 
 
-s8 dlist_del_first(dlist_t *l)
+s8 dlist_del(dlist_t *l, dlist_node_t *node)
 {
 	func_ptr_t free_f;
-	dlist_node_t *next;
 
 	assert(l != NULL);
-	if(l->first == NULL){
-		Error("Empty list");
-		return -1;
-	}
+	assert(node != NULL);
+
+	if(node->next) node->next->prev = node->prev;
+	else l->last = node->prev;
+	if(node->prev) node->prev->next = node->next;
+	else l->first = node->next;
 
 	free_f = type_get_func(l->type_name, "free");
-	next = l->first->next;
-	dlist_node_del(l->first, free_f);
-	if(l->first == l->last) l->last = NULL;
-	l->first = next;
+	if(free_f) free_f(dlnode_data(node));
+	dlnode_free(node);
 
 	return 0;
+}
+
+s8 dlist_del_first(dlist_t *l)
+{
+	assert(l != NULL);
+
+	return dlist_del(l, l->first);
 }
 
 s8 dlist_del_last(dlist_t *l)
 {
-	func_ptr_t free_f;
-	dlist_node_t *prev;
-
 	assert(l != NULL);
-	if(l->last == NULL){
-		Error("Empty list");
-		return -1;
-	}
 
-	free_f = type_get_func(l->type_name, "free");
-	prev = l->last->prev;
-	dlist_node_del(l->last, free_f);
-	if(l->first == l->last) l->first = NULL;
-	l->last = prev;
-	
-	return 0;
+	return dlist_del(l, l->last);
 }
 
-s8 dlist_del(iterator_t *it)
+s8 dlist_it_del(iterator_t *it)
 {
 	dlist_t *l;
 	dlist_node_t *node;
-	func_ptr_t free_f;
 
 	assert(it != NULL);
-	assert(it->container != NULL);
-	assert(it->pointer != NULL);
 
 	l = (dlist_t *)it->container;
 	node = (dlist_node_t *)it->pointer;
-	free_f = type_get_func(l->type_name, "free");
-	if(l->first == node) l->first = l->first->next;
-	if(l->last == node) l->last = l->last->prev;
 	iterator_next(it);
-	dlist_node_del(node, free_f);
 
-	return 0;
-}
-
-void *dlist_get_first(dlist_t *l)
-{
-	assert(l != NULL);
-
-	return dlist_node_get(l->first);
-}
-
-void *dlist_get_last(dlist_t *l)
-{
-	assert(l != NULL);
-
-	return dlist_node_get(l->last);
+	return dlist_del(l, node);
 }
 
 void *dlist_get(dlist_t *l, dlist_node_t *node)
 {
 	assert(l != NULL);
 
-	return dlist_node_get(node);
+	return dlnode_data(node);
+}
+
+void *dlist_get_first(dlist_t *l)
+{
+	assert(l != NULL);
+
+	return dlist_get(l, l->first);
+}
+
+void *dlist_get_last(dlist_t *l)
+{
+	assert(l != NULL);
+
+	return dlist_get(l, l->last);
+}
+
+void *dlist_it_get(iterator_t *it)
+{
+	dlist_t *l;
+	dlist_node_t *node;
+
+	assert(it != NULL);
+
+	l = (dlist_t *)it->container;
+	node = (dlist_node_t *)it->pointer;
+
+	return dlist_get(l, node);
 }
 
 
@@ -502,7 +458,6 @@ void dlist_free(dlist_t *l)
 		while(tmp){
 			tmp2 = tmp->next;
 			if(free_f) free_f(tmp->data);
-			else free(tmp->data);
 			free(tmp);
 			tmp = tmp2;
 		}

@@ -142,7 +142,6 @@ s8 slist_end(slist_t *l, slist_node_t *node)
 slist_node_t *slist_add(slist_t *l, slist_node_t *node, void *data)
 {
 	slist_node_t *newnode;
-	slist_node_t *tmp;
 
 	assert(l != NULL);
 	assert(data != NULL);
@@ -157,18 +156,8 @@ slist_node_t *slist_add(slist_t *l, slist_node_t *node, void *data)
 		newnode->next = l->first;
 		l->first = newnode;
 	}else{
-		tmp = l->first;
-		while(tmp != NULL && tmp != node){
-			tmp = tmp->next;
-		}
-		if(tmp == NULL){
-			Error("Node (%p) not found in list"
-			" starting at %p", node, l->first);
-			slnode_free(newnode);
-			return NULL;
-		}
-		newnode->next = tmp->next;
-		tmp->next = newnode;
+		newnode->next = node->next;
+		node->next = newnode;
 	}
 	if(newnode->next == NULL) l->last = newnode;
 
