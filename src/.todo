@@ -18,13 +18,10 @@
             Fix dlist API
         </note>
     </note>
-    <note priority="medium" time="1279628125">
+    <note priority="medium" time="1279628125" done="1282598179">
         Re-write stack.[hc] and queue.[hc] properly
-        <comment>
-            Untouched
-        </comment>
     </note>
-    <note priority="low" time="1279628191">
+    <note priority="low" time="1279628191" done="1282599147">
         Implement deques
     </note>
     <note priority="low" time="1279628202">
