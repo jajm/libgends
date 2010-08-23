@@ -115,3 +115,18 @@ void stack_free(stack_t *S)
 	}
 }
 
+void stack_destroy(stack_t *S)
+{
+	slist_node_t *tmp, *tmp2;
+
+	if(S){
+		free(S->type_name);
+		tmp = S->head;
+		while(tmp != NULL){
+			tmp2 = tmp->next;
+			slnode_free(tmp);
+			tmp = tmp2;
+		}
+	}
+}
+

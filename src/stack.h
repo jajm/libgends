@@ -42,6 +42,7 @@ stack_t *stack_new(const char *type_name);
 s8 stack_push(stack_t *S, void *data);
 void *stack_pop(stack_t *S);
 void stack_free(stack_t *S);
+void stack_destroy(stack_t *S);
 
 #endif /* Not stack_h_included */
 
