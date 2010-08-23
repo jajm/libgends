@@ -18,7 +18,7 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * Fichier		: stack.h                                            *
+ * Fichier		: stack.c                                            *
  * Description Brève	: Gestion d'une pile (LIFO, Last In First Out)       *
  * Auteur		: Julian Maurice                                     *
  * Créé le		: 01/06/2010					     *
@@ -28,20 +28,90 @@
  * constant.                                                                 *
  *****************************************************************************/
 
-#ifndef stack_h_included
-#define stack_h_included
+#include <stdlib.h>
+#include <string.h>
+#include <assert.h>
+#include "stack.h"
+#include "types.h"
+#include "error.h"
 
-#include "slist_node.h"
+stack_t *stack_new(const char *type_name)
+{
+	stack_t *S;
+	size_t len;
 
-typedef struct{
-	char *type_name;
-	slist_node_t *head;
-} stack_t;
+	assert(type_name != NULL);
 
-stack_t *stack_new(const char *type_name);
-s8 stack_push(stack_t *S, void *data);
-void *stack_pop(stack_t *S);
-void stack_free(stack_t *S);
+	S = malloc(sizeof(stack_t));
+	if(S == NULL){
+		Error("Memory allocation error");
+		return NULL;
+	}
+	len = strlen(type_name);
+	S->type_name = malloc(len+1);
+	if(S->type_name == NULL){
+		Error("Memory allocation error");
+		free(S);
+		return NULL;
+	}
+	strncpy(S->type_name, type_name, len+1);
+	S->head = NULL;
 
-#endif /* Not stack_h_included */
+	return S;
+}
+
+s8 stack_push(stack_t *S, void *data)
+{
+	slist_node_t *newnode;
+
+	assert(S != NULL);
+	assert(data != NULL);
+	
+	newnode = slnode_new(data);
+	if(newnode == NULL){
+		ErrorP("Failed to create the node");
+		return -1;
+	}
+	newnode->next = S->head;
+	S->head = newnode;
+	
+	return 0;
+}
+
+void *stack_pop(stack_t *S)
+{
+	void *data;
+	slist_node_t *next;
+
+	assert(S != NULL);
+	if(S->head == NULL){
+		Error("Stack is empty");
+		return NULL;
+	}
+
+	next = S->head->next;
+	data = slnode_data(S->head);
+	slnode_free(S->head);
+	S->head = next;
+
+	return data;
+}
+
+void stack_free(stack_t *S)
+{
+	slist_node_t *tmp, *tmp2;
+	func_ptr_t free_f;
+
+	if(S){
+		free_f = type_get_func(S->type_name, "free");
+		free(S->type_name);
+		tmp = S->head;
+		while(tmp != NULL){
+			tmp2 = tmp->next;
+			if(free_f) free_f(slnode_data(tmp));
+			slnode_free(tmp);
+			tmp = tmp2;
+		}
+	}
+}
 

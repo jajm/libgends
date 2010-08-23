@@ -24,6 +24,7 @@
 #include <assert.h>
 #include "error.h"
 #include "dlist.h"
+#include "stack.h"
 
 typedef struct{
 	int a;
@@ -81,10 +82,27 @@ void print_list(dlist_t *l)
 	iterator_free(it);
 }
 
+void print_stack(stack_t *S)
+{
+	slist_node_t *node;
+	test_t *t;
+
+	node = S->head;
+	puts("Pile");
+	puts("----");
+	while(node != NULL){
+		t = (test_t *)slnode_data(node);
+		printf("%d\n", t->a);
+		node = node->next;
+	}
+	printf("\n\n");
+}
+
 #define MAX 20
 int main()
 {
 	dlist_t *L;
+	stack_t *S;
 	//test_t *toh = test_new(400);
 	u32 i;
 	test_t * tab[MAX];
@@ -193,8 +211,25 @@ int main()
 	puts("Suppression de la liste");
 	dlist_free(L);
 
+	puts("Création de la pile");
+	S = stack_new("test");
+	print_stack(S);
+	puts("PUSH de 12");
+	stack_push(S, tab[12]);
+	print_stack(S);
+	puts("POP 2 fois");
+	test_free((test_t *)stack_pop(S));
+	stack_pop(S);
+	print_stack(S);
+	puts("PUSH 13, 14");
+	stack_push(S, tab[13]);
+	stack_push(S, tab[14]);
+	print_stack(S);
+	puts("Libération de la pile");
+	stack_free(S);
+	
 	puts("Libération mémoire");
-	for(i=12; i<MAX; i++)
+	for(i=15; i<MAX; i++)
 		test_free(tab[i]);
 
 	types_free();
