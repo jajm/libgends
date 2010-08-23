@@ -31,32 +31,9 @@
 #ifndef dlist_h_included
 #define dlist_h_included
 
-#include "basic_types.h"
+#include "dlist_node.h"
 #include "types.h"
 #include "iterator.h"
-
-typedef struct dlist_node_s {
-	void *data;
-	struct dlist_node_s *prev;
-	struct dlist_node_s *next;
-} dlist_node_t;
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/* Crée un nouveau nœud */
-dlist_node_t *dlnode_new(void *data);
-/* Affecte une donnée à un nœud */
-void dlnode_set_data(dlist_node_t *node, void *data);
-/* Retourne la donnée associée au nœud */
-void *dlnode_data(dlist_node_t *node);
-/* Détruit un nœud */
-void dlnode_free(dlist_node_t *node);
-
-#ifdef __cplusplus
-}
-#endif
 
 typedef struct {
 	char *type_name;

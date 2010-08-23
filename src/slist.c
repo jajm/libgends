@@ -17,7 +17,7 @@
  * along with libgends.  If not, see <http://www.gnu.org/licenses/>.         *
  *****************************************************************************/
  
- /*****************************************************************************
+/*****************************************************************************
  * Fichier           : slist.c                                               *
  * Description Brève : Gestion d'une liste simplement chainée générique      *
  * Auteur            : Julian Maurice                                        *
@@ -34,46 +34,6 @@
 #include "slist.h"
 #include "types.h"
 #include "error.h"
-
-
-slist_node_t *slnode_new(void *data)
-{
-	slist_node_t *node;
-
-	assert(data != NULL);
-
-	node = malloc(sizeof(slist_node_t));
-	if(node){
-		node->data = data;
-		node->next = NULL;
-	}else{
-		Error("Memory allocation error");
-	}
-
-	return node;
-}
-
-
-void slnode_set_data(slist_node_t *node, void *data)
-{
-	assert(node != NULL);
-	assert(data != NULL);
-
-	node->data = data;
-}
-
-void *slnode_data(slist_node_t *node)
-{
-	assert(node != NULL);
-
-	return node->data;
-}
-
-
-void slnode_free(slist_node_t *node)
-{
-	free(node);
-}
 
 
 slist_t *slist_new(const char *type_name)

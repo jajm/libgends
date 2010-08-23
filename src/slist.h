@@ -17,7 +17,7 @@
  * along with libgends.  If not, see <http://www.gnu.org/licenses/>.         *
  *****************************************************************************/
  
- /****************************************************************************
+/*****************************************************************************
  * Fichier           : slist.h                                               *
  * Description Brève : Gestion d'une liste simplement chainée générique      *
  * Auteur            : Julian Maurice                                        *
@@ -31,32 +31,9 @@
 #ifndef slist_h_included
 #define slist_h_included
 
-#include "basic_types.h"
+#include "slist_node.h"
 #include "types.h"
 #include "iterator.h"
-
-/* Noeud d'une liste simplement chainée à largeur variable */
-typedef struct slist_node_s{
-	void *data;
-	struct slist_node_s *next;
-} slist_node_t;
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/* Crée un nouveau nœud */
-slist_node_t *slnode_new(void *data);
-/* Affecte une donnée à un nœud */
-void slnode_set_data(slist_node_t *node, void *data);
-/* Retourne la donnée associée au nœud */
-void *slnode_data(slist_node_t *node);
-/* Détruit un nœud */
-void slnode_free(slist_node_t *node);
-
-#ifdef __cplusplus
-}
-#endif
 
 typedef struct{
 	char *type_name;

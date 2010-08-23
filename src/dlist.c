@@ -35,44 +35,6 @@
 #include "types.h"
 #include "error.h"
 
-dlist_node_t *dlnode_new(void *data)
-{
-	dlist_node_t *newnode;
-
-	assert(data != NULL);
-
-	newnode = malloc(sizeof(dlist_node_t));
-	if(newnode == NULL){
-		Error("Memory allocation error");
-		return NULL;
-	}
-	newnode->data = data;
-	newnode->next = NULL;
-	
-	return newnode;
-}
-
-void dlnode_set_data(dlist_node_t *node, void *data)
-{
-	assert(node != NULL);
-	assert(data != NULL);
-
-	node->data = data;
-}
-
-void *dlnode_data(dlist_node_t *node)
-{
-	assert(node != NULL);
-
-	return node->data;
-}
-
-void dlnode_free(dlist_node_t *node)
-{
-	free(node);
-}
-
-
 dlist_t *dlist_new(const char *type_name)
 {
 	dlist_t *dlist;
