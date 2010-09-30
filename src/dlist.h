@@ -61,9 +61,11 @@ dlist_node_t *dlist_next(dlist_t *l, dlist_node_t *node);
 /* Retourne l'adresse du nœud précédent */
 dlist_node_t *dlist_prev(dlist_t *l, dlist_node_t *node);
 
-/* Retourne 1 si node == NULL, 0 sinon */
+/* Retourne 1 si node->next != NULL, 0 sinon */
 /* Utilisée par les itérateurs */
-s8 dlist_end(dlist_t *l, dlist_node_t *node);
+s8 dlist_has_next(dlist_t *l, dlist_node_t *node);
+/* Retourne 1 si node->prev != NULL, 0 sinon */
+s8 dlist_has_prev(dlist_t *l, dlist_node_t *node);
 
 
 /* ========================================================================= */

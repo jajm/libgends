@@ -73,7 +73,7 @@ void print_list(dlist_t *l)
 
 	it = dlist_iterator_new(l);
 	if(iterator_reset(it) < 0) pError();
-	while(!iterator_end(it)){
+	while(iterator_has_next(it)){
 		t = (test_t*) iterator_get(it);
 		printf("%d -> ", t->a);
 		iterator_next(it);

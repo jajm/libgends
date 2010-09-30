@@ -24,6 +24,9 @@
     <note priority="low" time="1279628191" done="1282599147">
         Implement deques
     </note>
+    <note priority="high" time="1285700246" done="1285832983">
+        Implements hasNext function for iterators
+    </note>
     <note priority="low" time="1279628202">
         Implement maps
     </note>

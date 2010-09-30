@@ -125,20 +125,20 @@ void *iterator_get(iterator_t *it)
 	return (void *)get(it->container, it->pointer);
 }
 
-s8 iterator_end(iterator_t *it)
+s8 iterator_has_next(iterator_t *it)
 {
-	func_ptr_t end;
+	func_ptr_t has_next;
 
 	assert(it != NULL);
 
-	end = type_get_func(it->type_name, "end");
-	if(end == NULL){
-		ErrorP("Failed to retrieve function 'end' for type '%s'",
+	has_next = type_get_func(it->type_name, "has_next");
+	if(has_next == NULL){
+		ErrorP("Failed to retrieve function 'has_next' for type '%s'",
 			it->type_name);
 		return -1;
 	}
 
-	return end(it->container, it->pointer);
+	return has_next(it->container, it->pointer);
 }
 
 void iterator_free(iterator_t *it)

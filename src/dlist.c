@@ -106,16 +106,27 @@ dlist_node_t *dlist_prev(dlist_t *l, dlist_node_t *node)
 	return node->prev;
 }
 
-s8 dlist_end(dlist_t *l, dlist_node_t *node)
+s8 dlist_has_next(dlist_t *l, dlist_node_t *node)
 {
 	assert(l != NULL);
+	assert(node != NULL);
 
-	if(node == NULL)
+	if(node->next != NULL)
 		return 1;
 	
 	return 0;
 }
 
+s8 dlist_has_prev(dlist_t *l, dlist_node_t *node)
+{
+	assert(l != NULL);
+	assert(node != NULL);
+
+	if(node->prev != NULL)
+		return 1;
+	
+	return 0;
+}
 
 dlist_node_t *dlist_add_after(dlist_t *l, dlist_node_t *node, void *data)
 {
@@ -352,7 +363,7 @@ iterator_t *dlist_iterator_new(dlist_t *l)
 		type_reg_func("dlist_it", "first", (func_ptr_t)&dlist_first);
 		type_reg_func("dlist_it", "next", (func_ptr_t)&dlist_next);
 		type_reg_func("dlist_it", "get", (func_ptr_t)&dlist_get);
-		type_reg_func("dlist_it", "end", (func_ptr_t)&dlist_end);
+		type_reg_func("dlist_it", "has_next", (func_ptr_t)&dlist_has_next);
 	}
 
 	it = iterator_new("dlist_it", l);
@@ -375,7 +386,7 @@ iterator_t *dlist_reverse_iterator_new(dlist_t *l)
 		type_reg_func("dlist_rit", "first", (func_ptr_t)&dlist_last);
 		type_reg_func("dlist_rit", "next", (func_ptr_t)&dlist_prev);
 		type_reg_func("dlist_rit", "get", (func_ptr_t)&dlist_get);
-		type_reg_func("dlist_rit", "end", (func_ptr_t)&dlist_end);
+		type_reg_func("dlist_rit", "has_next", (func_ptr_t)&dlist_has_prev);
 	}
 
 	it = iterator_new("dlist_rit", l);
