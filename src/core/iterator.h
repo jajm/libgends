@@ -51,17 +51,17 @@ extern "C" {
 #endif
 
 /* Crée un nouvel itérateur et initialise sa position au début du conteneur */
-iterator_t *iterator_new(const char *type_name, void *container);
+iterator_t *it_new(const char *type_name, void *container);
 /* Réinitialise l'itérateur à la première position */
-s8 iterator_reset(iterator_t *it);
+s8 it_reset(iterator_t *it);
 /* Déplace l'itérateur sur la position suivante */
-s8 iterator_next(iterator_t *it);
+s8 it_next(iterator_t *it);
 /* Retourne la donnée de l'élément pointé */
-void *iterator_get(iterator_t *it);
+void *it_get(iterator_t *it);
 /* Retourne 1 si tous les éléments ont été parcourus, 0 sinon */
-s8 iterator_end(iterator_t *it);
+s8 it_has_next(iterator_t *it);
 /* Libère la mémoire */
-void iterator_free(iterator_t *it);
+void it_free(iterator_t *it);
 
 #ifdef __cplusplus
 }

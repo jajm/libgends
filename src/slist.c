@@ -89,11 +89,11 @@ slist_node_t *slist_next(slist_t *l, slist_node_t *node)
 	return node->next;
 }
 
-s8 slist_end(slist_t *l, slist_node_t *node)
+s8 slist_has_next(slist_t *l, slist_node_t *node)
 {
 	assert(l != NULL);
 
-	if(node == NULL)
+	if(node != NULL && node->next != NULL)
 		return 1;
 	
 	return 0;
@@ -203,7 +203,7 @@ void *slist_it_pop(iterator_t *it)
 	l = (slist_t *)it->container;
 	node = (slist_node_t *)it->pointer;
 
-	iterator_next(it);
+	it_next(it);
 
 	return slist_pop(l, node);
 }
@@ -263,7 +263,7 @@ s8 slist_it_del(iterator_t *it)
 	l = (slist_t *)it->container;
 	node = (slist_node_t *)it->pointer;
 
-	iterator_next(it);
+	it_next(it);
 
 	return slist_del(l, node);
 }
@@ -317,11 +317,11 @@ iterator_t *slist_iterator_new(slist_t *l)
 		type_reg_func("slist_it", "first", (func_ptr_t)&slist_first);
 		type_reg_func("slist_it", "next", (func_ptr_t)&slist_next);
 		type_reg_func("slist_it", "get", (func_ptr_t)&slist_get);
-		type_reg_func("slist_it", "end", (func_ptr_t)&slist_end);
+		type_reg_func("slist_it", "has_next", (func_ptr_t)&slist_has_next);
 	}
 
-	it = iterator_new("slist_it", l);
-	iterator_reset(it);
+	it = it_new("slist_it", l);
+	it_reset(it);
 
 	return it;
 }		

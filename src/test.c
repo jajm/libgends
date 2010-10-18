@@ -72,14 +72,14 @@ void print_list(dlist_t *l)
 	assert(l != NULL);
 
 	it = dlist_iterator_new(l);
-	if(iterator_reset(it) < 0) pError();
-	while(!iterator_end(it)){
-		t = (test_t*) iterator_get(it);
+	if(it_reset(it) < 0) pError();
+	while(!it_has_next(it)){
+		t = (test_t*) it_get(it);
 		printf("%d -> ", t->a);
-		iterator_next(it);
+		it_next(it);
 	}
 	printf("NULL\n");
-	iterator_free(it);
+	it_free(it);
 }
 
 void print_stack(stack_t *S)
@@ -152,9 +152,9 @@ int main()
 
 	it = dlist_iterator_new(L);
 	if(it == NULL) pError();
-	if(iterator_next(it) < 0) pError();
-	iterator_next(it);
-	T = (test_t*) iterator_get(it);
+	if(it_next(it) < 0) pError();
+	it_next(it);
+	T = (test_t*) it_get(it);
 	printf("Ajout de 9, 10, 11 après l'itérateur (%d)\n", T->a);
 	dlist_it_add_after(it, tab[9]);
 	dlist_it_add_after(it, tab[10]);
@@ -193,8 +193,8 @@ int main()
 	dlist_del_last(L);
 	print_list(L);
 
-	iterator_reset(it);
-	iterator_next(it);
+	it_reset(it);
+	it_next(it);
 	puts("Suppression de l'itérateur");
 	dlist_it_del(it);
 	print_list(L);

@@ -33,8 +33,8 @@
  *                                                  vers l'élt suivant       *
  * - void *get(void *container, void *pointer);	    Retourne un pointeur     *
  *                                                  vers la donnée           *
- * - s8 end(void *container, void *pointer);	Retourne 1 si tous les élts  *
- *						ont été itérés, 0 sinon      *
+ * - s8 has_next(void *container, void *pointer);  Retourne 1 s'il reste des *
+ *						   élts à parcourir, 0 sinon *
  *****************************************************************************/
 
 #include <stdio.h>
@@ -45,7 +45,7 @@
 #include "types.h"
 #include "iterator.h"
 
-iterator_t *iterator_new(const char *type_name, void *container)
+iterator_t *it_new(const char *type_name, void *container)
 {
 	iterator_t *it;
 	size_t len;
@@ -73,7 +73,7 @@ iterator_t *iterator_new(const char *type_name, void *container)
 	return it;
 }
 
-s8 iterator_reset(iterator_t *it)
+s8 it_reset(iterator_t *it)
 {
 	func_ptr_t first;
 
@@ -91,7 +91,7 @@ s8 iterator_reset(iterator_t *it)
 	return 0;
 }
 
-s8 iterator_next(iterator_t *it)
+s8 it_next(iterator_t *it)
 {
 	func_ptr_t next;
 
@@ -109,7 +109,7 @@ s8 iterator_next(iterator_t *it)
 	return 0;
 }
 
-void *iterator_get(iterator_t *it)
+void *it_get(iterator_t *it)
 {
 	func_ptr_t get;
 
@@ -125,23 +125,23 @@ void *iterator_get(iterator_t *it)
 	return (void *)get(it->container, it->pointer);
 }
 
-s8 iterator_end(iterator_t *it)
+s8 it_has_next(iterator_t *it)
 {
-	func_ptr_t end;
+	func_ptr_t has_next;
 
 	assert(it != NULL);
 
-	end = type_get_func(it->type_name, "end");
-	if(end == NULL){
-		ErrorP("Failed to retrieve function 'end' for type '%s'",
+	has_next = type_get_func(it->type_name, "has_next");
+	if(has_next == NULL){
+		ErrorP("Failed to retrieve function 'has_next' for type '%s'",
 			it->type_name);
 		return -1;
 	}
 
-	return end(it->container, it->pointer);
+	return has_next(it->container, it->pointer);
 }
 
-void iterator_free(iterator_t *it)
+void it_free(iterator_t *it)
 {
 	if(it){
 		free(it->type_name);
