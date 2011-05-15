@@ -29,12 +29,16 @@ AC_TYPE_SIZE_T
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_CHECK_FUNCS([memmove])
+AC_CHECK_HEADERS([CUnit/Basic.h],[cunit=yes],[cunit=no])
+AM_CONDITIONAL([HAVE_CUNIT_BASIC_H], [test x$cunit = xyes])
 
 AC_CONFIG_FILES([
 	Makefile
 	libgends.pc
 	src/Makefile
 	src/core/Makefile
+	t/Makefile
+	t/core/Makefile
 ])
 
 AM_SILENT_RULES
