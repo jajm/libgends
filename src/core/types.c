@@ -33,7 +33,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
-#include <assert.h>
 #include "error.h"
 #include "types.h"
 
@@ -49,9 +48,11 @@ type_t *type_new(const char *name, u32 size)
 {
 	type_t *t = NULL;
 	size_t len;
-	
-	assert(name != NULL);
-	assert(size > 0);
+
+	if(name == NULL || size == 0){
+		Error("Bad parameters");
+		return NULL;
+	}
 	
 	if( (t = malloc(sizeof(type_t))) == NULL){
 		Error("Memory allocation error");
@@ -66,6 +67,7 @@ type_t *type_new(const char *name, u32 size)
 	}
 	strncpy(t->name, name, len+1);
 	t->size = size;
+	t->funcs = NULL;
 
 	return t;
 }
@@ -198,9 +200,11 @@ u32 type_hash(const char *name)
 	u32 hash = 0;
 	u32 i, size;
 
+	if(name == NULL) return 0;
+
 	size = strlen(name);
 	for(i=0; i<size; i++){
-		hash += name[i];
+		hash += name[i] * (i+1);
 	}
 	hash %= g_types->size;
 
@@ -255,6 +259,11 @@ s8 type_reg(const char *name, u32 size)
 	u32 hash;
 	type_t *type;
 
+	if(name == NULL){
+		Error("Bad parameters");
+		return -1;
+	}
+
 	if(g_types == NULL){
 		Error("User types not initialized");
 		return -1;
@@ -279,14 +288,22 @@ s8 type_reg_func(const char *name, const char *func_name, func_ptr_t func_ptr)
 	u32 hash;
 	type_t *type;
 
-	assert(name != NULL);
-	assert(func_name != NULL);
-	assert(func_ptr != NULL);
-	
+	if(name == NULL || func_name == NULL || func_ptr == NULL){
+		Error("Bad parameters");
+		return -1;
+	}
+	if(g_types == NULL){
+		Error("User types not initialized");
+		return -1;
+	}
+
 	hash = type_hash(name);
 	type = typelist_get(g_types->types[hash], name);
 	if(type){
-		funcs_add(&type->funcs, func_new(func_name, func_ptr));
+		if(funcs_add(&type->funcs, func_new(func_name, func_ptr)) == NULL){
+			ErrorP("Failed to add function '%s' to type '%s'",func_name,name);
+			return -1;
+		}
 	}else{
 		ErrorP("Failed to find type '%s'", name);
 		return -1;
@@ -301,8 +318,14 @@ func_ptr_t type_get_func(const char *name, const char *func_name)
 	type_t *type;
 	func_ptr_t func_ptr = NULL;
 
-	assert(name != NULL);
-	assert(func_name != NULL);
+	if(name == NULL || func_name == NULL){
+		Error("Bad parameters");
+		return NULL;
+	}
+	if(g_types == NULL){
+		Error("User types not initialized");
+		return NULL;
+	}
 
 	hash = type_hash(name);
 	type = typelist_get(g_types->types[hash], name);
@@ -322,12 +345,12 @@ s8 type_unreg(const char *name)
 {
 	u32 hash;
 
-	if(g_types == NULL){
-		Error("User types not initialized");
-		return -1;
-	}
 	if(name == NULL){
 		Error("Bad parameters");
+		return -1;
+	}
+	if(g_types == NULL){
+		Error("User types not initialized");
 		return -1;
 	}
 
@@ -345,13 +368,24 @@ s8 type_unreg_func(const char *name, const char *func_name)
 	u32 hash;
 	type_t *type;
 
-	assert(name != NULL);
-	assert(func_name != NULL);
-	
+	if(name == NULL || func_name == NULL){
+		Error("Bad parameters");
+		return -1;
+	}
+	if(g_types == NULL){
+		Error("User types not initialized");
+		return -1;
+	}
+
 	hash = type_hash(name);
 	type = typelist_get(g_types->types[hash], name);
-	if(type){
-		funcs_del(&(type->funcs), func_name);
+	if(type == NULL){
+		ErrorP("Failed to retrieve type %s", name);
+		return -1;
+	}
+	if(funcs_del(&(type->funcs), func_name) < 0){
+		ErrorP("Failed to delete function %s for type %s", func_name, name);
+		return -1;
 	}
 
 	return 0;
@@ -363,12 +397,12 @@ u32 type_sizeof(const char *name)
 	u32 size = 0;
 	typelist_node_t *tmp;
 
-	if(g_types == NULL){
-		Error("User types not initialized");
+	if(name == NULL){
+		Error("Parameter is NULL");
 		return 0;
 	}
-	if(name == NULL){
-		Error("Parameter 'name' is NULL");
+	if(g_types == NULL){
+		Error("User types not initialized");
 		return 0;
 	}
 

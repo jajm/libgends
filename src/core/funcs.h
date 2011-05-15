@@ -61,7 +61,7 @@ void func_free(func_t *func);
 /* Ajoute une fonction à la liste et retourne l'adresse du nœud créé */
 func_list_node_t *funcs_add(funcs_t *funcs, func_t *func);
 /* Supprime une fonction dans la liste */
-void funcs_del(funcs_t *head, const char *name);
+s8 funcs_del(funcs_t *head, const char *name);
 /* Libère la mémoire */
 void funcs_free(funcs_t head);
 /* Retourne l'adresse de la fonction (structure) */

@@ -24,8 +24,8 @@
  * Créé le		: 01/03/2010                                         *
  *****************************************************************************
  * Les types 'utilisateur' sont des nouveaux types définis par l'utilisateur.*
- * Ils sont décrits par un nom unique, une taille en octets et une liste de  *
- * fonctions identifiées par leur nom.                                       *
+ * Ils sont décrits par un nom unique, une taille en octets et possèdent une *
+ * liste de fonctions identifiées par leur nom.                              *
  *****************************************************************************/
 
 #ifndef types_h_included
