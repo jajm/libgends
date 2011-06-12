@@ -17,18 +17,6 @@
  * along with libgends.  If not, see <http://www.gnu.org/licenses/>.         *
  *****************************************************************************/
 
- /****************************************************************************
-  * Fichier		: types.c                                            *
-  * Description Brève	: Gestion de types 'utilisateur'                     *
-  * Auteur		: Julian Maurice                                     *
-  * Créé le		: 01/03/2010                                         *
- *****************************************************************************
- * Les types 'utilisateur' sont des nouveaux types définis par l'utilisateur.*
- * Ils sont décrits par un nom unique, une taille en octets et une liste de  *
- * fonctions identifiées par leur nom.                                       *
- *****************************************************************************/
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -237,19 +225,6 @@ s8 types_init(u32 size)
 	for (i=0; i<g_types->size; i++)
 		g_types->types[i] = NULL;
 	
-	/* Types par défaut */
-	type_reg("u8", sizeof(u8));
-	type_reg("u16", sizeof(u16));
-	type_reg("u32", sizeof(u32));
-	type_reg("u64", sizeof(u64));
-	type_reg("s8", sizeof(s8));
-	type_reg("s16", sizeof(s16));
-	type_reg("s32", sizeof(s32));
-	type_reg("s64", sizeof(s64));
-	type_reg("float", sizeof(float));
-	type_reg("double", sizeof(double));
-	type_reg("char", sizeof(char));
-
 	return 0;
 }
 

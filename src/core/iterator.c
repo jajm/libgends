@@ -17,26 +17,6 @@
  * along with libgends.  If not, see <http://www.gnu.org/licenses/>.         *
  *****************************************************************************/
 
-/*****************************************************************************
- * Fichier		: iterator.c                                         *
- * Description Brève	: Gestion d'itérateurs                               *
- * Auteur		: Julian Maurice                                     *
- * Crée le		: 01/06/2010                                         *
- *****************************************************************************
- * Les fonctions ci-dessous définissent une interface pour la création       *
- * d'itérateurs sur n'importe quelle structure de données.                   *
- * La création d'un itérateur requiert l'existence d'un type correspondant   *
- * (voir types.h).                                                           *
- * Le type de l'itérateur doit posséder les fonctions suivantes:             *
- * - void *first(void *container);	Retourne un pointeur vers le 1er élt *
- * - void *next(void *container, void *pointer);    Retourne un pointeur     *
- *                                                  vers l'élt suivant       *
- * - void *get(void *container, void *pointer);	    Retourne un pointeur     *
- *                                                  vers la donnée           *
- * - s8 has_next(void *container, void *pointer);  Retourne 1 s'il reste des *
- *						   élts à parcourir, 0 sinon *
- *****************************************************************************/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

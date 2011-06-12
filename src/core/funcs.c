@@ -17,16 +17,6 @@
  * along with libgends.  If not, see <http://www.gnu.org/licenses/>.         *
  *****************************************************************************/
 
-/*****************************************************************************
- * Fichier           : funcs.c                                               *
- * Description Brève : Liste de fonctions génériques                         *
- * Auteur            : Julian Maurice                                        *
- * Créé le           : 13/03/2010                                            *
- *****************************************************************************
- * Liste de fonctions génériques (en réalité de pointeurs de fonctions de    *
- * type intptr_t (*ptr)(void *, ...) ).                                      *
- *****************************************************************************/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>

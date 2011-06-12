@@ -18,49 +18,52 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * Fichier		: iterator.h                                         *
- * Description Brève	: Gestion d'itérateurs                               *
- * Auteur		: Julian Maurice                                     *
- * Crée le		: 01/06/2010                                         *
+ * File                 : iterator.h                                         *
+ * Short description    : Iterators management                               *
+ * Author               : Julian Maurice                                     *
+ * Created on           : 2010-06-01                                         *
  *****************************************************************************
- * Les fonctions ci-dessous définissent une interface pour la création       *
- * d'itérateurs sur n'importe quelle structure de données.                   *
- * La création d'un itérateur requiert l'existence d'un type correspondant   *
- * (voir types.h).                                                           *
- * Le type de l'itérateur doit posséder les fonctions suivantes:             *
- * - void *first(void *container);	Retourne un pointeur vers le 1er élt *
- * - void *next(void *container, void *pointer);    Retourne un pointeur     *
- *                                                  vers l'élt suivant       *
- * - void *get(void *container, void *pointer);	    Retourne un pointeur     *
- *                                                  vers la donnée           *
- * - s8 end(void *container, void *pointer);	Retourne 1 si tous les élts  *
- *						ont été itérés, 0 sinon      *
+ * To create an iterator on a custom type, you have to:                      *
+ *  - create a custom type (see types.h)                                     *
+ *  - create 4 functions for this type :                                     *
+ *    . void *first(void *container)  // return a pointer on 1st element     *
+ *    . void *next(void *container, void *pointer) // return a pointer on    *
+ *                                                 // the next element       *
+ *    . void *get(void *container, void *pointer) // return a pointer on data*
+ *    . s8 has_next(void *container, void *pointer) // return 1 if it remains*
+ *						// elements, 0 otherwise     *
+ *  - and then, create the iterator, with it_new.                            *
  *****************************************************************************/
- 
+
 #ifndef iterator_h_included
 #define iterator_h_included
 
 typedef struct {
-	char *type_name;	/* Le type de l'itérateur */
-	void *container;	/* Le conteneur sur lequel on va itérer */
-	void *pointer;		/* La position courante de l'itérateur */
+	char *type_name;	/* Type on what we'll iterate */
+	void *container;	/* Container on which we'll iterate */
+	void *pointer;		/* Current position of iterator */
 } iterator_t;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* Crée un nouvel itérateur et initialise sa position au début du conteneur */
+/* Create a new iterator. You will have to use it_reset before to use it
+ * Return a pointer on the new iterator, or NULL if an error occurs */
 iterator_t *it_new(const char *type_name, void *container);
-/* Réinitialise l'itérateur à la première position */
+/* (Re)set iterator to point on the first element
+ * Return 0 on success, or a negative value if an error occurs */
 s8 it_reset(iterator_t *it);
-/* Déplace l'itérateur sur la position suivante */
+/* Set iterator to point on the next element
+ * Return 0 on success, or a negative value if an error occurs */
 s8 it_next(iterator_t *it);
-/* Retourne la donnée de l'élément pointé */
+/* Get data pointed by iterator */
+/* Return NULL if an error occurs */
 void *it_get(iterator_t *it);
-/* Retourne 1 si tous les éléments ont été parcourus, 0 sinon */
+/* Get iterator status
+ * Return 1 if it remains elements, 0 otherwise */
 s8 it_has_next(iterator_t *it);
-/* Libère la mémoire */
+/* Free memory */
 void it_free(iterator_t *it);
 
 #ifdef __cplusplus

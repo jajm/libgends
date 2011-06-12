@@ -17,24 +17,6 @@
  * along with libgends.  If not, see <http://www.gnu.org/licenses/>.         *
  *****************************************************************************/
 
-/*****************************************************************************
- * Fichier		: error.c                                            *
- * Description Brève	: Gestion d'erreurs                                  *
- * Auteur		: Julian Maurice                                     *
- * Créé le		: 01/03/2010                                         *
- *****************************************************************************
- * Une 'erreur' est ici représentée par un message, et la                    *
- * localisation de l'erreur (fichier, ligne, fonction).                      *
- * Une fois une erreur enregistrée (par l'appel de Error_at ou Error,        *
- * elle peut être affichée par l'appel de pError.                            *
- *****************************************************************************
- * Utilisation:                                                              *
- * 	Error_init();	// Init avant la première utilisation                *
- * 	Error("malloc failed");                                              *
- *	Error_at("doc.xml", 42, NULL, "Invalid syntax");                     *
- * 	pError();                                                            *
- *****************************************************************************/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -50,16 +32,7 @@ typedef struct {
 	char *string;	/* Error in 'function' at 'file':'line': 'msg' */
 } error_t;
 
-error_t g_error;
-
-void Error_init(void)
-{
-	g_error.msg = NULL;
-	g_error.file = NULL;
-	g_error.function = NULL;
-	g_error.line = 0;
-	g_error.string = NULL;
-}
+error_t g_error = {NULL, NULL, NULL, 0, NULL};
 
 void Error_at(const char *file, u32 line, const char *function,
 	 const char *msg, ...)

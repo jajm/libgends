@@ -18,14 +18,13 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * Fichier		: types.h                                            *
- * Description Brève	: Gestion de types 'utilisateur'                     *
- * Auteur		: Julian Maurice                                     *
- * Créé le		: 01/03/2010                                         *
+ * File                 : types.h                                            *
+ * Short description    : Custom types management                            *
+ * Author               : Julian Maurice                                     *
+ * Created on           : 2010-03-01                                         *
  *****************************************************************************
- * Les types 'utilisateur' sont des nouveaux types définis par l'utilisateur.*
- * Ils sont décrits par un nom unique, une taille en octets et possèdent une *
- * liste de fonctions identifiées par leur nom.                              *
+ * Custom types are user-defined types. They are described by a unique name, *
+ * a size in bytes and have a list of functions identified by their name.    *
  *****************************************************************************/
 
 #ifndef types_h_included
@@ -38,29 +37,32 @@
 extern "C" {
 #endif
 
-/* À appeler avant d'utiliser les autres fonctions */
-/* Retourne 0, ou une valeur négative s'il y a eu une erreur */
+/* WARNING: This function has to be called before the others functions.
+ * Initialize the custom types hash table. size is the width of hash table.
+ * Return 0 on success, or a negative value if an error occurs. */
 s8 types_init(u32 size);
-/* Enregistrer un nouveau type */
-/* Retourne une valeur négative s'il y a eu une erreur, */
-/* 	    une valeur positive si le type existe déjà, */
-/*	    0 sinon */
+/* Register a new type.
+ * Return 0 on success,
+ *        a negative value if an error occurs,
+ *        or a positive value if type already exists. */
 s8 type_reg(const char *name, u32 size);
-/* Associer une fonction à un type */
-/* Retourne 0, ou une valeur négative s'il y a eu une erreur */
+/* Add a function to type's function list.
+ * Return 0 on success, or a negative value if an error occurs */
 s8 type_reg_func(const char *name, const char *func_name, func_ptr_t func_ptr);
-/* Retourne un pointeur vers la fonction correspondante, ou NULL si la fonction n'existe pas */
+/* Get function pointer
+ * Return a pointer of 'name' named function if it exists, NULL otherwise */
 func_ptr_t type_get_func(const char *name, const char *func_name);
-/* Supprimer un type existant */
-/* Retourne 0, ou une valeur négative s'il y a eu une erreur */
+/* Unregister an existing type
+ * Return 0 on success, or a negative value if an error occurs */
 s8 type_unreg(const char *name);
-/* Supprimer une fonction associée à un type */
-/* Retourne 0, ou une valeur négative s'il y a eu une erreur */
+/* Remove a function from type's function list
+ * Return 0 on success, or a negative value if an error occurs */
 s8 type_unreg_func(const char *name, const char *func_name);
-/* Retourne la taille d'un type existant, ou 0 si inexistant */
+/* Get type size */
+/* Return the size of 'name' named type, or 0 if an error occurs */
 u32 type_sizeof(const char *name);
 
-/* Détruire tous les types */
+/* Destroy all types */
 void types_free(void);
 
 /* For debugging purposes */

@@ -18,13 +18,12 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * Fichier		: funcs.h                                            *
- * Description Brève	: Liste de fonctions génériques                      *
- * Auteur		: Julian Maurice                                     *
- * Créé le		: 13/03/2010					     *
+ * File                 : funcs.h                                            *
+ * Short description    : Linked list of generic functions                   *
+ * Author               : Julian Maurice                                     *
+ * Created on           : 2010-03-13                                         *
  *****************************************************************************
- * Liste de fonctions génériques (en réalité de pointeurs de fonctions de    *
- * type intptr_t (*ptr)(void *, ...) ).                                      *
+ * Linked list of pointer of intptr_t (*ptr)(void *, ...)                    *
  *****************************************************************************/
 
 #ifndef funcs_h_included
@@ -36,8 +35,8 @@
 typedef intptr_t (*func_ptr_t)(void *, ...);
 
 typedef struct {
-	char *name;	/* Nom de la fonction */
-	func_ptr_t ptr;	/* Pointeur de fonction */
+	char *name;	/* Function name (it will be its identifier) */
+	func_ptr_t ptr;	/* Function pointer */
 } func_t;
 
 typedef struct func_list_node_s {
@@ -49,29 +48,43 @@ typedef struct func_list_node_s {
 extern "C" {
 #endif
 
-/* Crée une nouvelle fonction et retourne son adresse */
+/* All functions that can return an error (NULL, or a negative value) use
+ * error.h functions to store an error message.
+ * You can use pError to print this error message.
+ */
+
+/* Create new function structure
+ * Return a pointer on newly created structure, or NULL if error occurs */
 func_t *func_new(const char *func_name, func_ptr_t func_ptr);
-/* Retourne le nom de la fonction */
+/* Get function name
+ * Return a string which contains the name of the function, or NULL if an error
+ * occurs. */
 char *func_get_name(func_t *func);
-/* Retourne le pointeur de la fonction */
+/* Get function pointer */
+/* Return a function pointer, or NULL if an error occurs */
 func_ptr_t func_get_ptr(func_t *func);
-/* Libère la mémoire */
+/* Free memory */
 void func_free(func_t *func);
 
-/* Ajoute une fonction à la liste et retourne l'adresse du nœud créé */
+/* Add a function to the list
+ * Return a pointer on the newly created node, or NULL if an error occurs */
 func_list_node_t *funcs_add(funcs_t *funcs, func_t *func);
-/* Supprime une fonction dans la liste */
+/* Remove a function from the list. Search is done using name.
+ * Return 0 on succes, a negative value otherwise. */
 s8 funcs_del(funcs_t *head, const char *name);
-/* Libère la mémoire */
+/* Free memory */
 void funcs_free(funcs_t head);
-/* Retourne l'adresse de la fonction (structure) */
+/* Get function structure
+ * Return a pointer on function structure, or NULL if an error occurs */
 func_t *funcs_get(funcs_t head, const char *name);
-/* Retourne le pointeur de la fonction */
+/* Get function pointer */
+/* Return function pointer, or NULL if an error occurs */
 func_ptr_t funcs_get_ptr(funcs_t funcs, const char *name);
 
-/* Appelle la fonction nommée 'func_name', si elle est présente dans la liste
- * 'funcs', avec les arguments passés en paramètres.
- * Retourne la valeur de retour de la fonction appelée */
+/* Call 'name' named function, if it exists in 'funcs' list, with
+ * following arguments as parameters.
+ * Return return value of called function.
+ * WARNING: don't use this macro if you're not sure the function exists */
 #define funcs_call(funcs, name, arg1, ...) 	\
 		(funcs_get_ptr(funcs, name))(arg1, ##__VA_ARGS__)
 

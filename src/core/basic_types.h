@@ -18,16 +18,16 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * Fichier		: basic_types.h                                      *
- * Description Brève	: Liste de 'typedef' pour les types entiers          *
- * Auteur		: Julian Maurice                                     *
- * Créé le		: 01/03/2010                                         *
+ * File                 : basic_types.h                                      *
+ * Short description    : List of typedefs for integer types                 *
+ * Author               : Julian Maurice                                     *
+ * Created on           : 2010-03-01                                         *
  *****************************************************************************
- * Les types définis ici utilisent les types de C99.                         *
- * Les types sont nommés aXX, où a est soit 'u', soit 's', selon qu'il soit  *
- * respectivement 'Unsigned', ou 'Signed'.                                   *
- * XX est la taille exacte du type, en bits. Par exemple, u32 est le type    *
- * d'un entier non signé qui occupe exactement 32 bits en mémoire.           *
+ * Types defined here use C99 types.                                         *
+ * Types are named aXX, where 'a' is 'u' if type is unsigned, or 's' (signed)*
+ * otherwise.                                                                *
+ * 'XX' is the exact size of type, in bits. For example, u32 is an unsigned  *
+ * integer which is 32 bits long.                                            *
  *****************************************************************************/
 
 #ifndef basic_types_h_included
