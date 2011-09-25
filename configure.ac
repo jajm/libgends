@@ -1,5 +1,5 @@
 AC_PREREQ([2.65])
-AC_INIT([libgends], [0.1], [diwan@frankiz.eu])
+AC_INIT([libgends], [0.1], [jajm@jajm.org])
 AM_INIT_AUTOMAKE([-Wall -Werror silent-rules subdir-objects])
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADERS([config.h])
