@@ -3,8 +3,8 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
 
-Name: libgenty
-Description: libgenty fournit des types génériques
+Name: libgends
+Description: libgends provides generic data structures
 Version: @VERSION@
-Libs: -L${libdir} -lgenty
+Libs: -L${libdir} -lgends
 Cflags: -I${includedir}
