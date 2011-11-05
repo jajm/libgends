@@ -30,12 +30,12 @@ AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_CHECK_FUNCS([memmove])
 AC_ARG_ENABLE([cunit],
-	AC_HELP_STRING([--enable-cunit], [enable Cunit tests]),
+	AC_HELP_STRING([--enable-cunit], [build CUnit tests]),
 	[want_cunit=$enableval],
 	[want_cunit=no]
 )
 AC_CHECK_HEADERS([CUnit/Basic.h],[have_cunit=yes],[have_cunit=no])
-AM_CONDITIONAL([UNIT_TESTS], [test x$want_cunit$have_cunit = xyesyes])
+AM_CONDITIONAL([CUNIT_TESTS], [test x$want_cunit$have_cunit = xyesyes])
 
 AC_CONFIG_FILES([
 	Makefile
@@ -43,7 +43,8 @@ AC_CONFIG_FILES([
 	src/Makefile
 	src/core/Makefile
 	t/Makefile
-	t/core/Makefile
+	t/cunit/Makefile
+	t/cunit/core/Makefile
 ])
 
 AM_SILENT_RULES

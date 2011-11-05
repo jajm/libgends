@@ -1,4 +1,6 @@
-SUBDIRS = core
+if CUNIT_TESTS
+SUBDIRS = cunit
+endif
 
 AM_CPPFLAGS = -I../src/core -I../src
 AM_CFLAGS = -Wall -Wextra -Werror -std=c99
