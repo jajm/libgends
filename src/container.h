@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2010 Julian Maurice                                         *
+ * Copyright (C) 2010-2011 Julian Maurice                                    *
  *                                                                           *
  * This file is part of libgends.                                            *
  *                                                                           *
@@ -18,46 +18,115 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * Fichier		: container.h                                        *
- * Brève Description	: Conteneur de donnée générique                      *
- * Auteur		: Julian Maurice                                     *
- * Créé le		: 01/03/2010                                         *
+ * File              : container.h                                           *
+ * Short description : Generic data container                                *
  *****************************************************************************
- * Un conteneur peut contenir une et une seule donnée générique, représentée *
- * par un pointeur vers la donnée, et le nom du type de la donnée            *
+ * A 'container' can contain one and only one generic data, represented by a *
+ * pointer to the data, and the data type name                               *
  *****************************************************************************/
 
 #ifndef container_h_included
 #define container_h_included
 
-#include "basic_types.h"
+#include <stdint.h>
+#include <stdbool.h>
 
 typedef struct{
-	char *type_name;	/* Type de la donnée */
-	void *data_ptr;		/* Pointeur vers la donnée */
+	char *type_name;        /* Data type */
+	void *data_ptr;         /* Data pointer */
 } container_t;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* Crée une donnée générique à partir des arguments */
-container_t *container(const char *type_name, const void *data_ptr);
+/* Create a new container */
+/* type_name : name of a registered type (see core/types.h)
+ *  data_ptr : pointer to the data
+ *      copy : true => copy the data
+ *             false => just take the pointer value */
+/* Return: Success => pointer to the newly created container
+ *         Failure => NULL */
+	container_t *
+container_new(
+	const char *type_name,
+	void *data_ptr,
+	bool copy_data
+);
 
-/* Affecte une valeur à une donnée générique */
-s8 container_affect(container_t **g, const char *type_name, const void *data_ptr);
+/* Create a new container from another container */
+/* src: pointer to the container to clone */
+/* Return: Success => pointer to the newly created container
+ *         Failure => NULL */
+	container_t *
+container_new_clone(
+	const container_t *src
+);
 
-/* Copie de donnée générique */
-s8 container_copy(container_t **to, const container_t *from);
+/* Set a new value to an existing container */
+/*             c : pointer to the container
+ *     type_name : name of a registered type (see core/types.h)
+ *      data_ptr : pointer to the data
+ * free_old_data : true => free memory taken by old value
+ *                 false => don't free memory
+ *     copy_data : true => copy the data
+ *                 false => just take the pointer value */
+/* Return: Success => 0
+ *         Failure => a negative value */
+	int8_t
+container_set(
+	container_t *c,
+	const char *type_name,
+	void *data_ptr,
+	bool free_old_data,
+	bool copy_data
+);
 
-/* Comparaison de deux données génériques */
-s32 container_cmp(const container_t *g1, const container_t *g2);
+/* Set a new value to an existing container, from another container */
+/*           dst : pointer to the container to modify
+ *           src : pointer to the container to copy value from
+ * free_old_data : true => free memory taken by old value
+ *                 false => don't free memory */
+/* Return: Success => 0
+ *         Failure => a negative value */
+	int8_t
+container_set_clone(
+	container_t *dst,
+	const container_t *src,
+	bool free_old_data
+);
 
-/* Donne la taille d'une donnée générique */
-u32 container_size(const container_t *g);
+/* Get the contained data */
+/*    c : pointer to the container */
+/* copy : true => return a pointer to a copy of the data
+ *        false => return a direct pointer to the data */
+/* Return: pointer to the data */
+	void *
+container_get(
+	container_t *c,
+	bool copy
+);
 
-/* Libère la mémoire */
-void container_free(container_t *g);
+/* Get size in bytes of contained data */
+/* c: pointer to the container */
+/* Return: Success => the size in bytes of contained data
+ *         Failure => 0 */
+	uint32_t
+container_data_size(
+	const container_t *c
+);
+
+/* Free the memory */
+/*         c : pointer to the container
+ * free_data : true => try to free the data with "free" registered function
+ *                     or with standard free() function
+ *             false => don't free memory occupied by the data */
+/* Return: nothing */
+	void
+container_free(
+	container_t *c,
+	bool free_data
+);
 
 #ifdef __cplusplus
 }

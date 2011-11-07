@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2010 Julian Maurice                                         *
+ * Copyright (C) 2010-2011 Julian Maurice                                    *
  *                                                                           *
  * This file is part of libgends.                                            *
  *                                                                           *
@@ -18,26 +18,25 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * Fichier		: container.c                                        *
- * Brève Description	: Conteneur de donnée générique                      *
- * Auteur		: Julian Maurice                                     *
- * Créé le		: 01/03/2010                                         *
+ * File              : container.c                                           *
+ * Short description : Generic data container                                *
  *****************************************************************************
- * Un conteneur peut contenir une et une seule donnée générique, représentée *
- * par un pointeur vers la donnée, et le nom du type de la donnée            *
+ * A 'container' can contain one and only one generic data, represented by a *
+ * pointer to the data, and the data type name                               *
  *****************************************************************************/
 
-#include <stdio.h>
+#include <stdint.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 #include "types.h"
 #include "error.h"
 #include "container.h"
 
-container_t *container(const char *type_name, const void *data_ptr)
+container_t *container_new(const char *type_name, void *data_ptr, bool copy_data)
 {
-	container_t *g;
-	u32 data_size;
+	container_t *c;
 	size_t length;
 
 	if(type_name == NULL || data_ptr == NULL){
@@ -45,44 +44,63 @@ container_t *container(const char *type_name, const void *data_ptr)
 		return NULL;
 	}
 
-	data_size = type_sizeof(type_name);
-	if(data_size == 0){
-		ErrorP("Failed to retrieve '%s' size", type_name);
+	c = malloc(sizeof(container_t));
+	if(c == NULL){
+		Error("Memory allocation error");
 		return NULL;
 	}
-	length = strlen(type_name);
 
-	g = malloc(sizeof(container_t));
-	if(g == NULL){
+	length = strlen(type_name);
+	c->type_name = malloc(length+1);
+	if(c->type_name == NULL){
+		free(c);
 		Error("Memory allocation error");
 		return NULL;
 	}
-	g->data_ptr = malloc(data_size);
-	if(g->data_ptr == NULL){
-		free(g);
-		Error("Memory allocation error");
-		return NULL;
+	strncpy(c->type_name, type_name, length+1);
+	assert(c->type_name[length] == '\0');
+
+	if(copy_data){
+		uint32_t data_size = type_sizeof(c->type_name);
+		if(data_size == 0){
+			ErrorP("Failed to retrieve data size, can't copy data");
+			free(c->type_name);
+			free(c);
+			return NULL;
+		}
+		c->data_ptr = malloc(data_size);
+		if(c->data_ptr == NULL){
+			Error("Memory allocation error");
+			free(c->type_name);
+			free(c);
+			return NULL;
+		}
+		memmove(c->data_ptr, data_ptr, data_size);
+	}else{
+		c->data_ptr = data_ptr;
 	}
-	g->type_name = malloc(length+1);
-	if(g->type_name == NULL){
-		free(g->data_ptr);
-		free(g);
-		Error("Memory allocation error");
-		return NULL;
-	}
-	memmove(g->data_ptr, data_ptr, data_size);
-	strncpy(g->type_name, type_name, length+1);
 	
-	return g;
+	return c;
 }
 
-s8 container_affect(container_t **g, const char *type_name, const void *data_ptr)
+container_t * container_new_clone(const container_t *src)
 {
-	u32 data_size;
-	size_t length;
+	if(src == NULL){
+		Error("Bad parameters: NULL pointer");
+		return NULL;
+	}
 
-	if(g == NULL || type_name == NULL || data_ptr == NULL){
-		Error("Bad parameters");
+	return container_new(src->type_name, src->data_ptr, true);
+}
+
+int8_t container_set(container_t *c, const char *type_name, void *data_ptr,
+                     bool free_old_data, bool copy_data)
+{
+	size_t length;
+	uint32_t data_size;
+
+	if(c == NULL || type_name == NULL || data_ptr == NULL){
+		Error("Bad parameters: NULL pointer(s)");
 		return -1;
 	}
 
@@ -91,99 +109,134 @@ s8 container_affect(container_t **g, const char *type_name, const void *data_ptr
 		ErrorP("Failed to retrieve '%s' size", type_name);
 		return -1;
 	}
-	length = strlen(type_name);
-	
-	if(*g == NULL){
-		*g = container(type_name, data_ptr);
-	}else if(strcmp((*g)->type_name, type_name) == 0){
-		/* Pas de réallocation à faire */
-		memmove((*g)->data_ptr, data_ptr, data_size);
-	}else{
-		(*g)->type_name = realloc((*g)->type_name, length);
-		strncpy((*g)->type_name, type_name, length);
-		if(type_sizeof((*g)->type_name) != data_size){
-			(*g)->data_ptr = realloc((*g)->data_ptr, data_size);
-			if((*g)->data_ptr == NULL){
-				Error("Memory allocation error");
-				return -1;
-			}
+
+	if(strcmp(c->type_name, type_name) != 0){
+		length = strlen(type_name);
+		c->type_name = realloc(c->type_name, length);
+		strncpy(c->type_name, type_name, length);
+		assert(c->type_name[length] == '\0');
+	}
+
+	if(free_old_data){
+		func_ptr_t free_f = type_get_func(c->type_name, "free");
+		if(free_f) free_f(c->data_ptr);
+		else free(c->data_ptr);
+		c->data_ptr = NULL;
+	}
+
+	if(copy_data){
+		/* If c->data_ptr is NULL, equivalent to malloc(data_size) */
+		/* If data_size is the same as before, do nothing */
+		c->data_ptr = realloc(c->data_ptr, data_size);
+		if(c->data_ptr == NULL){
+			Error("Memory allocation error");
+			return -1;
 		}
-		memmove((*g)->data_ptr, data_ptr, data_size);
+		memmove(c->data_ptr, data_ptr, data_size);
+	}else{
+		c->data_ptr = data_ptr;
 	}
 
 	return 0;
 }
 
-s8 container_copy(container_t **to, const container_t *from)
+int8_t container_set_clone(container_t *dst, const container_t *src,
+                           bool free_old_data)
 {
-	return container_affect(to, from->type_name, from->data_ptr);
+	if(src == NULL){
+		Error("Bad parameters: NULL pointer");
+		return -1;
+	}
+
+	return container_set(dst, src->type_name, src->data_ptr, free_old_data, true);
 }
 
-s32 container_cmp(const container_t *g1, const container_t *g2)
+void * container_get(container_t *c, bool copy)
+{
+	void *data_ptr;
+
+	if(c == NULL) {
+		Error("Bad parameters: NULL pointer");
+		return NULL;
+	}
+
+	if(copy) {
+		uint32_t data_size = type_sizeof(c->type_name);
+		if(data_size == 0) {
+			ErrorP("Failed to retrieve type size : %s", c->type_name);
+			return NULL;
+		}
+		data_ptr = malloc(data_size);
+		if(data_ptr == NULL) {
+			Error("Memory allocation error");
+			return NULL;
+		}
+		memmove(data_ptr, c->data_ptr, data_size);
+	} else {
+		data_ptr = c->data_ptr;
+	}
+
+	return data_ptr;
+}
+
+int32_t container_cmp(const container_t *c1, const container_t *c2)
 {
 	func_ptr_t cmp_f;
-	u32 size1, size2;
-	s32 cmp;
-	void *ptr;
+	int32_t cmp;
 
-	/* S'ils sont tous les 2 à NULL, on dira qu'ils sont égaux */
-	if(g1 == NULL && g2 == NULL){
+	if(c1 == NULL && c2 == NULL){
+		/* S'ils sont tous les 2 à NULL, on dira qu'ils sont égaux */
 		cmp = 0;
-	/* Si l'un des deux est à NULL, c'est l'autre le plus grand */
-	}else if(g1 == NULL && g2 != NULL){
+	}else if(c1 == NULL && c2 != NULL){
+		/* Si l'un des deux est à NULL, c'est l'autre le plus grand */
 		cmp = -1;
-	}else if(g1 != NULL && g2 == NULL){
+	}else if(c1 != NULL && c2 == NULL){
 		cmp = 1;
-	/* Si aucun des deux n'est à NULL, qu'ils sont du même type,
-	 * et qu'ils possèdent une fonction de comparaison, on utilise
-	 * cette dernière */
-	}else if((cmp_f = type_get_func(g1->type_name, "cmp")) != NULL
-	  && strcmp(g1->type_name, g2->type_name) == 0){
-		cmp = cmp_f(g1->data_ptr, g2->data_ptr);
-	/* Sinon, on compare d'abord la taille,
-	 * et ensuite la valeur des données */
+	}else if((cmp_f = type_get_func(c1->type_name, "cmp")) != NULL
+	  && strcmp(c1->type_name, c2->type_name) == 0){
+		/* Si aucun des deux n'est à NULL, qu'ils sont du même type,
+		 * et qu'ils possèdent une fonction de comparaison, on utilise
+		 * cette dernière */
+		cmp = cmp_f(c1->data_ptr, c2->data_ptr);
 	}else{
-		size1 = type_sizeof(g1->type_name);
-		size2 = type_sizeof(g2->type_name);
+		/* Sinon, on compare d'abord la taille,
+		 * et ensuite la valeur des données */
+		uint32_t size1 = type_sizeof(c1->type_name);
+		uint32_t size2 = type_sizeof(c2->type_name);
 		if(size1 == size2){
-			cmp = memcmp(g1->data_ptr, g2->data_ptr, size1);
+			cmp = memcmp(c1->data_ptr, c2->data_ptr, size1);
 		}else{
-			u32 diff = (size1<size2)?(size2-size1):(size1-size2);
-			u32 min = size1<size2 ? size1 : size2;
-			cmp = memcmp(g1->data_ptr, g2->data_ptr, min);
-			ptr = calloc(diff, 1);
-			if(ptr){
-				if(size1 < size2)
-					cmp+=memcmp(ptr,g2->data_ptr+min,diff);
-				else
-					cmp+=memcmp(g1->data_ptr+min,ptr,diff);
-				free(ptr);
-			}else{
-				cmp += size1 - size2;
+			uint32_t min = (size1 < size2) ? (size1) : (size2);
+			cmp = memcmp(c1->data_ptr, c2->data_ptr, min);
+			if(cmp == 0){
+				cmp = size1 - size2;
 			}
 		}
 	}
 	return cmp;
 }
 
-u32 container_size(const container_t *g)
+uint32_t container_data_size(const container_t *c)
 {
-	u32 data_size = 0;
-	if(g != NULL){
-		data_size = type_sizeof(g->type_name);
+	uint32_t data_size = 0;
+	if(c != NULL){
+		data_size = type_sizeof(c->type_name);
 	}
 	return data_size;
 }
 
-void container_free(container_t *g)
+void container_free(container_t *c, bool free_data)
 {
-	func_ptr_t free_f;
 
-	if(g != NULL){
-		free_f = type_get_func(g->type_name, "free");
-		if(free_f) free_f(g->data_ptr);
-		free(g->type_name);
-		free(g);
+	if(c != NULL){
+		if(free_data) {
+			func_ptr_t free_f;
+			free_f = type_get_func(c->type_name, "free");
+			if(free_f) free_f(c->data_ptr);
+			else free(c->data_ptr);
+		}
+		free(c->type_name);
+		free(c);
 	}
 }
 
