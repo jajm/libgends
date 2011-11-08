@@ -17,22 +17,29 @@
  * along with libgends.  If not, see <http://www.gnu.org/licenses/>.         *
  *****************************************************************************/
 
+/*****************************************************************************
+ * File                 : types.c                                            *
+ * Short description    : Custom types management                            *
+ *****************************************************************************
+ * Custom types are user-defined types. They are described by a unique name, *
+ * a size in bytes and have a list of functions identified by their name.    *
+ *****************************************************************************/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdarg.h>
 #include "error.h"
 #include "types.h"
 
-#define DEFAULT_HT_SIZE	1000
+#define DEFAULT_HT_SIZE 1024
 
 typedef struct{
 	char *name;
-	u32 size;
+	uint32_t size;
 	funcs_t funcs;
 } type_t;
 
-type_t *type_new(const char *name, u32 size)
+type_t *type_new(const char *name, uint32_t size)
 {
 	type_t *t = NULL;
 	size_t len;
@@ -46,7 +53,7 @@ type_t *type_new(const char *name, u32 size)
 		Error("Memory allocation error");
 		return NULL;
 	}
-	
+
 	len = strlen(name);
 	if( (t->name = malloc(len+1)) == NULL){
 		free(t);
@@ -73,7 +80,7 @@ typedef struct typelist_node_s{
 	struct typelist_node_s *next;
 } typelist_node_t, *typelist_t;
 
-s8 typelist_add(typelist_t *tlist, type_t *type)
+int8_t typelist_add(typelist_t *tlist, type_t *type)
 {
 	typelist_node_t *tmp, *tmp2 = NULL;
 
@@ -103,11 +110,11 @@ s8 typelist_add(typelist_t *tlist, type_t *type)
 		tmp->next = *tlist;
 		*tlist = tmp;
 	}
-		
+
 	return 0;
 }
 
-s8 typelist_del(typelist_t *tlist, const char *name)
+int8_t typelist_del(typelist_t *tlist, const char *name)
 {
 	typelist_node_t *tmp, *tmp2 = NULL;
 
@@ -178,15 +185,15 @@ void typelist_free(typelist_t tlist)
 
 struct types_t{
 	typelist_t *types;
-	u32 size;
+	uint32_t size;
 };
 
 struct types_t *g_types = NULL;
 
-u32 type_hash(const char *name)
+uint32_t type_hash(const char *name)
 {
-	u32 hash = 0;
-	u32 i, size;
+	uint32_t hash = 0;
+	uint32_t i, size;
 
 	if(name == NULL) return 0;
 
@@ -199,10 +206,10 @@ u32 type_hash(const char *name)
 	return hash;
 }
 
-s8 types_init(u32 size)
+int8_t types_init(uint32_t size)
 {
-	u32 i;
-	
+	uint32_t i;
+
 	if(g_types == NULL){
 		g_types = malloc(sizeof(struct types_t));
 		if(g_types == NULL){
@@ -213,7 +220,7 @@ s8 types_init(u32 size)
 		Error("User types already initialized");
 		return -1;
 	}
-	
+
 	g_types->size = (size != 0) ? size : DEFAULT_HT_SIZE;
 	g_types->types = malloc(g_types->size*sizeof(typelist_t));
 	if(g_types->types == NULL){
@@ -224,14 +231,38 @@ s8 types_init(u32 size)
 
 	for (i=0; i<g_types->size; i++)
 		g_types->types[i] = NULL;
-	
+
 	return 0;
 }
 
-s8 type_reg(const char *name, u32 size)
+bool types_initialized(void)
 {
-	s8 tla;
-	u32 hash;
+	return (g_types != NULL) ? (true) : (false);
+}
+
+bool type_exist(const char *name)
+{
+	uint32_t hash;
+
+	if(name == NULL) {
+		Error("Bad parameters: NULL pointer");
+		return false;
+	}
+	if(g_types == NULL){
+		Error("User types not initialized");
+		return false;
+	}
+	hash = type_hash(name);
+
+	return (typelist_get(g_types->types[hash], name) != NULL)
+	       ? true
+	       : false;
+}
+
+int8_t type_reg(const char *name, uint32_t size)
+{
+	int8_t tla;
+	uint32_t hash;
 	type_t *type;
 
 	if(name == NULL){
@@ -248,19 +279,19 @@ s8 type_reg(const char *name, u32 size)
 		ErrorP("Type creation failed");
 		return -1;
 	}
-	
+
 	hash = type_hash(name);
 	tla = typelist_add(&g_types->types[hash], type);
 	if(tla != 0){
 		ErrorP("Adding type '%s' to the hash table failed", name);
 	}
-	
+
 	return tla;
 }
 
-s8 type_reg_func(const char *name, const char *func_name, func_ptr_t func_ptr)
+int8_t type_reg_func(const char *name, const char *func_name, func_ptr_t func_ptr)
 {
-	u32 hash;
+	uint32_t hash;
 	type_t *type;
 
 	if(name == NULL || func_name == NULL || func_ptr == NULL){
@@ -289,7 +320,7 @@ s8 type_reg_func(const char *name, const char *func_name, func_ptr_t func_ptr)
 
 func_ptr_t type_get_func(const char *name, const char *func_name)
 {
-	u32 hash;
+	uint32_t hash;
 	type_t *type;
 	func_ptr_t func_ptr = NULL;
 
@@ -316,9 +347,9 @@ func_ptr_t type_get_func(const char *name, const char *func_name)
 	return func_ptr;
 }
 
-s8 type_unreg(const char *name)
+int8_t type_unreg(const char *name)
 {
-	u32 hash;
+	uint32_t hash;
 
 	if(name == NULL){
 		Error("Bad parameters");
@@ -338,9 +369,9 @@ s8 type_unreg(const char *name)
 	return 0;
 }
 
-s8 type_unreg_func(const char *name, const char *func_name)
+int8_t type_unreg_func(const char *name, const char *func_name)
 {
-	u32 hash;
+	uint32_t hash;
 	type_t *type;
 
 	if(name == NULL || func_name == NULL){
@@ -366,10 +397,10 @@ s8 type_unreg_func(const char *name, const char *func_name)
 	return 0;
 }
 
-u32 type_sizeof(const char *name)
+uint32_t type_sizeof(const char *name)
 {
-	u32 hash;
-	u32 size = 0;
+	uint32_t hash;
+	uint32_t size = 0;
 	typelist_node_t *tmp;
 
 	if(name == NULL){
@@ -398,7 +429,7 @@ u32 type_sizeof(const char *name)
 
 void types_free(void)
 {
-	u32 i;
+	uint32_t i;
 
 	if(g_types == NULL) return;
 
@@ -411,10 +442,9 @@ void types_free(void)
 	g_types = NULL;
 }
 
-
 void types_print(void)
 {
-	u32 i;
+	uint32_t i;
 	typelist_node_t *tmp;
 
 	if(g_types == NULL){
@@ -434,3 +464,4 @@ void types_print(void)
 		}
 	}
 }
+

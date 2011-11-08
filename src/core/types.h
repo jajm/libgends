@@ -20,8 +20,6 @@
 /*****************************************************************************
  * File                 : types.h                                            *
  * Short description    : Custom types management                            *
- * Author               : Julian Maurice                                     *
- * Created on           : 2010-03-01                                         *
  *****************************************************************************
  * Custom types are user-defined types. They are described by a unique name, *
  * a size in bytes and have a list of functions identified by their name.    *
@@ -30,7 +28,8 @@
 #ifndef types_h_included
 #define types_h_included
 
-#include "basic_types.h"
+#include <stdint.h>
+#include <stdbool.h>
 #include "funcs.h"
 
 #ifdef __cplusplus
@@ -38,35 +37,103 @@ extern "C" {
 #endif
 
 /* WARNING: This function has to be called before the others functions.
- * Initialize the custom types hash table. size is the width of hash table.
- * Return 0 on success, or a negative value if an error occurs. */
-s8 types_init(u32 size);
-/* Register a new type.
- * Return 0 on success,
- *        a negative value if an error occurs,
- *        or a positive value if type already exists. */
-s8 type_reg(const char *name, u32 size);
-/* Add a function to type's function list.
- * Return 0 on success, or a negative value if an error occurs */
-s8 type_reg_func(const char *name, const char *func_name, func_ptr_t func_ptr);
-/* Get function pointer
- * Return a pointer of 'name' named function if it exists, NULL otherwise */
-func_ptr_t type_get_func(const char *name, const char *func_name);
-/* Unregister an existing type
- * Return 0 on success, or a negative value if an error occurs */
-s8 type_unreg(const char *name);
-/* Remove a function from type's function list
- * Return 0 on success, or a negative value if an error occurs */
-s8 type_unreg_func(const char *name, const char *func_name);
-/* Get type size */
-/* Return the size of 'name' named type, or 0 if an error occurs */
-u32 type_sizeof(const char *name);
+ * Initialize the custom types system. It's implemented with a hash table */
+/* size : the width of the hash table,
+ *        0 if you don't care (set to default 1024) */
+/* Return: Success => 0
+ *         Failure => a negative value */
+	int8_t
+types_init(
+	uint32_t size
+);
 
-/* Destroy all types */
-void types_free(void);
+/* Check if custom types are initialized */
+/* Return: true => custom types are initialized
+ *         false => custom types are NOT initialized */
+	bool
+types_initialized(void);
+
+/* Check if a type exists */
+/* name : Type name to check */
+/* Return: true => exists
+ *         false => does not exist */
+	bool
+type_exist(
+	const char *name
+);
+
+/* Register a new type. */
+/* name : Name of the type to register
+ * size : Size of the type */
+/* Return: 0 on success,
+ *         a negative value if an error occurs,
+ *         a positive value if type already exists. */
+	int8_t
+type_reg(
+	const char *name,
+	uint32_t size
+);
+
+/* Add a function to type's function list. */
+/*      name : Type name
+ * func_name : Name of the function to register
+ *  func_ptr : pointer to the function */
+/* Return: 0 on success,
+ *         a negative value if an error occurs */
+	int8_t
+type_reg_func(
+	const char *name,
+	const char *func_name,
+	func_ptr_t func_ptr
+);
+
+/* Get function pointer */
+/*      name : Type name
+ * func_name : Function name */
+/* Return: Success => a pointer to the function
+ *         Failure => NULL */
+	func_ptr_t
+type_get_func(
+	const char *name,
+	const char *func_name
+);
+
+/* Unregister an existing type */
+/* name : Type name to unregister */
+/* Return: Success => 0,
+ *         Failure => a negative value */
+	int8_t
+type_unreg(
+	const char *name
+);
+
+/* Remove a function from type's function list */
+/* name : Type name
+ * func_name : Function name */
+/* Return: Success => 0,
+ *         Failure => a negative value */
+	int8_t
+type_unreg_func(
+	const char *name,
+	const char *func_name
+);
+
+/* Get type size */
+/* name : Type name */
+/* Return: Success => size of the type,
+ *         Failure => 0 */
+	uint32_t
+type_sizeof(
+	const char *name
+);
+
+/* Free memory */
+	void
+types_free(void);
 
 /* For debugging purposes */
-void types_print(void);
+	void
+types_print(void);
 
 #ifdef __cplusplus
 }
