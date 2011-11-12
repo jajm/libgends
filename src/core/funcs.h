@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2010 Julian Maurice                                         *
+ * Copyright (C) 2010-2011 Julian Maurice                                    *
  *                                                                           *
  * This file is part of libgends.                                            *
  *                                                                           *
@@ -20,8 +20,6 @@
 /*****************************************************************************
  * File                 : funcs.h                                            *
  * Short description    : Linked list of generic functions                   *
- * Author               : Julian Maurice                                     *
- * Created on           : 2010-03-13                                         *
  *****************************************************************************
  * Linked list of pointer of intptr_t (*ptr)(void *, ...)                    *
  *****************************************************************************/
@@ -30,13 +28,12 @@
 #define funcs_h_included
 
 #include <stdint.h>
-#include "basic_types.h"
 
 typedef intptr_t (*func_ptr_t)(void *, ...);
 
 typedef struct {
-	char *name;	/* Function name (it will be its identifier) */
-	func_ptr_t ptr;	/* Function pointer */
+	char *name;     /* Function name (it will be its identifier) */
+	func_ptr_t ptr; /* Function pointer */
 } func_t;
 
 typedef struct func_list_node_s {
@@ -71,7 +68,7 @@ void func_free(func_t *func);
 func_list_node_t *funcs_add(funcs_t *funcs, func_t *func);
 /* Remove a function from the list. Search is done using name.
  * Return 0 on succes, a negative value otherwise. */
-s8 funcs_del(funcs_t *head, const char *name);
+int8_t funcs_del(funcs_t *head, const char *name);
 /* Free memory */
 void funcs_free(funcs_t head);
 /* Get function structure
@@ -85,8 +82,8 @@ func_ptr_t funcs_get_ptr(funcs_t funcs, const char *name);
  * following arguments as parameters.
  * Return return value of called function.
  * WARNING: don't use this macro if you're not sure the function exists */
-#define funcs_call(funcs, name, arg1, ...) 	\
-		(funcs_get_ptr(funcs, name))(arg1, ##__VA_ARGS__)
+#define funcs_call(funcs, name, arg1, ...) \
+        (funcs_get_ptr(funcs, name))(arg1, ##__VA_ARGS__)
 
 #ifdef __cplusplus
 }

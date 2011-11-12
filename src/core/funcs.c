@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2010 Julian Maurice                                         *
+ * Copyright (C) 2010-2011 Julian Maurice                                    *
  *                                                                           *
  * This file is part of libgends.                                            *
  *                                                                           *
@@ -17,9 +17,14 @@
  * along with libgends.  If not, see <http://www.gnu.org/licenses/>.         *
  *****************************************************************************/
 
-#include <stdio.h>
+/*****************************************************************************
+ * File                 : funcs.c                                            *
+ * Short description    : Linked list of generic functions                   *
+ *****************************************************************************
+ * Linked list of pointer of intptr_t (*ptr)(void *, ...)                    *
+ *****************************************************************************/
+
 #include <stdlib.h>
-#include <stdarg.h>
 #include <string.h>
 #include "error.h"
 #include "funcs.h"
@@ -119,7 +124,7 @@ func_t *funcs_get(funcs_t head, const char *name)
 	return node->func;
 }
 
-s8 funcs_del(funcs_t *head, const char *name)
+int8_t funcs_del(funcs_t *head, const char *name)
 {
 	func_list_node_t *node, *prev = NULL;
 	char *func_name;
