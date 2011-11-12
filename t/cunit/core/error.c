@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <CUnit/Basic.h>
@@ -16,13 +17,13 @@ void t_Error_at(void)
 	char *msg = "Sample error message";
 	char *file = "file_where_error_occured";
 	char *function = "function_where_error_occured";
-	u32 line = 42;
+	uint32_t line = 42;
 
 	Error_at(NULL, -1, NULL, NULL);
 	CU_ASSERT(NULL == Error_msg());
 	CU_ASSERT(NULL == Error_file());
 	CU_ASSERT(NULL == Error_function());
-	CU_ASSERT((u32)-1 == Error_line());
+	CU_ASSERT((uint32_t)-1 == Error_line());
 
 	Error_at(NULL, 0, NULL, msg);
 	CU_ASSERT(0 == strcmp(msg, Error_msg()));

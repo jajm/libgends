@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2010 Julian Maurice                                         *
+ * Copyright (C) 2010-2011 Julian Maurice                                    *
  *                                                                           *
  * This file is part of libgends.                                            *
  *                                                                           *
@@ -20,8 +20,6 @@
 /*****************************************************************************
  * File                 : error.h                                            *
  * Short description    : Error management                                   *
- * Author               : Julian Maurice                                     *
- * Created on           : 2010-03-01                                         *
  *****************************************************************************
  * An error is a message, and a triplet (filename, line, function) where the *
  * error occurs.                                                             *
@@ -35,14 +33,14 @@
 #ifndef error_h_included
 #define error_h_included
 
-#include "basic_types.h"
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Register an error */
-void Error_at(const char *file, u32 line, const char *function,
+void Error_at(const char *file, uint32_t line, const char *function,
 	const char *msg, ...);
 #define Error(errmsg, ...) \
 	Error_at(__FILE__, __LINE__, __func__, errmsg, ##__VA_ARGS__)
@@ -61,7 +59,7 @@ void pError(void);
 char * Error_msg(void);
 char * Error_file(void);
 char * Error_function(void);
-u32 Error_line(void);
+uint32_t Error_line(void);
 /* Returns the string as printed by pError */
 char * Error_string(void);
 

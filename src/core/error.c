@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2010 Julian Maurice                                         *
+ * Copyright (C) 2010-2011 Julian Maurice                                    *
  *                                                                           *
  * This file is part of libgends.                                            *
  *                                                                           *
@@ -17,6 +17,20 @@
  * along with libgends.  If not, see <http://www.gnu.org/licenses/>.         *
  *****************************************************************************/
 
+/*****************************************************************************
+ * File                 : error.c                                            *
+ * Short description    : Error management                                   *
+ *****************************************************************************
+ * An error is a message, and a triplet (filename, line, function) where the *
+ * error occurs.                                                             *
+ * You can register an error by calling Error, or Error_at, and then print   *
+ * with pError.                                                              *
+ * Only one error is kept in memory. To display more than one error at a time*
+ * you can use ErrorP which place the error message before the preceding     *
+ * messages.                                                                 *
+ *****************************************************************************/
+
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -27,14 +41,14 @@ typedef struct {
 	char *msg;
 	char *file;
 	char *function;
-	u32 line;
+	uint32_t line;
 
-	char *string;	/* Error in 'function' at 'file':'line': 'msg' */
+	char *string;    /* Error in 'function' at 'file':'line': 'msg' */
 } error_t;
 
 error_t g_error = {NULL, NULL, NULL, 0, NULL};
 
-void Error_at(const char *file, u32 line, const char *function,
+void Error_at(const char *file, uint32_t line, const char *function,
 	 const char *msg, ...)
 {
 	size_t len;
@@ -111,7 +125,7 @@ char * Error_function(void)
 	return g_error.function;
 }
 
-u32 Error_line(void)
+uint32_t Error_line(void)
 {
 	return g_error.line;
 }
