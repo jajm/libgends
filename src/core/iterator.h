@@ -20,8 +20,6 @@
 /*****************************************************************************
  * File                 : iterator.h                                         *
  * Short description    : Iterators management                               *
- * Author               : Julian Maurice                                     *
- * Created on           : 2010-06-01                                         *
  *****************************************************************************
  * To create an iterator on a custom type, you have to:                      *
  *  - create a custom type (see types.h)                                     *
@@ -30,18 +28,21 @@
  *    . void *next(void *container, void *pointer) // return a pointer on    *
  *                                                 // the next element       *
  *    . void *get(void *container, void *pointer) // return a pointer on data*
- *    . s8 has_next(void *container, void *pointer) // return 1 if it remains*
- *						// elements, 0 otherwise     *
+ *    . bool has_next(void *container, void *pointer) // return 1 if it      *
+ *                                          // remains elements, 0 otherwise *
  *  - and then, create the iterator, with it_new.                            *
  *****************************************************************************/
 
 #ifndef iterator_h_included
 #define iterator_h_included
 
+#include <stdint.h>
+#include <stdbool.h>
+
 typedef struct {
-	char *type_name;	/* Type on what we'll iterate */
-	void *container;	/* Container on which we'll iterate */
-	void *pointer;		/* Current position of iterator */
+	char *type_name;    /* Type on what we'll iterate */
+	void *container;    /* Container on which we'll iterate */
+	void *pointer;      /* Current position of iterator */
 } iterator_t;
 
 #ifdef __cplusplus
@@ -53,16 +54,16 @@ extern "C" {
 iterator_t *it_new(const char *type_name, void *container);
 /* (Re)set iterator to point on the first element
  * Return 0 on success, or a negative value if an error occurs */
-s8 it_reset(iterator_t *it);
+int8_t it_reset(iterator_t *it);
 /* Set iterator to point on the next element
  * Return 0 on success, or a negative value if an error occurs */
-s8 it_next(iterator_t *it);
+int8_t it_next(iterator_t *it);
 /* Get data pointed by iterator */
 /* Return NULL if an error occurs */
 void *it_get(iterator_t *it);
 /* Get iterator status
  * Return 1 if it remains elements, 0 otherwise */
-s8 it_has_next(iterator_t *it);
+bool it_has_next(iterator_t *it);
 /* Free memory */
 void it_free(iterator_t *it);
 

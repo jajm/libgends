@@ -17,11 +17,11 @@
  * along with libgends.  If not, see <http://www.gnu.org/licenses/>.         *
  *****************************************************************************/
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 #include "error.h"
+#include "funcs.h"
 #include "types.h"
 #include "iterator.h"
 
@@ -53,12 +53,12 @@ iterator_t *it_new(const char *type_name, void *container)
 	return it;
 }
 
-s8 it_reset(iterator_t *it)
+int8_t it_reset(iterator_t *it)
 {
 	func_ptr_t first;
 
 	assert(it != NULL);
-	
+
 	first = type_get_func(it->type_name, "first");
 	if(first){
 		it->pointer = (void *)first(it->container);
@@ -71,7 +71,7 @@ s8 it_reset(iterator_t *it)
 	return 0;
 }
 
-s8 it_next(iterator_t *it)
+int8_t it_next(iterator_t *it)
 {
 	func_ptr_t next;
 
@@ -105,7 +105,7 @@ void *it_get(iterator_t *it)
 	return (void *)get(it->container, it->pointer);
 }
 
-s8 it_has_next(iterator_t *it)
+bool it_has_next(iterator_t *it)
 {
 	func_ptr_t has_next;
 
@@ -115,7 +115,7 @@ s8 it_has_next(iterator_t *it)
 	if(has_next == NULL){
 		ErrorP("Failed to retrieve function 'has_next' for type '%s'",
 			it->type_name);
-		return -1;
+		return 0;
 	}
 
 	return has_next(it->container, it->pointer);
