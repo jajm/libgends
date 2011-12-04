@@ -108,10 +108,10 @@ container_get(
 );
 
 /* Get size in bytes of contained data */
-/* c: pointer to the container */
+/* c : pointer to the container */
 /* Return: Success => the size in bytes of contained data
  *         Failure => 0 */
-	uint32_t
+	size_t
 container_data_size(
 	const container_t *c
 );

@@ -34,7 +34,8 @@
 #include "error.h"
 #include "container.h"
 
-container_t *container_new(const char *type_name, void *data_ptr, bool copy_data)
+container_t *container_new(const char *type_name, void *data_ptr,
+	bool copy_data)
 {
 	container_t *c;
 	size_t length;
@@ -97,45 +98,51 @@ int8_t container_set(container_t *c, const char *type_name, void *data_ptr,
                      bool free_old_data, bool copy_data)
 {
 	size_t length;
-	uint32_t data_size;
+	size_t data_size;
+	void *_data_ptr;
+	char *_type_name;
 
 	if(c == NULL || type_name == NULL || data_ptr == NULL){
 		Error("Bad parameters: NULL pointer(s)");
 		return -1;
 	}
 
-	data_size = type_sizeof(type_name);
-	if(data_size == 0){
-		ErrorP("Failed to retrieve '%s' size", type_name);
-		return -1;
+	if(copy_data){
+		data_size = type_sizeof(type_name);
+		if(data_size == 0){
+			ErrorP("Failed to retrieve '%s' size", type_name);
+			return -1;
+		}
+		_data_ptr = malloc(data_size);
+		if(_data_ptr == NULL){
+			Error("Memory allocation error");
+			return -1;
+		}
+		memmove(_data_ptr, data_ptr, data_size);
+	} else {
+		_data_ptr = data_ptr;
 	}
 
 	if(strcmp(c->type_name, type_name) != 0){
 		length = strlen(type_name);
-		c->type_name = realloc(c->type_name, length);
-		strncpy(c->type_name, type_name, length);
-		assert(c->type_name[length] == '\0');
+		_type_name = malloc(length+1);
+		if(_type_name == NULL) {
+			Error("Memory allocation error");
+			return -1;
+		}
+		strncpy(_type_name, type_name, length+1);
+		assert(_type_name[length] == '\0');
+		free(c->type_name);
+		c->type_name = _type_name;
 	}
 
 	if(free_old_data){
 		func_ptr_t free_f = type_get_func(c->type_name, "free");
 		if(free_f) free_f(c->data_ptr);
 		else free(c->data_ptr);
-		c->data_ptr = NULL;
 	}
 
-	if(copy_data){
-		/* If c->data_ptr is NULL, equivalent to malloc(data_size) */
-		/* If data_size is the same as before, do nothing */
-		c->data_ptr = realloc(c->data_ptr, data_size);
-		if(c->data_ptr == NULL){
-			Error("Memory allocation error");
-			return -1;
-		}
-		memmove(c->data_ptr, data_ptr, data_size);
-	}else{
-		c->data_ptr = data_ptr;
-	}
+	c->data_ptr = _data_ptr;
 
 	return 0;
 }
@@ -148,7 +155,8 @@ int8_t container_set_clone(container_t *dst, const container_t *src,
 		return -1;
 	}
 
-	return container_set(dst, src->type_name, src->data_ptr, free_old_data, true);
+	return container_set(dst, src->type_name, src->data_ptr, free_old_data,
+		true);
 }
 
 void * container_get(container_t *c, bool copy)
@@ -216,9 +224,9 @@ int32_t container_cmp(const container_t *c1, const container_t *c2)
 	return cmp;
 }
 
-uint32_t container_data_size(const container_t *c)
+size_t container_data_size(const container_t *c)
 {
-	uint32_t data_size = 0;
+	size_t data_size = 0;
 	if(c != NULL){
 		data_size = type_sizeof(c->type_name);
 	}
