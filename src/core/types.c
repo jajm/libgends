@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2010 Julian Maurice                                         *
+ * Copyright (C) 2010-2011 Julian Maurice                                    *
  *                                                                           *
  * This file is part of libgends.                                            *
  *                                                                           *
@@ -35,11 +35,11 @@
 
 typedef struct{
 	char *name;
-	uint32_t size;
+	size_t size;
 	funcs_t funcs;
 } type_t;
 
-type_t *type_new(const char *name, uint32_t size)
+type_t *type_new(const char *name, size_t size)
 {
 	type_t *t = NULL;
 	size_t len;
@@ -193,12 +193,13 @@ struct types_t *g_types = NULL;
 uint32_t type_hash(const char *name)
 {
 	uint32_t hash = 0;
-	uint32_t i, size;
+	uint32_t i;
+	size_t len;
 
 	if(name == NULL) return 0;
 
-	size = strlen(name);
-	for(i=0; i<size; i++){
+	len = strlen(name);
+	for(i=0; i<len; i++){
 		hash += name[i] * (i+1);
 	}
 	hash %= g_types->size;
@@ -259,7 +260,7 @@ bool type_exist(const char *name)
 	       : false;
 }
 
-int8_t type_reg(const char *name, uint32_t size)
+int8_t type_reg(const char *name, size_t size)
 {
 	int8_t tla;
 	uint32_t hash;
@@ -397,10 +398,10 @@ int8_t type_unreg_func(const char *name, const char *func_name)
 	return 0;
 }
 
-uint32_t type_sizeof(const char *name)
+size_t type_sizeof(const char *name)
 {
 	uint32_t hash;
-	uint32_t size = 0;
+	size_t size = 0;
 	typelist_node_t *tmp;
 
 	if(name == NULL){
@@ -422,7 +423,7 @@ uint32_t type_sizeof(const char *name)
 		tmp = tmp->next;
 	}
 
-	if(size == 0) Error("Type '%s' doesn't exist");
+	if(size == 0) Error("Type '%s' doesn't exist", name);
 
 	return size;
 }
@@ -456,8 +457,8 @@ void types_print(void)
 		tmp = g_types->types[i];
 		if(tmp) printf("[%d]", i);
 		while(tmp != NULL){
-			printf("\tname(\"%s\"), size(\"%d\"), "
-				"type_sizeof(\"%d\")\n",
+			printf("\tname(\"%s\"), size(\"%zd\"), "
+				"type_sizeof(\"%zd\")\n",
 				tmp->type->name, tmp->type->size,
 				type_sizeof(tmp->type->name));
 			tmp = tmp->next;

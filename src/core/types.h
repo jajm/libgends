@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2010 Julian Maurice                                         *
+ * Copyright (C) 2010-2011 Julian Maurice                                    *
  *                                                                           *
  * This file is part of libgends.                                            *
  *                                                                           *
@@ -71,7 +71,7 @@ type_exist(
 	int8_t
 type_reg(
 	const char *name,
-	uint32_t size
+	size_t size
 );
 
 /* Add a function to type's function list. */
@@ -122,7 +122,7 @@ type_unreg_func(
 /* name : Type name */
 /* Return: Success => size of the type,
  *         Failure => 0 */
-	uint32_t
+	size_t
 type_sizeof(
 	const char *name
 );
