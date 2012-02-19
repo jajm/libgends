@@ -2,5 +2,5 @@ AM_CFLAGS = -Wall -Wextra -Werror -std=c99
 
 noinst_LTLIBRARIES = libcore.la
 
-libcore_la_SOURCES = types.c error.c funcs.c iterator.c
+libcore_la_SOURCES = types.c func_list.c iterator.c log.c
 

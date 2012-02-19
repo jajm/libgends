@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2010 Julian Maurice                                         *
+ * Copyright (C) 2010-2012 Julian Maurice                                    *
  *                                                                           *
  * This file is part of libgends.                                            *
  *                                                                           *
@@ -17,114 +17,90 @@
  * along with libgends.  If not, see <http://www.gnu.org/licenses/>.         *
  *****************************************************************************/
 
+/*****************************************************************************
+ * File                 : iterator.c                                         *
+ * Short description    : Iterators management                               *
+ *****************************************************************************
+ * What this file contains is just an interface for containers which want to *
+ * provide an iterator. By using this interface, whatever container is used, *
+ * it's always the same API.                                                 *
+ * To implement an iterator for your container, you have to:                 *
+ *  - define a struct, or whatever you need to store iterator informations   *
+ *  - define 3 functions (described below) which will deal with these        *
+ *  informations:                                                            *
+ *    . int8_t reset(void *data)                                             *
+ *    . int8_t step(void *data)                                              *
+ *    . void * get(void *data, bool copy_data)                               *
+ *  - and provide a way to get an initialized iterator for your container    *
+ * See slist.h or dlist.h for examples of implementation                     *
+ *****************************************************************************/
+
+#include <stdbool.h>
+#include <stdint.h>
 #include <stdlib.h>
-#include <string.h>
-#include <assert.h>
-#include "error.h"
-#include "funcs.h"
-#include "types.h"
+#include "log.h"
 #include "iterator.h"
 
-iterator_t *it_new(const char *type_name, void *container)
+gds_iterator_t *gds_iterator_new(void *data, gds_iterator_reset_func_t reset_f,
+	gds_iterator_step_func_t step_f, gds_iterator_get_func_t get_f)
 {
-	iterator_t *it;
-	size_t len;
+	gds_iterator_t *it;
 
-	assert(type_name != NULL);
-	assert(container != NULL);
-
-	it = malloc(sizeof(iterator_t));
-	if(it){
-		len = strlen(type_name);
-		it->type_name = malloc(len+1);
-		if(it->type_name){
-			strncpy(it->type_name, type_name, len+1);
-			it->container = container;
-			it->pointer = NULL;
-		}else{
-			Error("Memory allocation error");
-			free(it);
-			it = NULL;
-		}
-	}else{
-		Error("Memory allocation error");
+	if(data == NULL || reset_f == NULL || step_f == NULL || get_f == NULL) {
+		GDS_LOG_ERROR("Bad arguments");
+		return NULL;
 	}
+
+	it = malloc(sizeof(gds_iterator_t));
+	if(it == NULL){
+		GDS_LOG_ERROR("Memory allocation error");
+		return NULL;
+	}
+
+	it->data = data;
+	it->reset_f = reset_f;
+	it->step_f = step_f;
+	it->get_f = get_f;
 
 	return it;
 }
 
-int8_t it_reset(iterator_t *it)
+int8_t gds_iterator_reset(gds_iterator_t *it)
 {
-	func_ptr_t first;
-
-	assert(it != NULL);
-
-	first = type_get_func(it->type_name, "first");
-	if(first){
-		it->pointer = (void *)first(it->container);
-	}else{
-		ErrorP("Failed to retrieve function 'first' for type '%s'",
-			it->type_name);
+	if(it == NULL) {
+		GDS_LOG_ERROR("Bad arguments");
 		return -1;
 	}
 
-	return 0;
+	return it->reset_f(it->data);
 }
 
-int8_t it_next(iterator_t *it)
+int8_t gds_iterator_step(gds_iterator_t *it)
 {
-	func_ptr_t next;
-
-	assert(it != NULL);
-
-	next = type_get_func(it->type_name, "next");
-	if(next){
-		it->pointer = (void *)next(it->container, it->pointer);
-	}else{
-		ErrorP("Failed to retrieve function 'next' for type '%s'",
-			it->type_name);
+	if(it == NULL) {
+		GDS_LOG_ERROR("Bad arguments");
 		return -1;
 	}
 
-	return 0;
+	return it->step_f(it->data);
 }
 
-void *it_get(iterator_t *it)
+void * gds_iterator_get(gds_iterator_t *it, bool copy_data)
 {
-	func_ptr_t get;
-
-	assert(it != NULL);
-
-	get = type_get_func(it->type_name, "get");
-	if(get == NULL){
-		ErrorP("Failed to retrieve function 'get' for type '%s'",
-			it->type_name);
+	if(it == NULL) {
+		GDS_LOG_ERROR("Bad arguments");
 		return NULL;
 	}
 
-	return (void *)get(it->container, it->pointer);
+	return it->get_f(it->data, copy_data);
 }
 
-bool it_has_next(iterator_t *it)
-{
-	func_ptr_t has_next;
-
-	assert(it != NULL);
-
-	has_next = type_get_func(it->type_name, "has_next");
-	if(has_next == NULL){
-		ErrorP("Failed to retrieve function 'has_next' for type '%s'",
-			it->type_name);
-		return 0;
-	}
-
-	return has_next(it->container, it->pointer);
-}
-
-void it_free(iterator_t *it)
+void gds_iterator_free(gds_iterator_t *it, void free_f(void *data))
 {
 	if(it){
-		free(it->type_name);
+		if(free_f) {
+			free_f(it->data);
+		}
 		free(it);
 	}
 }

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2010-2011 Julian Maurice                                    *
+ * Copyright (C) 2010-2012 Julian Maurice                                    *
  *                                                                           *
  * This file is part of libgends.                                            *
  *                                                                           *
@@ -18,167 +18,118 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * File                 : funcs.c                                            *
+ * File                 : func_list.c                                        *
  * Short description    : Linked list of generic functions                   *
  *****************************************************************************
  * Linked list of pointer of intptr_t (*ptr)(void *, ...)                    *
  *****************************************************************************/
 
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-#include "error.h"
-#include "funcs.h"
+#include "log.h"
+#include "func_ptr.h"
+#include "func_list.h"
 
-
-func_t *func_new(const char *func_name, func_ptr_t func_ptr)
+gds_func_list_node_t * gds_func_list_add(gds_func_list_node_t **head,
+	const char *name, gds_func_ptr_t ptr)
 {
-	func_t *f;
+	gds_func_list_node_t *newnode;
 	size_t len;
 
-	if(func_name == NULL || func_ptr == NULL){
-		Error("Bad parameters");
+	if(head == NULL || name == NULL || ptr == NULL){
+		GDS_LOG_ERROR("Bad parameters");
 		return NULL;
 	}
 
-	f = malloc(sizeof(func_t));
-	if(f){
-		len = strlen(func_name);
-		f->name = malloc(len+1);
-		if(f->name){
-			strncpy(f->name, func_name, len+1);
-			f->ptr = func_ptr;
-		}else{
-			free(f);
-			f = NULL;
-		}
-	}
-
-	return f;
-}
-
-char *func_get_name(func_t *func)
-{
-	if(func == NULL){
-		Error("Bad parameters");
-		return NULL;
-	}
-	return func->name;
-}
-
-func_ptr_t func_get_ptr(func_t *func)
-{
-	if(func == NULL){
-		Error("Bad parameters");
+	newnode = malloc(sizeof(gds_func_list_node_t));
+	if(newnode == NULL) {
+		GDS_LOG_ERROR("Memory allocation error");
 		return NULL;
 	}
 
-	return func->ptr;
-}
-
-void func_free(func_t *func)
-{
-	if(func){
-		free(func->name);
-		free(func);
-	}
-}
-
-func_list_node_t *funcs_add(funcs_t *head, func_t *func)
-{
-	func_list_node_t *newnode;
-
-	if(head == NULL || func == NULL){
-		Error("Bad parameters");
+	len = strlen(name);
+	newnode->name = malloc(len+1);
+	if(newnode->name == NULL) {
+		GDS_LOG_ERROR("Memory allocation error");
+		free(newnode);
 		return NULL;
 	}
-
-	newnode = malloc(sizeof(func_list_node_t));
-	if(newnode){
-		newnode->func = func;
-		newnode->next = *head;
-		*head = newnode;
-	}
+	strncpy(newnode->name, name, len+1);
+	assert(newnode->name[len] == '\0');
+	newnode->ptr = ptr;
+	/* TODO Insert in order according to name */
+	newnode->next = *head;
+	*head = newnode;
 
 	return newnode;
 }
 
-func_t *funcs_get(funcs_t head, const char *name)
+int8_t gds_func_list_del(gds_func_list_node_t **head, const char *name)
 {
-	func_list_node_t *node;
-	char *func_name;
-
-	if(name == NULL){
-		Error("Bad parameters");
-		return NULL;
-	}
-
-	node = head;
-	while(node != NULL){
-		func_name = func_get_name(node->func);
-		if(strcmp(func_name, name) == 0)
-			break;
-		node = node->next;
-	}
-
-	if(node == NULL) return NULL;
-	return node->func;
-}
-
-int8_t funcs_del(funcs_t *head, const char *name)
-{
-	func_list_node_t *node, *prev = NULL;
-	char *func_name;
+	gds_func_list_node_t *node, *prev = NULL;
 
 	if(head == NULL || name == NULL){
-		Error("Bad parameters");
+		GDS_LOG_ERROR("Bad parameters");
 		return -1;
 	}
 
 	node = *head;
 	while(node != NULL){
-		func_name = func_get_name(node->func);
-		if(strcmp(func_name, name) == 0)
+		if(strcmp(node->name, name) == 0)
 			break;
 		prev = node;
 		node = node->next;
 	}
 
 	if(node == NULL){
-		Error("Function %s does not exist", name);
+		GDS_LOG_ERROR("Function %s does not exist", name);
 		return -1;
 	}
 
 	if(node != NULL){
-		if(prev == NULL)
+		if(prev == NULL) {
 			*head = node->next;
-		else
+		} else {
 			prev->next = node->next;
-		func_free(node->func);
+		}
+		free(node->name);
 		free(node);
 	}
 	return 0;
 }
 
-void funcs_free(funcs_t head)
+void gds_func_list_free(gds_func_list_node_t *head)
 {
-	func_list_node_t *node, *next;
+	gds_func_list_node_t *node, *next;
 
 	node = head;
 	while(node != NULL){
 		next = node->next;
-		func_free(node->func);
+		free(node->name);
 		free(node);
 		node = next;
 	}
 }
 
-func_ptr_t funcs_get_ptr(funcs_t funcs, const char *name)
+gds_func_ptr_t gds_func_list_get_ptr(gds_func_list_node_t *head,
+	const char *name)
 {
-	func_t *func;
-	func_ptr_t func_ptr = NULL;
+	gds_func_ptr_t func_ptr = NULL;
+	gds_func_list_node_t *node;
 
-	func = funcs_get(funcs, name);
-	if(func != NULL) func_ptr = func_get_ptr(func);
+	if(name == NULL) {
+		GDS_LOG_ERROR("Bad parameters");
+		return NULL;
+	}
+
+	node = head;
+	while(node != NULL) {
+		if(strcmp(node->name, name) == 0) {
+			func_ptr = node->ptr;
+		}
+		node = node->next;
+	}
 
 	return func_ptr;
 }

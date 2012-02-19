@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2010 Julian Maurice                                         *
+ * Copyright (C) 2012 Julian Maurice                                         *
  *                                                                           *
  * This file is part of libgends.                                            *
  *                                                                           *
@@ -18,32 +18,16 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * File                 : basic_types.h                                      *
- * Short description    : List of typedefs for integer types                 *
- * Author               : Julian Maurice                                     *
- * Created on           : 2010-03-01                                         *
- *****************************************************************************
- * Types defined here use C99 types.                                         *
- * Types are named aXX, where 'a' is 'u' if type is unsigned, or 's' (signed)*
- * otherwise.                                                                *
- * 'XX' is the exact size of type, in bits. For example, u32 is an unsigned  *
- * integer which is 32 bits long.                                            *
+ * File                 : func_ptr.h                                         *
+ * Short description    : Typedef of a generic function pointer              *
  *****************************************************************************/
 
-#ifndef basic_types_h_included
-#define basic_types_h_included
+#ifndef func_ptr_h_included
+#define func_ptr_h_included
 
 #include <stdint.h>
 
-typedef uint8_t u8;
-typedef uint16_t u16;
-typedef uint32_t u32;
-typedef uint64_t u64;
+typedef intptr_t (*gds_func_ptr_t)(void *, ...);
 
-typedef int8_t s8;
-typedef int16_t s16;
-typedef int32_t s32;
-typedef int64_t s64;
-
-#endif /* Not basic_types_h_included */
+#endif /* Not func_ptr_h_included */
 

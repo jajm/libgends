@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2010-2012 Julian Maurice                                    *
+ * Copyright (C) 2012 Julian Maurice                                         *
  *                                                                           *
  * This file is part of libgends.                                            *
  *                                                                           *
@@ -18,31 +18,48 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * File              : queue.h                                               *
- * Short description : Queue management (FIFO, First In First Out)           *
- *****************************************************************************
- * Queue is implemented using a single-linked list.                          *
- * Elements are added at end of list (in constant time) and removed from     *
- * beginning of list (in constant time too).                                 *
+ * File                 : log.c                                              *
+ * Short description    : libgends logging system                            *
  *****************************************************************************/
-#ifndef queue_h_included
-#define queue_h_included
 
-#include "slist.h"
+#include <stdarg.h>
+#include <stdint.h>
+#include <stdio.h>
+#include "log.h"
 
-typedef gds_slist_t gds_queue_t;
+uint8_t gds_log_level = 0;
+const char * gds_log_level_label[] = {
+	"fatal",
+	"error",
+	"warning",
+	"info",
+	"debug"
+};
 
-#define gds_queue_new(type_name) \
-	gds_slist_new(type_name)
+int8_t gds_log_init(uint8_t level)
+{
+	gds_log_level = level;
+	return 0;
+}
 
-#define gds_queue_push(queue, data, copy_data) \
-	gds_slist_add_last(queue, data, copy_data)
-
-#define gds_queue_pop(queue) \
-	gds_slist_pop_first(queue)
-
-#define gds_queue_free(queue, free_data) \
-	gds_slist_free(queue, free_data)
-
-#endif /* Not queue_h_included */
-
+void gds_log_print(uint8_t level, const char *file, const char *func,
+	uint32_t line, const char *msg, ...)
+{
+	va_list va_ptr;
+	if(level > 0 && level <= gds_log_level) {
+		va_start(va_ptr, msg);
+		fprintf(stderr, "[%s]", gds_log_level_label[level-1]);
+		if(file) {
+			fprintf(stderr, " In file %s:%d", file, line);
+		}
+		if(func) {
+			fprintf(stderr, " (%s)", func);
+		}
+		if(file || func) {
+			fprintf(stderr, " > ");
+		}
+		vfprintf(stderr, msg, va_ptr);
+		fprintf(stderr, "\n");
+		va_end(va_ptr);
+	}
+}

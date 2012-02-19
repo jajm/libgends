@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2010 Julian Maurice                                         *
+ * Copyright (C) 2010-2012 Julian Maurice                                    *
  *                                                                           *
  * This file is part of libgends.                                            *
  *                                                                           *
@@ -18,115 +18,113 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * Fichier		: stack.c                                            *
- * Description Brève	: Gestion d'une pile (LIFO, Last In First Out)       *
- * Auteur		: Julian Maurice                                     *
- * Créé le		: 01/06/2010					     *
- *****************************************************************************
- * La pile est implémentée en utilisant une liste chainée simple.            *
- * Les éléments sont ajoutés et retirés en tête de liste, donc en temps      *
- * constant.                                                                 *
+ * File              : stack.c                                               *
+ * Short description : Stack management (LIFO, Last In First Out)            *
  *****************************************************************************/
 
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
+#include "log.h"
+#include "func_list.h"
+#include "slist_node.h"
 #include "stack.h"
 #include "types.h"
-#include "error.h"
 
-stack_t *stack_new(const char *type_name)
+gds_stack_t *gds_stack_new(const char *type_name)
 {
-	stack_t *S;
+	gds_stack_t *S;
 	size_t len;
 
-	assert(type_name != NULL);
+	if(type_name == NULL) {
+		GDS_LOG_ERROR("Bad arguments");
+		return NULL;
+	}
 
-	S = malloc(sizeof(stack_t));
+	S = malloc(sizeof(gds_stack_t));
 	if(S == NULL){
-		Error("Memory allocation error");
+		GDS_LOG_ERROR("Memory allocation error");
 		return NULL;
 	}
 	len = strlen(type_name);
 	S->type_name = malloc(len+1);
 	if(S->type_name == NULL){
-		Error("Memory allocation error");
+		GDS_LOG_ERROR("Memory allocation error");
 		free(S);
 		return NULL;
 	}
 	strncpy(S->type_name, type_name, len+1);
+	assert(S->type_name[len] == '\0');
 	S->head = NULL;
 
 	return S;
 }
 
-s8 stack_push(stack_t *S, void *data)
+int8_t gds_stack_push(gds_stack_t *S, void *data, bool copy_data)
 {
-	slist_node_t *newnode;
+	gds_slist_node_t *newnode;
+	gds_func_ptr_t alloc_f = NULL;
 
-	assert(S != NULL);
-	assert(data != NULL);
-	
-	newnode = slnode_new(data);
+	if(S == NULL || data == NULL) {
+		GDS_LOG_ERROR("Bad arguments");
+		return -1;
+	}
+
+	if(copy_data) {
+		alloc_f = gds_type_get_func(S->type_name, "alloc");
+	}
+
+	newnode = gds_slist_node_new(data, copy_data, alloc_f);
 	if(newnode == NULL){
-		ErrorP("Failed to create the node");
+		GDS_LOG_ERROR("Failed to create the node");
 		return -1;
 	}
 	newnode->next = S->head;
 	S->head = newnode;
-	
+
 	return 0;
 }
 
-void *stack_pop(stack_t *S)
+void *gds_stack_pop(gds_stack_t *S)
 {
 	void *data;
-	slist_node_t *next;
+	gds_slist_node_t *next;
 
-	assert(S != NULL);
+	if(S == NULL) {
+		GDS_LOG_ERROR("Bad arguments");
+		return NULL;
+	}
+
 	if(S->head == NULL){
-		Error("Stack is empty");
+		GDS_LOG_ERROR("Stack is empty");
 		return NULL;
 	}
 
 	next = S->head->next;
-	data = slnode_data(S->head);
-	slnode_free(S->head);
+	data = gds_slist_node_get_data(S->head, false, 0);
+	gds_slist_node_free(S->head, false, NULL);
 	S->head = next;
 
 	return data;
 }
 
-void stack_free(stack_t *S)
+void gds_stack_free(gds_stack_t *S, bool free_data)
 {
-	slist_node_t *tmp, *tmp2;
-	func_ptr_t free_f;
+	gds_slist_node_t *tmp, *tmp2;
+	gds_func_ptr_t free_f = NULL;
 
 	if(S){
-		free_f = type_get_func(S->type_name, "free");
-		free(S->type_name);
+		if(free_data) {
+			free_f = gds_type_get_func(S->type_name, "free");
+		}
 		tmp = S->head;
 		while(tmp != NULL){
 			tmp2 = tmp->next;
-			if(free_f) free_f(slnode_data(tmp));
-			slnode_free(tmp);
+			gds_slist_node_free(tmp, free_data, free_f);
 			tmp = tmp2;
 		}
-	}
-}
-
-void stack_destroy(stack_t *S)
-{
-	slist_node_t *tmp, *tmp2;
-
-	if(S){
 		free(S->type_name);
-		tmp = S->head;
-		while(tmp != NULL){
-			tmp2 = tmp->next;
-			slnode_free(tmp);
-			tmp = tmp2;
-		}
+		free(S);
 	}
 }
 

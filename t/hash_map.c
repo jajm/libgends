@@ -1,26 +1,24 @@
+#include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <assert.h>
 #include "types.h"
 #include "hash_map.h"
 
 typedef struct{
-	u32 i;
+	uint32_t i;
 	char *s;
 } test_t;
 
-test_t * test_new(u32 i, const char *s)
+test_t * test_new(uint32_t i, const char *s)
 {
 	test_t *t;
 	size_t len;
 
 	t = malloc(sizeof(test_t));
-	assert(t != NULL);
 	t->i = i;
 	len = strlen(s);
 	t->s = malloc(len+1);
-	assert(t->s != NULL);
 	strncpy(t->s, s, len);
 
 	return t;
@@ -34,9 +32,9 @@ void test_free(test_t *t)
 	}
 }
 
-void test_print(test_t *t, u32 indent)
+void test_print(test_t *t, uint32_t indent)
 {
-	u32 i;
+	uint32_t i;
 
 	if(t == NULL){
 		printf("NULL");
@@ -53,39 +51,40 @@ void test_print(test_t *t, u32 indent)
 
 int init(void)
 {
-	types_init(512);
-	type_reg("test", sizeof(test_t));
-	type_reg_func("test", "free", (func_ptr_t)&test_free);
-	type_reg_func("test", "print", (func_ptr_t)&test_print);
+	gds_types_init(512);
+	gds_type_register("test");
+	gds_type_register_func("test", "free", (gds_func_ptr_t)&test_free);
+	gds_type_register_func("test", "print", (gds_func_ptr_t)&test_print);
 	return 0;
 }
 
 int clean(void)
 {
-	types_free();
+	gds_types_free();
 	return 0;
 }
 
 int main()
 {
-	hash_map_t *h;
-	u32 i;
+	gds_hash_map_t *h;
+	uint32_t i;
 
 	init();
 
-	h = hash_map_new("test", 512, NULL);
+	h = gds_hash_map_new("test", 512, NULL);
 	for(i=0; i<10; i++) {
 		char key[512];
 		char s[512];
 		sprintf(key, "test_%d", i);
 		sprintf(s, "s_%d", i);
-		hash_map_set(
+		gds_hash_map_set(
 			h,
 			key,
-			test_new(i, s)
+			true,
+			test_new(i, s),
+			false
 		);
 	}
-	hash_map_print(h);
 
 	clean();
 	return 0;

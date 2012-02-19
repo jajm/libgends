@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2010-2012 Julian Maurice                                    *
+ * Copyright (C) 2012 Julian Maurice                                         *
  *                                                                           *
  * This file is part of libgends.                                            *
  *                                                                           *
@@ -18,31 +18,53 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * File              : queue.h                                               *
- * Short description : Queue management (FIFO, First In First Out)           *
- *****************************************************************************
- * Queue is implemented using a single-linked list.                          *
- * Elements are added at end of list (in constant time) and removed from     *
- * beginning of list (in constant time too).                                 *
+ * File                 : log.h                                              *
+ * Short description    : libgends logging system                            *
  *****************************************************************************/
-#ifndef queue_h_included
-#define queue_h_included
 
-#include "slist.h"
+#ifndef log_h_included
+#define log_h_included
 
-typedef gds_slist_t gds_queue_t;
+#include <stdint.h>
 
-#define gds_queue_new(type_name) \
-	gds_slist_new(type_name)
+#define GDS_LOG_LEVEL_FATAL 1
+#define GDS_LOG_LEVEL_ERROR 2
+#define GDS_LOG_LEVEL_WARNING 3
+#define GDS_LOG_LEVEL_INFO 4
+#define GDS_LOG_LEVEL_DEBUG 5
 
-#define gds_queue_push(queue, data, copy_data) \
-	gds_slist_add_last(queue, data, copy_data)
+int8_t
+gds_log_init(uint8_t level);
 
-#define gds_queue_pop(queue) \
-	gds_slist_pop_first(queue)
+void
+gds_log_print(
+	uint8_t level,
+	const char *file,
+	const char *func,
+	uint32_t line,
+	const char *msg,
+	...
+);
 
-#define gds_queue_free(queue, free_data) \
-	gds_slist_free(queue, free_data)
+#define GDS_LOG_FATAL(msg, ...) \
+	gds_log_print(GDS_LOG_LEVEL_FATAL, __FILE__, __func__, \
+	__LINE__, msg, ##__VA_ARGS__)
 
-#endif /* Not queue_h_included */
+#define GDS_LOG_ERROR(msg, ...) \
+	gds_log_print(GDS_LOG_LEVEL_ERROR, __FILE__, __func__, \
+	__LINE__, msg, ##__VA_ARGS__)
+
+#define GDS_LOG_WARNING(msg, ...) \
+	gds_log_print(GDS_LOG_LEVEL_WARNING, __FILE__, __func__, \
+	__LINE__, msg, ##__VA_ARGS__)
+
+#define GDS_LOG_INFO(msg, ...) \
+	gds_log_print(GDS_LOG_LEVEL_INFO, __FILE__, __func__, \
+	__LINE__, msg, ##__VA_ARGS__)
+
+#define GDS_LOG_DEBUG(msg, ...) \
+	gds_log_print(GDS_LOG_LEVEL_DEBUG, __FILE__, __func__, \
+	__LINE__, msg, ##__VA_ARGS__)
+
+#endif /* log_h_included */
 

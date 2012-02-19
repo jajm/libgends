@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2010 Julian Maurice                                         *
+ * Copyright (C) 2010-2012 Julian Maurice                                    *
  *                                                                           *
  * This file is part of libgends.                                            *
  *                                                                           *
@@ -18,39 +18,34 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * Fichier		: deque.h                                            *
- * Description Brève	: Gestion d'une 'double-ended queue'                 *
- * Auteur		: Julian Maurice                                     *
- * Créé le		: 01/06/2010					     *
+ * File              : deque.h                                               *
+ * Short description : Double-Ended Queue management                         *
  *****************************************************************************
- * La file est implémentée en utilisant une liste chainée double.            *
- * Toutes les opérations (mises à part free et destroy) sont en temps        *
- * constant.                                                                 *
+ * Queue is implemented using a double-linked list.                          *
+ * All operations (except for free) are executed in constant time            *
  *****************************************************************************/
 #ifndef deque_h_included
 #define deque_h_included
 
 #include "dlist.h"
 
-typedef dlist_t deque_t;
+typedef gds_dlist_t gds_deque_t;
 
-#define deque_new(type_name) \
-	dlist_new(type_name)
+#define gds_deque_new(type_name) \
+	gds_dlist_new(type_name)
 
-#define deque_push_front(deque, data) \
-	dlist_add_first(deque, data)
-#define deque_push_back(deque, data) \
-	dlist_add_last(deque, data)
+#define gds_deque_push_front(deque, data, copy_data) \
+	gds_dlist_add_first(deque, data, copy_data)
+#define gds_deque_push_back(deque, data, copy_data) \
+	gds_dlist_add_last(deque, data, copy_data)
 
-#define deque_pop_front(deque, data) \
-	dlist_pop_first(deque, data)
-#define deque_pop_back(deque, data) \
-	dlist_pop_last(deque, data)
+#define gds_deque_pop_front(deque) \
+	gds_dlist_pop_first(deque)
+#define gds_deque_pop_back(deque) \
+	gds_dlist_pop_last(deque)
 
-#define deque_free(deque) \
-	dlist_free(deque)
-#define deque_destroy(deque) \
-	dlist_destroy(deque)
+#define gds_deque_free(deque, free_data) \
+	gds_dlist_free(deque, free_data)
 
 #endif /* Not deque_h_included */
 

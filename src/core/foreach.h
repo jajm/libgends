@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2010-2012 Julian Maurice                                    *
+ * Copyright (C) 2011-2012 Julian Maurice                                    *
  *                                                                           *
  * This file is part of libgends.                                            *
  *                                                                           *
@@ -18,31 +18,19 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * File              : queue.h                                               *
- * Short description : Queue management (FIFO, First In First Out)           *
- *****************************************************************************
- * Queue is implemented using a single-linked list.                          *
- * Elements are added at end of list (in constant time) and removed from     *
- * beginning of list (in constant time too).                                 *
+ * File                 : foreach.h                                          *
+ * Short description    : 'Fake' foreach using iterators                     *
  *****************************************************************************/
-#ifndef queue_h_included
-#define queue_h_included
 
-#include "slist.h"
+#ifndef foreach_h_included
+#define foreach_h_included
 
-typedef gds_slist_t gds_queue_t;
+#include <stdbool.h>
+#include "iterator.h"
 
-#define gds_queue_new(type_name) \
-	gds_slist_new(type_name)
+#define foreach(var, iterator) \
+	for(bool _loop_ok = !gds_iterator_reset(iterator); _loop_ok; _loop_ok = false) \
+	while (!gds_iterator_step(iterator) && ((var = gds_iterator_get(iterator, false)) || !var))
 
-#define gds_queue_push(queue, data, copy_data) \
-	gds_slist_add_last(queue, data, copy_data)
-
-#define gds_queue_pop(queue) \
-	gds_slist_pop_first(queue)
-
-#define gds_queue_free(queue, free_data) \
-	gds_slist_free(queue, free_data)
-
-#endif /* Not queue_h_included */
+#endif /* Not foreach_h_included */
 

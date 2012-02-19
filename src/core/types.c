@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2010-2011 Julian Maurice                                    *
+ * Copyright (C) 2010-2012 Julian Maurice                                    *
  *                                                                           *
  * This file is part of libgends.                                            *
  *                                                                           *
@@ -21,85 +21,85 @@
  * File                 : types.c                                            *
  * Short description    : Custom types management                            *
  *****************************************************************************
- * Custom types are user-defined types. They are described by a unique name, *
- * a size in bytes and have a list of functions identified by their name.    *
+ * Custom types are user-defined types. They are described by a unique name  *
+ * and have a list of functions identified by their name.                    *
  *****************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "error.h"
+#include "log.h"
+#include "func_list.h"
 #include "types.h"
 
-#define DEFAULT_HT_SIZE 1024
+#define GDS_TYPES_DEFAULT_HT_SIZE 1024
 
 typedef struct{
 	char *name;
-	size_t size;
-	funcs_t funcs;
-} type_t;
+	gds_func_list_node_t *func_list;
+} gds_type_t;
 
-type_t *type_new(const char *name, size_t size)
+gds_type_t * gds_type_new(const char *name)
 {
-	type_t *t = NULL;
+	gds_type_t *t = NULL;
 	size_t len;
 
-	if(name == NULL || size == 0){
-		Error("Bad parameters");
+	if(name == NULL){
+		GDS_LOG_ERROR("Bad parameters");
 		return NULL;
 	}
 	
-	if( (t = malloc(sizeof(type_t))) == NULL){
-		Error("Memory allocation error");
+	if( (t = malloc(sizeof(gds_type_t))) == NULL){
+		GDS_LOG_ERROR("Memory allocation error");
 		return NULL;
 	}
 
 	len = strlen(name);
 	if( (t->name = malloc(len+1)) == NULL){
 		free(t);
-		Error("Memory allocation error");
+		GDS_LOG_ERROR("Memory allocation error");
 		return NULL;
 	}
 	strncpy(t->name, name, len+1);
-	t->size = size;
-	t->funcs = NULL;
+	t->func_list = NULL;
 
 	return t;
 }
 
-void type_free(type_t *type)
+void gds_type_free(gds_type_t *type)
 {
 	if(type){
 		free(type->name);
+		gds_func_list_free(type->func_list);
 		free(type);
 	}
 }
 
-typedef struct typelist_node_s{
-	type_t *type;
-	struct typelist_node_s *next;
-} typelist_node_t, *typelist_t;
+typedef struct gds_type_list_node_s{
+	gds_type_t *type;
+	struct gds_type_list_node_s *next;
+} gds_type_list_node_t, *gds_type_list_t;
 
-int8_t typelist_add(typelist_t *tlist, type_t *type)
+int8_t gds_type_list_add(gds_type_list_t *type_list, gds_type_t *type)
 {
-	typelist_node_t *tmp, *tmp2 = NULL;
+	gds_type_list_node_t *tmp, *tmp2 = NULL;
 
-	if(tlist == NULL || type == NULL){
-		Error("Bad parameters");
+	if(type_list == NULL || type == NULL){
+		GDS_LOG_ERROR("Bad parameters");
 		return -1;
 	}
 
-	tmp = *tlist;
+	tmp = *type_list;
 	while(tmp != NULL){
 		if(strcmp(tmp->type->name, type->name) == 0){
-			Error("Type %s already exists", type->name);
+			GDS_LOG_ERROR("Type %s already exists", type->name);
 			return 1;
 		}
 		tmp2 = tmp;
 		tmp = tmp->next;
 	}
-	if( (tmp = malloc(sizeof(typelist_node_t))) == NULL){
-		Error("Memory allocation error");
+	if( (tmp = malloc(sizeof(gds_type_list_node_t))) == NULL){
+		GDS_LOG_ERROR("Memory allocation error");
 		return -1;
 	}
 	tmp->type = type;
@@ -107,55 +107,53 @@ int8_t typelist_add(typelist_t *tlist, type_t *type)
 		tmp->next = NULL;
 		tmp2->next = tmp;
 	}else{
-		tmp->next = *tlist;
-		*tlist = tmp;
+		tmp->next = *type_list;
+		*type_list = tmp;
 	}
 
 	return 0;
 }
 
-int8_t typelist_del(typelist_t *tlist, const char *name)
+int8_t gds_type_list_del(gds_type_list_t *type_list, const char *name)
 {
-	typelist_node_t *tmp, *tmp2 = NULL;
+	gds_type_list_node_t *tmp, *tmp2 = NULL;
 
-	if(tlist == NULL || name == NULL){
-		Error("Bad parameters");
+	if(type_list == NULL || name == NULL){
+		GDS_LOG_ERROR("Bad parameters");
 		return -1;
 	}
-	tmp = *tlist;
+	tmp = *type_list;
 	while(tmp && strcmp(tmp->type->name, name)){
 		tmp2 = tmp;
 		tmp = tmp->next;
 	}
 	if(tmp == NULL){
-		Error("Type '%s' doesn't exist", name);
+		GDS_LOG_ERROR("Type '%s' doesn't exist", name);
 		return -1;
 	}
 
 	if(tmp2 == NULL){
-		*tlist = tmp->next;
-		type_free(tmp->type);
-		free(tmp);
+		*type_list = tmp->next;
 	}else{
 		tmp2->next = tmp->next;
-		type_free(tmp->type);
-		free(tmp);
 	}
+	gds_type_free(tmp->type);
+	free(tmp);
 
 	return 0;
 }
 
-type_t *typelist_get(typelist_t tlist, const char *name)
+gds_type_t *gds_type_list_get(gds_type_list_t type_list, const char *name)
 {
-	typelist_node_t *tmp;
-	type_t *t = NULL;
+	gds_type_list_node_t *tmp;
+	gds_type_t *t = NULL;
 	
-	if(tlist == NULL || name == NULL){
-		Error("Bad parameters");
+	if(type_list == NULL || name == NULL){
+		GDS_LOG_ERROR("Bad parameters");
 		return NULL;
 	}
 
-	tmp = tlist;
+	tmp = type_list;
 	while(tmp != NULL){
 		if(strcmp(tmp->type->name, name) == 0){
 			t = tmp->type;
@@ -167,15 +165,15 @@ type_t *typelist_get(typelist_t tlist, const char *name)
 	return t;
 }
 
-void typelist_free(typelist_t tlist)
+void gds_type_list_free(gds_type_list_t type_list)
 {
-	typelist_node_t *tmp, *tmp2;
+	gds_type_list_node_t *tmp, *tmp2;
 
-	if(tlist){
-		tmp = tlist;
+	if(type_list){
+		tmp = type_list;
 		while(tmp != NULL){
 			tmp2 = tmp->next;
-			type_free(tmp->type);
+			gds_type_free(tmp->type);
 			free(tmp);
 			tmp = tmp2;
 		}
@@ -183,14 +181,14 @@ void typelist_free(typelist_t tlist)
 }
 
 
-struct types_t{
-	typelist_t *types;
+struct gds_types_t{
+	gds_type_list_t *type_list;
 	uint32_t size;
 };
 
-struct types_t *g_types = NULL;
+struct gds_types_t *g_types = NULL;
 
-uint32_t type_hash(const char *name)
+uint32_t gds_type_hash(const char *name)
 {
 	uint32_t hash = 0;
 	uint32_t i;
@@ -207,246 +205,218 @@ uint32_t type_hash(const char *name)
 	return hash;
 }
 
-int8_t types_init(uint32_t size)
+int8_t gds_types_init(uint32_t size)
 {
 	uint32_t i;
 
 	if(g_types == NULL){
-		g_types = malloc(sizeof(struct types_t));
+		g_types = malloc(sizeof(struct gds_types_t));
 		if(g_types == NULL){
-			Error("Memory allocation error");
+			GDS_LOG_ERROR("Memory allocation error");
 			return -1;
 		}
 	}else{
-		Error("User types already initialized");
+		GDS_LOG_ERROR("User types already initialized");
 		return -1;
 	}
 
-	g_types->size = (size != 0) ? size : DEFAULT_HT_SIZE;
-	g_types->types = malloc(g_types->size*sizeof(typelist_t));
-	if(g_types->types == NULL){
-		Error("Memory allocation error");
+	g_types->size = (size != 0) ? size : GDS_TYPES_DEFAULT_HT_SIZE;
+	g_types->type_list = malloc(g_types->size*sizeof(gds_type_list_t));
+	if(g_types->type_list == NULL){
+		GDS_LOG_ERROR("Memory allocation error");
 		free(g_types);
 		return -1;
 	}
 
 	for (i=0; i<g_types->size; i++)
-		g_types->types[i] = NULL;
+		g_types->type_list[i] = NULL;
 
 	return 0;
 }
 
-bool types_initialized(void)
+bool gds_types_initialized(void)
 {
 	return (g_types != NULL) ? (true) : (false);
 }
 
-bool type_exist(const char *name)
+bool gds_type_exist(const char *name)
 {
 	uint32_t hash;
 
 	if(name == NULL) {
-		Error("Bad parameters: NULL pointer");
+		GDS_LOG_ERROR("Bad parameters: NULL pointer");
 		return false;
 	}
 	if(g_types == NULL){
-		Error("User types not initialized");
+		GDS_LOG_ERROR("User types not initialized");
 		return false;
 	}
-	hash = type_hash(name);
+	hash = gds_type_hash(name);
 
-	return (typelist_get(g_types->types[hash], name) != NULL)
+	return (gds_type_list_get(g_types->type_list[hash], name) != NULL)
 	       ? true
 	       : false;
 }
 
-int8_t type_reg(const char *name, size_t size)
+int8_t gds_type_register(const char *name)
 {
 	int8_t tla;
 	uint32_t hash;
-	type_t *type;
+	gds_type_t *type;
 
 	if(name == NULL){
-		Error("Bad parameters");
+		GDS_LOG_ERROR("Bad parameters");
 		return -1;
 	}
 
-	if(g_types == NULL){
-		Error("User types not initialized");
+	if(g_types == NULL) {
+		GDS_LOG_ERROR("User types not initialized");
 		return -1;
 	}
 
-	if( (type = type_new(name, size)) == NULL){
-		ErrorP("Type creation failed");
+	if( (type = gds_type_new(name)) == NULL ) {
+		GDS_LOG_ERROR("Type creation failed");
 		return -1;
 	}
 
-	hash = type_hash(name);
-	tla = typelist_add(&g_types->types[hash], type);
+	hash = gds_type_hash(name);
+	tla = gds_type_list_add(&g_types->type_list[hash], type);
 	if(tla != 0){
-		ErrorP("Adding type '%s' to the hash table failed", name);
+		gds_type_free(type);
+		GDS_LOG_ERROR("Adding type '%s' to the hash table failed", name);
 	}
 
 	return tla;
 }
 
-int8_t type_reg_func(const char *name, const char *func_name, func_ptr_t func_ptr)
+int8_t gds_type_register_func(const char *name, const char *func_name,
+	gds_func_ptr_t func_ptr)
 {
 	uint32_t hash;
-	type_t *type;
+	gds_type_t *type;
 
 	if(name == NULL || func_name == NULL || func_ptr == NULL){
-		Error("Bad parameters");
+		GDS_LOG_ERROR("Bad parameters");
 		return -1;
 	}
 	if(g_types == NULL){
-		Error("User types not initialized");
+		GDS_LOG_ERROR("User types not initialized");
 		return -1;
 	}
 
-	hash = type_hash(name);
-	type = typelist_get(g_types->types[hash], name);
+	hash = gds_type_hash(name);
+	type = gds_type_list_get(g_types->type_list[hash], name);
 	if(type){
-		if(funcs_add(&type->funcs, func_new(func_name, func_ptr)) == NULL){
-			ErrorP("Failed to add function '%s' to type '%s'",func_name,name);
+		if(gds_func_list_add(&type->func_list, func_name, func_ptr) == NULL){
+			GDS_LOG_ERROR("Failed to add function '%s' to type '%s'",func_name,name);
 			return -1;
 		}
 	}else{
-		ErrorP("Failed to find type '%s'", name);
+		GDS_LOG_ERROR("Failed to find type '%s'", name);
 		return -1;
 	}
 
 	return 0;
 }
 
-func_ptr_t type_get_func(const char *name, const char *func_name)
+gds_func_ptr_t gds_type_get_func(const char *name, const char *func_name)
 {
 	uint32_t hash;
-	type_t *type;
-	func_ptr_t func_ptr = NULL;
+	gds_type_t *type;
+	gds_func_ptr_t func_ptr = NULL;
 
 	if(name == NULL || func_name == NULL){
-		Error("Bad parameters");
+		GDS_LOG_ERROR("Bad parameters");
 		return NULL;
 	}
 	if(g_types == NULL){
-		Error("User types not initialized");
+		GDS_LOG_ERROR("User types not initialized");
 		return NULL;
 	}
 
-	hash = type_hash(name);
-	type = typelist_get(g_types->types[hash], name);
+	hash = gds_type_hash(name);
+	type = gds_type_list_get(g_types->type_list[hash], name);
 	if(type){
-		if(type->funcs)
-			func_ptr = funcs_get_ptr(type->funcs, func_name);
+		if(type->func_list)
+			func_ptr = gds_func_list_get_ptr(type->func_list, func_name);
 		else
-			Error("No functions associated with type %s", name);
+			GDS_LOG_ERROR("No functions associated with type %s", name);
 	}else{
-		ErrorP("Failed to find type '%s'", name);
+		GDS_LOG_ERROR("Failed to find type '%s'", name);
 	}
 
 	return func_ptr;
 }
 
-int8_t type_unreg(const char *name)
+int8_t gds_type_unregister(const char *name)
 {
 	uint32_t hash;
 
 	if(name == NULL){
-		Error("Bad parameters");
+		GDS_LOG_ERROR("Bad parameters");
 		return -1;
 	}
 	if(g_types == NULL){
-		Error("User types not initialized");
+		GDS_LOG_ERROR("User types not initialized");
 		return -1;
 	}
 
-	hash = type_hash(name);
-	if( (typelist_del(&g_types->types[hash], name)) < 0){
-		ErrorP("Deleting type '%s' from hash table failed", name);
+	hash = gds_type_hash(name);
+	if( (gds_type_list_del(&g_types->type_list[hash], name)) < 0){
+		GDS_LOG_ERROR("Deleting type '%s' from hash table failed", name);
 		return -1;
 	}
 
 	return 0;
 }
 
-int8_t type_unreg_func(const char *name, const char *func_name)
+int8_t gds_type_unregister_func(const char *name, const char *func_name)
 {
 	uint32_t hash;
-	type_t *type;
+	gds_type_t *type;
 
 	if(name == NULL || func_name == NULL){
-		Error("Bad parameters");
+		GDS_LOG_ERROR("Bad parameters");
 		return -1;
 	}
 	if(g_types == NULL){
-		Error("User types not initialized");
+		GDS_LOG_ERROR("User types not initialized");
 		return -1;
 	}
 
-	hash = type_hash(name);
-	type = typelist_get(g_types->types[hash], name);
+	hash = gds_type_hash(name);
+	type = gds_type_list_get(g_types->type_list[hash], name);
 	if(type == NULL){
-		ErrorP("Failed to retrieve type %s", name);
+		GDS_LOG_ERROR("Failed to retrieve type %s", name);
 		return -1;
 	}
-	if(funcs_del(&(type->funcs), func_name) < 0){
-		ErrorP("Failed to delete function %s for type %s", func_name, name);
+	if(gds_func_list_del(&(type->func_list), func_name) < 0){
+		GDS_LOG_ERROR("Failed to delete function %s for type %s", func_name, name);
 		return -1;
 	}
 
 	return 0;
 }
 
-size_t type_sizeof(const char *name)
-{
-	uint32_t hash;
-	size_t size = 0;
-	typelist_node_t *tmp;
-
-	if(name == NULL){
-		Error("Parameter is NULL");
-		return 0;
-	}
-	if(g_types == NULL){
-		Error("User types not initialized");
-		return 0;
-	}
-
-	hash = type_hash(name);
-	tmp = g_types->types[hash];
-	while(tmp != NULL){
-		if(strcmp(tmp->type->name, name) == 0){
-			size = tmp->type->size;
-			break;
-		}
-		tmp = tmp->next;
-	}
-
-	if(size == 0) Error("Type '%s' doesn't exist", name);
-
-	return size;
-}
-
-void types_free(void)
+void gds_types_free(void)
 {
 	uint32_t i;
 
 	if(g_types == NULL) return;
 
 	for(i=0; i<g_types->size; i++){
-		typelist_free(g_types->types[i]);
-		g_types->types[i] = NULL;
+		gds_type_list_free(g_types->type_list[i]);
+		g_types->type_list[i] = NULL;
 	}
-	free(g_types->types);
+	free(g_types->type_list);
 	free(g_types);
 	g_types = NULL;
 }
 
-void types_print(void)
+void gds_types_print(void)
 {
 	uint32_t i;
-	typelist_node_t *tmp;
+	gds_type_list_node_t *tmp;
 
 	if(g_types == NULL){
 		fprintf(stderr, "User types not initialized\n");
@@ -454,13 +424,10 @@ void types_print(void)
 	}
 
 	for(i=0; i<g_types->size; i++){
-		tmp = g_types->types[i];
+		tmp = g_types->type_list[i];
 		if(tmp) printf("[%d]", i);
 		while(tmp != NULL){
-			printf("\tname(\"%s\"), size(\"%zd\"), "
-				"type_sizeof(\"%zd\")\n",
-				tmp->type->name, tmp->type->size,
-				type_sizeof(tmp->type->name));
+			printf("\tname(\"%s\")\n", tmp->type->name);
 			tmp = tmp->next;
 		}
 	}

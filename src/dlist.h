@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2010 Julian Maurice                                         *
+ * Copyright (C) 2010-2012 Julian Maurice                                    *
  *                                                                           *
  * This file is part of libgends.                                            *
  *                                                                           *
@@ -18,143 +18,434 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * Fichier		: dlist.h                                            *
- * Description Brève	: Gestion d'une liste doublement chainée générique   *
- * Auteur		: Julian Maurice                                     *
- * Créé le		: 01/06/2010                                         *
+ * File              : dlist.h                                               *
+ * Short description : Generic double linked list management                 *
  *****************************************************************************
- * Une liste chainée générique peut contenir tout type de données, à partir  *
- * du moment où un type utilisateur correspondant existe.                    *
- * Voir types.h pour plus d'informations sur les types utilisateurs          *
+ * A generic linked list can contain data of any type, since a corresponding *
+ * custom type is defined (see core/types.h)                                 *
  *****************************************************************************/
- 
+
+/*****************************************************************************
+ * Custom functions used:                                                    *
+ * - alloc:                                                                  *
+ *   Prototype: void * alloc(void *data);                                    *
+ *   Takes a pointer to data in parameter and should return a pointer to a   *
+ *   copy of data.                                                           *
+ *   Used in gds_dlist_add_*, gds_dlist_it_add, gds_dlist_get_* and          *
+ *   gds_dlist_it_get if parameter copy_data is true.                        *
+ * - free:                                                                   *
+ *   Prototype: void free(void *data);                                       *
+ *   Takes a pointer to data and free it.                                    *
+ *   Used in gds_dlist_del, gds_dlist_del_*, gds_dlist_it_del and            *
+ *   gds_dlist_free if parameter free_data is true.                          *
+ * - cmp:                                                                    *
+ *   Prototype: int32_t cmp(void *data1, void *data2);                       *
+ *   Compare two data, should return 0 if data are equals, a positive value  *
+ *   if data1 is greater than data2, or a negative value if data1 is lesser  *
+ *   than data2.                                                             *
+ *   Used in gds_dlist_chk.                                                  *
+ *****************************************************************************/
+
 #ifndef dlist_h_included
 #define dlist_h_included
 
+#include <stdbool.h>
+#include <stdint.h>
 #include "dlist_node.h"
-#include "types.h"
 #include "iterator.h"
 
 typedef struct {
 	char *type_name;
-	dlist_node_t *first;
-	dlist_node_t *last;
-} dlist_t;
+	gds_dlist_node_t *first;
+	gds_dlist_node_t *last;
+} gds_dlist_t;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* Crée une nouvelle liste et retourne l'adresse de cette liste */
-dlist_t *dlist_new(const char *type_name);
+/* Create a new list */
+/* type_name : name of data type */
+/* Return: Success => pointer to the newly created list
+ *         Failure => NULL */
+gds_dlist_t *
+gds_dlist_new(
+	const char *type_name
+);
 
-/* Teste si la liste est vide (0 = non vide, 1 = vide) */
-s8 dlist_empty(dlist_t *l);
+/* Check if list is empty */
+/* l : pointer to the list */
+/* Return: true => the list is empty
+ *         false => not empty */
+bool
+gds_dlist_empty(
+	gds_dlist_t *l
+);
 
-/* Retourne l'adresse du premier nœud */
-dlist_node_t *dlist_first(dlist_t *l);
-/* Retourne l'adresse du dernier nœud */
-dlist_node_t *dlist_last(dlist_t *l);
+/* Get pointer to the first node of the list */
+/* l : pointer to the list */
+/* Return: Success => a pointer to the first node of the list
+ *         Failure => NULL */
+gds_dlist_node_t *
+gds_dlist_first(
+	gds_dlist_t *l
+);
 
-/* Retourne l'adresse du nœud suivant */
-dlist_node_t *dlist_next(dlist_t *l, dlist_node_t *node);
-/* Retourne l'adresse du nœud précédent */
-dlist_node_t *dlist_prev(dlist_t *l, dlist_node_t *node);
+/* Get pointer to the last node of the list */
+/* l : pointer to the list */
+/* Return: Success => a pointer to the last node of the list
+ *         Failure => NULL */
+gds_dlist_node_t *
+gds_dlist_last(
+	gds_dlist_t *l
+);
 
-/* Retourne 1 si node est suivi d'un autre nœud, 0 sinon */
-/* Utilisée par les itérateurs */
-s8 dlist_has_next(dlist_t *l, dlist_node_t *node);
-/* Retourne 1 si node est précédé par un autre nœud, 0 sinon */
-/* Utilisée par les itérateurs */
-s8 dlist_has_prev(dlist_t *l, dlist_node_t *node);
+/* Get pointer to the next node */
+/*    l : pointer to the list
+ * node : pointer to a node in the list */
+/* Return: a pointer to the following node */
+gds_dlist_node_t *
+gds_dlist_next(
+	gds_dlist_t *l,
+	gds_dlist_node_t *node
+);
 
-/* ========================================================================= */
-/*                             Fonctions d'ajout                             */
-/* ========================================================================= */
+/* Get pointer to the previous node */
+/*    l : pointer to the list
+ * node : pointer to a node in the list */
+/* Return: a pointer to the previous node */
+gds_dlist_node_t *
+gds_dlist_prev(
+	gds_dlist_t *l,
+	gds_dlist_node_t *node
+);
 
-dlist_node_t *dlist_add_after(dlist_t *l, dlist_node_t *node, void *data);
-dlist_node_t *dlist_add_before(dlist_t *l, dlist_node_t *node, void *data);
+/* Check if node is followed by another node */
+/*    l : pointer to the list
+ * node : pointer to a node in the list */
+/* Return: true => node is followed by another node
+ *         false => node is the last node of the list */
+bool
+gds_dlist_has_next(
+	gds_dlist_t *l,
+	gds_dlist_node_t *node
+);
 
-/* Ajoute un nœud à la liste en première position */
-/* Retourne l'adresse du nouveau nœud */
-dlist_node_t *dlist_add_first(dlist_t *l, void *data);
-
-/* Ajoute un nœud à la liste en dernière position */
-/* Retourne l'adresse du nouveau nœud */
-dlist_node_t *dlist_add_last(dlist_t *l, void *data);
-
-/* Ajoute un nœud à la liste après l'itérateur */
-dlist_node_t *dlist_it_add_after(iterator_t *it, void *data);
-/* Ajoute un nœud à la liste avant l'itérateur */
-dlist_node_t *dlist_it_add_before(iterator_t *it, void *data);
-
-
-/* ========================================================================= */
-/*                          Fonctions de suppression                         */
-/* ========================================================================= */
-
-/* --------- Supprime un nœud et renvoie la donnée qu'il contient ---------- */
-void *dlist_pop(dlist_t *l, dlist_node_t *node);
-
-/* Supprime le premier nœud de la liste */
-void *dlist_pop_first(dlist_t *l);
-
-/* Supprime le dernier nœud de la liste */
-void *dlist_pop_last(dlist_t *l);
-
-/* Supprime le nœud sur lequel pointe l'itérateur */
-void *dlist_it_pop(iterator_t *it);
-
-
-/* ---------- Supprime un nœud ainsi que la donnée qu'il contient ---------- */
-s8 dlist_del(dlist_t *l, dlist_node_t *node);
-
-/* Supprime le premier nœud de la liste */
-s8 dlist_del_first(dlist_t *l);
-
-/* Supprime le dernier nœud de la liste */
-s8 dlist_del_last(dlist_t *l);
-
-/* Supprimer le nœud sur lequel pointe l'itérateur */
-s8 dlist_it_del(iterator_t *it);
-
-
-/* ========================================================================= */
-/*                  Fonctions de récupération des données                    */
-/* ========================================================================= */
-
-/* Récupère la donnée du nœud passé en paramètre */
-void *dlist_get(dlist_t *l, dlist_node_t *node);
-
-/* Récupère la donnée du premier nœud de la liste */
-void *dlist_get_first(dlist_t *l);
-
-/* Récupère la donnée du dernier nœud de la liste */
-void *dlist_get_last(dlist_t *l);
-
-void *dlist_it_get(iterator_t *it);
+/* Check if node is preceded by another node */
+/*    l : pointer to the list
+ * node : pointer to a node in the list */
+/* Return: true => node is preceded by another node
+ *         false => node is the first node of the list */
+bool
+gds_dlist_has_prev(
+	gds_dlist_t *l,
+	gds_dlist_node_t *node
+);
 
 /* ========================================================================= */
-/*                               Itérateurs                                  */
+/*                              'Add' functions                              */
 /* ========================================================================= */
 
-/* Crée un itérateur qui va du début à la fin de la liste (ordre normal) */
-iterator_t *dlist_iterator_new(dlist_t *l);
-/* Crée un itérateur qui va de la fin au début de la liste (ordre inverse) */
-iterator_t *dlist_reverse_iterator_new(dlist_t *l);
+/* Add a new node after the given node */
+/*         l : pointer to the list
+ *      node : pointer to a node in the list. The new node will be added after
+ *             it. If NULL, the new node is added in last position
+ *      data : pointer to the data
+ * copy_data : true => make a copy of the data
+ *             false => just take the pointer value */
+/* Return: Success => pointer to the newly created node
+ *         Failure => NULL */
+gds_dlist_node_t *
+gds_dlist_add_after(
+	gds_dlist_t *l,
+	gds_dlist_node_t *node,
+	void *data,
+	bool copy_data
+);
+
+/* Add a new node before the given node */
+/*         l : pointer to the list
+ *      node : pointer to a node in the list. The new node will be added before
+ *             it. If NULL, the new node is added in first position
+ *      data : pointer to the data
+ * copy_data : true => make a copy of the data
+ *             false => just take the pointer value */
+/* Return: Success => pointer to the newly created node
+ *         Failure => NULL */
+gds_dlist_node_t *
+gds_dlist_add_before(
+	gds_dlist_t *l,
+	gds_dlist_node_t *node,
+	void *data,
+	bool copy_data
+);
+
+/* Add a new node at beginning of the list */
+/*         l : pointer to the list
+ *      data : pointer to the data
+ * copy_data : true => make a copy of the data
+ *             false => just take the pointer value */
+/* Return: Success => pointer to the newly created node
+ *         Failure => NULL */
+gds_dlist_node_t *
+gds_dlist_add_first(
+	gds_dlist_t *l,
+	void *data,
+	bool copy_data
+);
+
+/* Add a new node at end of the list */
+/*         l : pointer to the list
+ *      data : pointer to the data
+ * copy_data : true => make a copy of the data
+ *             false => just take the pointer value */
+/* Return: Success => pointer to the newly created node
+ *         Failure => NULL */
+gds_dlist_node_t *
+gds_dlist_add_last(
+	gds_dlist_t *l,
+	void *data,
+	bool copy_data
+);
+
+/* Add a new node after the node pointed by the iterator */
+/*        it : pointer to the iterator
+ *      data : pointer to the data
+ * copy_data : true => make a copy of the data
+ *             false => just take the pointer value */
+/* Return: Success => pointer to the newly created node
+ *         Failure => NULL */
+gds_dlist_node_t *
+gds_dlist_it_add_after(
+	gds_iterator_t *it,
+	void *data,
+	bool copy_data
+);
+
+/* Add a new node before the node pointed by the iterator */
+/*        it : pointer to the iterator
+ *      data : pointer to the data
+ * copy_data : true => make a copy of the data
+ *             false => just take the pointer value */
+/* Return: Success => pointer to the newly created node
+ *         Failure => NULL */
+gds_dlist_node_t *
+gds_dlist_it_add_before(
+	gds_iterator_t *it,
+	void *data,
+	bool copy_data
+);
 
 
 /* ========================================================================= */
-/*                             Autres fonctions                              */
+/*                            'Remove' functions                             */
 /* ========================================================================= */
 
-/* Vérification de la présence d'un élément dans une liste */
-dlist_node_t *dlist_chk(dlist_t *l, void *data);
+/* ---------- Remove a node and returns previously contained data ---------- */
+/* Remove given node in the list */
+/*    l : pointer to the list
+ * node : pointer to the node to remove */
+/* Return: Success => pointer to previously contained data
+ *         Failure => NULL */
+void *
+gds_dlist_pop(
+	gds_dlist_t *l,
+	gds_dlist_node_t *node
+);
 
-/* Libération de la mémoire */
-void dlist_free(dlist_t *l);
+/* Remove the first node of the list */
+/* l : pointer to the list */
+/* Return: Success => pointer to previously contained data
+ *         Failure => NULL */
+void *
+gds_dlist_pop_first(
+	gds_dlist_t *l
+);
 
-void dlist_destroy(dlist_t *l);
+/* Remove the last node of the list */
+/* l : pointer to the list */
+/* Return: Success => pointer to previously contained data
+ *         Failure => NULL */
+void *
+gds_dlist_pop_last(
+	gds_dlist_t *l
+);
+
+/* Remove node pointed by iterator and move iterator to the next node */
+/* it : pointer to iterator */
+/* Return: Success => pointer to previously contained data
+ *         Failure => NULL */
+void *
+gds_dlist_it_pop(
+	gds_iterator_t *it
+);
+
+
+/* ----------------- Remove a node without returning data ------------------ */
+/* Remove given node from the list */
+/*         l : pointer to the list
+ *      node : pointer to the node to remove
+ * free_data : true => free memory occupied by data (use "free" custom
+ *                     function)
+ *             false => don't free the memory */
+/* Return: Success => 0
+ *         Failure => a negative value */
+int8_t
+gds_dlist_del(
+	gds_dlist_t *l,
+	gds_dlist_node_t *node,
+	bool free_data
+);
+
+/* Remove the first node of the list */
+/*         l : pointer to the list
+ * free_data : true => free memory occupied by data (use "free" custom
+ *                     function)
+ *             false => don't free the memory */
+/* Return: Success => 0
+ *         Failure => a negative value */
+int8_t
+gds_dlist_del_first(
+	gds_dlist_t *l,
+	bool free_data
+);
+
+/* Remove the last node of the list */
+/*         l : pointer to the list
+ * free_data : true => free memory occupied by data (use "free" custom
+ *                     function)
+ *             false => don't free the memory */
+/* Return: Success => 0
+ *         Failure => a negative value */
+int8_t
+gds_dlist_del_last(
+	gds_dlist_t *l,
+	bool free_data
+);
+
+/* Remove node pointed by iterator and move iterator to the next node */
+/* it : pointer to iterator
+ * free_data : true => free memory occupied by data (use "free" custom
+ *                     function)
+ *             false => don't free the memory */
+/* Return: Success => 0
+ *         Failure => a negative value */
+int8_t
+gds_dlist_it_del(
+	gds_iterator_t *it,
+	bool free_data
+);
+
+
+/* ========================================================================= */
+/*                           'Get' functions                                 */
+/* ========================================================================= */
+
+/* Get the data of given node */
+/*         l : pointer to the list
+ *      node : pointer to the node
+ * copy_data : true => returns a pointer to a copy of the data
+ *             false => returns a pointer to the real data */
+/* Return: Success => pointer to the data
+ *          Failure => NULL */
+void *
+gds_dlist_get(
+	gds_dlist_t *l,
+	gds_dlist_node_t *node,
+	bool copy_data
+);
+
+/* Get the data of first node */
+/*         l : pointer to the list
+ * copy_data : true => returns a pointer to a copy of the data
+ *             false => returns a pointer to the real data */
+/* Return: Success => pointer to the data
+ *          Failure => NULL */
+void *
+gds_dlist_get_first(
+	gds_dlist_t *l,
+	bool copy_data
+);
+
+/* Get the data of last node */
+/*         l : pointer to the list
+ * copy_data : true => returns a pointer to a copy of the data
+ *             false => returns a pointer to the real data */
+/* Return: Success => pointer to the data
+ *          Failure => NULL */
+void *
+gds_dlist_get_last(
+	gds_dlist_t *l,
+	bool copy_data
+);
+
+/* Get the data of the node pointed by iterator */
+/*        it : pointer to the iterator
+ * copy_data : true => returns a pointer to a copy of the data
+ *             false => returns a pointer to the real data */
+/* Return: Success => pointer to the data
+ *          Failure => NULL */
+void *
+gds_dlist_it_get(
+	gds_iterator_t *it,
+	bool copy_data
+);
+
+/* ========================================================================= */
+/*                                Iterators                                  */
+/* ========================================================================= */
+
+/* Create a new iterator which go from beggining to end of the list
+ * (normal order) */
+/* l : pointer to the list */
+/* Return: Success => a pointer to the newly created iterator
+ *          Failure => NULL */
+gds_iterator_t *
+gds_dlist_iterator_new(
+	gds_dlist_t *l
+);
+
+/* Create a new iterator which go from end to beginning of the list
+ * (reverse order) */
+/* l : pointer to the list */
+/* Return: Success => a pointer to the newly created iterator
+ *          Failure => NULL */
+gds_iterator_t *
+gds_dlist_reverse_iterator_new(
+	gds_dlist_t *l
+);
+
+/* Free iterator */
+/* it : pointer to the iterator */
+void
+gds_dlist_iterator_free(
+	gds_iterator_t *it
+);
+
+/* ========================================================================= */
+/*                             Others functions                              */
+/* ========================================================================= */
+
+/* Check if data is in the list */
+/*    l : pointer to the list
+ * data : pointer to the data */
+/* Return: Success => pointer to the node which contain searched data
+ *         Failure => NULL */
+gds_dlist_node_t *
+gds_dlist_chk(
+	gds_dlist_t *l,
+	void *data
+);
+
+/* Free memory occupied by the list */
+/*         l : pointer to the list
+ * free_data : true => free memory occupied by data
+ *             false => don't free memory occupied by data */
+void
+gds_dlist_free(
+	gds_dlist_t *l,
+	bool free_data
+);
 
 #ifdef __cplusplus
 }

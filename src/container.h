@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2010-2011 Julian Maurice                                    *
+ * Copyright (C) 2010-2012 Julian Maurice                                    *
  *                                                                           *
  * This file is part of libgends.                                            *
  *                                                                           *
@@ -25,6 +25,27 @@
  * pointer to the data, and the data type name                               *
  *****************************************************************************/
 
+/*****************************************************************************
+ * Custom functions used:                                                    *
+ * - alloc:                                                                  *
+ *   Prototype: void * alloc(void *data);                                    *
+ *   Takes a pointer to data in parameter and should return a pointer to a   *
+ *   copy of data.                                                           *
+ *   Used in gds_container_new, gds_container_set, and gds_container_get     *
+ *   if parameter copy_data is true.                                         *
+ * - free:                                                                   *
+ *   Prototype: void free(void *data);                                       *
+ *   Takes a pointer to data and free it.                                    *
+ *   Used in gds_container_set and gds_container_free if parameter free_data *
+ *   (or free_old_data) is true.                                             *
+ * - cmp:                                                                    *
+ *   Prototype: int32_t cmp(void *data1, void *data2);                       *
+ *   Compare two data, should return 0 if data are equals, a positive value  *
+ *   if data1 is greater than data2, or a negative value if data1 is lesser  *
+ *   than data2.                                                             *
+ *   Used in gds_container_cmp.                                              *
+ *****************************************************************************/
+
 #ifndef container_h_included
 #define container_h_included
 
@@ -34,21 +55,21 @@
 typedef struct{
 	char *type_name;        /* Data type */
 	void *data_ptr;         /* Data pointer */
-} container_t;
+} gds_container_t;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Create a new container */
-/* type_name : name of a registered type (see core/types.h)
+/* type_name : name of a registered type
  *  data_ptr : pointer to the data
- *      copy : true => copy the data
+ * copy_data : true => copy the data
  *             false => just take the pointer value */
 /* Return: Success => pointer to the newly created container
  *         Failure => NULL */
-	container_t *
-container_new(
+gds_container_t *
+gds_container_new(
 	const char *type_name,
 	void *data_ptr,
 	bool copy_data
@@ -58,9 +79,9 @@ container_new(
 /* src: pointer to the container to clone */
 /* Return: Success => pointer to the newly created container
  *         Failure => NULL */
-	container_t *
-container_new_clone(
-	const container_t *src
+gds_container_t *
+gds_container_new_clone(
+	const gds_container_t *src
 );
 
 /* Set a new value to an existing container */
@@ -73,9 +94,9 @@ container_new_clone(
  *                 false => just take the pointer value */
 /* Return: Success => 0
  *         Failure => a negative value */
-	int8_t
-container_set(
-	container_t *c,
+int8_t
+gds_container_set(
+	gds_container_t *c,
 	const char *type_name,
 	void *data_ptr,
 	bool free_old_data,
@@ -89,31 +110,35 @@ container_set(
  *                 false => don't free memory */
 /* Return: Success => 0
  *         Failure => a negative value */
-	int8_t
-container_set_clone(
-	container_t *dst,
-	const container_t *src,
+int8_t
+gds_container_set_clone(
+	gds_container_t *dst,
+	const gds_container_t *src,
 	bool free_old_data
 );
 
 /* Get the contained data */
-/*    c : pointer to the container */
-/* copy : true => return a pointer to a copy of the data
- *        false => return a direct pointer to the data */
+/*         c : pointer to the container */
+/* copy_data : true => return a pointer to a copy of the data
+ *             false => return a direct pointer to the data */
 /* Return: pointer to the data */
-	void *
-container_get(
-	container_t *c,
-	bool copy
+void *
+gds_container_get(
+	gds_container_t *c,
+	bool copy_data
 );
 
-/* Get size in bytes of contained data */
-/* c : pointer to the container */
-/* Return: Success => the size in bytes of contained data
- *         Failure => 0 */
-	size_t
-container_data_size(
-	const container_t *c
+/* Compare two containers, needs that both containers are of the same type,
+ * and function 'cmp' is registered for this type */
+/* c1 : first container
+ * c2 : second container */
+/* Return: Success => the value of 'cmp' function
+ *         Failure => a value different than 0 (actually you can't know
+ *                    if this function succeed or not) */
+int32_t
+gds_container_cmp(
+	const gds_container_t *c1,
+	const gds_container_t *c2
 );
 
 /* Free the memory */
@@ -121,10 +146,9 @@ container_data_size(
  * free_data : true => try to free the data with "free" registered function
  *                     or with standard free() function
  *             false => don't free memory occupied by the data */
-/* Return: nothing */
-	void
-container_free(
-	container_t *c,
+void
+gds_container_free(
+	gds_container_t *c,
 	bool free_data
 );
 

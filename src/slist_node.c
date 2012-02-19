@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2010 Julian Maurice                                         *
+ * Copyright (C) 2010-2012 Julian Maurice                                    *
  *                                                                           *
  * This file is part of libgends.                                            *
  *                                                                           *
@@ -16,54 +16,127 @@
  * You should have received a copy of the GNU General Public License         *
  * along with libgends.  If not, see <http://www.gnu.org/licenses/>.         *
  *****************************************************************************/
- 
+
 /*****************************************************************************
- * Fichier           : slist_node.c                                          *
- * Description Brève : Nœud d'une liste simplement chainée                   *
- * Auteur            : Julian Maurice                                        *
- * Créé le           : 23/08/2010                                            *
+ * File              : slist_node.c                                          *
+ * Short description : Singly linked list node                               *
  *****************************************************************************/
 
 #include <stdlib.h>
-#include <assert.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include "func_ptr.h"
+#include "log.h"
 #include "slist_node.h"
-#include "error.h"
 
-slist_node_t *slnode_new(void *data)
+gds_slist_node_t *gds_slist_node_new(void *data, bool copy_data, gds_func_ptr_t alloc_f)
 {
-	slist_node_t *node;
+	gds_slist_node_t *node;
 
-	assert(data != NULL);
-
-	node = malloc(sizeof(slist_node_t));
-	if(node){
-		node->data = data;
-		node->next = NULL;
-	}else{
-		Error("Memory allocation error");
+	if(data == NULL || (copy_data && alloc_f == NULL)) {
+		GDS_LOG_ERROR("Bad arguments");
+		return NULL;
 	}
+
+	node = malloc(sizeof(gds_slist_node_t));
+	if(node == NULL) {
+		GDS_LOG_ERROR("Memory allocation error");
+		return NULL;
+	}
+	if(copy_data) {
+		node->data = (void *)alloc_f(data);
+		if(node->data == NULL) {
+			GDS_LOG_ERROR("Memory allocation error");
+			free(node);
+			return NULL;
+		}
+	} else {
+		node->data = data;
+	}
+	node->next = NULL;
 
 	return node;
 }
 
 
-void slnode_set_data(slist_node_t *node, void *data)
+int8_t gds_slist_node_set_data(gds_slist_node_t *node, void *data, bool free_old_data,
+	gds_func_ptr_t free_f, bool copy_data, gds_func_ptr_t alloc_f)
 {
-	assert(node != NULL);
-	assert(data != NULL);
+	if(node == NULL || data == NULL || (copy_data && alloc_f == NULL)
+	|| (free_old_data && free_f == NULL)) {
+		GDS_LOG_ERROR("Bad arguments");
+		return -1;
+	}
 
-	node->data = data;
+	if(free_old_data) {
+		free_f(node->data);
+	}
+
+	if(copy_data) {
+		node->data = (void *)alloc_f(data);
+		if(node->data == NULL) {
+			GDS_LOG_ERROR("Memory allocation error");
+			return -1;
+		}
+	} else {
+		node->data = data;
+	}
+
+	return 0;
 }
 
-void *slnode_data(slist_node_t *node)
+void *gds_slist_node_get_data(gds_slist_node_t *node, bool copy, gds_func_ptr_t alloc_f)
 {
-	assert(node != NULL);
+	void *data;
 
-	return node->data;
+	if(node == NULL || (copy && alloc_f == NULL)) {
+		GDS_LOG_ERROR("Bad arguments");
+		return NULL;
+	}
+
+	if(copy) {
+		data = (void *)alloc_f(node->data);
+		if(data == NULL) {
+			GDS_LOG_ERROR("Memory allocation error");
+			return NULL;
+		}
+	} else {
+		data = node->data;
+	}
+
+	return data;
 }
 
-
-void slnode_free(slist_node_t *node)
+int8_t gds_slist_node_set_next(gds_slist_node_t *node, gds_slist_node_t *next)
 {
+	if(node == NULL) {
+		GDS_LOG_ERROR("Bad arguments");
+		return -1;
+	}
+
+	node->next = next;
+	
+	return 0;
+}
+
+gds_slist_node_t *gds_slist_node_get_next(gds_slist_node_t *node)
+{
+	if(node == NULL) {
+		GDS_LOG_ERROR("Bad arguments");
+		return NULL;
+	}
+
+	return node->next;
+}
+
+void gds_slist_node_free(gds_slist_node_t *node, bool free_data, gds_func_ptr_t free_f)
+{
+	if(node && free_data) {
+		if(free_f) {
+			free_f(node->data);
+		} else {
+			GDS_LOG_ERROR("free_data is true but free_f is NULL");
+		}
+	}
 	free(node);
 }

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2010 Julian Maurice                                         *
+ * Copyright (C) 2010-2011 Julian Maurice                                    *
  *                                                                           *
  * This file is part of libgends.                                            *
  *                                                                           *
@@ -21,16 +21,18 @@
  * File                 : iterator.h                                         *
  * Short description    : Iterators management                               *
  *****************************************************************************
- * To create an iterator on a custom type, you have to:                      *
- *  - create a custom type (see types.h)                                     *
- *  - create 4 functions for this type :                                     *
- *    . void *first(void *container)  // return a pointer on 1st element     *
- *    . void *next(void *container, void *pointer) // return a pointer on    *
- *                                                 // the next element       *
- *    . void *get(void *container, void *pointer) // return a pointer on data*
- *    . bool has_next(void *container, void *pointer) // return 1 if it      *
- *                                          // remains elements, 0 otherwise *
- *  - and then, create the iterator, with it_new.                            *
+ * What this file contains is just an interface for containers which want to *
+ * provide an iterator. By using this interface, whatever container is used, *
+ * it's always the same API.                                                 *
+ * To implement an iterator for your container, you have to:                 *
+ *  - define a struct, or whatever you need to store iterator informations   *
+ *  - define 3 functions (described below) which will deal with these        *
+ *  informations:                                                            *
+ *    . int8_t reset(void *data)                                             *
+ *    . int8_t step(void *data)                                              *
+ *    . void * get(void *data, bool copy_data)                               *
+ *  - and provide a way to get an initialized iterator for your container    *
+ * See slist.h or dlist.h for examples of implementation                     *
  *****************************************************************************/
 
 #ifndef iterator_h_included
@@ -39,33 +41,77 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+typedef int8_t (*gds_iterator_reset_func_t)(void *);
+typedef int8_t (*gds_iterator_step_func_t)(void *);
+typedef void * (*gds_iterator_get_func_t)(void *, bool);
+
 typedef struct {
-	char *type_name;    /* Type on what we'll iterate */
-	void *container;    /* Container on which we'll iterate */
-	void *pointer;      /* Current position of iterator */
-} iterator_t;
+	/* Used to store iterator-specific information
+	 * It will be passed to the three following functions */
+	void *data;
+
+	/* This function must reset the iterator to beginning
+	 * It must take one argument (data) and return 0 on success,
+	 * a negative value otherwise */
+	gds_iterator_reset_func_t reset_f;
+
+	/* This function must move iterator to the next element
+	 * It must take one argument (data) and return 0 on success,
+	 * a positive value if iterator has reached the end, and a negative
+	 * value otherwise */
+	gds_iterator_step_func_t step_f;
+
+	/* This fuction must return data of element pointed by iterator
+	 * It must take two arguments: data, and a boolean which indicates if
+	 * returned data must be a copy of real data (true), or a direct
+	 * pointer to it (false).
+	 * It should return a valid pointer on success, or NULL otherwise */
+	gds_iterator_get_func_t get_f;
+} gds_iterator_t;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Create a new iterator. You will have to use it_reset before to use it
+ * This function only allocate memory for the structure and affect parameters
+ * to corresponding members.
  * Return a pointer on the new iterator, or NULL if an error occurs */
-iterator_t *it_new(const char *type_name, void *container);
-/* (Re)set iterator to point on the first element
- * Return 0 on success, or a negative value if an error occurs */
-int8_t it_reset(iterator_t *it);
-/* Set iterator to point on the next element
- * Return 0 on success, or a negative value if an error occurs */
-int8_t it_next(iterator_t *it);
-/* Get data pointed by iterator */
-/* Return NULL if an error occurs */
-void *it_get(iterator_t *it);
-/* Get iterator status
- * Return 1 if it remains elements, 0 otherwise */
-bool it_has_next(iterator_t *it);
+gds_iterator_t *
+gds_iterator_new(
+	void *data,
+	gds_iterator_reset_func_t reset_f,
+	gds_iterator_step_func_t step_f,
+	gds_iterator_get_func_t get_f
+);
+
+/* Alias for it->reset_f(it->data) */
+int8_t
+gds_iterator_reset(
+	gds_iterator_t *it
+);
+
+/* Alias for it->step_f(it->data) */
+int8_t
+gds_iterator_step(
+	gds_iterator_t *it
+);
+
+/* Alias for it->get_f(it->data, copy_data) */
+void *
+gds_iterator_get(
+	gds_iterator_t *it,
+	bool copy_data
+);
+
 /* Free memory */
-void it_free(iterator_t *it);
+/* free_f : Pointer to function that should free it->data.
+ *          If NULL, it doesn't free it */
+void
+gds_iterator_free(
+	gds_iterator_t *it,
+	void free_f(void *data)
+);
 
 #ifdef __cplusplus
 }

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2010-2011 Julian Maurice                                    *
+ * Copyright (C) 2010-2012 Julian Maurice                                    *
  *                                                                           *
  * This file is part of libgends.                                            *
  *                                                                           *
@@ -21,8 +21,8 @@
  * File                 : types.h                                            *
  * Short description    : Custom types management                            *
  *****************************************************************************
- * Custom types are user-defined types. They are described by a unique name, *
- * a size in bytes and have a list of functions identified by their name.    *
+ * Custom types are user-defined types. They are described by a unique name  *
+ * and have a list of functions identified by their name.                    *
  *****************************************************************************/
 
 #ifndef types_h_included
@@ -30,7 +30,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "funcs.h"
+#include "func_list.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,23 +42,23 @@ extern "C" {
  *        0 if you don't care (set to default 1024) */
 /* Return: Success => 0
  *         Failure => a negative value */
-	int8_t
-types_init(
+int8_t
+gds_types_init(
 	uint32_t size
 );
 
 /* Check if custom types are initialized */
 /* Return: true => custom types are initialized
  *         false => custom types are NOT initialized */
-	bool
-types_initialized(void);
+bool
+gds_types_initialized(void);
 
 /* Check if a type exists */
 /* name : Type name to check */
 /* Return: true => exists
  *         false => does not exist */
-	bool
-type_exist(
+bool
+gds_type_exist(
 	const char *name
 );
 
@@ -68,10 +68,9 @@ type_exist(
 /* Return: 0 on success,
  *         a negative value if an error occurs,
  *         a positive value if type already exists. */
-	int8_t
-type_reg(
-	const char *name,
-	size_t size
+int8_t
+gds_type_register(
+	const char *name
 );
 
 /* Add a function to type's function list. */
@@ -80,11 +79,11 @@ type_reg(
  *  func_ptr : pointer to the function */
 /* Return: 0 on success,
  *         a negative value if an error occurs */
-	int8_t
-type_reg_func(
+int8_t
+gds_type_register_func(
 	const char *name,
 	const char *func_name,
-	func_ptr_t func_ptr
+	gds_func_ptr_t func_ptr
 );
 
 /* Get function pointer */
@@ -92,8 +91,8 @@ type_reg_func(
  * func_name : Function name */
 /* Return: Success => a pointer to the function
  *         Failure => NULL */
-	func_ptr_t
-type_get_func(
+gds_func_ptr_t
+gds_type_get_func(
 	const char *name,
 	const char *func_name
 );
@@ -102,8 +101,8 @@ type_get_func(
 /* name : Type name to unregister */
 /* Return: Success => 0,
  *         Failure => a negative value */
-	int8_t
-type_unreg(
+int8_t
+gds_type_unregister(
 	const char *name
 );
 
@@ -112,28 +111,19 @@ type_unreg(
  * func_name : Function name */
 /* Return: Success => 0,
  *         Failure => a negative value */
-	int8_t
-type_unreg_func(
+int8_t
+gds_type_unregister_func(
 	const char *name,
 	const char *func_name
 );
 
-/* Get type size */
-/* name : Type name */
-/* Return: Success => size of the type,
- *         Failure => 0 */
-	size_t
-type_sizeof(
-	const char *name
-);
-
 /* Free memory */
-	void
-types_free(void);
+void
+gds_types_free(void);
 
 /* For debugging purposes */
-	void
-types_print(void);
+void
+gds_types_print(void);
 
 #ifdef __cplusplus
 }

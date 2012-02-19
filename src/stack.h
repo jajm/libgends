@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2010 Julian Maurice                                         *
+ * Copyright (C) 2010-2012 Julian Maurice                                    *
  *                                                                           *
  * This file is part of libgends.                                            *
  *                                                                           *
@@ -18,31 +18,72 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * Fichier		: stack.h                                            *
- * Description Brève	: Gestion d'une pile (LIFO, Last In First Out)       *
- * Auteur		: Julian Maurice                                     *
- * Créé le		: 01/06/2010					     *
- *****************************************************************************
- * La pile est implémentée en utilisant une liste chainée simple.            *
- * Les éléments sont ajoutés et retirés en tête de liste, donc en temps      *
- * constant.                                                                 *
+ * File              : stack.h                                               *
+ * Short description : Stack management (LIFO, Last In First Out)            *
  *****************************************************************************/
 
 #ifndef stack_h_included
 #define stack_h_included
 
+#include <stdbool.h>
+#include <stdint.h>
 #include "slist_node.h"
 
 typedef struct{
 	char *type_name;
-	slist_node_t *head;
-} stack_t;
+	gds_slist_node_t *head;
+} gds_stack_t;
 
-stack_t *stack_new(const char *type_name);
-s8 stack_push(stack_t *S, void *data);
-void *stack_pop(stack_t *S);
-void stack_free(stack_t *S);
-void stack_destroy(stack_t *S);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* Create a new stack */
+/* type_name : type name of stored data (see core/types.h) */
+/* Return: Success => pointer to the newly created stack
+ *         Failure => NULL */
+	gds_stack_t *
+gds_stack_new(
+	const char *type_name
+);
+
+/* Push into the stack */
+/*         S : pointer to the stack
+ *      data : data to push
+ * copy_data : true => make a copy of the data
+ *             false => just take the pointer value */
+/* Return: Success => 0
+ *         Failure => a negative value */
+	int8_t
+gds_stack_push(
+	gds_stack_t *S,
+	void *data,
+	bool copy_data
+);
+
+/* Pop from the stack */
+/* S : pointer to the stack */
+/* Return: Success => pointer to the data
+ *         Failure => NULL */
+	void *
+gds_stack_pop(
+	gds_stack_t *S
+);
+
+/* Free memory */
+/* S : pointer to the stack
+ * free_data : true => free memory occupied by data (use "free" custom
+ *                     function)
+ *             false => don't free memory occupied by data */
+	void
+gds_stack_free(
+	gds_stack_t *S,
+	bool free_data
+);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* Not stack_h_included */
 
