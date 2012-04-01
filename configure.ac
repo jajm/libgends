@@ -45,6 +45,7 @@ AC_CONFIG_FILES([
 	t/Makefile
 	t/cunit/Makefile
 	t/cunit/core/Makefile
+	benchs/Makefile
 ])
 
 AM_SILENT_RULES

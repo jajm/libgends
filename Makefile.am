@@ -1,4 +1,4 @@
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libgends.pc
 
-SUBDIRS = src t
+SUBDIRS = src t benchs
