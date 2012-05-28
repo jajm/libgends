@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "func_ptr.h"
+#include "callbacks.h"
 
 struct gds_rbtree_node_s {
 	void *data;
@@ -19,14 +19,14 @@ gds_rbtree_node_t *
 gds_rbtree_node_new(
 	void *data,
 	bool copy_data,
-	gds_func_ptr_t alloc_f
+	gds_alloc_cb alloc_cb
 );
 
 void *
 gds_rbtree_node_get_data(
 	gds_rbtree_node_t *node,
 	bool copy_data,
-	gds_func_ptr_t alloc_f
+	gds_alloc_cb alloc_cb
 );
 
 int8_t
@@ -34,9 +34,9 @@ gds_rbtree_node_set_data(
 	gds_rbtree_node_t *node,
 	void *data,
 	bool copy_data,
-	gds_func_ptr_t alloc_f,
+	gds_alloc_cb alloc_cb,
 	bool free_old_data,
-	gds_func_ptr_t free_f
+	gds_free_cb free_cb
 );
 
 bool
@@ -48,7 +48,7 @@ void
 gds_rbtree_node_free(
 	gds_rbtree_node_t *node,
 	bool free_data,
-	gds_func_ptr_t free_f
+	gds_free_cb free_cb
 );
 
 #endif /* Not rbtree_node_h_included */

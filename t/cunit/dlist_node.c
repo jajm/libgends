@@ -41,129 +41,129 @@ int clean_suite(void){
 void t_dlist_node_new(void)
 {
 	test_structure_t test;
-	gds_func_ptr_t alloc_f = (gds_func_ptr_t)&test_alloc;
+	gds_alloc_cb alloc_cb = (gds_alloc_cb)test_alloc;
 	gds_dlist_node_t *node;
-	gds_func_ptr_t free_f = (gds_func_ptr_t) &test_free;
+	gds_free_cb free_cb = (gds_free_cb) test_free;
 
 	CU_ASSERT(NULL == gds_dlist_node_new(NULL, false, 0));
-	CU_ASSERT(NULL == gds_dlist_node_new(NULL, false, alloc_f));
+	CU_ASSERT(NULL == gds_dlist_node_new(NULL, false, alloc_cb));
 	CU_ASSERT(NULL == gds_dlist_node_new(NULL, true, 0));
-	CU_ASSERT(NULL == gds_dlist_node_new(NULL, true, alloc_f));
+	CU_ASSERT(NULL == gds_dlist_node_new(NULL, true, alloc_cb));
 
 	CU_ASSERT(NULL != (node = gds_dlist_node_new(&test, false, 0)));
 	CU_ASSERT(node->data == &test);
 	CU_ASSERT(node->next == NULL);
 	gds_dlist_node_free(node, false, NULL);
 
-	CU_ASSERT(NULL != (node = gds_dlist_node_new(&test, false, alloc_f)));
+	CU_ASSERT(NULL != (node = gds_dlist_node_new(&test, false, alloc_cb)));
 	CU_ASSERT(node->data == &test);
 	CU_ASSERT(node->next == NULL);
 	gds_dlist_node_free(node, false, NULL);
 
 	CU_ASSERT(NULL == gds_dlist_node_new(&test, true, 0));
 
-	CU_ASSERT(NULL != (node = gds_dlist_node_new(&test, true, alloc_f)));
+	CU_ASSERT(NULL != (node = gds_dlist_node_new(&test, true, alloc_cb)));
 	CU_ASSERT(node->data != &test);
 	CU_ASSERT(node->next == NULL);
-	gds_dlist_node_free(node, true, free_f);
+	gds_dlist_node_free(node, true, free_cb);
 }
 
 void t_dlist_node_set_data(void)
 {
 	test_structure_t t = {.i = 1, .c = 'a', .f = 1.1};
 	test_structure_t t2 = {.i = 2, .c = 'b', .f = 2.2};
-	gds_func_ptr_t alloc_f = (gds_func_ptr_t)&test_alloc;
+	gds_alloc_cb alloc_cb = (gds_alloc_cb)test_alloc;
 	gds_dlist_node_t *node;
-	gds_func_ptr_t free_f;
+	gds_free_cb free_cb;
 
 	node = gds_dlist_node_new(&t, false, 0);
 	assert(node != NULL);
-	free_f = (gds_func_ptr_t) &test_free;
+	free_cb = (gds_free_cb) test_free;
 
 	/* Fail because one of the two first parameters is NULL */
 	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, NULL, false, NULL, false, 0));
-	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, NULL, false, NULL, false, alloc_f));
+	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, NULL, false, NULL, false, alloc_cb));
 	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, NULL, false, NULL, true, 0));
-	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, NULL, false, NULL, true, alloc_f));
-	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, NULL, false, free_f, false, 0));
-	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, NULL, false, free_f, false, alloc_f));
-	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, NULL, false, free_f, true, 0));
-	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, NULL, false, free_f, true, alloc_f));
+	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, NULL, false, NULL, true, alloc_cb));
+	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, NULL, false, free_cb, false, 0));
+	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, NULL, false, free_cb, false, alloc_cb));
+	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, NULL, false, free_cb, true, 0));
+	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, NULL, false, free_cb, true, alloc_cb));
 	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, NULL, true, NULL, false, 0));
-	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, NULL, true, NULL, false, alloc_f));
+	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, NULL, true, NULL, false, alloc_cb));
 	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, NULL, true, NULL, true, 0));
-	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, NULL, true, NULL, true, alloc_f));
-	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, NULL, true, free_f, false, 0));
-	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, NULL, true, free_f, false, alloc_f));
-	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, NULL, true, free_f, true, 0));
-	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, NULL, true, free_f, true, alloc_f));
+	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, NULL, true, NULL, true, alloc_cb));
+	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, NULL, true, free_cb, false, 0));
+	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, NULL, true, free_cb, false, alloc_cb));
+	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, NULL, true, free_cb, true, 0));
+	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, NULL, true, free_cb, true, alloc_cb));
 	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, &t2, false, NULL, false, 0));
-	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, &t2, false, NULL, false, alloc_f));
+	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, &t2, false, NULL, false, alloc_cb));
 	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, &t2, false, NULL, true, 0));
-	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, &t2, false, NULL, true, alloc_f));
-	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, &t2, false, free_f, false, 0));
-	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, &t2, false, free_f, false, alloc_f));
-	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, &t2, false, free_f, true, 0));
-	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, &t2, false, free_f, true, alloc_f));
+	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, &t2, false, NULL, true, alloc_cb));
+	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, &t2, false, free_cb, false, 0));
+	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, &t2, false, free_cb, false, alloc_cb));
+	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, &t2, false, free_cb, true, 0));
+	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, &t2, false, free_cb, true, alloc_cb));
 	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, &t2, true, NULL, false, 0));
-	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, &t2, true, NULL, false, alloc_f));
+	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, &t2, true, NULL, false, alloc_cb));
 	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, &t2, true, NULL, true, 0));
-	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, &t2, true, NULL, true, alloc_f));
-	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, &t2, true, free_f, false, 0));
-	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, &t2, true, free_f, false, alloc_f));
-	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, &t2, true, free_f, true, 0));
-	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, &t2, true, free_f, true, alloc_f));
+	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, &t2, true, NULL, true, alloc_cb));
+	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, &t2, true, free_cb, false, 0));
+	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, &t2, true, free_cb, false, alloc_cb));
+	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, &t2, true, free_cb, true, 0));
+	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, &t2, true, free_cb, true, alloc_cb));
 	CU_ASSERT(0 > gds_dlist_node_set_data(node, NULL, false, NULL, false, 0));
-	CU_ASSERT(0 > gds_dlist_node_set_data(node, NULL, false, NULL, false, alloc_f));
+	CU_ASSERT(0 > gds_dlist_node_set_data(node, NULL, false, NULL, false, alloc_cb));
 	CU_ASSERT(0 > gds_dlist_node_set_data(node, NULL, false, NULL, true, 0));
-	CU_ASSERT(0 > gds_dlist_node_set_data(node, NULL, false, NULL, true, alloc_f));
-	CU_ASSERT(0 > gds_dlist_node_set_data(node, NULL, false, free_f, false, 0));
-	CU_ASSERT(0 > gds_dlist_node_set_data(node, NULL, false, free_f, false, alloc_f));
-	CU_ASSERT(0 > gds_dlist_node_set_data(node, NULL, false, free_f, true, 0));
-	CU_ASSERT(0 > gds_dlist_node_set_data(node, NULL, false, free_f, true, alloc_f));
+	CU_ASSERT(0 > gds_dlist_node_set_data(node, NULL, false, NULL, true, alloc_cb));
+	CU_ASSERT(0 > gds_dlist_node_set_data(node, NULL, false, free_cb, false, 0));
+	CU_ASSERT(0 > gds_dlist_node_set_data(node, NULL, false, free_cb, false, alloc_cb));
+	CU_ASSERT(0 > gds_dlist_node_set_data(node, NULL, false, free_cb, true, 0));
+	CU_ASSERT(0 > gds_dlist_node_set_data(node, NULL, false, free_cb, true, alloc_cb));
 	CU_ASSERT(0 > gds_dlist_node_set_data(node, NULL, true, NULL, false, 0));
-	CU_ASSERT(0 > gds_dlist_node_set_data(node, NULL, true, NULL, false, alloc_f));
+	CU_ASSERT(0 > gds_dlist_node_set_data(node, NULL, true, NULL, false, alloc_cb));
 	CU_ASSERT(0 > gds_dlist_node_set_data(node, NULL, true, NULL, true, 0));
-	CU_ASSERT(0 > gds_dlist_node_set_data(node, NULL, true, NULL, true, alloc_f));
-	CU_ASSERT(0 > gds_dlist_node_set_data(node, NULL, true, free_f, false, 0));
-	CU_ASSERT(0 > gds_dlist_node_set_data(node, NULL, true, free_f, false, alloc_f));
-	CU_ASSERT(0 > gds_dlist_node_set_data(node, NULL, true, free_f, true, 0));
-	CU_ASSERT(0 > gds_dlist_node_set_data(node, NULL, true, free_f, true, alloc_f));
+	CU_ASSERT(0 > gds_dlist_node_set_data(node, NULL, true, NULL, true, alloc_cb));
+	CU_ASSERT(0 > gds_dlist_node_set_data(node, NULL, true, free_cb, false, 0));
+	CU_ASSERT(0 > gds_dlist_node_set_data(node, NULL, true, free_cb, false, alloc_cb));
+	CU_ASSERT(0 > gds_dlist_node_set_data(node, NULL, true, free_cb, true, 0));
+	CU_ASSERT(0 > gds_dlist_node_set_data(node, NULL, true, free_cb, true, alloc_cb));
 
-	/* Fail because copy_data is true but alloc_f is 0 */
+	/* Fail because copy_data is true but alloc_cb is 0 */
 	CU_ASSERT(0 > gds_dlist_node_set_data(node, &t2, false, NULL, true, 0));
-	CU_ASSERT(0 > gds_dlist_node_set_data(node, &t2, false, free_f, true, 0));
+	CU_ASSERT(0 > gds_dlist_node_set_data(node, &t2, false, free_cb, true, 0));
 	CU_ASSERT(0 > gds_dlist_node_set_data(node, &t2, true, NULL, true, 0));
-	CU_ASSERT(0 > gds_dlist_node_set_data(node, &t2, true, free_f, true, 0));
+	CU_ASSERT(0 > gds_dlist_node_set_data(node, &t2, true, free_cb, true, 0));
 
 	/* Don't free memory, dont copy data */
 	CU_ASSERT(0 == gds_dlist_node_set_data(node, &t2, false, NULL, false, 0));
 	CU_ASSERT(node->data == &t2);
 
-	CU_ASSERT(0 == gds_dlist_node_set_data(node, &t, false, NULL, false, alloc_f));
+	CU_ASSERT(0 == gds_dlist_node_set_data(node, &t, false, NULL, false, alloc_cb));
 	CU_ASSERT(node->data == &t);
 
-	CU_ASSERT(0 == gds_dlist_node_set_data(node, &t2, false, free_f, false, 0));
+	CU_ASSERT(0 == gds_dlist_node_set_data(node, &t2, false, free_cb, false, 0));
 	CU_ASSERT(node->data == &t2);
 
-	CU_ASSERT(0 == gds_dlist_node_set_data(node, &t, false, free_f, false, alloc_f));
+	CU_ASSERT(0 == gds_dlist_node_set_data(node, &t, false, free_cb, false, alloc_cb));
 	CU_ASSERT(node->data == &t);
 
 
 	/* Don't free memory, copy data */
-	CU_ASSERT(0 == gds_dlist_node_set_data(node, &t2, false, NULL, true, alloc_f));
+	CU_ASSERT(0 == gds_dlist_node_set_data(node, &t2, false, NULL, true, alloc_cb));
 	CU_ASSERT(node->data != &t2);
 
 	free(node->data); /* Just to avoid memory loss */
-	CU_ASSERT(0 == gds_dlist_node_set_data(node, &t, false, free_f, true, alloc_f));
+	CU_ASSERT(0 == gds_dlist_node_set_data(node, &t, false, free_cb, true, alloc_cb));
 	CU_ASSERT(node->data != &t);
 
 
 	/* Free memory, copy data */
-	CU_ASSERT(0 == gds_dlist_node_set_data(node, &t2, true, NULL, true, alloc_f));
+	CU_ASSERT(0 == gds_dlist_node_set_data(node, &t2, true, NULL, true, alloc_cb));
 	CU_ASSERT(node->data != &t2);
 
-	CU_ASSERT(0 == gds_dlist_node_set_data(node, &t, true, free_f, true, alloc_f));
+	CU_ASSERT(0 == gds_dlist_node_set_data(node, &t, true, free_cb, true, alloc_cb));
 	CU_ASSERT(node->data != &t);
 
 
@@ -171,16 +171,16 @@ void t_dlist_node_set_data(void)
 	CU_ASSERT(0 == gds_dlist_node_set_data(node, &t2, true, NULL, false, 0));
 	CU_ASSERT(node->data == &t2);
 
-	gds_dlist_node_set_data(node, &t, false, NULL, true, alloc_f);
-	CU_ASSERT(0 == gds_dlist_node_set_data(node, &t2, true, NULL, false, alloc_f));
+	gds_dlist_node_set_data(node, &t, false, NULL, true, alloc_cb);
+	CU_ASSERT(0 == gds_dlist_node_set_data(node, &t2, true, NULL, false, alloc_cb));
 	CU_ASSERT(node->data == &t2);
 
-	gds_dlist_node_set_data(node, &t, false, NULL, true, alloc_f);
-	CU_ASSERT(0 == gds_dlist_node_set_data(node, &t2, true, free_f, false, 0));
+	gds_dlist_node_set_data(node, &t, false, NULL, true, alloc_cb);
+	CU_ASSERT(0 == gds_dlist_node_set_data(node, &t2, true, free_cb, false, 0));
 	CU_ASSERT(node->data == &t2);
 
-	gds_dlist_node_set_data(node, &t, false, NULL, true, alloc_f);
-	CU_ASSERT(0 == gds_dlist_node_set_data(node, &t2, true, free_f, false, alloc_f));
+	gds_dlist_node_set_data(node, &t, false, NULL, true, alloc_cb);
+	CU_ASSERT(0 == gds_dlist_node_set_data(node, &t2, true, free_cb, false, alloc_cb));
 	CU_ASSERT(node->data == &t2);
 
 	gds_dlist_node_free(node, false, NULL);
@@ -191,24 +191,24 @@ void t_dlist_node_get_data(void)
 	gds_dlist_node_t *node;
 	test_structure_t t = {.i = 1, .c = 'a', .f = 1.1};
 	void *data;
-	gds_func_ptr_t alloc_f = (gds_func_ptr_t)&test_alloc;
+	gds_alloc_cb alloc_cb = (gds_alloc_cb)test_alloc;
 
 	node = gds_dlist_node_new(&t, false, 0);
 	assert(node != NULL);
 
 	CU_ASSERT(NULL == gds_dlist_node_get_data(NULL, false, 0));
-	CU_ASSERT(NULL == gds_dlist_node_get_data(NULL, false, alloc_f));
+	CU_ASSERT(NULL == gds_dlist_node_get_data(NULL, false, alloc_cb));
 	CU_ASSERT(NULL == gds_dlist_node_get_data(NULL, true, 0));
-	CU_ASSERT(NULL == gds_dlist_node_get_data(NULL, true, alloc_f));
+	CU_ASSERT(NULL == gds_dlist_node_get_data(NULL, true, alloc_cb));
 	CU_ASSERT(NULL == gds_dlist_node_get_data(node, true, 0));
 
 	CU_ASSERT(NULL != (data = gds_dlist_node_get_data(node, false, 0)));
 	CU_ASSERT(data == &t);
 
-	CU_ASSERT(NULL != (data = gds_dlist_node_get_data(node, false, alloc_f)));
+	CU_ASSERT(NULL != (data = gds_dlist_node_get_data(node, false, alloc_cb)));
 	CU_ASSERT(data == &t);
 
-	CU_ASSERT(NULL != (data = gds_dlist_node_get_data(node, true, alloc_f)));
+	CU_ASSERT(NULL != (data = gds_dlist_node_get_data(node, true, alloc_cb)));
 	CU_ASSERT(data != &t);
 	free(data);
 
@@ -219,12 +219,12 @@ void t_dlist_node_set_next(void)
 {
 	gds_dlist_node_t *node, *next;
 	test_structure_t t = {.i = 1, .c = 'a', .f = 1.1};
-	gds_func_ptr_t alloc_f = (gds_func_ptr_t)&test_alloc;
-	gds_func_ptr_t free_f = (gds_func_ptr_t)&test_free;
+	gds_alloc_cb alloc_cb = (gds_alloc_cb)test_alloc;
+	gds_free_cb free_cb = (gds_free_cb)test_free;
 
-	node = gds_dlist_node_new(&t, true, alloc_f);
+	node = gds_dlist_node_new(&t, true, alloc_cb);
 	assert(node != NULL);
-	next = gds_dlist_node_new(&t, true, alloc_f);
+	next = gds_dlist_node_new(&t, true, alloc_cb);
 	assert(node != NULL);
 
 	CU_ASSERT(0 > gds_dlist_node_set_next(NULL, NULL));
@@ -235,20 +235,20 @@ void t_dlist_node_set_next(void)
 	CU_ASSERT(0 == gds_dlist_node_set_next(node, NULL));
 	CU_ASSERT(node->next == NULL);
 
-	gds_dlist_node_free(node, true, free_f);
-	gds_dlist_node_free(next, true, free_f);
+	gds_dlist_node_free(node, true, free_cb);
+	gds_dlist_node_free(next, true, free_cb);
 }
 
 void t_dlist_node_get_next(void)
 {
 	gds_dlist_node_t *node, *next;
 	test_structure_t t = {.i = 1, .c = 'a', .f = 1.1};
-	gds_func_ptr_t alloc_f = (gds_func_ptr_t)&test_alloc;
-	gds_func_ptr_t free_f = (gds_func_ptr_t)&test_free;
+	gds_alloc_cb alloc_cb = (gds_alloc_cb)test_alloc;
+	gds_free_cb free_cb = (gds_free_cb)test_free;
 
-	node = gds_dlist_node_new(&t, true, alloc_f);
+	node = gds_dlist_node_new(&t, true, alloc_cb);
 	assert(node != NULL);
-	next = gds_dlist_node_new(&t, true, alloc_f);
+	next = gds_dlist_node_new(&t, true, alloc_cb);
 	assert(node != NULL);
 
 	CU_ASSERT(NULL == gds_dlist_node_get_next(NULL));
@@ -256,20 +256,20 @@ void t_dlist_node_get_next(void)
 	gds_dlist_node_set_next(node, next);
 	CU_ASSERT(next == gds_dlist_node_get_next(node));
 
-	gds_dlist_node_free(node, true, free_f);
-	gds_dlist_node_free(next, true, free_f);
+	gds_dlist_node_free(node, true, free_cb);
+	gds_dlist_node_free(next, true, free_cb);
 }
 
 void t_dlist_node_set_prev(void)
 {
 	gds_dlist_node_t *node, *prev;
 	test_structure_t t = {.i = 1, .c = 'a', .f = 1.1};
-	gds_func_ptr_t alloc_f = (gds_func_ptr_t)&test_alloc;
-	gds_func_ptr_t free_f = (gds_func_ptr_t)&test_free;
+	gds_alloc_cb alloc_cb = (gds_alloc_cb)test_alloc;
+	gds_free_cb free_cb = (gds_free_cb)test_free;
 
-	node = gds_dlist_node_new(&t, true, alloc_f);
+	node = gds_dlist_node_new(&t, true, alloc_cb);
 	assert(node != NULL);
-	prev = gds_dlist_node_new(&t, true, alloc_f);
+	prev = gds_dlist_node_new(&t, true, alloc_cb);
 	assert(node != NULL);
 
 	CU_ASSERT(0 > gds_dlist_node_set_prev(NULL, NULL));
@@ -280,20 +280,20 @@ void t_dlist_node_set_prev(void)
 	CU_ASSERT(0 == gds_dlist_node_set_prev(node, NULL));
 	CU_ASSERT(node->prev == NULL);
 
-	gds_dlist_node_free(node, true, free_f);
-	gds_dlist_node_free(prev, true, free_f);
+	gds_dlist_node_free(node, true, free_cb);
+	gds_dlist_node_free(prev, true, free_cb);
 }
 
 void t_dlist_node_get_prev(void)
 {
 	gds_dlist_node_t *node, *prev;
 	test_structure_t t = {.i = 1, .c = 'a', .f = 1.1};
-	gds_func_ptr_t alloc_f = (gds_func_ptr_t)&test_alloc;
-	gds_func_ptr_t free_f = (gds_func_ptr_t)&test_free;
+	gds_alloc_cb alloc_cb = (gds_alloc_cb)test_alloc;
+	gds_free_cb free_cb = (gds_free_cb)test_free;
 
-	node = gds_dlist_node_new(&t, true, alloc_f);
+	node = gds_dlist_node_new(&t, true, alloc_cb);
 	assert(node != NULL);
-	prev = gds_dlist_node_new(&t, true, alloc_f);
+	prev = gds_dlist_node_new(&t, true, alloc_cb);
 	assert(node != NULL);
 
 	CU_ASSERT(NULL == gds_dlist_node_get_prev(NULL));
@@ -301,8 +301,8 @@ void t_dlist_node_get_prev(void)
 	gds_dlist_node_set_prev(node, prev);
 	CU_ASSERT(prev == gds_dlist_node_get_prev(node));
 
-	gds_dlist_node_free(node, true, free_f);
-	gds_dlist_node_free(prev, true, free_f);
+	gds_dlist_node_free(node, true, free_cb);
+	gds_dlist_node_free(prev, true, free_cb);
 }
 
 int main()

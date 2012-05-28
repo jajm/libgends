@@ -33,6 +33,7 @@
 #include "types.h"
 #include "log.h"
 #include "container.h"
+#include "callbacks.h"
 
 gds_container_t * gds_container_new(const char *type_name, void *data_ptr,
 	bool copy_data)
@@ -62,15 +63,15 @@ gds_container_t * gds_container_new(const char *type_name, void *data_ptr,
 	assert(c->type_name[length] == '\0');
 
 	if(copy_data) {
-		gds_func_ptr_t alloc_f = gds_type_get_func(c->type_name, "alloc");
-		if(alloc_f == NULL) {
+		gds_alloc_cb alloc_cb = (gds_alloc_cb)gds_type_get_func(c->type_name, "alloc");
+		if(alloc_cb == NULL) {
 			GDS_LOG_ERROR("Failed to retrieve function 'alloc' for"
 				"type %s", c->type_name);
 			free(c->type_name);
 			free(c);
 			return NULL;
 		}
-		c->data_ptr = (void *)alloc_f(data_ptr);
+		c->data_ptr = alloc_cb(data_ptr);
 		assert(c->data_ptr != NULL);
 	} else {
 		c->data_ptr = data_ptr;
@@ -102,13 +103,13 @@ int8_t gds_container_set(gds_container_t *c, const char *type_name,
 	}
 
 	if(copy_data){
-		gds_func_ptr_t alloc_f = gds_type_get_func(type_name, "alloc");
-		if(alloc_f == NULL) {
+		gds_alloc_cb alloc_cb = (gds_alloc_cb)gds_type_get_func(type_name, "alloc");
+		if(alloc_cb == NULL) {
 			GDS_LOG_ERROR("Failed to retrieve function 'alloc' for"
 				"type %s", type_name);
 			return -1;
 		}
-		_data_ptr = (void *)alloc_f(data_ptr);
+		_data_ptr = alloc_cb(data_ptr);
 		assert(_data_ptr != NULL);
 	} else {
 		_data_ptr = data_ptr;
@@ -129,9 +130,9 @@ int8_t gds_container_set(gds_container_t *c, const char *type_name,
 	}
 
 	if(free_old_data){
-		gds_func_ptr_t free_f = gds_type_get_func(c->type_name, "free");
-		if(free_f) {
-			free_f(c->data_ptr);
+		gds_free_cb free_cb = (gds_free_cb)gds_type_get_func(c->type_name, "free");
+		if(free_cb) {
+			free_cb(c->data_ptr);
 		} else {
 			GDS_LOG_WARNING("Can't retrieve 'free' function for type"
 				" %s", c->type_name);
@@ -166,9 +167,9 @@ void * gds_container_get(gds_container_t *c, bool copy)
 	}
 
 	if(copy) {
-		gds_func_ptr_t alloc_f = gds_type_get_func(c->type_name, "alloc");
-		if(alloc_f) {
-			data_ptr = (void *)alloc_f(c->data_ptr);
+		gds_alloc_cb alloc_cb = (gds_alloc_cb)gds_type_get_func(c->type_name, "alloc");
+		if(alloc_cb) {
+			data_ptr = alloc_cb(c->data_ptr);
 		} else {
 			GDS_LOG_WARNING("Failed to retrieve 'alloc' function "
 				"for type '%s'.", c->type_name);
@@ -182,13 +183,13 @@ void * gds_container_get(gds_container_t *c, bool copy)
 
 int32_t gds_container_cmp(const gds_container_t *c1, const gds_container_t *c2)
 {
-	gds_func_ptr_t cmp_f;
+	gds_cmp_cb cmp_cb;
 	int32_t cmp;
 
 	if(c1 != NULL && c2 != NULL
 	  && strcmp(c1->type_name, c2->type_name) == 0
-	  && (cmp_f = gds_type_get_func(c1->type_name, "cmp")) != NULL) {
-		cmp = cmp_f(c1->data_ptr, c2->data_ptr);
+	  && (cmp_cb = (gds_cmp_cb)gds_type_get_func(c1->type_name, "cmp")) != NULL) {
+		cmp = cmp_cb(c1->data_ptr, c2->data_ptr);
 	} else {
 		GDS_LOG_WARNING("Can't compare containers, 'cmp' function "
 			"doesn't exist or containers are of different type");
@@ -202,10 +203,10 @@ void gds_container_free(gds_container_t *c, bool free_data)
 {
 	if(c != NULL){
 		if(free_data) {
-			gds_func_ptr_t free_f;
-			free_f = gds_type_get_func(c->type_name, "free");
-			if(free_f) {
-				free_f(c->data_ptr);
+			gds_free_cb free_cb;
+			free_cb = (gds_free_cb)gds_type_get_func(c->type_name, "free");
+			if(free_cb) {
+				free_cb(c->data_ptr);
 			} else {
 				GDS_LOG_WARNING("Can't retrieve 'free' function"
 				" for type '%s'. Impossible to free data",

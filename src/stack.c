@@ -63,7 +63,7 @@ gds_stack_t *gds_stack_new(const char *type_name)
 int8_t gds_stack_push(gds_stack_t *S, void *data, bool copy_data)
 {
 	gds_slist_node_t *newnode;
-	gds_func_ptr_t alloc_f = NULL;
+	gds_alloc_cb alloc_cb = NULL;
 
 	if(S == NULL || data == NULL) {
 		GDS_LOG_ERROR("Bad arguments");
@@ -71,10 +71,10 @@ int8_t gds_stack_push(gds_stack_t *S, void *data, bool copy_data)
 	}
 
 	if(copy_data) {
-		alloc_f = gds_type_get_func(S->type_name, "alloc");
+		alloc_cb = (gds_alloc_cb)gds_type_get_func(S->type_name, "alloc");
 	}
 
-	newnode = gds_slist_node_new(data, copy_data, alloc_f);
+	newnode = gds_slist_node_new(data, copy_data, alloc_cb);
 	if(newnode == NULL){
 		GDS_LOG_ERROR("Failed to create the node");
 		return -1;
@@ -111,16 +111,16 @@ void *gds_stack_pop(gds_stack_t *S)
 void gds_stack_free(gds_stack_t *S, bool free_data)
 {
 	gds_slist_node_t *tmp, *tmp2;
-	gds_func_ptr_t free_f = NULL;
+	gds_free_cb free_cb = NULL;
 
 	if(S){
 		if(free_data) {
-			free_f = gds_type_get_func(S->type_name, "free");
+			free_cb = (gds_free_cb)gds_type_get_func(S->type_name, "free");
 		}
 		tmp = S->head;
 		while(tmp != NULL){
 			tmp2 = tmp->next;
-			gds_slist_node_free(tmp, free_data, free_f);
+			gds_slist_node_free(tmp, free_data, free_cb);
 			tmp = tmp2;
 		}
 		free(S->type_name);

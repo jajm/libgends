@@ -28,9 +28,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "types.h"
-#include "func_list.h"
 #include "log.h"
 #include "hash_map.h"
+#include "callbacks.h"
 
 typedef struct gds_hash_map_list_node_s {
 	char *key;
@@ -39,12 +39,12 @@ typedef struct gds_hash_map_list_node_s {
 } gds_hash_map_list_node_t, *gds_hash_map_list_t;
 
 gds_hash_map_list_node_t * gds_hash_map_list_node_new(const char *key,
-	void *data, bool copy_data, gds_func_ptr_t alloc_f)
+	void *data, bool copy_data, gds_alloc_cb alloc_cb)
 {
 	gds_hash_map_list_node_t *node;
 	size_t len;
 
-	if(key == NULL || (copy_data && (data == NULL || alloc_f == NULL))) {
+	if(key == NULL || (copy_data && (data == NULL || alloc_cb == NULL))) {
 		GDS_LOG_ERROR("Bad parameters");
 		return NULL;
 	}
@@ -67,7 +67,7 @@ gds_hash_map_list_node_t * gds_hash_map_list_node_new(const char *key,
 	assert(node->key[len] == '\0');
 
 	if(copy_data) {
-		node->data = (void *)alloc_f(data);
+		node->data = alloc_cb(data);
 		if(node->data == NULL) {
 			GDS_LOG_ERROR("Memory allocation error");
 			free(node->key);
@@ -83,24 +83,24 @@ gds_hash_map_list_node_t * gds_hash_map_list_node_new(const char *key,
 }
 
 int8_t gds_hash_map_list_node_set_data(gds_hash_map_list_node_t *node,
-	void *data, bool free_old_data, gds_func_ptr_t free_f, bool copy_data,
-	gds_func_ptr_t alloc_f)
+	void *data, bool free_old_data, gds_free_cb free_cb, bool copy_data,
+	gds_alloc_cb alloc_cb)
 {
-	if(node == NULL || (copy_data && (data == NULL || alloc_f == NULL))) {
+	if(node == NULL || (copy_data && (data == NULL || alloc_cb == NULL))) {
 		GDS_LOG_ERROR("Bad arguments");
 		return -1;
 	}
 
 	if(free_old_data) {
-		if(free_f) {
-			free_f(node->data);
+		if(free_cb) {
+			free_cb(node->data);
 		} else {
 			free(node->data);
 		}
 	}
 
 	if(copy_data) {
-		node->data = (void *)alloc_f(data);
+		node->data = alloc_cb(data);
 		if(node->data == NULL) {
 			GDS_LOG_ERROR("Memory allocation error");
 			return -1;
@@ -111,17 +111,17 @@ int8_t gds_hash_map_list_node_set_data(gds_hash_map_list_node_t *node,
 }
 
 void *gds_hash_map_list_node_get_data(gds_hash_map_list_node_t *node,
-	bool copy_data, gds_func_ptr_t alloc_f)
+	bool copy_data, gds_alloc_cb alloc_cb)
 {
 	void *data;
 
-	if(node == NULL || (copy_data && alloc_f == NULL)) {
+	if(node == NULL || (copy_data && alloc_cb == NULL)) {
 		GDS_LOG_ERROR("Bad arguments");
 		return NULL;
 	}
 
 	if(copy_data) {
-		data = (void *)alloc_f(node->data);
+		data = alloc_cb(node->data);
 		if(data == NULL) {
 			GDS_LOG_ERROR("Memory allocation");
 			return NULL;
@@ -161,14 +161,14 @@ char *gds_hash_map_list_node_get_key(gds_hash_map_list_node_t *node)
 }
 
 void gds_hash_map_list_node_free(gds_hash_map_list_node_t *node, bool free_data,
-	gds_func_ptr_t free_f)
+	gds_free_cb free_cb)
 {
 	if(node) {
 		free(node->key);
-		if(free_data && free_f) {
-			free_f(node->data);
+		if(free_data && free_cb) {
+			free_cb(node->data);
 		} else if(free_data) {
-			GDS_LOG_ERROR("free_data is true but free_f is NULL, "
+			GDS_LOG_ERROR("free_data is true but free_cb is NULL, "
 				"data not freed.");
 		}
 		free(node);
@@ -177,14 +177,14 @@ void gds_hash_map_list_node_free(gds_hash_map_list_node_t *node, bool free_data,
 
 gds_hash_map_list_node_t *gds_hash_map_list_add(
 	gds_hash_map_list_t *hash_map_list, const char *key, void *data,
-	bool free_old_data, gds_func_ptr_t free_f, bool copy_data,
-	gds_func_ptr_t alloc_f)
+	bool free_old_data, gds_free_cb free_cb, bool copy_data,
+	gds_alloc_cb alloc_cb)
 {
 	gds_hash_map_list_node_t *cur, *prev = NULL, *newnode = NULL;
 	int32_t cmp;
 
 	if( hash_map_list == NULL || key == NULL
-	|| (copy_data && (data == NULL || alloc_f == NULL)) )
+	|| (copy_data && (data == NULL || alloc_cb == NULL)) )
 	{
 		GDS_LOG_ERROR("Bad parameters");
 		return NULL;
@@ -201,10 +201,10 @@ gds_hash_map_list_node_t *gds_hash_map_list_add(
 	}
 	if(newnode != NULL) {
 		gds_hash_map_list_node_set_data(newnode, data, free_old_data,
-			free_f, copy_data, alloc_f);
+			free_cb, copy_data, alloc_cb);
 	} else {
 		newnode = gds_hash_map_list_node_new(key, data, copy_data,
-			alloc_f);
+			alloc_cb);
 		if(newnode == NULL) {
 			GDS_LOG_ERROR("Failed to create gds_hash_map_list_node_t");
 			return NULL;
@@ -242,16 +242,16 @@ gds_hash_map_list_node_t * gds_hash_map_list_get(
 }
 
 void * gds_hash_map_list_get_data(gds_hash_map_list_t hash_map_list,
-	const char *key, bool copy_data, gds_func_ptr_t alloc_f)
+	const char *key, bool copy_data, gds_alloc_cb alloc_cb)
 {
 	gds_hash_map_list_node_t *node;
 
 	node = gds_hash_map_list_get(hash_map_list, key);
-	return gds_hash_map_list_node_get_data(node, copy_data, alloc_f);
+	return gds_hash_map_list_node_get_data(node, copy_data, alloc_cb);
 }
 
 int8_t gds_hash_map_list_del(gds_hash_map_list_t *hash_map_list,
-	const char *key, bool free_data, gds_func_ptr_t free_f)
+	const char *key, bool free_data, gds_free_cb free_cb)
 {
 	gds_hash_map_list_node_t *prev = NULL, *cur;
 
@@ -270,7 +270,7 @@ int8_t gds_hash_map_list_del(gds_hash_map_list_t *hash_map_list,
 		} else {
 			*hash_map_list = cur->next;
 		}
-		gds_hash_map_list_node_free(cur, free_data, free_f);
+		gds_hash_map_list_node_free(cur, free_data, free_cb);
 	}
 
 	return 0;
@@ -295,20 +295,20 @@ bool gds_hash_map_list_exists(gds_hash_map_list_t hash_map_list,
 }
 
 void gds_hash_map_list_free(gds_hash_map_list_t hash_map_list, bool free_data,
-	gds_func_ptr_t free_f)
+	gds_free_cb free_cb)
 {
 	gds_hash_map_list_node_t *cur, *next;
 
 	cur = hash_map_list;
 	while(cur != NULL) {
 		next = cur->next;
-		gds_hash_map_list_node_free(cur, free_data, free_f);
+		gds_hash_map_list_node_free(cur, free_data, free_cb);
 		free(cur);
 		cur = next;
 	}
 }
 
-uint32_t gds_hash_map_default_hash_func(const char *key, uint32_t map_size)
+uint32_t gds_hash_map_default_hash_cb(const char *key, uint32_t map_size)
 {
 	uint32_t i;
 	uint32_t hash = 0;
@@ -331,7 +331,7 @@ uint32_t gds_hash_map_default_hash_func(const char *key, uint32_t map_size)
 struct gds_hash_map_s {
 	char *type_name;
 	uint32_t map_size;
-	gds_hash_func_t hash_func;
+	gds_hash_cb hash_cb;
 	gds_hash_map_list_t *map;
 };
 
@@ -344,7 +344,7 @@ uint32_t gds_hash_map_hash(gds_hash_map_t *h, const char *key)
 		return 0;
 	}
 
-	hash = h->hash_func(key, h->map_size);
+	hash = h->hash_cb(key, h->map_size);
 	hash %= h->map_size;
 
 	return hash;
@@ -403,7 +403,7 @@ int8_t gds_hash_map_rebuild(gds_hash_map_t *h)
 }
 
 gds_hash_map_t * gds_hash_map_new(const char *type_name, uint32_t map_size,
-	gds_hash_func_t hash_func)
+	gds_hash_cb hash_cb)
 {
 	gds_hash_map_t *hash_map;
 	size_t len;
@@ -434,10 +434,10 @@ gds_hash_map_t * gds_hash_map_new(const char *type_name, uint32_t map_size,
 		return NULL;
 	}
 	hash_map->map_size = map_size;
-	if(hash_func != NULL) {
-		hash_map->hash_func = hash_func;
+	if(hash_cb != NULL) {
+		hash_map->hash_cb = hash_cb;
 	} else {
-		hash_map->hash_func = &gds_hash_map_default_hash_func;
+		hash_map->hash_cb = &gds_hash_map_default_hash_cb;
 	}
 
 	return hash_map;
@@ -512,34 +512,34 @@ int8_t gds_hash_map_set_map_size(gds_hash_map_t *h, uint32_t map_size)
 	return 0;
 }
 
-gds_hash_func_t gds_hash_map_get_hash_func(gds_hash_map_t *h)
+gds_hash_cb gds_hash_map_get_hash_cb(gds_hash_map_t *h)
 {
 	if(h == NULL) {
 		GDS_LOG_ERROR("Bad parameters");
 		return NULL;
 	}
 
-	return h->hash_func;
+	return h->hash_cb;
 }
 
-int8_t gds_hash_map_set_hash_func(gds_hash_map_t *h, gds_hash_func_t hash_func)
+int8_t gds_hash_map_set_hash_cb(gds_hash_map_t *h, gds_hash_cb hash_cb)
 {
-	gds_hash_func_t old_hash_func;
+	gds_hash_cb old_hash_cb;
 
-	if(h == NULL || hash_func == NULL) {
+	if(h == NULL || hash_cb == NULL) {
 		GDS_LOG_ERROR("Bad parameters");
 		return -1;
 	}
-	if(h->hash_func == hash_func) {
+	if(h->hash_cb == hash_cb) {
 		/* Do nothing */
 		return 1;
 	}
 
-	old_hash_func = h->hash_func;
-	h->hash_func = hash_func;
+	old_hash_cb = h->hash_cb;
+	h->hash_cb = hash_cb;
 	if(gds_hash_map_rebuild(h) < 0) {
 		GDS_LOG_ERROR("Failed to rebuild hash map");
-		h->hash_func = old_hash_func;
+		h->hash_cb = old_hash_cb;
 		return -1;
 	}
 
@@ -550,8 +550,8 @@ int8_t gds_hash_map_set(gds_hash_map_t *h, const char *key, bool free_old_data,
 	void *data, bool copy_data)
 {
 	uint32_t hash;
-	gds_func_ptr_t alloc_f = NULL;
-	gds_func_ptr_t free_f = NULL;
+	gds_alloc_cb alloc_cb = NULL;
+	gds_free_cb free_cb = NULL;
 	gds_hash_map_list_node_t *node;
 
 	if(h == NULL || key == NULL) {
@@ -560,13 +560,13 @@ int8_t gds_hash_map_set(gds_hash_map_t *h, const char *key, bool free_old_data,
 	}
 	hash = gds_hash_map_hash(h, key);
 	if(free_old_data) {
-		free_f = gds_type_get_func(h->type_name, "free");
+		free_cb = (gds_free_cb)gds_type_get_func(h->type_name, "free");
 	}
 	if(copy_data) {
-		alloc_f = gds_type_get_func(h->type_name, "alloc");
+		alloc_cb = (gds_alloc_cb)gds_type_get_func(h->type_name, "alloc");
 	}
 	node = gds_hash_map_list_add(&(h->map[hash]), key, data, free_old_data,
-		free_f, copy_data, alloc_f);
+		free_cb, copy_data, alloc_cb);
 	if(node == NULL) {
 		GDS_LOG_ERROR("Failed to set data for '%s' key", key);
 		return -1;
@@ -578,7 +578,7 @@ int8_t gds_hash_map_set(gds_hash_map_t *h, const char *key, bool free_old_data,
 void * gds_hash_map_get(gds_hash_map_t *h, const char *key, bool copy_data)
 {
 	uint32_t hash;
-	gds_func_ptr_t alloc_f = NULL;
+	gds_alloc_cb alloc_cb = NULL;
 
 	if(h == NULL || key == NULL) {
 		GDS_LOG_ERROR("Bad parameters");
@@ -588,10 +588,10 @@ void * gds_hash_map_get(gds_hash_map_t *h, const char *key, bool copy_data)
 	hash = gds_hash_map_hash(h, key);
 
 	if(copy_data) {
-		alloc_f = gds_type_get_func(h->type_name, "alloc");
+		alloc_cb = (gds_alloc_cb)gds_type_get_func(h->type_name, "alloc");
 	}
 
-	return gds_hash_map_list_get_data(h->map[hash], key, copy_data, alloc_f);
+	return gds_hash_map_list_get_data(h->map[hash], key, copy_data, alloc_cb);
 }
 
 bool gds_hash_map_exists(gds_hash_map_t *h, const char *key)
@@ -646,20 +646,20 @@ int8_t gds_hash_map_set_key(gds_hash_map_t *h, const char *old_key,
 int8_t gds_hash_map_del(gds_hash_map_t *h, const char *key, bool free_data)
 {
 	uint32_t hash;
-	gds_func_ptr_t free_f = NULL;
+	gds_free_cb free_cb = NULL;
 
 	if(h == NULL || key == NULL) {
 		GDS_LOG_ERROR("Bad parameters");
 		return -1;
 	}
 
-	hash = h->hash_func(key, h->map_size);
+	hash = h->hash_cb(key, h->map_size);
 	assert(hash < h->map_size);
 
 	if(free_data) {
-		free_f = gds_type_get_func(h->type_name, "free");
+		free_cb = (gds_free_cb)gds_type_get_func(h->type_name, "free");
 	}
-	gds_hash_map_list_del(&(h->map[hash]), key, free_data, free_f);
+	gds_hash_map_list_del(&(h->map[hash]), key, free_data, free_cb);
 
 	return 0;
 }
@@ -667,14 +667,14 @@ int8_t gds_hash_map_del(gds_hash_map_t *h, const char *key, bool free_data)
 void gds_hash_map_free(gds_hash_map_t *h, bool free_data)
 {
 	uint32_t i;
-	gds_func_ptr_t free_f = NULL;
+	gds_free_cb free_cb = NULL;
 
 	if(h != NULL) {
 		if(free_data) {
-			free_f = gds_type_get_func(h->type_name, "free");
+			free_cb = (gds_free_cb)gds_type_get_func(h->type_name, "free");
 		}
 		for(i=0; i<h->map_size; i++) {
-			gds_hash_map_list_free(h->map[i], free_data, free_f);
+			gds_hash_map_list_free(h->map[i], free_data, free_cb);
 		}
 		free(h->map);
 		free(h->type_name);
@@ -744,7 +744,7 @@ char * gds_hash_map_iterator_keys_get(gds_hash_map_iterator_t *it,
 void * gds_hash_map_iterator_data_get(gds_hash_map_iterator_t *it,
 	bool copy_data)
 {
-	gds_func_ptr_t alloc_f = NULL;
+	gds_alloc_cb alloc_cb = NULL;
 
 	if(it == NULL || it->h == NULL) {
 		GDS_LOG_ERROR("Bad parameters");
@@ -752,10 +752,10 @@ void * gds_hash_map_iterator_data_get(gds_hash_map_iterator_t *it,
 	}
 
 	if(copy_data) {
-		alloc_f = gds_type_get_func(it->h->type_name, "alloc");
+		alloc_cb = (gds_alloc_cb)gds_type_get_func(it->h->type_name, "alloc");
 	}
 
-	return gds_hash_map_list_node_get_data(it->cur, copy_data, alloc_f);
+	return gds_hash_map_list_node_get_data(it->cur, copy_data, alloc_cb);
 }
 
 gds_iterator_t * gds_hash_map_iterator_keys_new(gds_hash_map_t *h)
@@ -775,9 +775,9 @@ gds_iterator_t * gds_hash_map_iterator_keys_new(gds_hash_map_t *h)
 
 	it = gds_iterator_new(
 		hit,
-		(gds_iterator_reset_func_t) &gds_hash_map_iterator_reset,
-		(gds_iterator_step_func_t) &gds_hash_map_iterator_step,
-		(gds_iterator_get_func_t) &gds_hash_map_iterator_keys_get
+		(gds_iterator_reset_cb) &gds_hash_map_iterator_reset,
+		(gds_iterator_step_cb) &gds_hash_map_iterator_step,
+		(gds_iterator_get_cb) &gds_hash_map_iterator_keys_get
 	);
 
 	return it;
@@ -800,9 +800,9 @@ gds_iterator_t * gds_hash_map_iterator_data_new(gds_hash_map_t *h)
 
 	it = gds_iterator_new(
 		hit,
-		(gds_iterator_reset_func_t) &gds_hash_map_iterator_reset,
-		(gds_iterator_step_func_t) &gds_hash_map_iterator_step,
-		(gds_iterator_get_func_t) &gds_hash_map_iterator_data_get
+		(gds_iterator_reset_cb) &gds_hash_map_iterator_reset,
+		(gds_iterator_step_cb) &gds_hash_map_iterator_step,
+		(gds_iterator_get_cb) &gds_hash_map_iterator_data_get
 	);
 
 	return it;

@@ -106,8 +106,8 @@ int main()
 	test_t *t;
 	for(i=0; i<max; i++) {
 		t = test_new(i);
-		gds_compact_rbtree_add(&croot, t, (gds_func_ptr_t)&getkey,
-			(gds_func_ptr_t)&cmpkey, false, (gds_func_ptr_t)&test_alloc);
+		gds_compact_rbtree_add(&croot, t, (gds_getkey_cb)getkey,
+			(gds_cmpkey_cb)cmpkey, false, (gds_alloc_cb)test_alloc);
 	}
 	gettimeofday(&end, NULL);
 	timeval_diff(&start, &end, &diff);
@@ -115,8 +115,8 @@ int main()
 	printf("\tGetting %ld nodes...\n", max);
 	gettimeofday(&start, NULL);
 	for(i=0; i<max; i++) {
-		gds_compact_rbtree_get(croot, (void *)i, (gds_func_ptr_t)&getkey,
-			(gds_func_ptr_t)&cmpkey, false, (gds_func_ptr_t)&test_alloc);
+		gds_compact_rbtree_get(croot, (void *)i, (gds_getkey_cb)getkey,
+			(gds_cmpkey_cb)cmpkey, false, (gds_alloc_cb)test_alloc);
 	}
 	gettimeofday(&end, NULL);
 	timeval_diff(&start, &end, &diff);
@@ -124,8 +124,8 @@ int main()
 	printf("\tDeleting %ld nodes...\n", max);
 	gettimeofday(&start, NULL);
 	for(i=0; i<max; i++) {
-		gds_compact_rbtree_del(&croot, (void*)i, (gds_func_ptr_t)&getkey,
-			(gds_func_ptr_t)&cmpkey, true, (gds_func_ptr_t)&test_free);
+		gds_compact_rbtree_del(&croot, (void*)i, (gds_getkey_cb)getkey,
+			(gds_cmpkey_cb)cmpkey, true, (gds_free_cb)test_free);
 	}
 	gettimeofday(&end, NULL);
 	timeval_diff(&start, &end, &diff);
@@ -142,8 +142,8 @@ int main()
 	gds_rbtree_node_t *root = NULL;
 	for(i=0; i<max; i++) {
 		t = test_new(i);
-		gds_rbtree_add(&root, t, (gds_func_ptr_t)&getkey,
-			(gds_func_ptr_t)&cmpkey, false, NULL);
+		gds_rbtree_add(&root, t, (gds_getkey_cb)getkey,
+			(gds_cmpkey_cb)cmpkey, false, NULL);
 	}
 	gettimeofday(&end, NULL);
 	timeval_diff(&start, &end, &diff);
@@ -151,8 +151,8 @@ int main()
 	printf("\tGetting %ld nodes...\n", max);
 	gettimeofday(&start, NULL);
 	for(i=0; i<max; i++) {
-		gds_rbtree_get(root, (void *)i, (gds_func_ptr_t)&getkey,
-			(gds_func_ptr_t)&cmpkey, false, NULL);
+		gds_rbtree_get(root, (void *)i, (gds_getkey_cb)getkey,
+			(gds_cmpkey_cb)cmpkey, false, NULL);
 	}
 	gettimeofday(&end, NULL);
 	timeval_diff(&start, &end, &diff);
@@ -161,8 +161,8 @@ int main()
 	gettimeofday(&start, NULL);
 	for(i=0; i<max; i++) {
 		gds_rbtree_del(&root, (void*)i,
-			(gds_func_ptr_t)&getkey, (gds_func_ptr_t)&cmpkey,
-			true, (gds_func_ptr_t)&test_free);
+			(gds_getkey_cb)getkey, (gds_cmpkey_cb)cmpkey,
+			true, (gds_free_cb)test_free);
 	}
 	gettimeofday(&end, NULL);
 	timeval_diff(&start, &end, &diff);

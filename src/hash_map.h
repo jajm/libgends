@@ -44,7 +44,7 @@
 /* Hash function pointer type */
 /* Hash functions take a string (the hash key) and an integer (the map size)
  * and must return an unsigned integer strictly inferior to map_size */
-typedef uint32_t (*gds_hash_func_t)(const char *, uint32_t);
+typedef uint32_t (*gds_hash_cb)(const char *, uint32_t);
 typedef struct gds_hash_map_s gds_hash_map_t;
 
 #ifdef __cplusplus
@@ -54,14 +54,14 @@ extern "C" {
 /* Create a new hash map */
 /* type_name : Name of data type
  *  map_size : Hash map size
- * hash_func : Hash function pointer, as described above */
+ * hash_cb : Hash function pointer, as described above */
 /* Return: Success => pointer to the newly created hash map
  *         Failure => NULL */
 gds_hash_map_t *
 gds_hash_map_new(
 	const char *type_name,
 	uint32_t map_size,
-	gds_hash_func_t hash_func
+	gds_hash_cb hash_cb
 );
 
 /* Get type name */
@@ -114,20 +114,20 @@ gds_hash_map_set_map_size(
 /* h : pointer to the hash map */
 /* Return: Success => the function pointer
  *         Failure => NULL */
-gds_hash_func_t
-gds_hash_map_get_hash_func(
+gds_hash_cb
+gds_hash_map_get_hash_cb(
 	gds_hash_map_t *h
 );
 
 /* Set hash function */
 /*         h : pointer to the hash map
- * hash_func : function pointer */
+ * hash_cb : function pointer */
 /* Return: Success => 0
  *         Failure => a negative value */
 int8_t
-gds_hash_map_set_hash_func(
+gds_hash_map_set_hash_cb(
 	gds_hash_map_t *h,
-	gds_hash_func_t hash_func
+	gds_hash_cb hash_cb
 );
 
 /* Add or change an element in a hash */

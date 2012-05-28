@@ -40,13 +40,14 @@
 #include <stdlib.h>
 #include "log.h"
 #include "iterator.h"
+#include "callbacks.h"
 
-gds_iterator_t *gds_iterator_new(void *data, gds_iterator_reset_func_t reset_f,
-	gds_iterator_step_func_t step_f, gds_iterator_get_func_t get_f)
+gds_iterator_t *gds_iterator_new(void *data, gds_iterator_reset_cb reset_cb,
+	gds_iterator_step_cb step_cb, gds_iterator_get_cb get_cb)
 {
 	gds_iterator_t *it;
 
-	if(data == NULL || reset_f == NULL || step_f == NULL || get_f == NULL) {
+	if(data == NULL || reset_cb == NULL || step_cb == NULL || get_cb == NULL) {
 		GDS_LOG_ERROR("Bad arguments");
 		return NULL;
 	}
@@ -58,9 +59,9 @@ gds_iterator_t *gds_iterator_new(void *data, gds_iterator_reset_func_t reset_f,
 	}
 
 	it->data = data;
-	it->reset_f = reset_f;
-	it->step_f = step_f;
-	it->get_f = get_f;
+	it->reset_cb = reset_cb;
+	it->step_cb = step_cb;
+	it->get_cb = get_cb;
 
 	return it;
 }
@@ -72,7 +73,7 @@ int8_t gds_iterator_reset(gds_iterator_t *it)
 		return -1;
 	}
 
-	return it->reset_f(it->data);
+	return it->reset_cb(it->data);
 }
 
 int8_t gds_iterator_step(gds_iterator_t *it)
@@ -82,7 +83,7 @@ int8_t gds_iterator_step(gds_iterator_t *it)
 		return -1;
 	}
 
-	return it->step_f(it->data);
+	return it->step_cb(it->data);
 }
 
 void * gds_iterator_get(gds_iterator_t *it, bool copy_data)
@@ -92,14 +93,14 @@ void * gds_iterator_get(gds_iterator_t *it, bool copy_data)
 		return NULL;
 	}
 
-	return it->get_f(it->data, copy_data);
+	return it->get_cb(it->data, copy_data);
 }
 
-void gds_iterator_free(gds_iterator_t *it, void free_f(void *data))
+void gds_iterator_free(gds_iterator_t *it, gds_free_cb free_cb)
 {
 	if(it){
-		if(free_f) {
-			free_f(it->data);
+		if(free_cb) {
+			free_cb(it->data);
 		}
 		free(it);
 	}

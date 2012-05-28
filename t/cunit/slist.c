@@ -47,7 +47,7 @@ int8_t test_cmp(test_structure_t *t1, test_structure_t *t2)
 	return memcmp(&(t1->f), &(t2->f), sizeof(double));
 }
 
-int init_suite(void){
+int init_suite(void) {
 	gds_types_init(0);
 	return 0;
 }

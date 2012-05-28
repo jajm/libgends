@@ -5,6 +5,7 @@
 #include "log.h"
 #include "rbtree.h"
 #include "rbtree_node.h"
+#include "callbacks.h"
 
 gds_rbtree_node_t * gds_rbtree_node_grandparent(gds_rbtree_node_t *n)
 {
@@ -86,24 +87,24 @@ gds_rbtree_node_t * gds_rbtree_rotate_right(gds_rbtree_node_t *n)
 }
 
 int8_t gds_rbtree_insert_bottom(gds_rbtree_node_t **root,
-	void *data, gds_func_ptr_t getkey_f, gds_func_ptr_t cmpkey_f,
-	bool copy_data, gds_func_ptr_t alloc_f, gds_rbtree_node_t **node_p)
+	void *data, gds_getkey_cb getkey_cb, gds_cmpkey_cb cmpkey_cb,
+	bool copy_data, gds_alloc_cb alloc_cb, gds_rbtree_node_t **node_p)
 {
 	gds_rbtree_node_t *node;
 	gds_rbtree_node_t *tmp, *parent = NULL;
 	void *nkey, *key;
 	int32_t cmp;
 
-	if(root == NULL || getkey_f == NULL || cmpkey_f == NULL) {
+	if(root == NULL || getkey_cb == NULL || cmpkey_cb == NULL) {
 		GDS_LOG_ERROR("Bad arguments");
 		return -1;
 	}
 
-	nkey = (void *)getkey_f(data);
+	nkey = getkey_cb(data);
 	tmp = *root;
 	while(tmp != NULL) {
-		key = (void *)getkey_f(tmp->data);
-		cmp = cmpkey_f(nkey, key);
+		key = getkey_cb(tmp->data);
+		cmp = cmpkey_cb(nkey, key);
 		parent = tmp;
 		if(cmp < 0) {
 			tmp = tmp->left;
@@ -119,7 +120,7 @@ int8_t gds_rbtree_insert_bottom(gds_rbtree_node_t **root,
 		return 1;
 	}
 
-	node = gds_rbtree_node_new(data, copy_data, alloc_f);
+	node = gds_rbtree_node_new(data, copy_data, alloc_cb);
 	if (node == NULL) {
 		GDS_LOG_ERROR("Failed to create node");
 		return -1;
@@ -199,14 +200,14 @@ void gds_rbtree_rebalance_after_insert(gds_rbtree_node_t **root,
 }
 
 int8_t gds_rbtree_add(gds_rbtree_node_t **root, void *data,
-	gds_func_ptr_t getkey_f, gds_func_ptr_t cmpkey_f, bool copy_data,
-	gds_func_ptr_t alloc_f)
+	gds_getkey_cb getkey_cb, gds_cmpkey_cb cmpkey_cb, bool copy_data,
+	gds_alloc_cb alloc_cb)
 {
 	gds_rbtree_node_t *node = NULL;
 	int8_t ret;
 
-	ret = gds_rbtree_insert_bottom(root, data, getkey_f, cmpkey_f,
-		copy_data, alloc_f, &node);
+	ret = gds_rbtree_insert_bottom(root, data, getkey_cb, cmpkey_cb,
+		copy_data, alloc_cb, &node);
 	if (node != NULL) {
 		gds_rbtree_rebalance_after_insert(root, node);
 	}
@@ -215,16 +216,16 @@ int8_t gds_rbtree_add(gds_rbtree_node_t **root, void *data,
 }
 
 gds_rbtree_node_t * gds_rbtree_get_node(gds_rbtree_node_t *root,
-	void *key, gds_func_ptr_t getkey_f, gds_func_ptr_t cmpkey_f)
+	void *key, gds_getkey_cb getkey_cb, gds_cmpkey_cb cmpkey_cb)
 {
 	gds_rbtree_node_t *node = root;
 	int32_t cmp;
 
-	if(getkey_f == NULL || cmpkey_f == NULL)
+	if(getkey_cb == NULL || cmpkey_cb == NULL)
 		return NULL;
 
 	while(node != NULL) {
-		cmp = (int32_t)cmpkey_f(key, (void*)getkey_f(node->data));
+		cmp = cmpkey_cb(key, getkey_cb(node->data));
 		if(cmp < 0) {
 			node = node->left;
 		} else if(cmp > 0) {
@@ -238,18 +239,18 @@ gds_rbtree_node_t * gds_rbtree_get_node(gds_rbtree_node_t *root,
 }
 
 void * gds_rbtree_get(gds_rbtree_node_t *root, void *key,
-	gds_func_ptr_t getkey_f, gds_func_ptr_t cmpkey_f, bool copy_data,
-	gds_func_ptr_t alloc_f)
+	gds_getkey_cb getkey_cb, gds_cmpkey_cb cmpkey_cb, bool copy_data,
+	gds_alloc_cb alloc_cb)
 {
 	gds_rbtree_node_t *n;
 
-	if(root == NULL || (copy_data && alloc_f == NULL)) {
+	if(root == NULL || (copy_data && alloc_cb == NULL)) {
 		GDS_LOG_ERROR("Bad parameters");
 		return NULL;
 	}
 
-	n = gds_rbtree_get_node(root, key, getkey_f, cmpkey_f);
-	return gds_rbtree_node_get_data(n, copy_data, alloc_f);
+	n = gds_rbtree_get_node(root, key, getkey_cb, cmpkey_cb);
+	return gds_rbtree_node_get_data(n, copy_data, alloc_cb);
 }
 
 void gds_rbtree_rebalance_after_delete(gds_rbtree_node_t **root,
@@ -374,19 +375,19 @@ void gds_rbtree_replace_with_child(gds_rbtree_node_t **root,
 }
 
 int8_t gds_rbtree_del(gds_rbtree_node_t **root, void *key,
-	gds_func_ptr_t getkey_f, gds_func_ptr_t cmpkey_f, bool free_data,
-	gds_func_ptr_t free_f)
+	gds_getkey_cb getkey_cb, gds_cmpkey_cb cmpkey_cb, bool free_data,
+	gds_free_cb free_cb)
 {
 	gds_rbtree_node_t *node, *child;
 	bool data_freed = false;
 
-	if (root == NULL || getkey_f == NULL || cmpkey_f == NULL
-	|| (free_data && free_f == NULL) ) {
+	if (root == NULL || getkey_cb == NULL || cmpkey_cb == NULL
+	|| (free_data && free_cb == NULL) ) {
 		GDS_LOG_ERROR("Bad arguments");
 		return -1;
 	}
 
-	node = gds_rbtree_get_node(*root, key, getkey_f, cmpkey_f);
+	node = gds_rbtree_get_node(*root, key, getkey_cb, cmpkey_cb);
 	if(node == NULL) {
 		GDS_LOG_WARNING("key doesn't exist in tree");
 		return 1;
@@ -402,7 +403,7 @@ int8_t gds_rbtree_del(gds_rbtree_node_t **root, void *key,
 			child = child->right;
 		}
 		if (free_data) {
-			free_f(node->data);
+			free_cb(node->data);
 			data_freed = true;
 		}
 		node->data = child->data;
@@ -423,16 +424,16 @@ int8_t gds_rbtree_del(gds_rbtree_node_t **root, void *key,
 		}
 	}
 
-	gds_rbtree_node_free(node, (!data_freed && free_data), free_f);
+	gds_rbtree_node_free(node, (!data_freed && free_data), free_cb);
 	return 0;
 }
 
 void gds_rbtree_free(gds_rbtree_node_t *root, bool free_data,
-	gds_func_ptr_t free_f)
+	gds_free_cb free_cb)
 {
 	if (root != NULL) {
-		gds_rbtree_free(root->left, free_data, free_f);
-		gds_rbtree_free(root->right, free_data, free_f);
-		gds_rbtree_node_free(root, free_data, free_f);
+		gds_rbtree_free(root->left, free_data, free_cb);
+		gds_rbtree_free(root->right, free_data, free_cb);
+		gds_rbtree_node_free(root, free_data, free_cb);
 	}
 }

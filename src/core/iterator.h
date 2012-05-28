@@ -40,10 +40,11 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "callbacks.h"
 
-typedef int8_t (*gds_iterator_reset_func_t)(void *);
-typedef int8_t (*gds_iterator_step_func_t)(void *);
-typedef void * (*gds_iterator_get_func_t)(void *, bool);
+typedef int8_t (*gds_iterator_reset_cb)(void *);
+typedef int8_t (*gds_iterator_step_cb)(void *);
+typedef void * (*gds_iterator_get_cb)(void *, bool);
 
 typedef struct {
 	/* Used to store iterator-specific information
@@ -53,20 +54,20 @@ typedef struct {
 	/* This function must reset the iterator to beginning
 	 * It must take one argument (data) and return 0 on success,
 	 * a negative value otherwise */
-	gds_iterator_reset_func_t reset_f;
+	gds_iterator_reset_cb reset_cb;
 
 	/* This function must move iterator to the next element
 	 * It must take one argument (data) and return 0 on success,
 	 * a positive value if iterator has reached the end, and a negative
 	 * value otherwise */
-	gds_iterator_step_func_t step_f;
+	gds_iterator_step_cb step_cb;
 
 	/* This fuction must return data of element pointed by iterator
 	 * It must take two arguments: data, and a boolean which indicates if
 	 * returned data must be a copy of real data (true), or a direct
 	 * pointer to it (false).
 	 * It should return a valid pointer on success, or NULL otherwise */
-	gds_iterator_get_func_t get_f;
+	gds_iterator_get_cb get_cb;
 } gds_iterator_t;
 
 #ifdef __cplusplus
@@ -80,24 +81,24 @@ extern "C" {
 gds_iterator_t *
 gds_iterator_new(
 	void *data,
-	gds_iterator_reset_func_t reset_f,
-	gds_iterator_step_func_t step_f,
-	gds_iterator_get_func_t get_f
+	gds_iterator_reset_cb reset_cb,
+	gds_iterator_step_cb step_cb,
+	gds_iterator_get_cb get_cb
 );
 
-/* Alias for it->reset_f(it->data) */
+/* Alias for it->reset_cb(it->data) */
 int8_t
 gds_iterator_reset(
 	gds_iterator_t *it
 );
 
-/* Alias for it->step_f(it->data) */
+/* Alias for it->step_cb(it->data) */
 int8_t
 gds_iterator_step(
 	gds_iterator_t *it
 );
 
-/* Alias for it->get_f(it->data, copy_data) */
+/* Alias for it->get_cb(it->data, copy_data) */
 void *
 gds_iterator_get(
 	gds_iterator_t *it,
@@ -105,12 +106,12 @@ gds_iterator_get(
 );
 
 /* Free memory */
-/* free_f : Pointer to function that should free it->data.
+/* free_cb : Pointer to function that should free it->data.
  *          If NULL, it doesn't free it */
 void
 gds_iterator_free(
 	gds_iterator_t *it,
-	void free_f(void *data)
+	gds_free_cb free_cb
 );
 
 #ifdef __cplusplus
