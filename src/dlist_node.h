@@ -25,7 +25,6 @@
 #ifndef dlist_node_h_included
 #define dlist_node_h_included
 
-#include <stdbool.h>
 #include <stdint.h>
 #include "callbacks.h"
 
@@ -50,7 +49,6 @@ extern "C" {
 	gds_dlist_node_t *
 gds_dlist_node_new(
 	void *data,
-	bool copy_data,
 	gds_alloc_cb alloc_cb
 );
 
@@ -71,9 +69,7 @@ gds_dlist_node_new(
 gds_dlist_node_set_data(
 	gds_dlist_node_t *node,
 	void *data,
-	bool free_old_data,
 	gds_free_cb free_cb,
-	bool copy_data,
 	gds_alloc_cb alloc_cb
 );
 
@@ -88,7 +84,6 @@ gds_dlist_node_set_data(
 	void *
 gds_dlist_node_get_data(
 	gds_dlist_node_t *node,
-	bool copy_data,
 	gds_alloc_cb alloc_cb
 );
 
@@ -139,7 +134,6 @@ gds_dlist_node_get_prev(
 	void
 gds_dlist_node_free(
 	gds_dlist_node_t *node,
-	bool free_data,
 	gds_free_cb free_cb
 );
 

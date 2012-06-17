@@ -30,7 +30,7 @@
  *  informations:                                                            *
  *    . int8_t reset(void *data)                                             *
  *    . int8_t step(void *data)                                              *
- *    . void * get(void *data, bool copy_data)                               *
+ *    . void * get(void *data)                                               *
  *  - and provide a way to get an initialized iterator for your container    *
  * See slist.h or dlist.h for examples of implementation                     *
  *****************************************************************************/
@@ -44,7 +44,7 @@
 
 typedef int8_t (*gds_iterator_reset_cb)(void *);
 typedef int8_t (*gds_iterator_step_cb)(void *);
-typedef void * (*gds_iterator_get_cb)(void *, bool);
+typedef void * (*gds_iterator_get_cb)(void *);
 
 typedef struct {
 	/* Used to store iterator-specific information
@@ -63,10 +63,8 @@ typedef struct {
 	gds_iterator_step_cb step_cb;
 
 	/* This fuction must return data of element pointed by iterator
-	 * It must take two arguments: data, and a boolean which indicates if
-	 * returned data must be a copy of real data (true), or a direct
-	 * pointer to it (false).
-	 * It should return a valid pointer on success, or NULL otherwise */
+	 * It must take one argument (data) and return a valid pointer on
+	 * success, or NULL otherwise */
 	gds_iterator_get_cb get_cb;
 } gds_iterator_t;
 
@@ -98,11 +96,10 @@ gds_iterator_step(
 	gds_iterator_t *it
 );
 
-/* Alias for it->get_cb(it->data, copy_data) */
+/* Alias for it->get_cb(it->data) */
 void *
 gds_iterator_get(
-	gds_iterator_t *it,
-	bool copy_data
+	gds_iterator_t *it
 );
 
 /* Free memory */

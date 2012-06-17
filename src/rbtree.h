@@ -1,7 +1,6 @@
 #ifndef rbtree_h_included
 #define rbtree_h_included
 
-#include <stdbool.h>
 #include <stdint.h>
 #include "callbacks.h"
 #include "rbtree_node.h"
@@ -28,7 +27,6 @@ gds_rbtree_add(
 	void *data,
 	gds_getkey_cb getkey_cb,
 	gds_cmpkey_cb cmpkey_cb,
-	bool copy_data,
 	gds_alloc_cb alloc_cb
 );
 
@@ -38,7 +36,6 @@ gds_rbtree_get(
 	void *key,
 	gds_getkey_cb getkey_cb,
 	gds_cmpkey_cb cmpkey_cb,
-	bool copy_data,
 	gds_alloc_cb alloc_cb
 );
 
@@ -48,14 +45,12 @@ gds_rbtree_del(
 	void *key,
 	gds_getkey_cb getkey_cb,
 	gds_cmpkey_cb cmpkey_cb,
-	bool free_data,
 	gds_free_cb free_cb
 );
 
 void
 gds_rbtree_free(
 	gds_rbtree_node_t *root,
-	bool free_data,
 	gds_free_cb free_cb
 );
 

@@ -196,13 +196,13 @@ void t_gds_slist_add(void)
 	CU_ASSERT(NULL == gds_slist_add(NULL, NULL, &test, false));
 	CU_ASSERT(NULL == gds_slist_add(NULL, NULL, &test, true));
 
-	node = gds_slist_node_new(&test, false, NULL);
+	node = gds_slist_node_new(&test, NULL);
 	assert(node != NULL);
 	CU_ASSERT(NULL == gds_slist_add(NULL, node, NULL, false));
 	CU_ASSERT(NULL == gds_slist_add(NULL, node, NULL, true));
 	CU_ASSERT(NULL == gds_slist_add(NULL, node, &test, false));
 	CU_ASSERT(NULL == gds_slist_add(NULL, node, &test, true));
-	gds_slist_node_free(node, false, NULL);
+	gds_slist_node_free(node, NULL);
 
 	CU_ASSERT(NULL == gds_slist_add(l, NULL, NULL, false));
 	CU_ASSERT(NULL == gds_slist_add(l, NULL, NULL, true));
@@ -372,7 +372,9 @@ void t_gds_slist_pop(void)
 
 	test_free((test_structure_t *)data);
 	test_free(test_ptr);
+	printf("a\n");
 	gds_slist_free(l, true);
+	printf("a\n");
 	gds_type_unregister(type_name);
 }
 
@@ -846,13 +848,11 @@ void t_gds_slist_iterator_new(void)
 	CU_ASSERT(NULL != (it = gds_slist_iterator_new(l)));
 	CU_ASSERT(0 == gds_iterator_reset(it));
 	CU_ASSERT(0 < gds_iterator_step(it));
-	CU_ASSERT(NULL == gds_iterator_get(it, false));
-	CU_ASSERT(NULL == gds_iterator_get(it, true));
+	CU_ASSERT(NULL == gds_iterator_get(it));
 
 	gds_slist_add_last(l, &test, false);
 	CU_ASSERT(0 == gds_iterator_step(it));
-	CU_ASSERT(&test == gds_iterator_get(it, false));
-	CU_ASSERT(NULL != gds_iterator_get(it, true));
+	CU_ASSERT(&test == gds_iterator_get(it));
 
 	CU_ASSERT(0 < gds_iterator_step(it));
 
@@ -903,7 +903,7 @@ int main()
 		return CU_get_error();
 
 	/* add a suite to the registry */
-	pSuite = CU_add_suite("Container data structure",
+	pSuite = CU_add_suite("Singly linked list data structure",
 		init_suite, clean_suite);
 	if (NULL == pSuite) {
 		CU_cleanup_registry();

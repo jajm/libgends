@@ -150,7 +150,7 @@ gds_dlist_node_t *gds_dlist_add_after(gds_dlist_t *l, gds_dlist_node_t *node, vo
 	if(copy_data) {
 		alloc_cb = (gds_alloc_cb)gds_type_get_func(l->type_name, "alloc");
 	}
-	newnode = gds_dlist_node_new(data, copy_data, alloc_cb);
+	newnode = gds_dlist_node_new(data, alloc_cb);
 	if(newnode == NULL){
 		GDS_LOG_ERROR("Failed to create the node");
 		return NULL;
@@ -184,7 +184,7 @@ gds_dlist_node_t *gds_dlist_add_before(gds_dlist_t *l, gds_dlist_node_t *node, v
 	if(copy_data) {
 		alloc_cb = (gds_alloc_cb)gds_type_get_func(l->type_name, "alloc");
 	}
-	newnode = gds_dlist_node_new(data, copy_data, alloc_cb);
+	newnode = gds_dlist_node_new(data, alloc_cb);
 	if(newnode == NULL){
 		GDS_LOG_ERROR("Failed to create the node");
 		return NULL;
@@ -280,8 +280,8 @@ void *gds_dlist_pop(gds_dlist_t *l, gds_dlist_node_t *node)
 		l->first = node->next;
 	}
 
-	data = gds_dlist_node_get_data(node, false, 0);
-	gds_dlist_node_free(node, false, NULL);
+	data = gds_dlist_node_get_data(node, NULL);
+	gds_dlist_node_free(node, NULL);
 
 	return data;
 }
@@ -355,7 +355,7 @@ int8_t gds_dlist_del(gds_dlist_t *l, gds_dlist_node_t *node, bool free_data)
 	if(free_data) {
 		free_cb = (gds_free_cb)gds_type_get_func(l->type_name, "free");
 	}
-	gds_dlist_node_free(node, free_data, free_cb);
+	gds_dlist_node_free(node, free_cb);
 
 	return 0;
 }
@@ -418,7 +418,7 @@ void *gds_dlist_get(gds_dlist_t *l, gds_dlist_node_t *node, bool copy_data)
 		alloc_cb = (gds_alloc_cb)gds_type_get_func(l->type_name, "alloc");
 	}
 
-	return gds_dlist_node_get_data(node, copy_data, alloc_cb);
+	return gds_dlist_node_get_data(node, alloc_cb);
 }
 
 void *gds_dlist_get_first(gds_dlist_t *l, bool copy_data)
@@ -510,20 +510,14 @@ int8_t gds_dlist_reverse_iterator_step(gds_dlist_iterator_t *it)
 	return 0;
 }
 
-void * gds_dlist_iterator_get(gds_dlist_iterator_t *it, bool copy_data)
+void * gds_dlist_iterator_get(gds_dlist_iterator_t *it)
 {
-	gds_alloc_cb alloc_cb = NULL;
-
 	if(it == NULL || it->l == NULL || it->cur == NULL) {
 		GDS_LOG_ERROR("Iterator doesn't point on anything");
 		return NULL;
 	}
 
-	if(copy_data) {
-		alloc_cb = (gds_alloc_cb)gds_type_get_func(it->l->type_name, "alloc");
-	}
-
-	return gds_dlist_node_get_data(it->cur, copy_data, alloc_cb);
+	return gds_dlist_node_get_data(it->cur, NULL);
 }
 
 gds_iterator_t *gds_dlist_iterator_new(gds_dlist_t *l)
@@ -624,7 +618,7 @@ void gds_dlist_free(gds_dlist_t *l, bool free_data)
 		tmp = l->first;
 		while(tmp){
 			tmp2 = tmp->next;
-			gds_dlist_node_free(tmp, free_data, free_cb);
+			gds_dlist_node_free(tmp, free_cb);
 			tmp = tmp2;
 		}
 		free(l);

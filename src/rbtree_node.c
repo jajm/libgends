@@ -5,15 +5,9 @@
 #include "rbtree_node.h"
 #include "callbacks.h"
 
-gds_rbtree_node_t * gds_rbtree_node_new(void *data, bool copy_data,
-	gds_alloc_cb alloc_cb)
+gds_rbtree_node_t * gds_rbtree_node_new(void *data, gds_alloc_cb alloc_cb)
 {
 	gds_rbtree_node_t *n;
-
-	if(copy_data && alloc_cb == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return NULL;
-	}
 
 	n = malloc(sizeof(gds_rbtree_node_t));
 	if(n == NULL) {
@@ -21,7 +15,7 @@ gds_rbtree_node_t * gds_rbtree_node_new(void *data, bool copy_data,
 		return NULL;
 	}
 	
-	if(copy_data) {
+	if (alloc_cb != NULL) {
 		n->data = alloc_cb(data);
 	} else {
 		n->data = data;
@@ -39,24 +33,22 @@ bool gds_rbtree_node_is_red(gds_rbtree_node_t *node)
 }
 
 int8_t gds_rbtree_node_set_data(gds_rbtree_node_t *node, void *data,
-	bool copy_data, gds_alloc_cb alloc_cb, bool free_old_data,
-	gds_free_cb free_cb)
+	gds_alloc_cb alloc_cb, gds_free_cb free_cb)
 {
 	void *d;
 
-	if(node == NULL || (copy_data && alloc_cb == NULL)
-	|| (free_old_data && free_cb == NULL)) {
+	if (node == NULL) {
 		GDS_LOG_ERROR("Bad parameters");
 		return -1;
 	}
 
-	if (copy_data) {
+	if (alloc_cb != NULL) {
 		d = alloc_cb(data);
 	} else {
 		d = data;
 	}
 
-	if (free_old_data) {
+	if (free_cb != NULL) {
 		free_cb(node->data);
 	}
 	node->data = d;
@@ -64,17 +56,16 @@ int8_t gds_rbtree_node_set_data(gds_rbtree_node_t *node, void *data,
 	return 0;
 }
 
-void * gds_rbtree_node_get_data(gds_rbtree_node_t *node, bool copy_data,
-	gds_alloc_cb alloc_cb)
+void * gds_rbtree_node_get_data(gds_rbtree_node_t *node, gds_alloc_cb alloc_cb)
 {
 	void *data;
 
-	if (node == NULL || (copy_data && alloc_cb == NULL)) {
+	if (node == NULL) {
 		GDS_LOG_ERROR("Bad parameters");
 		return NULL;
 	}
 
-	if (copy_data) {
+	if (alloc_cb != NULL) {
 		data = alloc_cb(node->data);
 	} else {
 		data = node->data;
@@ -83,16 +74,11 @@ void * gds_rbtree_node_get_data(gds_rbtree_node_t *node, bool copy_data,
 	return data;
 }
 
-void gds_rbtree_node_free(gds_rbtree_node_t *node, bool free_data,
-	gds_free_cb free_cb)
+void gds_rbtree_node_free(gds_rbtree_node_t *node, gds_free_cb free_cb)
 {
 	if(node) {
-		if(free_data) {
-			if(free_cb == NULL) {
-				GDS_LOG_WARNING("No free function provided");
-			} else {
-				free_cb(node->data);
-			}
+		if(free_cb != NULL) {
+			free_cb(node->data);
 		}
 		free(node);
 	}

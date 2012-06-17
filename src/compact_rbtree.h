@@ -10,7 +10,6 @@ gds_compact_rbtree_add(
 	void *data,
 	gds_getkey_cb getkey_cb,
 	gds_cmpkey_cb cmpkey_cb,
-	bool copy_data,
 	gds_alloc_cb alloc_cb
 );
 
@@ -20,7 +19,6 @@ gds_compact_rbtree_get(
 	void *key,
 	gds_getkey_cb getkey_cb,
 	gds_cmpkey_cb cmpkey_cb,
-	bool copy_data,
 	gds_alloc_cb alloc_cb
 );
 
@@ -30,14 +28,12 @@ gds_compact_rbtree_del(
 	void *key,
 	gds_getkey_cb getkey_cb,
 	gds_cmpkey_cb cmpkey_cb,
-	bool free_data,
 	gds_free_cb free_cb
 );
 
 void
 gds_compact_rbtree_free(
 	gds_compact_rbtree_node_t *root,
-	bool free_data,
 	gds_free_cb free_cb
 );
 

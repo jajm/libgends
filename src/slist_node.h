@@ -26,7 +26,6 @@
 #define slist_node_h_included
 
 #include <stdint.h>
-#include <stdbool.h>
 #include "callbacks.h"
 
 typedef struct gds_slist_node_s{
@@ -39,55 +38,42 @@ extern "C" {
 #endif
 
 /* Create a new node */
-/*      data : pointer to the data
- * copy_data : true => copy the data
- *             false => just take the pointer value
- *  alloc_cb : function that take a pointer and returns a copy of pointed
- *             data. Unused if copy_data is false */
+/*     data : pointer to the data
+ * alloc_cb : function that take a pointer and returns a copy of pointed
+ *            data. The copy is stored in the node. NULL to disable copy */
 /* Return: Success => pointer to the newly created node
  *         Failure => NULL */
 gds_slist_node_t *
 gds_slist_node_new(
 	void *data,
-	bool copy_data,
 	gds_alloc_cb alloc_cb
 );
 
 /* Set a new value to an existing node */
-/*          node : pointer to the node
- *          data : pointer to the data
- * free_old_data : true => free memory taken by old value
- *                 false => don't free memory
- *       free_cb : function that takes a pointer and free pointed data and
- *                 returns nothing. Must not be NULL if free_old_data is true
- *                 Unused if free_old_data is false
- *     copy_data : true => copy the data
- *                 false => just take the pointer value
- *      alloc_cb : function that takes a pointer and returns a copy of pointed
- *                 data. Unused if copy_data is false */
+/*     node : pointer to the node
+ *     data : pointer to the data
+ *  free_cb : function that takes a pointer and free pointed data.
+ *            NULL to disable freeing old data
+ * alloc_cb : function that takes a pointer and returns a copy of pointed
+ *            data. The copy is stored in the node. NULL to disable copy */
 /* Return: Success => 0
  *         Failure => a negative value */
 int8_t
 gds_slist_node_set_data(
 	gds_slist_node_t *node,
 	void *data,
-	bool free_old_data,
 	gds_free_cb free_cb,
-	bool copy_data,
 	gds_alloc_cb alloc_cb
 );
 
 /* Get the node data */
-/*      node : pointer to the node
- *      copy : true => return a pointer to a copy of the data
- *             false => return a direct pointer to the data
- *  alloc_cb : function that takes a pointer and returns a copy of pointed
- *             data. Unused if copy is false */
+/*     node : pointer to the node
+ * alloc_cb : function that takes a pointer and returns a copy of pointed
+ *             data. The copy is returned. NULL to disable copy */
 /* Return: pointer to the data */
 void *
 gds_slist_node_get_data(
 	gds_slist_node_t *node,
-	bool copy,
 	gds_alloc_cb alloc_cb
 );
 
@@ -111,16 +97,12 @@ gds_slist_node_get_next(
 );
 
 /* Free a node */
-/*      node : pointer to the node
- * free_data : true => free data
- *             false => don't free memory occupied by data
- *   free_cb : function that takes a pointer and free pointed data and
- *             returns nothing. Must not be NULL if free_old_data is true
- *             Unused if free_old_data is false */
+/*    node : pointer to the node
+ * free_cb : function that takes a pointer and free pointed data.
+ *           NULL to disable freeing data */
 void
 gds_slist_node_free(
 	gds_slist_node_t *node,
-	bool free_data,
 	gds_free_cb free_cb
 );
 

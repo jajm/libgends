@@ -32,6 +32,7 @@
 #include <string.h>
 #include "log.h"
 #include "slist_node.h"
+#include "ll_slist.h"
 #include "slist.h"
 #include "types.h"
 #include "callbacks.h"
@@ -114,20 +115,20 @@ gds_slist_node_t *gds_slist_add(gds_slist_t *l, gds_slist_node_t *node,
 		alloc_cb = (gds_alloc_cb)gds_type_get_func(l->type_name, "alloc");
 	}
 
-	newnode = gds_slist_node_new(data, copy_data, alloc_cb);
-	if(newnode == NULL){
-		GDS_LOG_ERROR("Failed to create a new node");
-		return NULL;
-	}
-	if(l->first == NULL || node == NULL){
+	if (l->first == NULL || node == NULL) {
 		/* Add in first position */
-		newnode->next = l->first;
+		newnode = gds_ll_slist_add_first(l->first, data, alloc_cb);
+		if (newnode == NULL) {
+			GDS_LOG_ERROR("Failed to add data to the list");
+			return NULL;
+		}
 		l->first = newnode;
-	}else{
-		newnode->next = node->next;
-		node->next = newnode;
+	} else {
+		newnode = gds_ll_slist_add_after(node, data, alloc_cb);
 	}
-	if(newnode->next == NULL) l->last = newnode;
+
+	if (newnode->next == NULL)
+		l->last = newnode;
 
 	return newnode;
 }
@@ -135,7 +136,7 @@ gds_slist_node_t *gds_slist_add(gds_slist_t *l, gds_slist_node_t *node,
 
 gds_slist_node_t *gds_slist_add_first(gds_slist_t *l, void *data,
 	bool copy_data)
-{	
+{
 	return gds_slist_add(l, NULL, data, copy_data);
 }
 
@@ -188,35 +189,46 @@ void *gds_slist_pop(gds_slist_t *l, gds_slist_node_t *node)
 		GDS_LOG_ERROR("Failed to find the node");
 		return NULL;
 	}
-	data = gds_slist_node_get_data(tmp, false, 0);
+
+	data = gds_slist_node_get_data(tmp, NULL);
 	if(tmp2 == NULL)
-		l->first = tmp->next;
+		l->first = gds_ll_slist_del_first(l->first, NULL);
 	else
-		tmp2->next = tmp->next;
-	if(tmp->next == NULL) l->last = tmp2;
-	gds_slist_node_free(tmp, false, NULL);
+		gds_ll_slist_del_after(tmp2, NULL);
+	if(tmp2->next == NULL)
+		l->last = tmp2;
 
 	return data;
 }
 
 void *gds_slist_pop_first(gds_slist_t *l)
 {
+	void *data;
+
 	if(l == NULL) {
 		GDS_LOG_ERROR("Bad arguments");
 		return NULL;
 	}
 
-	return gds_slist_pop(l, l->first);
+	data = gds_slist_node_get_data(l->first, NULL);
+	l->first = gds_ll_slist_del_first(l->first, NULL);
+
+	return data;
 }
 
 void *gds_slist_pop_last(gds_slist_t *l)
 {
+	void *data;
+
 	if(l == NULL) {
 		GDS_LOG_ERROR("Bad arguments");
 		return NULL;
 	}
 
-	return gds_slist_pop(l, l->last);
+	data = gds_slist_node_get_data(l->last, NULL);
+	l->first = gds_ll_slist_del_last(l->first, NULL);
+
+	return data;
 }
 
 void *gds_slist_it_pop(gds_iterator_t *it)
@@ -274,7 +286,7 @@ int8_t gds_slist_del(gds_slist_t *l, gds_slist_node_t *node, bool free_data)
 	if(free_data) {
 		free_cb = (gds_free_cb)gds_type_get_func(l->type_name, "free");
 	}
-	gds_slist_node_free(tmp, free_data, free_cb);
+	gds_slist_node_free(tmp, free_cb);
 
 	return 0;
 }
@@ -337,7 +349,7 @@ void *gds_slist_get(gds_slist_t *l, gds_slist_node_t *node, bool copy_data)
 		alloc_cb = (gds_alloc_cb)gds_type_get_func(l->type_name, "alloc");
 	}
 
-	return gds_slist_node_get_data(node, copy_data, alloc_cb);
+	return gds_slist_node_get_data(node, alloc_cb);
 }
 
 void *gds_slist_get_first(gds_slist_t *l, bool copy_data)
@@ -408,20 +420,14 @@ int8_t gds_slist_iterator_step(gds_slist_iterator_t *it)
 	return 0;
 }
 
-void * gds_slist_iterator_get(gds_slist_iterator_t *it, bool copy_data)
+void * gds_slist_iterator_get(gds_slist_iterator_t *it)
 {
-	gds_alloc_cb alloc_cb = NULL;
-
 	if(it == NULL || it->l == NULL || it->cur == NULL) {
 		GDS_LOG_ERROR("Iterator doesn't point on anything");
 		return NULL;
 	}
 
-	if(copy_data) {
-		alloc_cb = (gds_alloc_cb)gds_type_get_func(it->l->type_name, "alloc");
-	}
-
-	return gds_slist_node_get_data(it->cur, copy_data, alloc_cb);
+	return gds_slist_node_get_data(it->cur, NULL);
 }
 
 gds_iterator_t *gds_slist_iterator_new(gds_slist_t *l)
@@ -486,19 +492,13 @@ gds_slist_node_t *gds_slist_chk(gds_slist_t *l, void *data)
 
 void gds_slist_free(gds_slist_t *l, bool free_data)
 {
-	gds_slist_node_t *tmp, *tmp2;
 	gds_free_cb free_cb = NULL;
 
 	if(l != NULL){
 		if(free_data) {
 			free_cb = (gds_free_cb)gds_type_get_func(l->type_name, "free");
 		}
-		tmp = l->first;
-		while(tmp != NULL){
-			tmp2 = tmp->next;
-			gds_slist_node_free(tmp, free_data, free_cb);
-			tmp = tmp2;
-		}
+		gds_ll_slist_free(l->first, free_cb);
 		free(l->type_name);
 		free(l);
 	}

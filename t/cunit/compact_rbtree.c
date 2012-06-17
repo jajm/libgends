@@ -88,112 +88,84 @@ void t_compact_rbtree_add(void)
 	gds_compact_rbtree_node_t *root = NULL;
 	test_t *t = test_new("key", 4);
 	char buf[512];
+	gds_cmpkey_cb cmpkey_cb = (gds_cmpkey_cb)test_cmpkey;
+	gds_getkey_cb getkey_cb = (gds_getkey_cb)test_getkey;
+	gds_alloc_cb alloc_cb = (gds_alloc_cb)test_alloc;
+	gds_free_cb free_cb = (gds_free_cb)test_free;
 
-	CU_ASSERT(0 > gds_compact_rbtree_add(NULL, NULL, NULL, NULL, false, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_add(NULL, NULL, NULL, NULL, false, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(0 > gds_compact_rbtree_add(NULL, NULL, NULL, NULL, true, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_add(NULL, NULL, NULL, NULL, true, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(0 > gds_compact_rbtree_add(NULL, NULL, NULL, (gds_cmpkey_cb)test_cmpkey, false, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_add(NULL, NULL, NULL, (gds_cmpkey_cb)test_cmpkey, false, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(0 > gds_compact_rbtree_add(NULL, NULL, NULL, (gds_cmpkey_cb)test_cmpkey, true, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_add(NULL, NULL, NULL, (gds_cmpkey_cb)test_cmpkey, true, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(0 > gds_compact_rbtree_add(NULL, NULL, (gds_getkey_cb)test_getkey, NULL, false, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_add(NULL, NULL, (gds_getkey_cb)test_getkey, NULL, false, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(0 > gds_compact_rbtree_add(NULL, NULL, (gds_getkey_cb)test_getkey, NULL, true, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_add(NULL, NULL, (gds_getkey_cb)test_getkey, NULL, true, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(0 > gds_compact_rbtree_add(NULL, NULL, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, false, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_add(NULL, NULL, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, false, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(0 > gds_compact_rbtree_add(NULL, NULL, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, true, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_add(NULL, NULL, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, true, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(0 > gds_compact_rbtree_add(NULL, t, NULL, NULL, false, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_add(NULL, t, NULL, NULL, false, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(0 > gds_compact_rbtree_add(NULL, t, NULL, NULL, true, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_add(NULL, t, NULL, NULL, true, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(0 > gds_compact_rbtree_add(NULL, t, NULL, (gds_cmpkey_cb)test_cmpkey, false, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_add(NULL, t, NULL, (gds_cmpkey_cb)test_cmpkey, false, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(0 > gds_compact_rbtree_add(NULL, t, NULL, (gds_cmpkey_cb)test_cmpkey, true, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_add(NULL, t, NULL, (gds_cmpkey_cb)test_cmpkey, true, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(0 > gds_compact_rbtree_add(NULL, t, (gds_getkey_cb)test_getkey, NULL, false, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_add(NULL, t, (gds_getkey_cb)test_getkey, NULL, false, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(0 > gds_compact_rbtree_add(NULL, t, (gds_getkey_cb)test_getkey, NULL, true, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_add(NULL, t, (gds_getkey_cb)test_getkey, NULL, true, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(0 > gds_compact_rbtree_add(NULL, t, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, false, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_add(NULL, t, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, false, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(0 > gds_compact_rbtree_add(NULL, t, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, true, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_add(NULL, t, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, true, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(0 > gds_compact_rbtree_add(&root, NULL, NULL, NULL, false, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_add(&root, NULL, NULL, NULL, false, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(0 > gds_compact_rbtree_add(&root, NULL, NULL, NULL, true, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_add(&root, NULL, NULL, NULL, true, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(0 > gds_compact_rbtree_add(&root, NULL, NULL, (gds_cmpkey_cb)test_cmpkey, false, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_add(&root, NULL, NULL, (gds_cmpkey_cb)test_cmpkey, false, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(0 > gds_compact_rbtree_add(&root, NULL, NULL, (gds_cmpkey_cb)test_cmpkey, true, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_add(&root, NULL, NULL, (gds_cmpkey_cb)test_cmpkey, true, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(0 > gds_compact_rbtree_add(&root, NULL, (gds_getkey_cb)test_getkey, NULL, false, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_add(&root, NULL, (gds_getkey_cb)test_getkey, NULL, false, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(0 > gds_compact_rbtree_add(&root, NULL, (gds_getkey_cb)test_getkey, NULL, true, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_add(&root, NULL, (gds_getkey_cb)test_getkey, NULL, true, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(0 > gds_compact_rbtree_add(&root, NULL, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, true, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_add(&root, t, NULL, NULL, false, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_add(&root, t, NULL, NULL, false, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(0 > gds_compact_rbtree_add(&root, t, NULL, NULL, true, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_add(&root, t, NULL, NULL, true, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(0 > gds_compact_rbtree_add(&root, t, NULL, (gds_cmpkey_cb)test_cmpkey, false, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_add(&root, t, NULL, (gds_cmpkey_cb)test_cmpkey, false, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(0 > gds_compact_rbtree_add(&root, t, NULL, (gds_cmpkey_cb)test_cmpkey, true, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_add(&root, t, NULL, (gds_cmpkey_cb)test_cmpkey, true, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(0 > gds_compact_rbtree_add(&root, t, (gds_getkey_cb)test_getkey, NULL, false, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_add(&root, t, (gds_getkey_cb)test_getkey, NULL, false, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(0 > gds_compact_rbtree_add(&root, t, (gds_getkey_cb)test_getkey, NULL, true, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_add(&root, t, (gds_getkey_cb)test_getkey, NULL, true, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(0 > gds_compact_rbtree_add(&root, t, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, true, NULL));
+	CU_ASSERT(0 > gds_compact_rbtree_add(NULL , NULL, NULL     , NULL     , NULL));
+	CU_ASSERT(0 > gds_compact_rbtree_add(NULL , NULL, NULL     , NULL     , alloc_cb));
+	CU_ASSERT(0 > gds_compact_rbtree_add(NULL , NULL, NULL     , cmpkey_cb, NULL));
+	CU_ASSERT(0 > gds_compact_rbtree_add(NULL , NULL, NULL     , cmpkey_cb, alloc_cb));
+	CU_ASSERT(0 > gds_compact_rbtree_add(NULL , NULL, getkey_cb, NULL     , NULL));
+	CU_ASSERT(0 > gds_compact_rbtree_add(NULL , NULL, getkey_cb, NULL     , alloc_cb));
+	CU_ASSERT(0 > gds_compact_rbtree_add(NULL , NULL, getkey_cb, cmpkey_cb, NULL));
+	CU_ASSERT(0 > gds_compact_rbtree_add(NULL , NULL, getkey_cb, cmpkey_cb, alloc_cb));
+	CU_ASSERT(0 > gds_compact_rbtree_add(NULL , t   , NULL     , NULL     , NULL));
+	CU_ASSERT(0 > gds_compact_rbtree_add(NULL , t   , NULL     , NULL     , alloc_cb));
+	CU_ASSERT(0 > gds_compact_rbtree_add(NULL , t   , NULL     , cmpkey_cb, NULL));
+	CU_ASSERT(0 > gds_compact_rbtree_add(NULL , t   , NULL     , cmpkey_cb, alloc_cb));
+	CU_ASSERT(0 > gds_compact_rbtree_add(NULL , t   , getkey_cb, NULL     , NULL));
+	CU_ASSERT(0 > gds_compact_rbtree_add(NULL , t   , getkey_cb, NULL     , alloc_cb));
+	CU_ASSERT(0 > gds_compact_rbtree_add(NULL , t   , getkey_cb, cmpkey_cb, NULL));
+	CU_ASSERT(0 > gds_compact_rbtree_add(NULL , t   , getkey_cb, cmpkey_cb, alloc_cb));
+	CU_ASSERT(0 > gds_compact_rbtree_add(&root, NULL, NULL     , NULL     , NULL));
+	CU_ASSERT(0 > gds_compact_rbtree_add(&root, NULL, NULL     , NULL     , alloc_cb));
+	CU_ASSERT(0 > gds_compact_rbtree_add(&root, NULL, NULL     , cmpkey_cb, NULL));
+	CU_ASSERT(0 > gds_compact_rbtree_add(&root, NULL, NULL     , cmpkey_cb, alloc_cb));
+	CU_ASSERT(0 > gds_compact_rbtree_add(&root, NULL, getkey_cb, NULL     , NULL));
+	CU_ASSERT(0 > gds_compact_rbtree_add(&root, NULL, getkey_cb, NULL     , alloc_cb));
+	CU_ASSERT(0 > gds_compact_rbtree_add(&root, t   , NULL     , NULL     , NULL));
+	CU_ASSERT(0 > gds_compact_rbtree_add(&root, t   , NULL     , NULL     , alloc_cb));
+	CU_ASSERT(0 > gds_compact_rbtree_add(&root, t   , NULL     , cmpkey_cb, NULL));
+	CU_ASSERT(0 > gds_compact_rbtree_add(&root, t   , NULL     , cmpkey_cb, alloc_cb));
+	CU_ASSERT(0 > gds_compact_rbtree_add(&root, t   , getkey_cb, NULL     , NULL));
+	CU_ASSERT(0 > gds_compact_rbtree_add(&root, t   , getkey_cb, NULL     , alloc_cb));
 
 	/* Tree is unchanged */
 	CU_ASSERT(NULL == root);
-	CU_ASSERT(gds_compact_rbtree_is_valid(root, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey));
+	CU_ASSERT(gds_compact_rbtree_is_valid(root, getkey_cb, cmpkey_cb));
 
 	/* Add NULL as data, first call should success, others must return a positive value, meaning that data is already in the tree */
-	CU_ASSERT(0 == gds_compact_rbtree_add(&root, NULL, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, false, NULL));
-	CU_ASSERT(gds_compact_rbtree_is_valid(root, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey));
-	CU_ASSERT(0 < gds_compact_rbtree_add(&root, NULL, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, false, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(gds_compact_rbtree_is_valid(root, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey));
-	CU_ASSERT(0 < gds_compact_rbtree_add(&root, NULL, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, true, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(gds_compact_rbtree_is_valid(root, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey));
+	CU_ASSERT(0 == gds_compact_rbtree_add(&root, NULL, getkey_cb, cmpkey_cb, NULL));
+	CU_ASSERT(gds_compact_rbtree_is_valid(root, getkey_cb, cmpkey_cb));
+	CU_ASSERT(0 < gds_compact_rbtree_add(&root, NULL, getkey_cb, cmpkey_cb, NULL));
+	CU_ASSERT(gds_compact_rbtree_is_valid(root, getkey_cb, cmpkey_cb));
+	CU_ASSERT(0 < gds_compact_rbtree_add(&root, NULL, getkey_cb, cmpkey_cb, alloc_cb));
+	CU_ASSERT(gds_compact_rbtree_is_valid(root, getkey_cb, cmpkey_cb));
 
 	/* Add t as data, first call should success, others must return a positive value, meaning that data is already in the tree */
-	CU_ASSERT(0 == gds_compact_rbtree_add(&root, t, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, false, NULL));
-	CU_ASSERT(gds_compact_rbtree_is_valid(root, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey));
-	CU_ASSERT(0 < gds_compact_rbtree_add(&root, t, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, false, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(gds_compact_rbtree_is_valid(root, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey));
-	CU_ASSERT(0 < gds_compact_rbtree_add(&root, t, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, true, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(gds_compact_rbtree_is_valid(root, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey));
+	CU_ASSERT(0 == gds_compact_rbtree_add(&root, t, getkey_cb, cmpkey_cb, NULL));
+	CU_ASSERT(gds_compact_rbtree_is_valid(root, getkey_cb, cmpkey_cb));
+	CU_ASSERT(0 < gds_compact_rbtree_add(&root, t, getkey_cb, cmpkey_cb, NULL));
+	CU_ASSERT(gds_compact_rbtree_is_valid(root, getkey_cb, cmpkey_cb));
+	CU_ASSERT(0 < gds_compact_rbtree_add(&root, t, getkey_cb, cmpkey_cb, alloc_cb));
+	CU_ASSERT(gds_compact_rbtree_is_valid(root, getkey_cb, cmpkey_cb));
 
-	gds_compact_rbtree_free(root, false, NULL);
+	gds_compact_rbtree_free(root, NULL);
 	test_free(t);
 	root = NULL;
 
 	for (int i=0; i<100; i++) {
 		sprintf(buf, "key %d", i);
 		CU_ASSERT(0 == gds_compact_rbtree_add(&root, test_new(buf, i),
-			(gds_getkey_cb)test_getkey,
-			(gds_cmpkey_cb)test_cmpkey, false, NULL));
-		CU_ASSERT(gds_compact_rbtree_is_valid(root, (gds_getkey_cb)test_getkey,
-			(gds_cmpkey_cb)test_cmpkey));
+			getkey_cb, cmpkey_cb, NULL));
+		CU_ASSERT(gds_compact_rbtree_is_valid(root, getkey_cb,
+			cmpkey_cb));
 	}
 
-	gds_compact_rbtree_free(root, true, (gds_free_cb)test_free);
+	gds_compact_rbtree_free(root, free_cb);
 	root = NULL;
 
 	for (int i=100; i>0; i--) {
 		sprintf(buf, "key %d", i);
 		CU_ASSERT(0 == gds_compact_rbtree_add(&root, test_new(buf, i),
-			(gds_getkey_cb)test_getkey,
-			(gds_cmpkey_cb)test_cmpkey, false, NULL));
-		CU_ASSERT(gds_compact_rbtree_is_valid(root, (gds_getkey_cb)test_getkey,
-			(gds_cmpkey_cb)test_cmpkey));
+			getkey_cb, cmpkey_cb, NULL));
+		CU_ASSERT(gds_compact_rbtree_is_valid(root, getkey_cb,
+			cmpkey_cb));
 	}
 
-	gds_compact_rbtree_free(root, true, (gds_free_cb)test_free);
+	gds_compact_rbtree_free(root, free_cb);
 	root = NULL;
 
 	srand(time(NULL));
@@ -201,13 +173,12 @@ void t_compact_rbtree_add(void)
 		int j = rand();
 		sprintf(buf, "key %d", j);
 		CU_ASSERT(0 <= gds_compact_rbtree_add(&root, test_new(buf, j),
-			(gds_getkey_cb)test_getkey,
-			(gds_cmpkey_cb)test_cmpkey, false, NULL));
-		CU_ASSERT(gds_compact_rbtree_is_valid(root, (gds_getkey_cb)test_getkey,
-			(gds_cmpkey_cb)test_cmpkey));
+			getkey_cb, cmpkey_cb, NULL));
+		CU_ASSERT(gds_compact_rbtree_is_valid(root, getkey_cb,
+			cmpkey_cb));
 	}
 
-	gds_compact_rbtree_free(root, true, (gds_free_cb)test_free);
+	gds_compact_rbtree_free(root, free_cb);
 }
 
 void t_compact_rbtree_get(void)
@@ -215,96 +186,65 @@ void t_compact_rbtree_get(void)
 	gds_compact_rbtree_node_t *root = NULL;
 	test_t *data;
 	char buf[512];
+	gds_cmpkey_cb cmpkey_cb = (gds_cmpkey_cb)test_cmpkey;
+	gds_getkey_cb getkey_cb = (gds_getkey_cb)test_getkey;
+	gds_alloc_cb alloc_cb = (gds_alloc_cb)test_alloc;
+	gds_free_cb free_cb = (gds_free_cb)test_free;
 
 	gds_compact_rbtree_add(&root, test_new("key", 1),
-		(gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey,
-		false, NULL);
+		getkey_cb, cmpkey_cb, NULL);
 
-	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, NULL, NULL, NULL, false, NULL));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, NULL, NULL, NULL, false, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, NULL, NULL, NULL, true, NULL));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, NULL, NULL, NULL, true, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, NULL, NULL, (gds_cmpkey_cb)test_cmpkey, false, NULL));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, NULL, NULL, (gds_cmpkey_cb)test_cmpkey, false, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, NULL, NULL, (gds_cmpkey_cb)test_cmpkey, true, NULL));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, NULL, NULL, (gds_cmpkey_cb)test_cmpkey, true, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, NULL, (gds_getkey_cb)test_getkey, NULL, false, NULL));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, NULL, (gds_getkey_cb)test_getkey, NULL, false, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, NULL, (gds_getkey_cb)test_getkey, NULL, true, NULL));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, NULL, (gds_getkey_cb)test_getkey, NULL, true, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, NULL, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, false, NULL));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, NULL, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, false, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, NULL, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, true, NULL));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, NULL, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, true, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, "key", NULL, NULL, false, NULL));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, "key", NULL, NULL, false, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, "key", NULL, NULL, true, NULL));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, "key", NULL, NULL, true, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, "key", NULL, (gds_cmpkey_cb)test_cmpkey, false, NULL));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, "key", NULL, (gds_cmpkey_cb)test_cmpkey, false, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, "key", NULL, (gds_cmpkey_cb)test_cmpkey, true, NULL));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, "key", NULL, (gds_cmpkey_cb)test_cmpkey, true, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, "key", (gds_getkey_cb)test_getkey, NULL, false, NULL));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, "key", (gds_getkey_cb)test_getkey, NULL, false, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, "key", (gds_getkey_cb)test_getkey, NULL, true, NULL));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, "key", (gds_getkey_cb)test_getkey, NULL, true, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, "key", (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, false, NULL));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, "key", (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, false, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, "key", (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, true, NULL));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, "key", (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, true, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(root, NULL, NULL, NULL, false, NULL));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(root, NULL, NULL, NULL, false, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(root, NULL, NULL, NULL, true, NULL));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(root, NULL, NULL, NULL, true, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(root, NULL, NULL, (gds_cmpkey_cb)test_cmpkey, false, NULL));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(root, NULL, NULL, (gds_cmpkey_cb)test_cmpkey, false, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(root, NULL, NULL, (gds_cmpkey_cb)test_cmpkey, true, NULL));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(root, NULL, NULL, (gds_cmpkey_cb)test_cmpkey, true, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(root, NULL, (gds_getkey_cb)test_getkey, NULL, false, NULL));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(root, NULL, (gds_getkey_cb)test_getkey, NULL, false, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(root, NULL, (gds_getkey_cb)test_getkey, NULL, true, NULL));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(root, NULL, (gds_getkey_cb)test_getkey, NULL, true, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(root, NULL, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, false, NULL));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(root, NULL, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, false, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(root, NULL, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, true, NULL));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(root, NULL, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, true, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(root, "key", NULL, NULL, false, NULL));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(root, "key", NULL, NULL, false, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(root, "key", NULL, NULL, true, NULL));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(root, "key", NULL, NULL, true, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(root, "key", NULL, (gds_cmpkey_cb)test_cmpkey, false, NULL));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(root, "key", NULL, (gds_cmpkey_cb)test_cmpkey, false, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(root, "key", NULL, (gds_cmpkey_cb)test_cmpkey, true, NULL));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(root, "key", NULL, (gds_cmpkey_cb)test_cmpkey, true, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(root, "key", (gds_getkey_cb)test_getkey, NULL, false, NULL));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(root, "key", (gds_getkey_cb)test_getkey, NULL, false, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(root, "key", (gds_getkey_cb)test_getkey, NULL, true, NULL));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(root, "key", (gds_getkey_cb)test_getkey, NULL, true, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(NULL != gds_compact_rbtree_get(root, "key", (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, false, NULL));
-	CU_ASSERT(NULL != gds_compact_rbtree_get(root, "key", (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, false, (gds_alloc_cb)test_alloc));
-	CU_ASSERT(NULL == gds_compact_rbtree_get(root, "key", (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, true, NULL));
-	CU_ASSERT(NULL != (data = gds_compact_rbtree_get(root, "key", (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, true, (gds_alloc_cb)test_alloc)));
+	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, NULL, NULL, NULL, NULL));
+	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, NULL, NULL, NULL, alloc_cb));
+	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, NULL, NULL, cmpkey_cb, NULL));
+	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, NULL, NULL, cmpkey_cb, alloc_cb));
+	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, NULL, getkey_cb, NULL, NULL));
+	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, NULL, getkey_cb, NULL, alloc_cb));
+	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, NULL, getkey_cb, cmpkey_cb, NULL));
+	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, NULL, getkey_cb, cmpkey_cb, alloc_cb));
+	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, "key", NULL, NULL, NULL));
+	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, "key", NULL, NULL, alloc_cb));
+	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, "key", NULL, cmpkey_cb, NULL));
+	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, "key", NULL, cmpkey_cb, alloc_cb));
+	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, "key", getkey_cb, NULL, NULL));
+	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, "key", getkey_cb, NULL, alloc_cb));
+	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, "key", getkey_cb, cmpkey_cb, NULL));
+	CU_ASSERT(NULL == gds_compact_rbtree_get(NULL, "key", getkey_cb, cmpkey_cb, alloc_cb));
+	CU_ASSERT(NULL == gds_compact_rbtree_get(root, NULL, NULL, NULL, NULL));
+	CU_ASSERT(NULL == gds_compact_rbtree_get(root, NULL, NULL, NULL, alloc_cb));
+	CU_ASSERT(NULL == gds_compact_rbtree_get(root, NULL, NULL, cmpkey_cb, NULL));
+	CU_ASSERT(NULL == gds_compact_rbtree_get(root, NULL, NULL, cmpkey_cb, alloc_cb));
+	CU_ASSERT(NULL == gds_compact_rbtree_get(root, NULL, getkey_cb, NULL, NULL));
+	CU_ASSERT(NULL == gds_compact_rbtree_get(root, NULL, getkey_cb, NULL, alloc_cb));
+	CU_ASSERT(NULL == gds_compact_rbtree_get(root, NULL, getkey_cb, cmpkey_cb, NULL));
+	CU_ASSERT(NULL == gds_compact_rbtree_get(root, NULL, getkey_cb, cmpkey_cb, alloc_cb));
+	CU_ASSERT(NULL == gds_compact_rbtree_get(root, "key", NULL, NULL, NULL));
+	CU_ASSERT(NULL == gds_compact_rbtree_get(root, "key", NULL, NULL, alloc_cb));
+	CU_ASSERT(NULL == gds_compact_rbtree_get(root, "key", NULL, cmpkey_cb, NULL));
+	CU_ASSERT(NULL == gds_compact_rbtree_get(root, "key", NULL, cmpkey_cb, alloc_cb));
+	CU_ASSERT(NULL == gds_compact_rbtree_get(root, "key", getkey_cb, NULL, NULL));
+	CU_ASSERT(NULL == gds_compact_rbtree_get(root, "key", getkey_cb, NULL, alloc_cb));
+	CU_ASSERT(NULL != gds_compact_rbtree_get(root, "key", getkey_cb, cmpkey_cb, NULL));
+	CU_ASSERT(NULL != (data = gds_compact_rbtree_get(root, "key", getkey_cb, cmpkey_cb, alloc_cb)));
 	test_free(data);
 
-	gds_compact_rbtree_free(root, true, (gds_free_cb)test_free);
+	gds_compact_rbtree_free(root, free_cb);
 	root = NULL;
 
 	for (int i=0; i<100; i++) {
 		sprintf(buf, "key %d", i);
 		gds_compact_rbtree_add(&root, test_new(buf, i),
-			(gds_getkey_cb)test_getkey,
-			(gds_cmpkey_cb)test_cmpkey, false, NULL);
+			getkey_cb, cmpkey_cb, NULL);
 	}
 	for (int i=0; i<100; i++) {
 		sprintf(buf, "key %d", i);
 		data = gds_compact_rbtree_get(root, buf,
-			(gds_getkey_cb)test_getkey,
-			(gds_cmpkey_cb)test_cmpkey, false, NULL);
+			getkey_cb, cmpkey_cb, NULL);
 		CU_ASSERT(NULL != data);
 		CU_ASSERT(i == test_getvalue(data));
 		CU_ASSERT(0 == test_cmpkey(buf, test_getkey(data)));
 	}
-	gds_compact_rbtree_free(root, true, (gds_free_cb)test_free);
+	gds_compact_rbtree_free(root, free_cb);
 }
 
 void t_compact_rbtree_del(void)
@@ -312,99 +252,63 @@ void t_compact_rbtree_del(void)
 	gds_compact_rbtree_node_t *root = NULL;
 	test_t *t = test_new("key", 1);
 	char buf[512];
+	gds_cmpkey_cb cmpkey_cb = (gds_cmpkey_cb)test_cmpkey;
+	gds_getkey_cb getkey_cb = (gds_getkey_cb)test_getkey;
+	gds_free_cb free_cb = (gds_free_cb)test_free;
 
-	gds_compact_rbtree_add(&root, t, (gds_getkey_cb)test_getkey,
-		(gds_cmpkey_cb)test_cmpkey, false, NULL);
+	gds_compact_rbtree_add(&root, t, getkey_cb, cmpkey_cb, NULL);
 
-	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, NULL, NULL, NULL, false, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, NULL, NULL, NULL, false, (gds_free_cb)test_free));
-	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, NULL, NULL, NULL, true, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, NULL, NULL, NULL, true, (gds_free_cb)test_free));
-	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, NULL, NULL, (gds_cmpkey_cb)test_cmpkey, false, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, NULL, NULL, (gds_cmpkey_cb)test_cmpkey, false, (gds_free_cb)test_free));
-	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, NULL, NULL, (gds_cmpkey_cb)test_cmpkey, true, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, NULL, NULL, (gds_cmpkey_cb)test_cmpkey, true, (gds_free_cb)test_free));
-	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, NULL, (gds_getkey_cb)test_getkey, NULL, false, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, NULL, (gds_getkey_cb)test_getkey, NULL, false, (gds_free_cb)test_free));
-	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, NULL, (gds_getkey_cb)test_getkey, NULL, true, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, NULL, (gds_getkey_cb)test_getkey, NULL, true, (gds_free_cb)test_free));
-	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, NULL, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, false, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, NULL, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, false, (gds_free_cb)test_free));
-	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, NULL, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, true, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, NULL, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, true, (gds_free_cb)test_free));
-	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, "key", NULL, NULL, false, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, "key", NULL, NULL, false, (gds_free_cb)test_free));
-	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, "key", NULL, NULL, true, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, "key", NULL, NULL, true, (gds_free_cb)test_free));
-	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, "key", NULL, (gds_cmpkey_cb)test_cmpkey, false, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, "key", NULL, (gds_cmpkey_cb)test_cmpkey, false, (gds_free_cb)test_free));
-	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, "key", NULL, (gds_cmpkey_cb)test_cmpkey, true, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, "key", NULL, (gds_cmpkey_cb)test_cmpkey, true, (gds_free_cb)test_free));
-	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, "key", (gds_getkey_cb)test_getkey, NULL, false, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, "key", (gds_getkey_cb)test_getkey, NULL, false, (gds_free_cb)test_free));
-	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, "key", (gds_getkey_cb)test_getkey, NULL, true, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, "key", (gds_getkey_cb)test_getkey, NULL, true, (gds_free_cb)test_free));
-	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, "key", (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, false, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, "key", (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, false, (gds_free_cb)test_free));
-	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, "key", (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, true, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, "key", (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, true, (gds_free_cb)test_free));
-	CU_ASSERT(0 > gds_compact_rbtree_del(&root, NULL, NULL, NULL, false, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_del(&root, NULL, NULL, NULL, false, (gds_free_cb)test_free));
-	CU_ASSERT(0 > gds_compact_rbtree_del(&root, NULL, NULL, NULL, true, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_del(&root, NULL, NULL, NULL, true, (gds_free_cb)test_free));
-	CU_ASSERT(0 > gds_compact_rbtree_del(&root, NULL, NULL, (gds_cmpkey_cb)test_cmpkey, false, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_del(&root, NULL, NULL, (gds_cmpkey_cb)test_cmpkey, false, (gds_free_cb)test_free));
-	CU_ASSERT(0 > gds_compact_rbtree_del(&root, NULL, NULL, (gds_cmpkey_cb)test_cmpkey, true, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_del(&root, NULL, NULL, (gds_cmpkey_cb)test_cmpkey, true, (gds_free_cb)test_free));
-	CU_ASSERT(0 > gds_compact_rbtree_del(&root, NULL, (gds_getkey_cb)test_getkey, NULL, false, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_del(&root, NULL, (gds_getkey_cb)test_getkey, NULL, false, (gds_free_cb)test_free));
-	CU_ASSERT(0 > gds_compact_rbtree_del(&root, NULL, (gds_getkey_cb)test_getkey, NULL, true, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_del(&root, NULL, (gds_getkey_cb)test_getkey, NULL, true, (gds_free_cb)test_free));
-	CU_ASSERT(0 < gds_compact_rbtree_del(&root, NULL, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, false, NULL));
-	CU_ASSERT(0 < gds_compact_rbtree_del(&root, NULL, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, false, (gds_free_cb)test_free));
-	CU_ASSERT(0 > gds_compact_rbtree_del(&root, NULL, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, true, NULL));
-	CU_ASSERT(0 < gds_compact_rbtree_del(&root, NULL, (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, true, (gds_free_cb)test_free));
-	CU_ASSERT(0 > gds_compact_rbtree_del(&root, "key", NULL, NULL, false, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_del(&root, "key", NULL, NULL, false, (gds_free_cb)test_free));
-	CU_ASSERT(0 > gds_compact_rbtree_del(&root, "key", NULL, NULL, true, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_del(&root, "key", NULL, NULL, true, (gds_free_cb)test_free));
-	CU_ASSERT(0 > gds_compact_rbtree_del(&root, "key", NULL, (gds_cmpkey_cb)test_cmpkey, false, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_del(&root, "key", NULL, (gds_cmpkey_cb)test_cmpkey, false, (gds_free_cb)test_free));
-	CU_ASSERT(0 > gds_compact_rbtree_del(&root, "key", NULL, (gds_cmpkey_cb)test_cmpkey, true, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_del(&root, "key", NULL, (gds_cmpkey_cb)test_cmpkey, true, (gds_free_cb)test_free));
-	CU_ASSERT(0 > gds_compact_rbtree_del(&root, "key", (gds_getkey_cb)test_getkey, NULL, false, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_del(&root, "key", (gds_getkey_cb)test_getkey, NULL, false, (gds_free_cb)test_free));
-	CU_ASSERT(0 > gds_compact_rbtree_del(&root, "key", (gds_getkey_cb)test_getkey, NULL, true, NULL));
-	CU_ASSERT(0 > gds_compact_rbtree_del(&root, "key", (gds_getkey_cb)test_getkey, NULL, true, (gds_free_cb)test_free));
-	CU_ASSERT(0 == gds_compact_rbtree_del(&root, "key", (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, false, NULL));
-	CU_ASSERT(0 < gds_compact_rbtree_del(&root, "key", (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, false, (gds_free_cb)test_free));
-	CU_ASSERT(0 > gds_compact_rbtree_del(&root, "key", (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, true, NULL));
-	CU_ASSERT(0 < gds_compact_rbtree_del(&root, "key", (gds_getkey_cb)test_getkey, (gds_cmpkey_cb)test_cmpkey, true, (gds_free_cb)test_free));
+	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, NULL, NULL, NULL, NULL));
+	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, NULL, NULL, NULL, free_cb));
+	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, NULL, NULL, cmpkey_cb, NULL));
+	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, NULL, NULL, cmpkey_cb, free_cb));
+	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, NULL, getkey_cb, NULL, NULL));
+	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, NULL, getkey_cb, NULL, free_cb));
+	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, NULL, getkey_cb, cmpkey_cb, NULL));
+	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, NULL, getkey_cb, cmpkey_cb, free_cb));
+	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, "key", NULL, NULL, NULL));
+	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, "key", NULL, NULL, free_cb));
+	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, "key", NULL, cmpkey_cb, NULL));
+	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, "key", NULL, cmpkey_cb, free_cb));
+	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, "key", getkey_cb, NULL, NULL));
+	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, "key", getkey_cb, NULL, free_cb));
+	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, "key", getkey_cb, cmpkey_cb, NULL));
+	CU_ASSERT(0 > gds_compact_rbtree_del(NULL, "key", getkey_cb, cmpkey_cb, free_cb));
+	CU_ASSERT(0 > gds_compact_rbtree_del(&root, NULL, NULL, NULL, NULL));
+	CU_ASSERT(0 > gds_compact_rbtree_del(&root, NULL, NULL, NULL, free_cb));
+	CU_ASSERT(0 > gds_compact_rbtree_del(&root, NULL, NULL, cmpkey_cb, NULL));
+	CU_ASSERT(0 > gds_compact_rbtree_del(&root, NULL, NULL, cmpkey_cb, free_cb));
+	CU_ASSERT(0 > gds_compact_rbtree_del(&root, NULL, getkey_cb, NULL, NULL));
+	CU_ASSERT(0 > gds_compact_rbtree_del(&root, NULL, getkey_cb, NULL, free_cb));
+	CU_ASSERT(0 < gds_compact_rbtree_del(&root, NULL, getkey_cb, cmpkey_cb, NULL));
+	CU_ASSERT(0 < gds_compact_rbtree_del(&root, NULL, getkey_cb, cmpkey_cb, free_cb));
+	CU_ASSERT(0 > gds_compact_rbtree_del(&root, "key", NULL, NULL, NULL));
+	CU_ASSERT(0 > gds_compact_rbtree_del(&root, "key", NULL, NULL, free_cb));
+	CU_ASSERT(0 > gds_compact_rbtree_del(&root, "key", NULL, cmpkey_cb, NULL));
+	CU_ASSERT(0 > gds_compact_rbtree_del(&root, "key", NULL, cmpkey_cb, free_cb));
+	CU_ASSERT(0 > gds_compact_rbtree_del(&root, "key", getkey_cb, NULL, NULL));
+	CU_ASSERT(0 > gds_compact_rbtree_del(&root, "key", getkey_cb, NULL, free_cb));
+	CU_ASSERT(0 == gds_compact_rbtree_del(&root, "key", getkey_cb, cmpkey_cb, NULL));
+	CU_ASSERT(0 < gds_compact_rbtree_del(&root, "key", getkey_cb, cmpkey_cb, free_cb));
 
 	test_free(t);
 
 	for (int i=0; i<100; i++) {
 		sprintf(buf, "key %d", i);
-		gds_compact_rbtree_add(&root, test_new(buf, i),
-			(gds_getkey_cb)test_getkey,
-			(gds_cmpkey_cb)test_cmpkey, false, NULL);
+		gds_compact_rbtree_add(&root, test_new(buf, i), getkey_cb,
+			cmpkey_cb, NULL);
 	}
 	for (int i=0; i<100; i++) {
 		sprintf(buf, "key %d", i);
-		CU_ASSERT(0 == gds_compact_rbtree_del(&root, buf,
-			(gds_getkey_cb)test_getkey,
-			(gds_cmpkey_cb)test_cmpkey, true,
-			(gds_free_cb)test_free));
-		CU_ASSERT(gds_compact_rbtree_is_valid(root,
-			(gds_getkey_cb)test_getkey,
-			(gds_cmpkey_cb)test_cmpkey));
+		CU_ASSERT(0 == gds_compact_rbtree_del(&root, buf, getkey_cb,
+			cmpkey_cb, free_cb));
+		CU_ASSERT(gds_compact_rbtree_is_valid(root, getkey_cb,
+			cmpkey_cb));
 	}
 	for (int i=0; i<100; i++) {
 		sprintf(buf, "key %d", i);
-		CU_ASSERT(0 < gds_compact_rbtree_del(&root, buf,
-			(gds_getkey_cb)test_getkey,
-			(gds_cmpkey_cb)test_cmpkey, true,
-			(gds_free_cb)test_free));
+		CU_ASSERT(0 < gds_compact_rbtree_del(&root, buf, getkey_cb,
+			cmpkey_cb, free_cb));
 	}
 }
 

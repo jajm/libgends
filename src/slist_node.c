@@ -24,26 +24,25 @@
 
 #include <stdlib.h>
 #include <stdint.h>
-#include <stdbool.h>
 #include "log.h"
 #include "slist_node.h"
 #include "callbacks.h"
 
-gds_slist_node_t *gds_slist_node_new(void *data, bool copy_data, gds_alloc_cb alloc_cb)
+gds_slist_node_t *gds_slist_node_new(void *data, gds_alloc_cb alloc_cb)
 {
 	gds_slist_node_t *node;
 
-	if(data == NULL || (copy_data && alloc_cb == NULL)) {
+	if (data == NULL) {
 		GDS_LOG_ERROR("Bad arguments");
 		return NULL;
 	}
 
 	node = malloc(sizeof(gds_slist_node_t));
-	if(node == NULL) {
+	if (node == NULL) {
 		GDS_LOG_ERROR("Memory allocation error");
 		return NULL;
 	}
-	if(copy_data) {
+	if (alloc_cb != NULL) {
 		node->data = alloc_cb(data);
 		if(node->data == NULL) {
 			GDS_LOG_ERROR("Memory allocation error");
@@ -59,20 +58,19 @@ gds_slist_node_t *gds_slist_node_new(void *data, bool copy_data, gds_alloc_cb al
 }
 
 
-int8_t gds_slist_node_set_data(gds_slist_node_t *node, void *data, bool free_old_data,
-	gds_free_cb free_cb, bool copy_data, gds_alloc_cb alloc_cb)
+int8_t gds_slist_node_set_data(gds_slist_node_t *node, void *data,
+	gds_free_cb free_cb, gds_alloc_cb alloc_cb)
 {
-	if(node == NULL || data == NULL || (copy_data && alloc_cb == NULL)
-	|| (free_old_data && free_cb == NULL)) {
+	if (node == NULL || data == NULL) {
 		GDS_LOG_ERROR("Bad arguments");
 		return -1;
 	}
 
-	if(free_old_data) {
+	if (free_cb != NULL) {
 		free_cb(node->data);
 	}
 
-	if(copy_data) {
+	if (alloc_cb != NULL) {
 		node->data = alloc_cb(data);
 		if(node->data == NULL) {
 			GDS_LOG_ERROR("Memory allocation error");
@@ -85,16 +83,16 @@ int8_t gds_slist_node_set_data(gds_slist_node_t *node, void *data, bool free_old
 	return 0;
 }
 
-void *gds_slist_node_get_data(gds_slist_node_t *node, bool copy, gds_alloc_cb alloc_cb)
+void *gds_slist_node_get_data(gds_slist_node_t *node, gds_alloc_cb alloc_cb)
 {
 	void *data;
 
-	if(node == NULL || (copy && alloc_cb == NULL)) {
+	if (node == NULL) {
 		GDS_LOG_ERROR("Bad arguments");
 		return NULL;
 	}
 
-	if(copy) {
+	if (alloc_cb) {
 		data = alloc_cb(node->data);
 		if(data == NULL) {
 			GDS_LOG_ERROR("Memory allocation error");
@@ -129,14 +127,10 @@ gds_slist_node_t *gds_slist_node_get_next(gds_slist_node_t *node)
 	return node->next;
 }
 
-void gds_slist_node_free(gds_slist_node_t *node, bool free_data, gds_free_cb free_cb)
+void gds_slist_node_free(gds_slist_node_t *node, gds_free_cb free_cb)
 {
-	if(node && free_data) {
-		if(free_cb) {
-			free_cb(node->data);
-		} else {
-			GDS_LOG_ERROR("free_data is true but free_cb is NULL");
-		}
+	if(free_cb != NULL && node != NULL) {
+		free_cb(node->data);
 	}
 	free(node);
 }

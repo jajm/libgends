@@ -86,14 +86,14 @@ int8_t gds_iterator_step(gds_iterator_t *it)
 	return it->step_cb(it->data);
 }
 
-void * gds_iterator_get(gds_iterator_t *it, bool copy_data)
+void * gds_iterator_get(gds_iterator_t *it)
 {
 	if(it == NULL) {
 		GDS_LOG_ERROR("Bad arguments");
 		return NULL;
 	}
 
-	return it->get_cb(it->data, copy_data);
+	return it->get_cb(it->data);
 }
 
 void gds_iterator_free(gds_iterator_t *it, gds_free_cb free_cb)

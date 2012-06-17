@@ -26,10 +26,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include "log.h"
-#include "func_list.h"
-#include "slist_node.h"
-#include "stack.h"
 #include "types.h"
+#include "slist_node.h"
+#include "ll_slist.h"
+#include "stack.h"
 
 gds_stack_t *gds_stack_new(const char *type_name)
 {
@@ -74,13 +74,13 @@ int8_t gds_stack_push(gds_stack_t *S, void *data, bool copy_data)
 		alloc_cb = (gds_alloc_cb)gds_type_get_func(S->type_name, "alloc");
 	}
 
-	newnode = gds_slist_node_new(data, copy_data, alloc_cb);
-	if(newnode == NULL){
-		GDS_LOG_ERROR("Failed to create the node");
+	newnode = gds_ll_slist_add_first(S->head, data, alloc_cb);
+	if (newnode == NULL) {
+		GDS_LOG_ERROR("Failed to add data to the stack");
 		return -1;
+	} else {
+		S->head = newnode;
 	}
-	newnode->next = S->head;
-	S->head = newnode;
 
 	return 0;
 }
@@ -88,41 +88,27 @@ int8_t gds_stack_push(gds_stack_t *S, void *data, bool copy_data)
 void *gds_stack_pop(gds_stack_t *S)
 {
 	void *data;
-	gds_slist_node_t *next;
 
 	if(S == NULL) {
 		GDS_LOG_ERROR("Bad arguments");
 		return NULL;
 	}
 
-	if(S->head == NULL){
-		GDS_LOG_ERROR("Stack is empty");
-		return NULL;
-	}
-
-	next = S->head->next;
-	data = gds_slist_node_get_data(S->head, false, 0);
-	gds_slist_node_free(S->head, false, NULL);
-	S->head = next;
+	data = gds_slist_node_get_data(S->head, NULL);
+	S->head = gds_ll_slist_del_first(S->head, NULL);
 
 	return data;
 }
 
 void gds_stack_free(gds_stack_t *S, bool free_data)
 {
-	gds_slist_node_t *tmp, *tmp2;
 	gds_free_cb free_cb = NULL;
 
-	if(S){
+	if (S != NULL) {
 		if(free_data) {
 			free_cb = (gds_free_cb)gds_type_get_func(S->type_name, "free");
 		}
-		tmp = S->head;
-		while(tmp != NULL){
-			tmp2 = tmp->next;
-			gds_slist_node_free(tmp, free_data, free_cb);
-			tmp = tmp2;
-		}
+		gds_ll_slist_free(S->head, free_cb);
 		free(S->type_name);
 		free(S);
 	}

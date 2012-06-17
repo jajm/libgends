@@ -18,14 +18,12 @@ typedef struct gds_rbtree_node_s gds_rbtree_node_t;
 gds_rbtree_node_t *
 gds_rbtree_node_new(
 	void *data,
-	bool copy_data,
 	gds_alloc_cb alloc_cb
 );
 
 void *
 gds_rbtree_node_get_data(
 	gds_rbtree_node_t *node,
-	bool copy_data,
 	gds_alloc_cb alloc_cb
 );
 
@@ -33,9 +31,7 @@ int8_t
 gds_rbtree_node_set_data(
 	gds_rbtree_node_t *node,
 	void *data,
-	bool copy_data,
 	gds_alloc_cb alloc_cb,
-	bool free_old_data,
 	gds_free_cb free_cb
 );
 
@@ -47,7 +43,6 @@ gds_rbtree_node_is_red(
 void
 gds_rbtree_node_free(
 	gds_rbtree_node_t *node,
-	bool free_data,
 	gds_free_cb free_cb
 );
 
