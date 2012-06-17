@@ -3,6 +3,7 @@
 
 #include "compact_rbtree_node.h"
 #include "callbacks.h"
+#include "slist_node.h"
 
 int8_t
 gds_compact_rbtree_add(
@@ -35,6 +36,12 @@ void
 gds_compact_rbtree_free(
 	gds_compact_rbtree_node_t *root,
 	gds_free_cb free_cb
+);
+
+gds_slist_node_t *
+gds_compact_rbtree_values(
+	gds_compact_rbtree_node_t *root,
+	gds_alloc_cb alloc_cb
 );
 
 #endif /* Not defined compact_rbtree_h_included */

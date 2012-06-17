@@ -6,6 +6,8 @@
 #include "compact_rbtree_node.h"
 #include "compact_rbtree.h"
 #include "callbacks.h"
+#include "slist_node.h"
+#include "ll_slist.h"
 
 gds_compact_rbtree_node_t * gds_compact_rbtree_rotate(
 	gds_compact_rbtree_node_t *node, uint8_t dir)
@@ -252,3 +254,26 @@ void gds_compact_rbtree_free(gds_compact_rbtree_node_t *root,
 		gds_compact_rbtree_node_free(root, free_cb);
 	}
 }
+
+void gds_compact_rbtree_build_values_list(gds_compact_rbtree_node_t *root,
+	gds_alloc_cb alloc_cb, gds_slist_node_t **head)
+{
+	if (root != NULL) {
+		gds_compact_rbtree_build_values_list(root->son[1], alloc_cb,
+			head);
+		*head = gds_ll_slist_add_first(*head, root->data, alloc_cb);
+		gds_compact_rbtree_build_values_list(root->son[0], alloc_cb,
+			head);
+	}
+}
+
+gds_slist_node_t * gds_compact_rbtree_values(gds_compact_rbtree_node_t *root,
+	gds_alloc_cb alloc_cb)
+{
+	gds_slist_node_t *head = NULL;
+
+	gds_compact_rbtree_build_values_list(root, alloc_cb, &head);
+
+	return head;
+}
+
