@@ -197,6 +197,8 @@ int main()
 	for(i=0; i<max; i++) {
 		n = eina_rbtree_inline_lookup(eroot, (void *)i, 1, EINA_RBTREE_CMP_KEY_CB(cmpkey2), NULL);
 		eroot = eina_rbtree_inline_remove(eroot, n, EINA_RBTREE_CMP_NODE_CB(cmp), NULL);
+		t2 = EINA_RBTREE_CONTAINER_GET(n, test2_t);
+		free(t2);
 	}
 	gettimeofday(&end, NULL);
 	timeval_diff(&start, &end, &diff);
