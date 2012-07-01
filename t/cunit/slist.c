@@ -372,9 +372,7 @@ void t_gds_slist_pop(void)
 
 	test_free((test_structure_t *)data);
 	test_free(test_ptr);
-	printf("a\n");
 	gds_slist_free(l, true);
-	printf("a\n");
 	gds_type_unregister(type_name);
 }
 
