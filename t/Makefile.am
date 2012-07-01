@@ -2,7 +2,7 @@ if CUNIT_TESTS
 SUBDIRS = cunit
 endif
 
-AM_CPPFLAGS = -I../src/core -I../src
+AM_CPPFLAGS = -I../include/core -I../include
 AM_CFLAGS = -Wall -Wextra -Werror -std=c99
 
 noinst_PROGRAMS = hash_map

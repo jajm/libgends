@@ -1,10 +1,8 @@
-SUBDIRS = core
-
-AM_CPPFLAGS = -I.. -I../../src -I../../src/core
+AM_CPPFLAGS = -I.. -I../../include/core -I../../include
 AM_CFLAGS = -Wall -Wextra -Werror -std=c99
 
 noinst_PROGRAMS = container slist_node slist dlist_node dlist stack \
-	compact_rbtree_node compact_rbtree rbtree_node rbtree
+	compact_rbtree_node compact_rbtree rbtree_node rbtree types func_list
 
 container_SOURCES = container.c
 container_LDADD = ../../src/libgends.la
@@ -45,3 +43,11 @@ rbtree_node_LDFLAGS = -lcunit
 rbtree_SOURCES = rbtree.c ../test.c
 rbtree_LDADD = ../../src/libgends.la
 rbtree_LDFLAGS = -lcunit
+
+types_SOURCES = types.c
+types_LDADD = ../../src/libgends.la
+types_LDFLAGS = -lcunit
+
+func_list_SOURCES = func_list.c
+func_list_LDADD = ../../src/libgends.la
+func_list_LDFLAGS = -lcunit
