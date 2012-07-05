@@ -5,6 +5,8 @@
 #include <time.h>
 #include <CUnit/Basic.h>
 #include "compact_rbtree.h"
+#include "iterator.h"
+#include "ll_slist.h"
 #include "test.h"
 
 int init_suite(void)
@@ -312,6 +314,41 @@ void t_compact_rbtree_del(void)
 	}
 }
 
+void t_compact_rbtree_values(void)
+{
+	gds_compact_rbtree_node_t *root = NULL;
+	gds_slist_node_t *slist;
+	gds_iterator_t *it;
+	test_t *t;
+	char buf[512];
+	int i;
+	gds_cmpkey_cb cmpkey_cb = (gds_cmpkey_cb)test_cmpkey;
+	gds_getkey_cb getkey_cb = (gds_getkey_cb)test_getkey;
+	gds_free_cb free_cb = (gds_free_cb)test_free;
+
+	for(i=0; i<100; i++) {
+		sprintf(buf, "key %02d", i);
+		t = test_new(buf, i);
+		gds_compact_rbtree_add(&root, t, getkey_cb, cmpkey_cb, NULL);
+	}
+
+	slist = gds_compact_rbtree_values(root, NULL);
+	CU_ASSERT(NULL != slist);
+	it = gds_ll_slist_iterator_new(slist);
+	i = 0;
+	while(gds_iterator_step(it) == 0) {
+		t = gds_iterator_get(it);
+		CU_ASSERT(NULL != t);
+		sprintf(buf, "key %02d", i);
+		CU_ASSERT(0 == strncmp(t->key, buf, strlen(buf)));
+		CU_ASSERT(i == t->value);
+		i++;
+	}
+	gds_iterator_free(it, free_cb);
+	gds_compact_rbtree_free(root, free_cb);
+}
+
+
 int main()
 {
 	CU_pSuite pSuite = NULL;
@@ -333,6 +370,7 @@ int main()
 	   (NULL == CU_add_test(pSuite, "gds_compact_rbtree_add()", t_compact_rbtree_add))
 	|| (NULL == CU_add_test(pSuite, "gds_compact_rbtree_get()", t_compact_rbtree_get))
 	|| (NULL == CU_add_test(pSuite, "gds_compact_rbtree_del()", t_compact_rbtree_del))
+	|| (NULL == CU_add_test(pSuite, "gds_compact_rbtree_values()", t_compact_rbtree_values))
 	) {
 		CU_cleanup_registry();
 		return CU_get_error();
