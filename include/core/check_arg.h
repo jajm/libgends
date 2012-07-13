@@ -7,5 +7,9 @@
 	if ((arg) == NULL) \
 		GDS_THROW(BadArgumentException, "argument '%s' is NULL", #arg)
 
+#define GDS_CHECK_ARG_NOT_ZERO(arg) \
+	if ((arg) == 0) \
+		GDS_THROW(BadArgumentException, "argument '%s' == 0", #arg)
+
 #endif /* Not check_arg_h_included */
 

@@ -44,7 +44,6 @@
 /* Hash function pointer type */
 /* Hash functions take a string (the hash key) and an integer (the map size)
  * and must return an unsigned integer strictly inferior to map_size */
-typedef uint32_t (*gds_hash_cb)(const char *, uint32_t);
 typedef struct gds_hash_map_s gds_hash_map_t;
 
 #ifdef __cplusplus

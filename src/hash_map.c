@@ -439,7 +439,7 @@ gds_hash_map_t * gds_hash_map_new(const char *type_name, uint32_t map_size,
 	if(hash_cb != NULL) {
 		hash_map->hash_cb = hash_cb;
 	} else {
-		hash_map->hash_cb = &gds_hash_map_default_hash_cb;
+		hash_map->hash_cb = (gds_hash_cb)gds_hash_map_default_hash_cb;
 	}
 
 	return hash_map;

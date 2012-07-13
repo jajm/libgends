@@ -14,6 +14,16 @@ gds_compact_rbtree_add(
 	gds_alloc_cb alloc_cb
 );
 
+int8_t
+gds_compact_rbtree_set(
+	gds_compact_rbtree_node_t **root,
+	void *data,
+	gds_getkey_cb getkey_cb,
+	gds_cmpkey_cb cmpkey_cb,
+	gds_free_cb free_cb,
+	gds_alloc_cb alloc_cb
+);
+
 void *
 gds_compact_rbtree_get(
 	gds_compact_rbtree_node_t *root,

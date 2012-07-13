@@ -51,6 +51,54 @@ gds_slist_node_t * gds_ll_slist_add_after(gds_slist_node_t *node, void *data,
 	return n;
 }
 
+void gds_ll_slist_add_list_first(gds_slist_node_t **head,
+	gds_slist_node_t *list)
+{
+	gds_slist_node_t *node;
+	GDS_CHECK_ARG_NOT_NULL(head);
+	GDS_CHECK_ARG_NOT_NULL(list);
+
+	node = list;
+	while (node->next != NULL) {
+		node = node->next;
+	}
+	node->next = *head;
+	*head = list;
+}
+
+void gds_ll_slist_add_list_last(gds_slist_node_t **head,
+	gds_slist_node_t *list)
+{
+	gds_slist_node_t *node;
+	GDS_CHECK_ARG_NOT_NULL(head);
+	GDS_CHECK_ARG_NOT_NULL(list);
+
+	if (*head == NULL) {
+		*head = list;
+	} else {
+		node = *head;
+		while (node->next != NULL) {
+			node = node->next;
+		}
+		node->next = list;
+	}
+}
+
+void gds_ll_slist_add_list_after(gds_slist_node_t *node,
+	gds_slist_node_t *list)
+{
+	gds_slist_node_t *n;
+	GDS_CHECK_ARG_NOT_NULL(node);
+	GDS_CHECK_ARG_NOT_NULL(list);
+
+	n = list;
+	while (n->next != NULL) {
+		n = n->next;
+	}
+	n->next = node->next;
+	node->next = list;
+}
+
 gds_slist_node_t * gds_ll_slist_get_last(gds_slist_node_t *head)
 {
 	gds_slist_node_t *tmp = NULL;
@@ -187,4 +235,9 @@ gds_iterator_t * gds_ll_slist_iterator_new(gds_slist_node_t *head)
 		(gds_iterator_get_cb) &gds_ll_slist_iterator_get);
 	
 	return it;
+}
+
+void gds_ll_slist_iterator_free(gds_iterator_t *it)
+{
+	gds_iterator_free(it, (gds_free_cb)&free);
 }

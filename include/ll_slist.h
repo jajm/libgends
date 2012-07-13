@@ -72,6 +72,24 @@ gds_ll_slist_add_after(
 	gds_alloc_cb alloc_cb
 );
 
+void
+gds_ll_slist_add_list_first(
+	gds_slist_node_t **head,
+	gds_slist_node_t *list
+);
+
+void
+gds_ll_slist_add_list_last(
+	gds_slist_node_t **head,
+	gds_slist_node_t *list
+);
+
+void
+gds_ll_slist_add_list_after(
+	gds_slist_node_t *node,
+	gds_slist_node_t *list
+);
+
 /* Get last node of list */
 /* head : pointer to first node of list */
 /* Return : pointer to last node of list, or NULL if list is empty */
@@ -123,6 +141,13 @@ gds_ll_slist_del_after(
 gds_iterator_t *
 gds_ll_slist_iterator_new(
 	gds_slist_node_t *head
+);
+
+/* Free iterator */
+/* it: pointer to iterator */
+void
+gds_ll_slist_iterator_free(
+	gds_iterator_t *it
 );
 
 /* Free list */

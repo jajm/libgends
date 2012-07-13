@@ -41,4 +41,11 @@ typedef int32_t (*gds_cmpkey_cb)(void *, void *);
  *  - if object1 > object2: a positive value */
 typedef int32_t (*gds_cmp_cb)(void *, void *);
 
+/* Callback: gds_hash_cb */
+/* Purpose: Compute the hash of an object */
+/* 1st parameter: object to compute
+ * 2nd parameter: size of hash map */
+/* Should returns: hash (integer) of the object */
+typedef uint32_t (*gds_hash_cb)(const void *, uint32_t);
+
 #endif /* Not callbacks_h_included */

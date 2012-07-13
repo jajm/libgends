@@ -114,8 +114,9 @@ int8_t gds_compact_rbtree_add(gds_compact_rbtree_node_t **root, void *data,
 	return (node_added) ? 0 : 1;
 }
 
-void * gds_compact_rbtree_get(gds_compact_rbtree_node_t *root, void *key,
-	gds_getkey_cb getkey_cb, gds_cmpkey_cb cmpkey_cb, gds_alloc_cb alloc_cb)
+gds_compact_rbtree_node_t * gds_compact_rbtree_get_node(
+	gds_compact_rbtree_node_t *root, void *key, gds_getkey_cb getkey_cb,
+	gds_cmpkey_cb cmpkey_cb)
 {
 	gds_compact_rbtree_node_t *node;
 	uint8_t dir;
@@ -135,7 +136,52 @@ void * gds_compact_rbtree_get(gds_compact_rbtree_node_t *root, void *key,
 		node = node->son[dir];
 	}
 
+	return node;
+}
+
+void * gds_compact_rbtree_get(gds_compact_rbtree_node_t *root, void *key,
+	gds_getkey_cb getkey_cb, gds_cmpkey_cb cmpkey_cb, gds_alloc_cb alloc_cb)
+{
+	gds_compact_rbtree_node_t *node;
+
+	node = gds_compact_rbtree_get_node(root, key, getkey_cb, cmpkey_cb);
+
 	return gds_compact_rbtree_node_get_data(node, alloc_cb);
+}
+
+int8_t gds_compact_rbtree_set(gds_compact_rbtree_node_t **root, void *data,
+	gds_getkey_cb getkey_cb, gds_cmpkey_cb cmpkey_cb, gds_free_cb free_cb,
+	gds_alloc_cb alloc_cb)
+{
+	void *key;
+	gds_compact_rbtree_node_t *node;
+	int8_t ret;
+
+	GDS_CHECK_ARG_NOT_NULL(root);
+	GDS_CHECK_ARG_NOT_NULL(getkey_cb);
+	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb);
+
+	key = getkey_cb(data);
+	node = gds_compact_rbtree_get_node(*root, key, getkey_cb, cmpkey_cb);
+	if (node != NULL) {
+		/* Node found: the key already exists in the tree */
+		if (free_cb != NULL) {
+			free_cb(node->data);
+		}
+		if (alloc_cb != NULL) {
+			node->data = alloc_cb(data);
+		} else {
+			node->data = data;
+		}
+		ret = 0;
+	} else {
+		/* Node not found: add a new node */
+		gds_compact_rbtree_add(root, data, getkey_cb, cmpkey_cb,
+			alloc_cb);
+		ret = 1;
+	}
+
+	return ret;
 }
 
 int8_t gds_compact_rbtree_del(gds_compact_rbtree_node_t **root, void *key,
