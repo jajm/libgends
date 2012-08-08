@@ -2,6 +2,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include "exception.h"
+#include "check_arg.h"
 #include "log.h"
 #include "compact_rbtree_node.h"
 #include "compact_rbtree.h"
@@ -45,18 +47,13 @@ int8_t gds_compact_rbtree_add(gds_compact_rbtree_node_t **root, void *data,
 	int32_t cmp;
 	bool node_added = false;
 
-	if (root == NULL || getkey_cb == NULL || cmpkey_cb == NULL) {
-		GDS_LOG_ERROR("Bad parameters");
-		return -1;
-	}
+	GDS_CHECK_ARG_NOT_NULL(root);
+	GDS_CHECK_ARG_NOT_NULL(getkey_cb);
+	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb);
 
 	if (*root == NULL) {
 		/* Empty tree case */
 		node = gds_compact_rbtree_node_new(data, alloc_cb);
-		if (node == NULL) {
-			GDS_LOG_ERROR("Failed to create node");
-			return -1;
-		}
 		*root = node;
 		(*root)->red = false;
 		return 0;
@@ -73,10 +70,6 @@ int8_t gds_compact_rbtree_add(gds_compact_rbtree_node_t **root, void *data,
 		if (q == NULL) {
 			/* Insert new node at the bottom */
 			node = gds_compact_rbtree_node_new(data, alloc_cb);
-			if (node == NULL) {
-				GDS_LOG_ERROR("Failed to create node");
-				return -1;
-			}
 			p->son[dir] = q = node;
 			node_added = true;
 		}
@@ -128,10 +121,8 @@ void * gds_compact_rbtree_get(gds_compact_rbtree_node_t *root, void *key,
 	uint8_t dir;
 	int32_t cmp;
 
-	if (getkey_cb == NULL || cmpkey_cb == NULL) {
-		GDS_LOG_ERROR("Bad parameters");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(getkey_cb);
+	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb);
 
 	node = root;
 	while (node != NULL) {
@@ -156,10 +147,9 @@ int8_t gds_compact_rbtree_del(gds_compact_rbtree_node_t **root, void *key,
 	uint8_t dir = 1;
 	bool node_deleted = false;
 
-	if(root == NULL || getkey_cb == NULL || cmpkey_cb == NULL) {
-		GDS_LOG_ERROR("Bad parameters");
-		return -1;
-	}
+	GDS_CHECK_ARG_NOT_NULL(root);
+	GDS_CHECK_ARG_NOT_NULL(getkey_cb);
+	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb);
 	
 	if(*root == NULL) {
 		GDS_LOG_WARNING("Tree is empty");

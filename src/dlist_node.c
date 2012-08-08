@@ -25,6 +25,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include "exception.h"
+#include "check_arg.h"
 #include "callbacks.h"
 #include "log.h"
 #include "dlist_node.h"
@@ -33,22 +35,15 @@ gds_dlist_node_t *gds_dlist_node_new(void *data, gds_alloc_cb alloc_cb)
 {
 	gds_dlist_node_t *newnode;
 
-	if (data == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(data);
 
 	newnode = malloc(sizeof(gds_dlist_node_t));
 	if(newnode == NULL){
-		GDS_LOG_ERROR("Memory allocation error");
-		return NULL;
+		GDS_THROW(NotEnoughMemoryException, "failed to allocate %d "
+			"bytes", sizeof(gds_dlist_node_t));
 	}
 	if (alloc_cb != NULL) {
 		newnode->data = alloc_cb(data);
-		if(newnode->data == NULL) {
-			GDS_LOG_ERROR("Memory allocation error");
-			return NULL;
-		}
 	} else {
 		newnode->data = data;
 	}
@@ -61,10 +56,8 @@ gds_dlist_node_t *gds_dlist_node_new(void *data, gds_alloc_cb alloc_cb)
 int8_t gds_dlist_node_set_data(gds_dlist_node_t *node, void *data,
 	gds_free_cb free_cb, gds_alloc_cb alloc_cb)
 {
-	if (node == NULL || data == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return -1;
-	}
+	GDS_CHECK_ARG_NOT_NULL(node);
+	GDS_CHECK_ARG_NOT_NULL(data);
 
 	if (free_cb != NULL) {
 		free_cb(node->data);
@@ -72,10 +65,6 @@ int8_t gds_dlist_node_set_data(gds_dlist_node_t *node, void *data,
 
 	if (alloc_cb != NULL) {
 		node->data = alloc_cb(data);
-		if (node->data == NULL) {
-			GDS_LOG_ERROR("Memory allocation error");
-			return -1;
-		}
 	} else {
 		node->data = data;
 	}
@@ -87,17 +76,10 @@ void * gds_dlist_node_get_data(gds_dlist_node_t *node, gds_alloc_cb alloc_cb)
 {
 	void *data;
 
-	if (node == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(node);
 
 	if (alloc_cb != NULL) {
 		data = alloc_cb(node->data);
-		if(data == NULL) {
-			GDS_LOG_ERROR("Memory allocation error");
-			return NULL;
-		}
 	} else {
 		data = node->data;
 	}
@@ -107,10 +89,7 @@ void * gds_dlist_node_get_data(gds_dlist_node_t *node, gds_alloc_cb alloc_cb)
 
 int8_t gds_dlist_node_set_next(gds_dlist_node_t *node, gds_dlist_node_t *next)
 {
-	if(node == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return -1;
-	}
+	GDS_CHECK_ARG_NOT_NULL(node);
 
 	node->next = next;
 	
@@ -119,20 +98,14 @@ int8_t gds_dlist_node_set_next(gds_dlist_node_t *node, gds_dlist_node_t *next)
 
 gds_dlist_node_t *gds_dlist_node_get_next(gds_dlist_node_t *node)
 {
-	if(node == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(node);
 
 	return node->next;
 }
 
 int8_t gds_dlist_node_set_prev(gds_dlist_node_t *node, gds_dlist_node_t *prev)
 {
-	if(node == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return -1;
-	}
+	GDS_CHECK_ARG_NOT_NULL(node);
 
 	node->prev = prev;
 	
@@ -141,10 +114,7 @@ int8_t gds_dlist_node_set_prev(gds_dlist_node_t *node, gds_dlist_node_t *prev)
 
 gds_dlist_node_t *gds_dlist_node_get_prev(gds_dlist_node_t *node)
 {
-	if(node == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(node);
 
 	return node->prev;
 }

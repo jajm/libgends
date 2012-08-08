@@ -1,6 +1,8 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <CUnit/Basic.h>
+#include "test_macros.h"
 #include "func_list.h"
 
 gds_func_list_node_t *funclist;
@@ -22,40 +24,47 @@ int test_func(int* a, int* b)
 
 void t_gds_func_list_add(void)
 {
-	CU_ASSERT(NULL == gds_func_list_add(NULL, NULL, (gds_func_ptr_t)&test_func));
-	CU_ASSERT(NULL == gds_func_list_add(NULL, NULL, NULL));
-	CU_ASSERT(NULL == gds_func_list_add(NULL, "f1", (gds_func_ptr_t)&test_func));
-	CU_ASSERT(NULL == gds_func_list_add(NULL, "f1", NULL));
-	CU_ASSERT(NULL == gds_func_list_add(&funclist, NULL, (gds_func_ptr_t)&test_func));
-	CU_ASSERT(NULL == gds_func_list_add(&funclist, NULL, NULL));
-	CU_ASSERT(NULL != gds_func_list_add(&funclist, "f1", (gds_func_ptr_t)&test_func));
-	CU_ASSERT(NULL == gds_func_list_add(&funclist, "f1", NULL));
+	gds_func_ptr_t func_ptr = (gds_func_ptr_t)&test_func;
 
-	CU_ASSERT(NULL != gds_func_list_add(&funclist, "f2", (gds_func_ptr_t)&test_func));
+	GDS_ASSERT_THROW(BadArgumentException, gds_func_list_add(NULL, NULL, NULL));
+	GDS_ASSERT_THROW(BadArgumentException, gds_func_list_add(NULL, NULL, func_ptr));
+	GDS_ASSERT_THROW(BadArgumentException, gds_func_list_add(NULL, "f1", NULL));
+	GDS_ASSERT_THROW(BadArgumentException, gds_func_list_add(NULL, "f1", func_ptr));
+	GDS_ASSERT_THROW(BadArgumentException, gds_func_list_add(&funclist, NULL, NULL));
+	GDS_ASSERT_THROW(BadArgumentException, gds_func_list_add(&funclist, NULL, func_ptr));
+	GDS_ASSERT_THROW(BadArgumentException, gds_func_list_add(&funclist, "f1", NULL));
+
+	CU_ASSERT_PTR_NOT_NULL(gds_func_list_add(&funclist, "f1", func_ptr));
+	CU_ASSERT_PTR_NOT_NULL(gds_func_list_add(&funclist, "f2", func_ptr));
 }
 
 void t_gds_func_list_get_ptr(void)
 {
-	CU_ASSERT(NULL == gds_func_list_get_ptr(NULL, NULL));
-	CU_ASSERT(NULL == gds_func_list_get_ptr(NULL, ""));
-	CU_ASSERT(NULL == gds_func_list_get_ptr(NULL, "f1"));
-	CU_ASSERT(NULL == gds_func_list_get_ptr(funclist, NULL));
-	CU_ASSERT(NULL == gds_func_list_get_ptr(funclist, ""));
-	gds_func_ptr_t f1_ptr = gds_func_list_get_ptr(funclist, "f1");
-	gds_func_ptr_t f2_ptr = gds_func_list_get_ptr(funclist, "f2");
-	CU_ASSERT(NULL != f1_ptr);
-	CU_ASSERT(NULL != f2_ptr);
-	int a=2, b=3;
-	CU_ASSERT(test_func(&a,&b) == f1_ptr(&a, &b));
-	CU_ASSERT(test_func(&a,&b) == f2_ptr(&a, &b));
+	gds_func_ptr_t f1_ptr, f2_ptr;
+	int a = 2, b = 3;
+
+	GDS_ASSERT_THROW(BadArgumentException, gds_func_list_get_ptr(NULL, NULL));
+	GDS_ASSERT_THROW(BadArgumentException, gds_func_list_get_ptr(funclist, NULL));
+
+	CU_ASSERT_PTR_NULL(gds_func_list_get_ptr(NULL, ""));
+	CU_ASSERT_PTR_NULL(gds_func_list_get_ptr(NULL, "f1"));
+	CU_ASSERT_PTR_NULL(gds_func_list_get_ptr(funclist, ""));
+
+	f1_ptr = gds_func_list_get_ptr(funclist, "f1");
+	f2_ptr = gds_func_list_get_ptr(funclist, "f2");
+	CU_ASSERT_PTR_NOT_NULL(f1_ptr);
+	CU_ASSERT_PTR_NOT_NULL(f2_ptr);
+	CU_ASSERT_EQUAL(test_func(&a,&b), f1_ptr(&a, &b));
+	CU_ASSERT_EQUAL(test_func(&a,&b), f2_ptr(&a, &b));
 }
 
 void t_gds_func_list_del(void)
 {
-	CU_ASSERT(0 > gds_func_list_del(NULL, NULL));
-	CU_ASSERT(0 > gds_func_list_del(NULL, ""));
-	CU_ASSERT(0 > gds_func_list_del(NULL, "f1"));
-	CU_ASSERT(0 > gds_func_list_del(&funclist, NULL));
+	GDS_ASSERT_THROW(BadArgumentException, gds_func_list_del(NULL, NULL));
+	GDS_ASSERT_THROW(BadArgumentException, gds_func_list_del(NULL, ""));
+	GDS_ASSERT_THROW(BadArgumentException, gds_func_list_del(NULL, "f1"));
+	GDS_ASSERT_THROW(BadArgumentException, gds_func_list_del(&funclist, NULL));
+
 	CU_ASSERT(0 > gds_func_list_del(&funclist, ""));
 	CU_ASSERT(0 == gds_func_list_del(&funclist, "f1"));
 	CU_ASSERT(0 > gds_func_list_del(&funclist, "f1"));
@@ -90,7 +99,17 @@ int main()
 
 	/* Run all tests using the CUnit Basic interface */
 	CU_basic_set_mode(CU_BRM_VERBOSE);
-	CU_basic_run_tests();
+	try {
+		CU_basic_run_tests();
+	} catch() as (e) {
+		fprintf(stderr, "\nTests returned an unexpected exception\n");
+		fprintf(stderr, "\tType: %s\n", e->type());
+		fprintf(stderr, "\tMessage: %s\n", e->message());
+		fprintf(stderr, "\tFile: %s\n", e->filename());
+		fprintf(stderr, "\tFunction: %s\n", e->function());
+		fprintf(stderr, "\tLine: %d\n", e->line());
+		return EXIT_FAILURE;
+	}
 	CU_cleanup_registry();
 	return CU_get_error();
 }

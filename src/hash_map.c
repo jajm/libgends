@@ -27,6 +27,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include "exception.h"
+#include "check_arg.h"
 #include "types.h"
 #include "log.h"
 #include "hash_map.h"

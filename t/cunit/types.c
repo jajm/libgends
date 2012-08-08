@@ -1,5 +1,8 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <CUnit/Basic.h>
+#include "exception.h"
+#include "test_macros.h"
 #include "types.h"
 
 int init_suite(void){
@@ -12,7 +15,7 @@ int clean_suite(void){
 }
 
 void t_gds_type_register(void){
-	CU_ASSERT(0 > gds_type_register(NULL));
+	GDS_ASSERT_THROW(BadArgumentException, gds_type_register(NULL));
 	
 	CU_ASSERT(0 == gds_type_register(""));
 	CU_ASSERT(0 == gds_type_register("type8"));
@@ -29,46 +32,52 @@ int test_func(int* a, int* b)
 
 void t_gds_type_register_func(void)
 {
-	CU_ASSERT(0 > gds_type_register_func(NULL, NULL, (gds_func_ptr_t)NULL));
-	CU_ASSERT(0 > gds_type_register_func(NULL, NULL, (gds_func_ptr_t)&test_func));
-	CU_ASSERT(0 > gds_type_register_func(NULL, "", (gds_func_ptr_t)NULL));
-	CU_ASSERT(0 > gds_type_register_func(NULL, "", (gds_func_ptr_t)&test_func));
-	CU_ASSERT(0 > gds_type_register_func(NULL, "func1", (gds_func_ptr_t)NULL));
-	CU_ASSERT(0 > gds_type_register_func(NULL, "func1", (gds_func_ptr_t)&test_func));
-	CU_ASSERT(0 > gds_type_register_func("", NULL, (gds_func_ptr_t)NULL));
-	CU_ASSERT(0 > gds_type_register_func("", NULL, (gds_func_ptr_t)&test_func));
-	CU_ASSERT(0 > gds_type_register_func("", "", (gds_func_ptr_t)NULL));
-	CU_ASSERT(0 > gds_type_register_func("", "func1", (gds_func_ptr_t)NULL));
-	CU_ASSERT(0 > gds_type_register_func("newtype", NULL, (gds_func_ptr_t)NULL));
-	CU_ASSERT(0 > gds_type_register_func("newtype", NULL, (gds_func_ptr_t)&test_func));
-	CU_ASSERT(0 > gds_type_register_func("newtype", "", (gds_func_ptr_t)NULL));
-	CU_ASSERT(0 > gds_type_register_func("newtype", "", (gds_func_ptr_t)&test_func));
-	CU_ASSERT(0 > gds_type_register_func("newtype", "func1", (gds_func_ptr_t)NULL));
-	CU_ASSERT(0 > gds_type_register_func("newtype", "func1", (gds_func_ptr_t)&test_func));
+	gds_func_ptr_t func_ptr = (gds_func_ptr_t)&test_func;
+	GDS_ASSERT_THROW(BadArgumentException, gds_type_register_func(NULL, NULL, NULL));
+	GDS_ASSERT_THROW(BadArgumentException, gds_type_register_func(NULL, NULL, func_ptr));
+	GDS_ASSERT_THROW(BadArgumentException, gds_type_register_func(NULL, "", NULL));
+	GDS_ASSERT_THROW(BadArgumentException, gds_type_register_func(NULL, "", func_ptr));
+	GDS_ASSERT_THROW(BadArgumentException, gds_type_register_func(NULL, "func1", NULL));
+	GDS_ASSERT_THROW(BadArgumentException, gds_type_register_func(NULL, "func1", func_ptr));
+	GDS_ASSERT_THROW(BadArgumentException, gds_type_register_func("", NULL, NULL));
+	GDS_ASSERT_THROW(BadArgumentException, gds_type_register_func("", NULL, func_ptr));
+	GDS_ASSERT_THROW(BadArgumentException, gds_type_register_func("", "", NULL));
+	GDS_ASSERT_THROW(BadArgumentException, gds_type_register_func("", "func1", NULL));
+	GDS_ASSERT_THROW(BadArgumentException, gds_type_register_func("newtype", NULL, NULL));
+	GDS_ASSERT_THROW(BadArgumentException, gds_type_register_func("newtype", NULL, func_ptr));
+	GDS_ASSERT_THROW(BadArgumentException, gds_type_register_func("newtype", "", NULL));
+	GDS_ASSERT_THROW(BadArgumentException, gds_type_register_func("newtype", "func1", NULL));
 
-	CU_ASSERT(0 == gds_type_register_func("", "", (gds_func_ptr_t)&test_func));
-	CU_ASSERT(0 == gds_type_register_func("", "func1", (gds_func_ptr_t)&test_func));
+	CU_ASSERT(0 > gds_type_register_func("newtype", "", func_ptr));
+	CU_ASSERT(0 > gds_type_register_func("newtype", "func1", func_ptr));
+
+	CU_ASSERT(0 == gds_type_register_func("", "", func_ptr));
+	CU_ASSERT(0 == gds_type_register_func("", "func1", func_ptr));
 }
 
 void t_type_get_func(void)
 {
-	CU_ASSERT(NULL == gds_type_get_func(NULL, NULL));
-	CU_ASSERT(NULL == gds_type_get_func(NULL, ""));
-	CU_ASSERT(NULL == gds_type_get_func("", NULL));
+	int a = 2, b = 3;
+	gds_func_ptr_t fp;
+
+	GDS_ASSERT_THROW(BadArgumentException, gds_type_get_func(NULL, NULL));
+	GDS_ASSERT_THROW(BadArgumentException, gds_type_get_func(NULL, ""));
+	GDS_ASSERT_THROW(BadArgumentException, gds_type_get_func("", NULL));
+
 	CU_ASSERT(NULL == gds_type_get_func("", "newfunc"));
 	CU_ASSERT(NULL == gds_type_get_func("newtype", ""));
 	
-	gds_func_ptr_t fp = gds_type_get_func("","");
-	CU_ASSERT(NULL != fp);
-	int a = 2, b = 3;
-	CU_ASSERT(test_func(&a,&b) == fp(&a,&b));
+	fp = gds_type_get_func("","");
+	CU_ASSERT_PTR_NOT_NULL(fp);
+	CU_ASSERT_EQUAL(test_func(&a,&b), fp(&a,&b));
 }
 
 void t_type_unregister_func(void)
 {
-	CU_ASSERT(0 > gds_type_unregister_func(NULL, NULL));
-	CU_ASSERT(0 > gds_type_unregister_func(NULL, ""));
-	CU_ASSERT(0 > gds_type_unregister_func("newtype", NULL));
+	GDS_ASSERT_THROW(BadArgumentException, gds_type_unregister_func(NULL, NULL));
+	GDS_ASSERT_THROW(BadArgumentException, gds_type_unregister_func(NULL, ""));
+	GDS_ASSERT_THROW(BadArgumentException, gds_type_unregister_func("newtype", NULL));
+
 	CU_ASSERT(0 > gds_type_unregister_func("newtype", ""));
 	CU_ASSERT(0 > gds_type_unregister_func("", "newfunc"));
 
@@ -80,11 +89,10 @@ void t_type_unregister_func(void)
 
 void t_type_unregister(void)
 {
-	CU_ASSERT(0 > gds_type_unregister(NULL));
+	GDS_ASSERT_THROW(BadArgumentException, gds_type_unregister(NULL));
+
 	CU_ASSERT(0 > gds_type_unregister("newtype"));
-
 	CU_ASSERT(0 == gds_type_unregister(""));
-
 	CU_ASSERT(0 > gds_type_unregister(""));
 }
 
@@ -117,7 +125,17 @@ int main()
 
 	/* Run all tests using the CUnit Basic interface */
 	CU_basic_set_mode(CU_BRM_VERBOSE);
-	CU_basic_run_tests();
+	try {
+		CU_basic_run_tests();
+	} catch() as (e) {
+		fprintf(stderr, "\nTests returned an unexpected exception\n");
+		fprintf(stderr, "\tType: %s\n", e->type());
+		fprintf(stderr, "\tMessage: %s\n", e->message());
+		fprintf(stderr, "\tFile: %s\n", e->filename());
+		fprintf(stderr, "\tFunction: %s\n", e->function());
+		fprintf(stderr, "\tLine: %d\n", e->line());
+		return EXIT_FAILURE;
+	}
 	CU_cleanup_registry();
 	return CU_get_error();
 }

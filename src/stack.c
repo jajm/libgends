@@ -25,6 +25,8 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include "exception.h"
+#include "check_arg.h"
 #include "log.h"
 #include "types.h"
 #include "slist_node.h"
@@ -36,22 +38,19 @@ gds_stack_t *gds_stack_new(const char *type_name)
 	gds_stack_t *S;
 	size_t len;
 
-	if(type_name == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(type_name);
 
 	S = malloc(sizeof(gds_stack_t));
 	if(S == NULL){
-		GDS_LOG_ERROR("Memory allocation error");
-		return NULL;
+		GDS_THROW(NotEnoughMemoryException, "failed to allocate %d "
+			"bytes", sizeof(gds_stack_t));
 	}
 	len = strlen(type_name);
 	S->type_name = malloc(len+1);
 	if(S->type_name == NULL){
-		GDS_LOG_ERROR("Memory allocation error");
 		free(S);
-		return NULL;
+		GDS_THROW(NotEnoughMemoryException, "failed to allocate %d "
+			"bytes", len+1);
 	}
 	strncpy(S->type_name, type_name, len+1);
 	assert(S->type_name[len] == '\0');
@@ -65,22 +64,15 @@ int8_t gds_stack_push(gds_stack_t *S, void *data, bool copy_data)
 	gds_slist_node_t *newnode;
 	gds_alloc_cb alloc_cb = NULL;
 
-	if(S == NULL || data == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return -1;
-	}
+	GDS_CHECK_ARG_NOT_NULL(S);
+	GDS_CHECK_ARG_NOT_NULL(data);
 
 	if(copy_data) {
 		alloc_cb = (gds_alloc_cb)gds_type_get_func(S->type_name, "alloc");
 	}
 
 	newnode = gds_ll_slist_add_first(S->head, data, alloc_cb);
-	if (newnode == NULL) {
-		GDS_LOG_ERROR("Failed to add data to the stack");
-		return -1;
-	} else {
-		S->head = newnode;
-	}
+	S->head = newnode;
 
 	return 0;
 }
@@ -89,10 +81,7 @@ void *gds_stack_pop(gds_stack_t *S)
 {
 	void *data;
 
-	if(S == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(S);
 
 	data = gds_slist_node_get_data(S->head, NULL);
 	S->head = gds_ll_slist_del_first(S->head, NULL);

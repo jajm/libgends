@@ -66,8 +66,7 @@ extern "C" {
  *  data_ptr : pointer to the data
  * copy_data : true => copy the data
  *             false => just take the pointer value */
-/* Return: Success => pointer to the newly created container
- *         Failure => NULL */
+/* Return: a pointer to the newly created container */
 gds_container_t *
 gds_container_new(
 	const char *type_name,
@@ -77,8 +76,7 @@ gds_container_new(
 
 /* Create a new container from another container */
 /* src: pointer to the container to clone */
-/* Return: Success => pointer to the newly created container
- *         Failure => NULL */
+/* Return: pointer to the newly created container */
 gds_container_t *
 gds_container_new_clone(
 	const gds_container_t *src
@@ -92,9 +90,7 @@ gds_container_new_clone(
  *                 false => don't free memory
  *     copy_data : true => copy the data
  *                 false => just take the pointer value */
-/* Return: Success => 0
- *         Failure => a negative value */
-int8_t
+void
 gds_container_set(
 	gds_container_t *c,
 	const char *type_name,
@@ -108,9 +104,7 @@ gds_container_set(
  *           src : pointer to the container to copy value from
  * free_old_data : true => free memory taken by old value
  *                 false => don't free memory */
-/* Return: Success => 0
- *         Failure => a negative value */
-int8_t
+void
 gds_container_set_clone(
 	gds_container_t *dst,
 	const gds_container_t *src,

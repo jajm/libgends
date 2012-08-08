@@ -1,10 +1,11 @@
-#include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <CUnit/Basic.h>
+#include "exception.h"
+#include "test_macros.h"
 #include "types.h"
 #include "stack.h"
 
@@ -45,14 +46,15 @@ void t_gds_stack_new(void)
 {
 	gds_stack_t *s;
 
-	CU_ASSERT(NULL == gds_stack_new(NULL));
-	CU_ASSERT(NULL != (s = gds_stack_new("")));
+	GDS_ASSERT_THROW(BadArgumentException, gds_stack_new(NULL));
+
+	CU_ASSERT_PTR_NOT_NULL((s = gds_stack_new("")));
 	gds_stack_free(s, false);
-	CU_ASSERT(NULL != (s = gds_stack_new("basic_type_name")));
+	CU_ASSERT_PTR_NOT_NULL((s = gds_stack_new("basic_type_name")));
 	gds_stack_free(s, false);
-	CU_ASSERT(NULL != (s = gds_stack_new("name with spaces")));
+	CU_ASSERT_PTR_NOT_NULL((s = gds_stack_new("name with spaces")));
 	gds_stack_free(s, false);
-	CU_ASSERT(NULL != (s = gds_stack_new("numb3rs & ()ther 5tuff... 'éèëêç'")));
+	CU_ASSERT_PTR_NOT_NULL((s = gds_stack_new("numb3rs & ()ther 5tuff... 'éèëêç'")));
 	gds_stack_free(s, false);
 }
 
@@ -78,8 +80,8 @@ void t_gds_stack_push_and_pop(void)
 
 	for(i=9; i>=0; i--) {
 		test = gds_stack_pop(s);
-		CU_ASSERT(test != NULL);
-		CU_ASSERT(test->i == i);
+		CU_ASSERT_PTR_NOT_NULL(test);
+		CU_ASSERT_EQUAL(test->i, i);
 		test_free(test);
 	}
 
@@ -97,7 +99,7 @@ int main()
 		return CU_get_error();
 
 	/* add a suite to the registry */
-	pSuite = CU_add_suite("Container data structure",
+	pSuite = CU_add_suite("Stack data structure",
 		init_suite, clean_suite);
 	if (NULL == pSuite) {
 		CU_cleanup_registry();
@@ -115,7 +117,17 @@ int main()
 
 	/* Run all tests using the CUnit Basic interface */
 	CU_basic_set_mode(CU_BRM_VERBOSE);
-	CU_basic_run_tests();
+	try {
+		CU_basic_run_tests();
+	} catch() as (e) {
+		fprintf(stderr, "\nTests returned an unexpected exception\n");
+		fprintf(stderr, "\tType: %s\n", e->type());
+		fprintf(stderr, "\tMessage: %s\n", e->message());
+		fprintf(stderr, "\tFile: %s\n", e->filename());
+		fprintf(stderr, "\tFunction: %s\n", e->function());
+		fprintf(stderr, "\tLine: %d\n", e->line());
+		return EXIT_FAILURE;
+	}
 	CU_cleanup_registry();
 	return CU_get_error();
 }

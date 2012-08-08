@@ -1,10 +1,11 @@
-#include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <CUnit/Basic.h>
+#include "exception.h"
+#include "test_macros.h"
 #include "dlist_node.h"
 
 typedef struct {
@@ -45,17 +46,17 @@ void t_dlist_node_new(void)
 	gds_dlist_node_t *node;
 	gds_free_cb free_cb = (gds_free_cb) test_free;
 
-	CU_ASSERT(NULL == gds_dlist_node_new(NULL, NULL));
-	CU_ASSERT(NULL == gds_dlist_node_new(NULL, alloc_cb));
+	GDS_ASSERT_THROW(BadArgumentException, gds_dlist_node_new(NULL, NULL));
+	GDS_ASSERT_THROW(BadArgumentException, gds_dlist_node_new(NULL, alloc_cb));
 
-	CU_ASSERT(NULL != (node = gds_dlist_node_new(&test, NULL)));
-	CU_ASSERT(node->data == &test);
-	CU_ASSERT(node->next == NULL);
+	CU_ASSERT_PTR_NOT_NULL((node = gds_dlist_node_new(&test, NULL)));
+	CU_ASSERT_PTR_EQUAL(node->data, &test);
+	CU_ASSERT_PTR_NULL(node->next);
 	gds_dlist_node_free(node, NULL);
 
-	CU_ASSERT(NULL != (node = gds_dlist_node_new(&test, alloc_cb)));
-	CU_ASSERT(node->data != &test);
-	CU_ASSERT(node->next == NULL);
+	CU_ASSERT_PTR_NOT_NULL((node = gds_dlist_node_new(&test, alloc_cb)));
+	CU_ASSERT_PTR_NOT_EQUAL(node->data, &test);
+	CU_ASSERT_PTR_NULL(node->next);
 	gds_dlist_node_free(node, free_cb);
 }
 
@@ -64,38 +65,37 @@ void t_dlist_node_set_data(void)
 	test_structure_t t = {.i = 1, .c = 'a', .f = 1.1};
 	test_structure_t t2 = {.i = 2, .c = 'b', .f = 2.2};
 	gds_alloc_cb alloc_cb = (gds_alloc_cb)test_alloc;
+	gds_free_cb free_cb = (gds_free_cb) test_free;
 	gds_dlist_node_t *node;
-	gds_free_cb free_cb;
 
 	node = gds_dlist_node_new(&t, NULL);
-	assert(node != NULL);
-	free_cb = (gds_free_cb) test_free;
+	CU_ASSERT_PTR_NOT_NULL_FATAL(node);
 
 	/* Fail because one of the two first parameters is NULL */
-	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, NULL, NULL   , NULL));
-	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, NULL, NULL   , alloc_cb));
-	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, NULL, free_cb, NULL));
-	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, NULL, free_cb, alloc_cb));
-	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, &t2 , NULL   , NULL));
-	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, &t2 , NULL   , alloc_cb));
-	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, &t2 , free_cb, NULL));
-	CU_ASSERT(0 > gds_dlist_node_set_data(NULL, &t2 , free_cb, alloc_cb));
-	CU_ASSERT(0 > gds_dlist_node_set_data(node, NULL, NULL   , NULL));
-	CU_ASSERT(0 > gds_dlist_node_set_data(node, NULL, NULL   , alloc_cb));
-	CU_ASSERT(0 > gds_dlist_node_set_data(node, NULL, free_cb, NULL));
-	CU_ASSERT(0 > gds_dlist_node_set_data(node, NULL, free_cb, alloc_cb));
+	GDS_ASSERT_THROW(BadArgumentException, gds_dlist_node_set_data(NULL, NULL, NULL   , NULL));
+	GDS_ASSERT_THROW(BadArgumentException, gds_dlist_node_set_data(NULL, NULL, NULL   , alloc_cb));
+	GDS_ASSERT_THROW(BadArgumentException, gds_dlist_node_set_data(NULL, NULL, free_cb, NULL));
+	GDS_ASSERT_THROW(BadArgumentException, gds_dlist_node_set_data(NULL, NULL, free_cb, alloc_cb));
+	GDS_ASSERT_THROW(BadArgumentException, gds_dlist_node_set_data(NULL, &t2 , NULL   , NULL));
+	GDS_ASSERT_THROW(BadArgumentException, gds_dlist_node_set_data(NULL, &t2 , NULL   , alloc_cb));
+	GDS_ASSERT_THROW(BadArgumentException, gds_dlist_node_set_data(NULL, &t2 , free_cb, NULL));
+	GDS_ASSERT_THROW(BadArgumentException, gds_dlist_node_set_data(NULL, &t2 , free_cb, alloc_cb));
+	GDS_ASSERT_THROW(BadArgumentException, gds_dlist_node_set_data(node, NULL, NULL   , NULL));
+	GDS_ASSERT_THROW(BadArgumentException, gds_dlist_node_set_data(node, NULL, NULL   , alloc_cb));
+	GDS_ASSERT_THROW(BadArgumentException, gds_dlist_node_set_data(node, NULL, free_cb, NULL));
+	GDS_ASSERT_THROW(BadArgumentException, gds_dlist_node_set_data(node, NULL, free_cb, alloc_cb));
 
 	CU_ASSERT(0 == gds_dlist_node_set_data(node, &t2, NULL, NULL));
-	CU_ASSERT(node->data == &t2);
+	CU_ASSERT_PTR_EQUAL(node->data, &t2);
 
 	CU_ASSERT(0 == gds_dlist_node_set_data(node, &t, NULL, alloc_cb));
-	CU_ASSERT(node->data != &t);
+	CU_ASSERT_PTR_NOT_EQUAL(node->data, &t);
 
 	CU_ASSERT(0 == gds_dlist_node_set_data(node, &t2, free_cb, alloc_cb));
-	CU_ASSERT(node->data != &t2);
+	CU_ASSERT_PTR_NOT_EQUAL(node->data, &t2);
 
 	CU_ASSERT(0 == gds_dlist_node_set_data(node, &t, free_cb, NULL));
-	CU_ASSERT(node->data == &t);
+	CU_ASSERT_PTR_EQUAL(node->data, &t);
 
 	gds_dlist_node_free(node, NULL);
 }
@@ -108,16 +108,16 @@ void t_dlist_node_get_data(void)
 	gds_alloc_cb alloc_cb = (gds_alloc_cb)test_alloc;
 
 	node = gds_dlist_node_new(&t, NULL);
-	assert(node != NULL);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(node);
 
-	CU_ASSERT(NULL == gds_dlist_node_get_data(NULL, NULL));
-	CU_ASSERT(NULL == gds_dlist_node_get_data(NULL, alloc_cb));
+	GDS_ASSERT_THROW(BadArgumentException, gds_dlist_node_get_data(NULL, NULL));
+	GDS_ASSERT_THROW(BadArgumentException, gds_dlist_node_get_data(NULL, alloc_cb));
 
-	CU_ASSERT(NULL != (data = gds_dlist_node_get_data(node, NULL)));
-	CU_ASSERT(data == &t);
+	CU_ASSERT_PTR_NOT_NULL((data = gds_dlist_node_get_data(node, NULL)));
+	CU_ASSERT_PTR_EQUAL(data, &t);
 
-	CU_ASSERT(NULL != (data = gds_dlist_node_get_data(node, alloc_cb)));
-	CU_ASSERT(data != &t);
+	CU_ASSERT_PTR_NOT_NULL((data = gds_dlist_node_get_data(node, alloc_cb)));
+	CU_ASSERT_PTR_NOT_EQUAL(data, &t);
 	free(data);
 
 	gds_dlist_node_free(node, NULL);
@@ -131,17 +131,17 @@ void t_dlist_node_set_next(void)
 	gds_free_cb free_cb = (gds_free_cb)test_free;
 
 	node = gds_dlist_node_new(&t, alloc_cb);
-	assert(node != NULL);
 	next = gds_dlist_node_new(&t, alloc_cb);
-	assert(node != NULL);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(node);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(next);
 
-	CU_ASSERT(0 > gds_dlist_node_set_next(NULL, NULL));
-	CU_ASSERT(0 > gds_dlist_node_set_next(NULL, next));
+	GDS_ASSERT_THROW(BadArgumentException, gds_dlist_node_set_next(NULL, NULL));
+	GDS_ASSERT_THROW(BadArgumentException, gds_dlist_node_set_next(NULL, next));
 
 	CU_ASSERT(0 == gds_dlist_node_set_next(node, next));
-	CU_ASSERT(node->next == next);
+	CU_ASSERT_PTR_EQUAL(node->next, next);
 	CU_ASSERT(0 == gds_dlist_node_set_next(node, NULL));
-	CU_ASSERT(node->next == NULL);
+	CU_ASSERT_PTR_NULL(node->next);
 
 	gds_dlist_node_free(node, free_cb);
 	gds_dlist_node_free(next, free_cb);
@@ -155,14 +155,14 @@ void t_dlist_node_get_next(void)
 	gds_free_cb free_cb = (gds_free_cb)test_free;
 
 	node = gds_dlist_node_new(&t, alloc_cb);
-	assert(node != NULL);
 	next = gds_dlist_node_new(&t, alloc_cb);
-	assert(node != NULL);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(node);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(next);
 
-	CU_ASSERT(NULL == gds_dlist_node_get_next(NULL));
-	CU_ASSERT(NULL == gds_dlist_node_get_next(node));
+	GDS_ASSERT_THROW(BadArgumentException, gds_dlist_node_get_next(NULL));
+	CU_ASSERT_PTR_NULL(gds_dlist_node_get_next(node));
 	gds_dlist_node_set_next(node, next);
-	CU_ASSERT(next == gds_dlist_node_get_next(node));
+	CU_ASSERT_PTR_EQUAL(next, gds_dlist_node_get_next(node));
 
 	gds_dlist_node_free(node, free_cb);
 	gds_dlist_node_free(next, free_cb);
@@ -176,17 +176,17 @@ void t_dlist_node_set_prev(void)
 	gds_free_cb free_cb = (gds_free_cb)test_free;
 
 	node = gds_dlist_node_new(&t, alloc_cb);
-	assert(node != NULL);
 	prev = gds_dlist_node_new(&t, alloc_cb);
-	assert(node != NULL);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(node);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(prev);
 
-	CU_ASSERT(0 > gds_dlist_node_set_prev(NULL, NULL));
-	CU_ASSERT(0 > gds_dlist_node_set_prev(NULL, prev));
+	GDS_ASSERT_THROW(BadArgumentException, gds_dlist_node_set_prev(NULL, NULL));
+	GDS_ASSERT_THROW(BadArgumentException, gds_dlist_node_set_prev(NULL, prev));
 
 	CU_ASSERT(0 == gds_dlist_node_set_prev(node, prev));
-	CU_ASSERT(node->prev == prev);
+	CU_ASSERT_PTR_EQUAL(node->prev, prev);
 	CU_ASSERT(0 == gds_dlist_node_set_prev(node, NULL));
-	CU_ASSERT(node->prev == NULL);
+	CU_ASSERT_PTR_NULL(node->prev);
 
 	gds_dlist_node_free(node, free_cb);
 	gds_dlist_node_free(prev, free_cb);
@@ -200,14 +200,14 @@ void t_dlist_node_get_prev(void)
 	gds_free_cb free_cb = (gds_free_cb)test_free;
 
 	node = gds_dlist_node_new(&t, alloc_cb);
-	assert(node != NULL);
 	prev = gds_dlist_node_new(&t, alloc_cb);
-	assert(node != NULL);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(node);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(prev);
 
-	CU_ASSERT(NULL == gds_dlist_node_get_prev(NULL));
-	CU_ASSERT(NULL == gds_dlist_node_get_prev(node));
+	GDS_ASSERT_THROW(BadArgumentException, gds_dlist_node_get_prev(NULL));
+	CU_ASSERT_PTR_NULL(gds_dlist_node_get_prev(node));
 	gds_dlist_node_set_prev(node, prev);
-	CU_ASSERT(prev == gds_dlist_node_get_prev(node));
+	CU_ASSERT_PTR_EQUAL(prev, gds_dlist_node_get_prev(node));
 
 	gds_dlist_node_free(node, free_cb);
 	gds_dlist_node_free(prev, free_cb);
@@ -245,7 +245,17 @@ int main()
 
 	/* Run all tests using the CUnit Basic interface */
 	CU_basic_set_mode(CU_BRM_VERBOSE);
-	CU_basic_run_tests();
+	try {
+		CU_basic_run_tests();
+	} catch() as (e) {
+		fprintf(stderr, "\nTests returned an unexpected exception\n");
+		fprintf(stderr, "\tType: %s\n", e->type());
+		fprintf(stderr, "\tMessage: %s\n", e->message());
+		fprintf(stderr, "\tFile: %s\n", e->filename());
+		fprintf(stderr, "\tFunction: %s\n", e->function());
+		fprintf(stderr, "\tLine: %d\n", e->line());
+		return EXIT_FAILURE;
+	}
 	CU_cleanup_registry();
 	return CU_get_error();
 }

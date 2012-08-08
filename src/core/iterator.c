@@ -38,6 +38,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include "exception.h"
+#include "check_arg.h"
 #include "log.h"
 #include "iterator.h"
 #include "callbacks.h"
@@ -47,15 +49,15 @@ gds_iterator_t *gds_iterator_new(void *data, gds_iterator_reset_cb reset_cb,
 {
 	gds_iterator_t *it;
 
-	if(data == NULL || reset_cb == NULL || step_cb == NULL || get_cb == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(data);
+	GDS_CHECK_ARG_NOT_NULL(reset_cb);
+	GDS_CHECK_ARG_NOT_NULL(step_cb);
+	GDS_CHECK_ARG_NOT_NULL(get_cb);
 
 	it = malloc(sizeof(gds_iterator_t));
-	if(it == NULL){
-		GDS_LOG_ERROR("Memory allocation error");
-		return NULL;
+	if (it == NULL) {
+		GDS_THROW(NotEnoughMemoryException, "failed to allocate %d "
+			"bytes", sizeof(gds_iterator_t));
 	}
 
 	it->data = data;
@@ -68,30 +70,21 @@ gds_iterator_t *gds_iterator_new(void *data, gds_iterator_reset_cb reset_cb,
 
 int8_t gds_iterator_reset(gds_iterator_t *it)
 {
-	if(it == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return -1;
-	}
+	GDS_CHECK_ARG_NOT_NULL(it);
 
 	return it->reset_cb(it->data);
 }
 
 int8_t gds_iterator_step(gds_iterator_t *it)
 {
-	if(it == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return -1;
-	}
+	GDS_CHECK_ARG_NOT_NULL(it);
 
 	return it->step_cb(it->data);
 }
 
 void * gds_iterator_get(gds_iterator_t *it)
 {
-	if(it == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(it);
 
 	return it->get_cb(it->data);
 }

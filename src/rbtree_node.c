@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include "exception.h"
+#include "check_arg.h"
 #include "log.h"
 #include "rbtree_node.h"
 #include "callbacks.h"
@@ -11,8 +13,8 @@ gds_rbtree_node_t * gds_rbtree_node_new(void *data, gds_alloc_cb alloc_cb)
 
 	n = malloc(sizeof(gds_rbtree_node_t));
 	if(n == NULL) {
-		GDS_LOG_ERROR("Memory allocation error");
-		return NULL;
+		GDS_THROW(NotEnoughMemoryException, "failed to allocate %d "
+			"bytes", sizeof(gds_rbtree_node_t));
 	}
 	
 	if (alloc_cb != NULL) {
@@ -37,10 +39,7 @@ int8_t gds_rbtree_node_set_data(gds_rbtree_node_t *node, void *data,
 {
 	void *d;
 
-	if (node == NULL) {
-		GDS_LOG_ERROR("Bad parameters");
-		return -1;
-	}
+	GDS_CHECK_ARG_NOT_NULL(node);
 
 	if (alloc_cb != NULL) {
 		d = alloc_cb(data);
@@ -60,10 +59,7 @@ void * gds_rbtree_node_get_data(gds_rbtree_node_t *node, gds_alloc_cb alloc_cb)
 {
 	void *data;
 
-	if (node == NULL) {
-		GDS_LOG_ERROR("Bad parameters");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(node);
 
 	if (alloc_cb != NULL) {
 		data = alloc_cb(node->data);

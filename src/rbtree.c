@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include "exception.h"
+#include "check_arg.h"
 #include "log.h"
 #include "rbtree.h"
 #include "rbtree_node.h"
@@ -95,10 +97,9 @@ int8_t gds_rbtree_insert_bottom(gds_rbtree_node_t **root,
 	void *nkey, *key;
 	int32_t cmp;
 
-	if(root == NULL || getkey_cb == NULL || cmpkey_cb == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return -1;
-	}
+	GDS_CHECK_ARG_NOT_NULL(root);
+	GDS_CHECK_ARG_NOT_NULL(getkey_cb);
+	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb);
 
 	nkey = getkey_cb(data);
 	tmp = *root;
@@ -121,10 +122,6 @@ int8_t gds_rbtree_insert_bottom(gds_rbtree_node_t **root,
 	}
 
 	node = gds_rbtree_node_new(data, alloc_cb);
-	if (node == NULL) {
-		GDS_LOG_ERROR("Failed to create node");
-		return -1;
-	}
 	*node_p = node;
 
 	if(parent != NULL) {
@@ -147,8 +144,8 @@ void gds_rbtree_rebalance_after_insert(gds_rbtree_node_t **root,
 	gds_rbtree_node_t *u, *g;
 	bool valid = 0;
 
-	if(root == NULL || node == NULL)
-		return;
+	GDS_CHECK_ARG_NOT_NULL(root);
+	GDS_CHECK_ARG_NOT_NULL(node);
 
 	while(!valid) {
 		if (node->parent == NULL) {
@@ -221,8 +218,8 @@ gds_rbtree_node_t * gds_rbtree_get_node(gds_rbtree_node_t *root,
 	gds_rbtree_node_t *node = root;
 	int32_t cmp;
 
-	if(getkey_cb == NULL || cmpkey_cb == NULL)
-		return NULL;
+	GDS_CHECK_ARG_NOT_NULL(getkey_cb);
+	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb);
 
 	while(node != NULL) {
 		cmp = cmpkey_cb(key, getkey_cb(node->data));
@@ -244,10 +241,7 @@ void * gds_rbtree_get(gds_rbtree_node_t *root, void *key,
 {
 	gds_rbtree_node_t *n;
 
-	if (root == NULL) {
-		GDS_LOG_ERROR("Bad parameters");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(root);
 
 	n = gds_rbtree_get_node(root, key, getkey_cb, cmpkey_cb);
 	return gds_rbtree_node_get_data(n, alloc_cb);
@@ -259,8 +253,7 @@ void gds_rbtree_rebalance_after_delete(gds_rbtree_node_t **root,
 	gds_rbtree_node_t *sibling, *tmp;
 	bool valid = false;
 
-	if(root == NULL)
-		return;
+	GDS_CHECK_ARG_NOT_NULL(root);
 
 	/* If we are here, we removed a black node which had one black child
 	 * or no child at all */
@@ -381,10 +374,9 @@ int8_t gds_rbtree_del(gds_rbtree_node_t **root, void *key,
 	gds_rbtree_node_t *node, *child;
 	bool data_freed = false;
 
-	if (root == NULL || getkey_cb == NULL || cmpkey_cb == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return -1;
-	}
+	GDS_CHECK_ARG_NOT_NULL(root);
+	GDS_CHECK_ARG_NOT_NULL(getkey_cb);
+	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb);
 
 	node = gds_rbtree_get_node(*root, key, getkey_cb, cmpkey_cb);
 	if(node == NULL) {

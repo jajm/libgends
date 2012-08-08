@@ -1,5 +1,7 @@
 #include <stdint.h>
 #include <stdlib.h>
+#include "exception.h"
+#include "check_arg.h"
 #include "callbacks.h"
 #include "log.h"
 #include "slist_node.h"
@@ -11,11 +13,6 @@ gds_slist_node_t * gds_ll_slist_add_first(gds_slist_node_t *head, void *data,
 	gds_slist_node_t *n;
 
 	n = gds_slist_node_new(data, alloc_cb);
-	if (n == NULL) {
-		GDS_LOG_ERROR("Failed to create gds_slist_node_t");
-		return NULL;
-	}
-
 	n->next = head;
 
 	return n;
@@ -27,10 +24,6 @@ gds_slist_node_t * gds_ll_slist_add_last(gds_slist_node_t *head, void *data,
 	gds_slist_node_t *n, *tmp;
 
 	n = gds_slist_node_new(data, alloc_cb);
-	if (n == NULL) {
-		GDS_LOG_ERROR("Failed to create gds_slist_node_t");
-		return NULL;
-	}
 
 	if (head != NULL) {
 		tmp = head;
@@ -49,10 +42,6 @@ gds_slist_node_t * gds_ll_slist_add_after(gds_slist_node_t *node, void *data,
 	gds_slist_node_t *n;
 
 	n = gds_slist_node_new(data, alloc_cb);
-	if (n == NULL) {
-		GDS_LOG_ERROR("Failed to create gds_slist_node_t");
-		return NULL;
-	}
 		
 	if (node != NULL) {
 		n->next = node->next;
@@ -115,10 +104,7 @@ int8_t gds_ll_slist_del_after(gds_slist_node_t *node, gds_free_cb free_cb)
 {
 	gds_slist_node_t *n;
 
-	if (node == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return -1;
-	}
+	GDS_CHECK_ARG_NOT_NULL(node);
 
 	if (node->next == NULL) {
 		GDS_LOG_WARNING("node is the last node");
@@ -151,10 +137,8 @@ typedef struct {
 
 int8_t gds_ll_slist_iterator_reset(gds_ll_slist_iterator_data_t *it_data)
 {
-	if (it_data == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return -1;
-	}
+	GDS_CHECK_ARG_NOT_NULL(it_data);
+
 	it_data->cur = NULL;
 
 	return 0;
@@ -164,10 +148,7 @@ int8_t gds_ll_slist_iterator_step(gds_ll_slist_iterator_data_t *it_data)
 {
 	gds_slist_node_t *next;
 
-	if (it_data == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return -1;
-	}
+	GDS_CHECK_ARG_NOT_NULL(it_data);
 
 	next = (it_data->cur != NULL) ? it_data->cur->next : it_data->head;
 	if (next == NULL) {
@@ -181,10 +162,7 @@ int8_t gds_ll_slist_iterator_step(gds_ll_slist_iterator_data_t *it_data)
 
 void * gds_ll_slist_iterator_get(gds_ll_slist_iterator_data_t *it_data)
 {
-	if (it_data == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(it_data);
 
 	return gds_slist_node_get_data(it_data->cur, NULL);
 }
@@ -196,8 +174,8 @@ gds_iterator_t * gds_ll_slist_iterator_new(gds_slist_node_t *head)
 
 	it_data = malloc(sizeof(gds_ll_slist_iterator_data_t));
 	if (it_data == NULL) {
-		GDS_LOG_ERROR("Memory allocation error");
-		return NULL;
+		GDS_THROW(NotEnoughMemoryException, "failed to allocate %d "
+			"bytes", sizeof(gds_ll_slist_iterator_data_t));
 	}
 
 	it_data->head = head;

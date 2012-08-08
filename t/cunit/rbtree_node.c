@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <CUnit/Basic.h>
+#include "exception.h"
+#include "test_macros.h"
 #include "rbtree_node.h"
 #include "test.h"
 
@@ -62,11 +64,8 @@ void t_rbtree_node_get_data(void)
 	t = test_new("key", 4);
 	n = gds_rbtree_node_new(t, NULL);
 
-	data = gds_rbtree_node_get_data(NULL, NULL);
-	CU_ASSERT(NULL == data);
-
-	data = gds_rbtree_node_get_data(NULL, alloc_cb);
-	CU_ASSERT(NULL == data);
+	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_node_get_data(NULL, NULL));
+	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_node_get_data(NULL, alloc_cb));
 
 	data = gds_rbtree_node_get_data(n, NULL);
 	CU_ASSERT(NULL != data);
@@ -96,14 +95,14 @@ void t_rbtree_node_set_data(void)
 	n = gds_rbtree_node_new(NULL, NULL);
 
 	/* Returns always a negative value if first parameter is NULL */
-	CU_ASSERT(0 >  gds_rbtree_node_set_data(NULL, NULL, NULL    , NULL   ));
-	CU_ASSERT(0 >  gds_rbtree_node_set_data(NULL, NULL, NULL    , free_cb));
-	CU_ASSERT(0 >  gds_rbtree_node_set_data(NULL, NULL, alloc_cb, NULL   ));
-	CU_ASSERT(0 >  gds_rbtree_node_set_data(NULL, NULL, alloc_cb, free_cb));
-	CU_ASSERT(0 >  gds_rbtree_node_set_data(NULL, t   , NULL    , NULL   ));
-	CU_ASSERT(0 >  gds_rbtree_node_set_data(NULL, t   , NULL    , free_cb));
-	CU_ASSERT(0 >  gds_rbtree_node_set_data(NULL, t   , alloc_cb, NULL   ));
-	CU_ASSERT(0 >  gds_rbtree_node_set_data(NULL, t   , alloc_cb, free_cb));
+	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_node_set_data(NULL, NULL, NULL    , NULL   ));
+	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_node_set_data(NULL, NULL, NULL    , free_cb));
+	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_node_set_data(NULL, NULL, alloc_cb, NULL   ));
+	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_node_set_data(NULL, NULL, alloc_cb, free_cb));
+	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_node_set_data(NULL, t   , NULL    , NULL   ));
+	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_node_set_data(NULL, t   , NULL    , free_cb));
+	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_node_set_data(NULL, t   , alloc_cb, NULL   ));
+	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_node_set_data(NULL, t   , alloc_cb, free_cb));
 
 	/* Set NULL as data. */
 	CU_ASSERT(0 == gds_rbtree_node_set_data(n   , NULL, NULL    , NULL   ));
@@ -147,7 +146,17 @@ int main()
 
 	/* Run all tests using the CUnit Basic interface */
 	CU_basic_set_mode(CU_BRM_VERBOSE);
-	CU_basic_run_tests();
+	try {
+		CU_basic_run_tests();
+	} catch() as (e) {
+		fprintf(stderr, "\nTests returned an unexpected exception\n");
+		fprintf(stderr, "\tType: %s\n", e->type());
+		fprintf(stderr, "\tMessage: %s\n", e->message());
+		fprintf(stderr, "\tFile: %s\n", e->filename());
+		fprintf(stderr, "\tFunction: %s\n", e->function());
+		fprintf(stderr, "\tLine: %d\n", e->line());
+		return EXIT_FAILURE;
+	}
 	CU_cleanup_registry();
 	return CU_get_error();
 }

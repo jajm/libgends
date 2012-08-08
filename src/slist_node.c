@@ -24,6 +24,8 @@
 
 #include <stdlib.h>
 #include <stdint.h>
+#include "exception.h"
+#include "check_arg.h"
 #include "log.h"
 #include "slist_node.h"
 #include "callbacks.h"
@@ -32,23 +34,15 @@ gds_slist_node_t *gds_slist_node_new(void *data, gds_alloc_cb alloc_cb)
 {
 	gds_slist_node_t *node;
 
-	if (data == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(data);
 
 	node = malloc(sizeof(gds_slist_node_t));
 	if (node == NULL) {
-		GDS_LOG_ERROR("Memory allocation error");
-		return NULL;
+		GDS_THROW(NotEnoughMemoryException, "failed to allocate %d "
+			"bytes", sizeof(gds_slist_node_t));
 	}
 	if (alloc_cb != NULL) {
 		node->data = alloc_cb(data);
-		if(node->data == NULL) {
-			GDS_LOG_ERROR("Memory allocation error");
-			free(node);
-			return NULL;
-		}
 	} else {
 		node->data = data;
 	}
@@ -61,10 +55,8 @@ gds_slist_node_t *gds_slist_node_new(void *data, gds_alloc_cb alloc_cb)
 int8_t gds_slist_node_set_data(gds_slist_node_t *node, void *data,
 	gds_free_cb free_cb, gds_alloc_cb alloc_cb)
 {
-	if (node == NULL || data == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return -1;
-	}
+	GDS_CHECK_ARG_NOT_NULL(node);
+	GDS_CHECK_ARG_NOT_NULL(data);
 
 	if (free_cb != NULL) {
 		free_cb(node->data);
@@ -72,10 +64,6 @@ int8_t gds_slist_node_set_data(gds_slist_node_t *node, void *data,
 
 	if (alloc_cb != NULL) {
 		node->data = alloc_cb(data);
-		if(node->data == NULL) {
-			GDS_LOG_ERROR("Memory allocation error");
-			return -1;
-		}
 	} else {
 		node->data = data;
 	}
@@ -87,17 +75,10 @@ void *gds_slist_node_get_data(gds_slist_node_t *node, gds_alloc_cb alloc_cb)
 {
 	void *data;
 
-	if (node == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(node);
 
 	if (alloc_cb) {
 		data = alloc_cb(node->data);
-		if(data == NULL) {
-			GDS_LOG_ERROR("Memory allocation error");
-			return NULL;
-		}
 	} else {
 		data = node->data;
 	}
@@ -107,10 +88,7 @@ void *gds_slist_node_get_data(gds_slist_node_t *node, gds_alloc_cb alloc_cb)
 
 int8_t gds_slist_node_set_next(gds_slist_node_t *node, gds_slist_node_t *next)
 {
-	if(node == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return -1;
-	}
+	GDS_CHECK_ARG_NOT_NULL(node);
 
 	node->next = next;
 	
@@ -119,10 +97,7 @@ int8_t gds_slist_node_set_next(gds_slist_node_t *node, gds_slist_node_t *next)
 
 gds_slist_node_t *gds_slist_node_get_next(gds_slist_node_t *node)
 {
-	if(node == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(node);
 
 	return node->next;
 }

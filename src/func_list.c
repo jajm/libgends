@@ -27,6 +27,8 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include "exception.h"
+#include "check_arg.h"
 #include "log.h"
 #include "func_ptr.h"
 #include "func_list.h"
@@ -37,23 +39,20 @@ gds_func_list_node_t * gds_func_list_add(gds_func_list_node_t **head,
 	gds_func_list_node_t *newnode;
 	size_t len;
 
-	if(head == NULL || name == NULL || ptr == NULL){
-		GDS_LOG_ERROR("Bad parameters");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(head);
+	GDS_CHECK_ARG_NOT_NULL(name);
+	GDS_CHECK_ARG_NOT_NULL(ptr);
 
 	newnode = malloc(sizeof(gds_func_list_node_t));
 	if(newnode == NULL) {
-		GDS_LOG_ERROR("Memory allocation error");
-		return NULL;
+		GDS_THROW_ALLOC_ERROR(sizeof(gds_func_list_node_t));
 	}
 
 	len = strlen(name);
 	newnode->name = malloc(len+1);
 	if(newnode->name == NULL) {
-		GDS_LOG_ERROR("Memory allocation error");
 		free(newnode);
-		return NULL;
+		GDS_THROW_ALLOC_ERROR(len+1);
 	}
 	strncpy(newnode->name, name, len+1);
 	assert(newnode->name[len] == '\0');
@@ -69,10 +68,8 @@ int8_t gds_func_list_del(gds_func_list_node_t **head, const char *name)
 {
 	gds_func_list_node_t *node, *prev = NULL;
 
-	if(head == NULL || name == NULL){
-		GDS_LOG_ERROR("Bad parameters");
-		return -1;
-	}
+	GDS_CHECK_ARG_NOT_NULL(head);
+	GDS_CHECK_ARG_NOT_NULL(name);
 
 	node = *head;
 	while(node != NULL){
@@ -118,10 +115,7 @@ gds_func_ptr_t gds_func_list_get_ptr(gds_func_list_node_t *head,
 	gds_func_ptr_t func_ptr = NULL;
 	gds_func_list_node_t *node;
 
-	if(name == NULL) {
-		GDS_LOG_ERROR("Bad parameters");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(name);
 
 	node = head;
 	while(node != NULL) {

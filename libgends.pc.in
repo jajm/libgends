@@ -6,5 +6,5 @@ includedir=@includedir@
 Name: libgends
 Description: libgends provides generic data structures
 Version: @VERSION@
-Libs: -L${libdir} -lgends
+Libs: -L${libdir} -lgends -lexception
 Cflags: -I${includedir}

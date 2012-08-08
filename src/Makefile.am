@@ -10,4 +10,5 @@ libgends_la_SOURCES = container.c slist_node.c slist.c dlist_node.c dlist.c \
 	compact_rbtree.c ll_slist.c func_list.c types.c
 
 libgends_la_LIBADD = core/libcore.la
-libgends_la_LDFLAGS = -version-info ${LIBGENDS_CUR}:${LIBGENDS_REV}:${LIBGENDS_AGE}
+libgends_la_LDFLAGS = -lexception \
+	-version-info ${LIBGENDS_CUR}:${LIBGENDS_REV}:${LIBGENDS_AGE}

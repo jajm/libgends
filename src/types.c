@@ -28,6 +28,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "exception.h"
+#include "check_arg.h"
 #include "log.h"
 #include "func_list.h"
 #include "types.h"
@@ -44,21 +46,18 @@ gds_type_t * gds_type_new(const char *name)
 	gds_type_t *t = NULL;
 	size_t len;
 
-	if(name == NULL){
-		GDS_LOG_ERROR("Bad parameters");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(name);
 	
 	if( (t = malloc(sizeof(gds_type_t))) == NULL){
-		GDS_LOG_ERROR("Memory allocation error");
-		return NULL;
+		GDS_THROW(NotEnoughMemoryException, "failed to allocate %d "
+			"bytes", sizeof(gds_type_t));
 	}
 
 	len = strlen(name);
 	if( (t->name = malloc(len+1)) == NULL){
 		free(t);
-		GDS_LOG_ERROR("Memory allocation error");
-		return NULL;
+		GDS_THROW(NotEnoughMemoryException, "failed to allocate %d "
+			"bytes", len+1);
 	}
 	strncpy(t->name, name, len+1);
 	t->func_list = NULL;
@@ -84,10 +83,8 @@ int8_t gds_type_list_add(gds_type_list_t *type_list, gds_type_t *type)
 {
 	gds_type_list_node_t *tmp, *tmp2 = NULL;
 
-	if(type_list == NULL || type == NULL){
-		GDS_LOG_ERROR("Bad parameters");
-		return -1;
-	}
+	GDS_CHECK_ARG_NOT_NULL(type_list);
+	GDS_CHECK_ARG_NOT_NULL(type);
 
 	tmp = *type_list;
 	while(tmp != NULL){
@@ -99,8 +96,8 @@ int8_t gds_type_list_add(gds_type_list_t *type_list, gds_type_t *type)
 		tmp = tmp->next;
 	}
 	if( (tmp = malloc(sizeof(gds_type_list_node_t))) == NULL){
-		GDS_LOG_ERROR("Memory allocation error");
-		return -1;
+		GDS_THROW(NotEnoughMemoryException, "failed to allocate %d "
+			"bytes", sizeof(gds_type_list_node_t));
 	}
 	tmp->type = type;
 	if(tmp2){
@@ -118,10 +115,9 @@ int8_t gds_type_list_del(gds_type_list_t *type_list, const char *name)
 {
 	gds_type_list_node_t *tmp, *tmp2 = NULL;
 
-	if(type_list == NULL || name == NULL){
-		GDS_LOG_ERROR("Bad parameters");
-		return -1;
-	}
+	GDS_CHECK_ARG_NOT_NULL(type_list);
+	GDS_CHECK_ARG_NOT_NULL(name);
+
 	tmp = *type_list;
 	while(tmp && strcmp(tmp->type->name, name)){
 		tmp2 = tmp;
@@ -148,10 +144,7 @@ gds_type_t *gds_type_list_get(gds_type_list_t type_list, const char *name)
 	gds_type_list_node_t *tmp;
 	gds_type_t *t = NULL;
 	
-	if(type_list == NULL || name == NULL){
-		GDS_LOG_ERROR("Bad parameters");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(name);
 
 	tmp = type_list;
 	while(tmp != NULL){
@@ -194,7 +187,7 @@ uint32_t gds_type_hash(const char *name)
 	uint32_t i;
 	size_t len;
 
-	if(name == NULL) return 0;
+	GDS_CHECK_ARG_NOT_NULL(name);
 
 	len = strlen(name);
 	for(i=0; i<len; i++){
@@ -212,8 +205,8 @@ int8_t gds_types_init(uint32_t size)
 	if(g_types == NULL){
 		g_types = malloc(sizeof(struct gds_types_t));
 		if(g_types == NULL){
-			GDS_LOG_ERROR("Memory allocation error");
-			return -1;
+			GDS_THROW(NotEnoughMemoryException, "failed to allocate"
+				" %d bytes", sizeof(struct gds_types_t)); 
 		}
 	}else{
 		GDS_LOG_ERROR("User types already initialized");
@@ -223,9 +216,9 @@ int8_t gds_types_init(uint32_t size)
 	g_types->size = (size != 0) ? size : GDS_TYPES_DEFAULT_HT_SIZE;
 	g_types->type_list = malloc(g_types->size*sizeof(gds_type_list_t));
 	if(g_types->type_list == NULL){
-		GDS_LOG_ERROR("Memory allocation error");
 		free(g_types);
-		return -1;
+		GDS_THROW(NotEnoughMemoryException, "failed to allocate %d "
+			"bytes", g_types->size * sizeof(gds_type_list_t));
 	}
 
 	for (i=0; i<g_types->size; i++)
@@ -243,14 +236,13 @@ bool gds_type_exist(const char *name)
 {
 	uint32_t hash;
 
-	if(name == NULL) {
-		GDS_LOG_ERROR("Bad parameters: NULL pointer");
-		return false;
-	}
+	GDS_CHECK_ARG_NOT_NULL(name);
+
 	if(g_types == NULL){
 		GDS_LOG_ERROR("User types not initialized");
 		return false;
 	}
+
 	hash = gds_type_hash(name);
 
 	return (gds_type_list_get(g_types->type_list[hash], name) != NULL)
@@ -264,21 +256,14 @@ int8_t gds_type_register(const char *name)
 	uint32_t hash;
 	gds_type_t *type;
 
-	if(name == NULL){
-		GDS_LOG_ERROR("Bad parameters");
-		return -1;
-	}
+	GDS_CHECK_ARG_NOT_NULL(name);
 
 	if(g_types == NULL) {
 		GDS_LOG_ERROR("User types not initialized");
 		return -1;
 	}
 
-	if( (type = gds_type_new(name)) == NULL ) {
-		GDS_LOG_ERROR("Type creation failed");
-		return -1;
-	}
-
+	type = gds_type_new(name);
 	hash = gds_type_hash(name);
 	tla = gds_type_list_add(&g_types->type_list[hash], type);
 	if(tla != 0){
@@ -295,10 +280,10 @@ int8_t gds_type_register_func(const char *name, const char *func_name,
 	uint32_t hash;
 	gds_type_t *type;
 
-	if(name == NULL || func_name == NULL || func_ptr == NULL){
-		GDS_LOG_ERROR("Bad parameters");
-		return -1;
-	}
+	GDS_CHECK_ARG_NOT_NULL(name);
+	GDS_CHECK_ARG_NOT_NULL(func_name);
+	GDS_CHECK_ARG_NOT_NULL(func_ptr);
+
 	if(g_types == NULL){
 		GDS_LOG_ERROR("User types not initialized");
 		return -1;
@@ -307,10 +292,7 @@ int8_t gds_type_register_func(const char *name, const char *func_name,
 	hash = gds_type_hash(name);
 	type = gds_type_list_get(g_types->type_list[hash], name);
 	if(type){
-		if(gds_func_list_add(&type->func_list, func_name, func_ptr) == NULL){
-			GDS_LOG_ERROR("Failed to add function '%s' to type '%s'",func_name,name);
-			return -1;
-		}
+		gds_func_list_add(&type->func_list, func_name, func_ptr);
 	}else{
 		GDS_LOG_ERROR("Failed to find type '%s'", name);
 		return -1;
@@ -325,10 +307,9 @@ gds_func_ptr_t gds_type_get_func(const char *name, const char *func_name)
 	gds_type_t *type;
 	gds_func_ptr_t func_ptr = NULL;
 
-	if(name == NULL || func_name == NULL){
-		GDS_LOG_ERROR("Bad parameters");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(name);
+	GDS_CHECK_ARG_NOT_NULL(func_name);
+
 	if(g_types == NULL){
 		GDS_LOG_ERROR("User types not initialized");
 		return NULL;
@@ -352,22 +333,16 @@ int8_t gds_type_unregister(const char *name)
 {
 	uint32_t hash;
 
-	if(name == NULL){
-		GDS_LOG_ERROR("Bad parameters");
-		return -1;
-	}
+	GDS_CHECK_ARG_NOT_NULL(name);
+
 	if(g_types == NULL){
 		GDS_LOG_ERROR("User types not initialized");
 		return -1;
 	}
 
 	hash = gds_type_hash(name);
-	if( (gds_type_list_del(&g_types->type_list[hash], name)) < 0){
-		GDS_LOG_ERROR("Deleting type '%s' from hash table failed", name);
-		return -1;
-	}
 
-	return 0;
+	return gds_type_list_del(&g_types->type_list[hash], name);
 }
 
 int8_t gds_type_unregister_func(const char *name, const char *func_name)
@@ -375,10 +350,9 @@ int8_t gds_type_unregister_func(const char *name, const char *func_name)
 	uint32_t hash;
 	gds_type_t *type;
 
-	if(name == NULL || func_name == NULL){
-		GDS_LOG_ERROR("Bad parameters");
-		return -1;
-	}
+	GDS_CHECK_ARG_NOT_NULL(name);
+	GDS_CHECK_ARG_NOT_NULL(func_name);
+
 	if(g_types == NULL){
 		GDS_LOG_ERROR("User types not initialized");
 		return -1;

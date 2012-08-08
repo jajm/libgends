@@ -28,6 +28,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include "exception.h"
+#include "check_arg.h"
 #include "callbacks.h"
 #include "dlist.h"
 #include "types.h"
@@ -43,23 +45,20 @@ gds_dlist_t *gds_dlist_new(const char *type_name)
 	gds_dlist_t *dlist;
 	size_t len;
 
-	if(type_name == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(type_name);
 
 	dlist = malloc(sizeof(gds_dlist_t));
 	if(dlist == NULL){
-		GDS_LOG_ERROR("Memory allocation error");
-		return NULL;
+		GDS_THROW(NotEnoughMemoryException, "Failed to allocate %d "
+			"bytes", sizeof(gds_dlist_t));
 	}
 
 	len = strlen(type_name);
 	dlist->type_name = malloc(len+1);
 	if(dlist->type_name == NULL){
-		GDS_LOG_ERROR("Memory allocation error");
 		free(dlist);
-		return NULL;
+		GDS_THROW(NotEnoughMemoryException, "Failed to allocate %d "
+			"bytes", len+1);
 	}
 
 	strncpy(dlist->type_name, type_name, len+1);
@@ -82,47 +81,40 @@ bool gds_dlist_empty(gds_dlist_t *l)
 
 gds_dlist_node_t *gds_dlist_first(gds_dlist_t *l)
 {
-	if(l == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(l);
 
 	return l->first;
 }
 
 gds_dlist_node_t *gds_dlist_last(gds_dlist_t *l)
 {
-	if(l == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(l);
 
 	return l->last;
 }
 
 gds_dlist_node_t *gds_dlist_next(gds_dlist_t *l, gds_dlist_node_t *node)
 {
-	if(l == NULL || node == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(l);
+	GDS_CHECK_ARG_NOT_NULL(node);
 
 	return node->next;
 }
 
 gds_dlist_node_t *gds_dlist_prev(gds_dlist_t *l, gds_dlist_node_t *node)
 {
-	if(l == NULL || node == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(l);
+	GDS_CHECK_ARG_NOT_NULL(node);
 
 	return node->prev;
 }
 
 bool gds_dlist_has_next(gds_dlist_t *l, gds_dlist_node_t *node)
 {
-	if(l != NULL && node != NULL && node->next != NULL)
+	GDS_CHECK_ARG_NOT_NULL(l);
+	GDS_CHECK_ARG_NOT_NULL(node);
+
+	if (node->next != NULL)
 		return true;
 	
 	return false;
@@ -130,7 +122,10 @@ bool gds_dlist_has_next(gds_dlist_t *l, gds_dlist_node_t *node)
 
 bool gds_dlist_has_prev(gds_dlist_t *l, gds_dlist_node_t *node)
 {
-	if(l != NULL && node != NULL && node->prev != NULL)
+	GDS_CHECK_ARG_NOT_NULL(l);
+	GDS_CHECK_ARG_NOT_NULL(node);
+
+	if(node->prev != NULL)
 		return true;
 	
 	return false;
@@ -142,19 +137,14 @@ gds_dlist_node_t *gds_dlist_add_after(gds_dlist_t *l, gds_dlist_node_t *node, vo
 	gds_dlist_node_t *newnode;
 	gds_alloc_cb alloc_cb = NULL;
 
-	if(l == NULL || data == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(l);
+	GDS_CHECK_ARG_NOT_NULL(data);
 
 	if(copy_data) {
 		alloc_cb = (gds_alloc_cb)gds_type_get_func(l->type_name, "alloc");
 	}
 	newnode = gds_dlist_node_new(data, alloc_cb);
-	if(newnode == NULL){
-		GDS_LOG_ERROR("Failed to create the node");
-		return NULL;
-	}
+
 	/* If node is NULL, add newnode at the end */
 	if(node == NULL) node = l->last;
 	if(node) {
@@ -170,25 +160,20 @@ gds_dlist_node_t *gds_dlist_add_after(gds_dlist_t *l, gds_dlist_node_t *node, vo
 	return newnode;
 }
 
-gds_dlist_node_t *gds_dlist_add_before(gds_dlist_t *l, gds_dlist_node_t *node, void *data,
-	bool copy_data)
+gds_dlist_node_t *gds_dlist_add_before(gds_dlist_t *l, gds_dlist_node_t *node,
+	void *data, bool copy_data)
 {
 	gds_dlist_node_t *newnode;
 	gds_alloc_cb alloc_cb = NULL;
 
-	if(l == NULL || data == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(l);
+	GDS_CHECK_ARG_NOT_NULL(data);
 
 	if(copy_data) {
 		alloc_cb = (gds_alloc_cb)gds_type_get_func(l->type_name, "alloc");
 	}
 	newnode = gds_dlist_node_new(data, alloc_cb);
-	if(newnode == NULL){
-		GDS_LOG_ERROR("Failed to create the node");
-		return NULL;
-	}
+
 	/* If node is NULL, add newnode at beginning */
 	if(node == NULL) node = l->first;
 	if(node){
@@ -206,20 +191,14 @@ gds_dlist_node_t *gds_dlist_add_before(gds_dlist_t *l, gds_dlist_node_t *node, v
 
 gds_dlist_node_t *gds_dlist_add_first(gds_dlist_t *l, void *data, bool copy_data)
 {
-	if(l == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(l);
 
 	return gds_dlist_add_before(l, l->first, data, copy_data);
 }
 
 gds_dlist_node_t *gds_dlist_add_last(gds_dlist_t *l, void *data, bool copy_data)
 {
-	if(l == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(l);
 
 	return gds_dlist_add_after(l, l->last, data, copy_data);
 }
@@ -230,10 +209,9 @@ gds_dlist_node_t *gds_dlist_it_add_after(gds_iterator_t *it, void *data, bool co
 	gds_dlist_t *l;
 	gds_dlist_iterator_t *dit;
 
-	if(it == NULL || it->data == NULL || data == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(it);
+	GDS_CHECK_ARG_NOT_NULL(it->data);
+	GDS_CHECK_ARG_NOT_NULL(data);
 
 	dit = it->data;
 	l = dit->l;
@@ -248,10 +226,9 @@ gds_dlist_node_t *gds_dlist_it_add_before(gds_iterator_t *it, void *data, bool c
 	gds_dlist_t *l;
 	gds_dlist_iterator_t *dit;
 
-	if(it == NULL || it->data == NULL || data == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(it);
+	GDS_CHECK_ARG_NOT_NULL(it->data);
+	GDS_CHECK_ARG_NOT_NULL(data);
 
 	dit = it->data;
 	l = dit->l;
@@ -264,10 +241,11 @@ void *gds_dlist_pop(gds_dlist_t *l, gds_dlist_node_t *node)
 {
 	void *data;
 
-	if(l == NULL || node == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return NULL;
+	GDS_CHECK_ARG_NOT_NULL(l);
+	if (l->first == NULL) {
+		GDS_THROW_EMPTY_LIST();
 	}
+	GDS_CHECK_ARG_NOT_NULL(node);
 
 	if(node->next) {
 		node->next->prev = node->prev;
@@ -288,20 +266,14 @@ void *gds_dlist_pop(gds_dlist_t *l, gds_dlist_node_t *node)
 
 void *gds_dlist_pop_first(gds_dlist_t *l)
 {
-	if(l == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(l);
 
 	return gds_dlist_pop(l, l->first);
 }
 
 void *gds_dlist_pop_last(gds_dlist_t *l)
 {
-	if(l == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(l);
 
 	return gds_dlist_pop(l, l->last);
 }
@@ -312,18 +284,16 @@ void *gds_dlist_it_pop(gds_iterator_t *it)
 	gds_dlist_node_t *node;
 	gds_dlist_iterator_t *dit;
 
-	if(it == NULL || it->data == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(it);
+	GDS_CHECK_ARG_NOT_NULL(it->data);
 
 	dit = it->data;
 	l = dit->l;
 	node = dit->cur;
 
 	if(l == NULL || node == NULL) {
-		GDS_LOG_ERROR("Iterator does not point on anything");
-		return NULL;
+		GDS_THROW(InvalidIteratorException,
+			"iterator doesn't point to anything");
 	}
 
 	gds_iterator_step(it);
@@ -336,10 +306,11 @@ int8_t gds_dlist_del(gds_dlist_t *l, gds_dlist_node_t *node, bool free_data)
 {
 	gds_free_cb free_cb = NULL;
 
-	if(l == NULL || node == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return -1;
+	GDS_CHECK_ARG_NOT_NULL(l);
+	if (l->first == NULL) {
+		GDS_THROW_EMPTY_LIST();
 	}
+	GDS_CHECK_ARG_NOT_NULL(node);
 
 	if(node->next) {
 		node->next->prev = node->prev;
@@ -362,20 +333,14 @@ int8_t gds_dlist_del(gds_dlist_t *l, gds_dlist_node_t *node, bool free_data)
 
 int8_t gds_dlist_del_first(gds_dlist_t *l, bool free_data)
 {
-	if(l == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return -1;
-	}
+	GDS_CHECK_ARG_NOT_NULL(l);
 
 	return gds_dlist_del(l, l->first, free_data);
 }
 
 int8_t gds_dlist_del_last(gds_dlist_t *l, bool free_data)
 {
-	if(l == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return -1;
-	}
+	GDS_CHECK_ARG_NOT_NULL(l);
 
 	return gds_dlist_del(l, l->last, free_data);
 }
@@ -386,18 +351,16 @@ int8_t gds_dlist_it_del(gds_iterator_t *it, bool free_data)
 	gds_dlist_node_t *node;
 	gds_dlist_iterator_t *dit;
 
-	if(it == NULL || it->data == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return -1;
-	}
+	GDS_CHECK_ARG_NOT_NULL(it);
+	GDS_CHECK_ARG_NOT_NULL(it->data);
 
 	dit = it->data;
 	l = dit->l;
 	node = dit->cur;
 
 	if(l == NULL || node == NULL) {
-		GDS_LOG_ERROR("Iterator does not point on anything");
-		return -1;
+		GDS_THROW(InvalidIteratorException,
+			"iterator doesn't point to anything");
 	}
 
 	gds_iterator_step(it);
@@ -409,9 +372,9 @@ void *gds_dlist_get(gds_dlist_t *l, gds_dlist_node_t *node, bool copy_data)
 {
 	gds_alloc_cb alloc_cb = NULL;
 
-	if(l == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return NULL;
+	GDS_CHECK_ARG_NOT_NULL(l);
+	if (l->first == NULL) {
+		GDS_THROW_EMPTY_LIST();
 	}
 
 	if(copy_data) {
@@ -423,20 +386,14 @@ void *gds_dlist_get(gds_dlist_t *l, gds_dlist_node_t *node, bool copy_data)
 
 void *gds_dlist_get_first(gds_dlist_t *l, bool copy_data)
 {
-	if(l == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(l);
 
 	return gds_dlist_get(l, l->first, copy_data);
 }
 
 void *gds_dlist_get_last(gds_dlist_t *l, bool copy_data)
 {
-	if(l == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(l);
 
 	return gds_dlist_get(l, l->last, copy_data);
 }
@@ -447,10 +404,8 @@ void *gds_dlist_it_get(gds_iterator_t *it, bool copy_data)
 	gds_dlist_node_t *node;
 	gds_dlist_iterator_t *dit;
 
-	if(it == NULL || it->data == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(it);
+	GDS_CHECK_ARG_NOT_NULL(it->data);
 
 	dit = it->data;
 	l = dit->l;
@@ -461,9 +416,10 @@ void *gds_dlist_it_get(gds_iterator_t *it, bool copy_data)
 
 int8_t gds_dlist_iterator_reset(gds_dlist_iterator_t *it)
 {
-	if(it == NULL || it->l == NULL) {
-		GDS_LOG_ERROR("Bad parameters");
-		return -1;
+	GDS_CHECK_ARG_NOT_NULL(it);
+	if (it->l == NULL) {
+		GDS_THROW(InvalidIteratorException,
+			"iterator doesn't point to anything");
 	}
 
 	it->cur = NULL;
@@ -474,9 +430,10 @@ int8_t gds_dlist_iterator_step(gds_dlist_iterator_t *it)
 {
 	gds_dlist_node_t *next;
 
-	if(it == NULL || it->l == NULL) {
-		GDS_LOG_ERROR("Bad parameters");
-		return -1;
+	GDS_CHECK_ARG_NOT_NULL(it);
+	if (it->l == NULL) {
+		GDS_THROW(InvalidIteratorException,
+			"iterator doesn't point to anything");
 	}
 
 	next = it->cur ? gds_dlist_node_get_next(it->cur)
@@ -494,9 +451,10 @@ int8_t gds_dlist_reverse_iterator_step(gds_dlist_iterator_t *it)
 {
 	gds_dlist_node_t *prev;
 
-	if(it == NULL || it->l == NULL) {
-		GDS_LOG_ERROR("Bad parameters");
-		return -1;
+	GDS_CHECK_ARG_NOT_NULL(it);
+	if (it->l == NULL) {
+		GDS_THROW(InvalidIteratorException,
+			"iterator doesn't point to anything");
 	}
 
 	prev = it->cur ? gds_dlist_node_get_prev(it->cur)
@@ -512,9 +470,10 @@ int8_t gds_dlist_reverse_iterator_step(gds_dlist_iterator_t *it)
 
 void * gds_dlist_iterator_get(gds_dlist_iterator_t *it)
 {
-	if(it == NULL || it->l == NULL || it->cur == NULL) {
-		GDS_LOG_ERROR("Iterator doesn't point on anything");
-		return NULL;
+	GDS_CHECK_ARG_NOT_NULL(it);
+	if (it->l == NULL || it->cur == NULL) {
+		GDS_THROW(InvalidIteratorException,
+			"iterator doesn't point to anything");
 	}
 
 	return gds_dlist_node_get_data(it->cur, NULL);
@@ -525,15 +484,12 @@ gds_iterator_t *gds_dlist_iterator_new(gds_dlist_t *l)
 	gds_iterator_t *it;
 	gds_dlist_iterator_t *dit;
 
-	if(l == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(l);
 
 	dit = malloc(sizeof(gds_dlist_iterator_t));
 	if(dit == NULL) {
-		GDS_LOG_ERROR("Memory allocation error");
-		return NULL;
+		GDS_THROW(NotEnoughMemoryException, "Failed to allocate %d "
+			"bytes", sizeof(gds_dlist_iterator_t));
 	}
 	dit->l = l;
 	dit->cur = NULL;
@@ -551,15 +507,12 @@ gds_iterator_t *gds_dlist_reverse_iterator_new(gds_dlist_t *l)
 	gds_iterator_t *it;
 	gds_dlist_iterator_t *dit;
 
-	if(l == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(l);
 
 	dit = malloc(sizeof(gds_dlist_iterator_t));
 	if(dit == NULL) {
-		GDS_LOG_ERROR("Memory allocation error");
-		return NULL;
+		GDS_THROW(NotEnoughMemoryException, "Failed to allocate %d "
+			"bytes", sizeof(gds_dlist_iterator_t));
 	}
 	dit->l = l;
 	dit->cur = NULL;
@@ -583,16 +536,13 @@ gds_dlist_node_t *gds_dlist_chk(gds_dlist_t *l, void *data)
 	gds_dlist_node_t *node = NULL;
 	gds_dlist_node_t *tmp;
 
-	if(l == NULL || data == NULL) {
-		GDS_LOG_ERROR("Bad arguments");
-		return NULL;
-	}
+	GDS_CHECK_ARG_NOT_NULL(l);
+	GDS_CHECK_ARG_NOT_NULL(data);
 
 	cmp_cb = (gds_cmp_cb)gds_type_get_func(l->type_name, "cmp");
 	if(cmp_cb == NULL) {
-		GDS_LOG_ERROR("Failed to retrieve 'cmp' function for type %s",
-			l->type_name);
-		return NULL;
+		GDS_THROW(FunctionNotFoundException, "failed to retrieve 'cmp' "
+			"function for type %s", l->type_name);
 	}
 	tmp = l->first;
 	while(tmp){
