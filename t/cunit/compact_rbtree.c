@@ -8,7 +8,7 @@
 #include "test_macros.h"
 #include "compact_rbtree.h"
 #include "iterator.h"
-#include "ll_slist.h"
+#include "slist.h"
 #include "test.h"
 
 int init_suite(void)
@@ -424,7 +424,7 @@ void t_compact_rbtree_values(void)
 
 	slist = gds_compact_rbtree_values(root, NULL);
 	CU_ASSERT_PTR_NOT_NULL(slist);
-	it = gds_ll_slist_iterator_new(slist);
+	it = gds_slist_iterator_new(slist);
 	i = 0;
 	while(gds_iterator_step(it) == 0) {
 		t = gds_iterator_get(it);

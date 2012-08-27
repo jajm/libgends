@@ -18,31 +18,72 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * File              : queue.h                                               *
- * Short description : Queue management (FIFO, First In First Out)           *
- *****************************************************************************
- * Queue is implemented using a single-linked list.                          *
- * Elements are added at end of list (in constant time) and removed from     *
- * beginning of list (in constant time too).                                 *
+ * File              : typed_stack.h                                         *
+ * Short description : Stack management (LIFO, Last In First Out)            *
  *****************************************************************************/
-#ifndef queue_h_included
-#define queue_h_included
 
-#include "slist.h"
+#ifndef gds_typed_stack_h_included
+#define gds_typed_stack_h_included
 
-typedef gds_slist_t gds_queue_t;
+#include <stdbool.h>
+#include <stdint.h>
+#include "slist_node.h"
 
-#define gds_queue_new(type_name) \
-	gds_slist_new(type_name)
+typedef struct{
+	char *type_name;
+	gds_slist_node_t *head;
+} gds_typed_stack_t;
 
-#define gds_queue_push(queue, data, copy_data) \
-	gds_slist_add_last(queue, data, copy_data)
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#define gds_queue_pop(queue) \
-	gds_slist_pop_first(queue)
+/* Create a new stack */
+/* type_name : type name of stored data (see core/types.h) */
+/* Return: Success => pointer to the newly created stack
+ *         Failure => NULL */
+	gds_typed_stack_t *
+gds_typed_stack_new(
+	const char *type_name
+);
 
-#define gds_queue_free(queue, free_data) \
-	gds_slist_free(queue, free_data)
+/* Push into the stack */
+/*         S : pointer to the stack
+ *      data : data to push
+ * copy_data : true => make a copy of the data
+ *             false => just take the pointer value */
+/* Return: Success => 0
+ *         Failure => a negative value */
+	int8_t
+gds_typed_stack_push(
+	gds_typed_stack_t *S,
+	void *data,
+	bool copy_data
+);
 
-#endif /* Not queue_h_included */
+/* Pop from the stack */
+/* S : pointer to the stack */
+/* Return: Success => pointer to the data
+ *         Failure => NULL */
+	void *
+gds_typed_stack_pop(
+	gds_typed_stack_t *S
+);
+
+/* Free memory */
+/* S : pointer to the stack
+ * free_data : true => free memory occupied by data (use "free" custom
+ *                     function)
+ *             false => don't free memory occupied by data */
+	void
+gds_typed_stack_free(
+	gds_typed_stack_t *S,
+	bool free_data
+);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* Not gds_typed_stack_h_included */
 

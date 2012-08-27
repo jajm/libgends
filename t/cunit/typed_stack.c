@@ -7,7 +7,7 @@
 #include "exception.h"
 #include "test_macros.h"
 #include "types.h"
-#include "stack.h"
+#include "typed_stack.h"
 
 typedef struct {
 	int32_t i;
@@ -42,25 +42,25 @@ int clean_suite(void){
 	return 0;
 }
 
-void t_gds_stack_new(void)
+void t_gds_typed_stack_new(void)
 {
-	gds_stack_t *s;
+	gds_typed_stack_t *s;
 
-	GDS_ASSERT_THROW(BadArgumentException, gds_stack_new(NULL));
+	GDS_ASSERT_THROW(BadArgumentException, gds_typed_stack_new(NULL));
 
-	CU_ASSERT_PTR_NOT_NULL((s = gds_stack_new("")));
-	gds_stack_free(s, false);
-	CU_ASSERT_PTR_NOT_NULL((s = gds_stack_new("basic_type_name")));
-	gds_stack_free(s, false);
-	CU_ASSERT_PTR_NOT_NULL((s = gds_stack_new("name with spaces")));
-	gds_stack_free(s, false);
-	CU_ASSERT_PTR_NOT_NULL((s = gds_stack_new("numb3rs & ()ther 5tuff... 'éèëêç'")));
-	gds_stack_free(s, false);
+	CU_ASSERT_PTR_NOT_NULL((s = gds_typed_stack_new("")));
+	gds_typed_stack_free(s, false);
+	CU_ASSERT_PTR_NOT_NULL((s = gds_typed_stack_new("basic_type_name")));
+	gds_typed_stack_free(s, false);
+	CU_ASSERT_PTR_NOT_NULL((s = gds_typed_stack_new("name with spaces")));
+	gds_typed_stack_free(s, false);
+	CU_ASSERT_PTR_NOT_NULL((s = gds_typed_stack_new("numb3rs & ()ther 5tuff... 'éèëêç'")));
+	gds_typed_stack_free(s, false);
 }
 
-void t_gds_stack_push_and_pop(void)
+void t_gds_typed_stack_push_and_pop(void)
 {
-	gds_stack_t *s;
+	gds_typed_stack_t *s;
 	test_structure_t *test;
 	char *type_name = "type_name";
 	int8_t i;
@@ -70,22 +70,22 @@ void t_gds_stack_push_and_pop(void)
 	gds_type_register_func(type_name, "free", (gds_func_ptr_t)&test_free);
 	test = calloc(1, sizeof(test_structure_t));
 
-	s = gds_stack_new(type_name);
+	s = gds_typed_stack_new(type_name);
 
 	for(i=0; i<=9; i++) {
 		test->i = i;
-		CU_ASSERT(0 == gds_stack_push(s, test, true));
+		CU_ASSERT(0 == gds_typed_stack_push(s, test, true));
 	}
 	test_free(test);
 
 	for(i=9; i>=0; i--) {
-		test = gds_stack_pop(s);
+		test = gds_typed_stack_pop(s);
 		CU_ASSERT_PTR_NOT_NULL(test);
 		CU_ASSERT_EQUAL(test->i, i);
 		test_free(test);
 	}
 
-	gds_stack_free(s, true);
+	gds_typed_stack_free(s, true);
 	gds_type_unregister(type_name);
 }
 
@@ -108,8 +108,8 @@ int main()
 
 	/* add the tests to the suite */
 	if(
-	   (NULL == CU_add_test(pSuite, "gds_stack_new()", t_gds_stack_new))
-	|| (NULL == CU_add_test(pSuite, "gds_stack push and pop", t_gds_stack_push_and_pop))
+	   (NULL == CU_add_test(pSuite, "gds_typed_stack_new()", t_gds_typed_stack_new))
+	|| (NULL == CU_add_test(pSuite, "gds_typed_stack push and pop", t_gds_typed_stack_push_and_pop))
 	) {
 		CU_cleanup_registry();
 		return CU_get_error();

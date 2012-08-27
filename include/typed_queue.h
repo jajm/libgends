@@ -18,34 +18,31 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * File              : deque.h                                               *
- * Short description : Double-Ended Queue management                         *
+ * File              : typed_queue.h                                         *
+ * Short description : Queue management (FIFO, First In First Out)           *
  *****************************************************************************
- * Queue is implemented using a double-linked list.                          *
- * All operations (except for free) are executed in constant time            *
+ * Queue is implemented using a single-linked list.                          *
+ * Elements are added at end of list (in constant time) and removed from     *
+ * beginning of list (in constant time too).                                 *
  *****************************************************************************/
-#ifndef deque_h_included
-#define deque_h_included
+#ifndef gds_typed_queue_h_included
+#define gds_typed_queue_h_included
 
-#include "dlist.h"
+#include "typed_slist.h"
 
-typedef gds_dlist_t gds_deque_t;
+typedef gds_typed_slist_t gds_typed_queue_t;
 
-#define gds_deque_new(type_name) \
-	gds_dlist_new(type_name)
+#define gds_typed_queue_new(type_name) \
+	gds_slist_new(type_name)
 
-#define gds_deque_push_front(deque, data, copy_data) \
-	gds_dlist_add_first(deque, data, copy_data)
-#define gds_deque_push_back(deque, data, copy_data) \
-	gds_dlist_add_last(deque, data, copy_data)
+#define gds_typed_queue_push(queue, data, copy_data) \
+	gds_slist_add_last(queue, data, copy_data)
 
-#define gds_deque_pop_front(deque) \
-	gds_dlist_pop_first(deque)
-#define gds_deque_pop_back(deque) \
-	gds_dlist_pop_last(deque)
+#define gds_typed_queue_pop(queue) \
+	gds_slist_pop_first(queue)
 
-#define gds_deque_free(deque, free_data) \
-	gds_dlist_free(deque, free_data)
+#define gds_typed_queue_free(queue, free_data) \
+	gds_slist_free(queue, free_data)
 
-#endif /* Not deque_h_included */
+#endif /* Not gds_typed_queue_h_included */
 

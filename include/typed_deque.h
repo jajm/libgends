@@ -18,72 +18,34 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * File              : stack.h                                               *
- * Short description : Stack management (LIFO, Last In First Out)            *
+ * File              : typed_deque.h                                         *
+ * Short description : Double-Ended Queue management                         *
+ *****************************************************************************
+ * Queue is implemented using a double-linked list.                          *
+ * All operations (except for free) are executed in constant time            *
  *****************************************************************************/
+#ifndef gds_typed_deque_h_included
+#define gds_typed_deque_h_included
 
-#ifndef stack_h_included
-#define stack_h_included
+#include "typed_dlist.h"
 
-#include <stdbool.h>
-#include <stdint.h>
-#include "slist_node.h"
+typedef gds_typed_dlist_t gds_typed_deque_t;
 
-typedef struct{
-	char *type_name;
-	gds_slist_node_t *head;
-} gds_stack_t;
+#define gds_typed_deque_new(type_name) \
+	gds_dlist_new(type_name)
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#define gds_typed_deque_push_front(deque, data, copy_data) \
+	gds_dlist_add_first(deque, data, copy_data)
+#define gds_typed_deque_push_back(deque, data, copy_data) \
+	gds_dlist_add_last(deque, data, copy_data)
 
-/* Create a new stack */
-/* type_name : type name of stored data (see core/types.h) */
-/* Return: Success => pointer to the newly created stack
- *         Failure => NULL */
-	gds_stack_t *
-gds_stack_new(
-	const char *type_name
-);
+#define gds_typed_deque_pop_front(deque) \
+	gds_dlist_pop_first(deque)
+#define gds_typed_deque_pop_back(deque) \
+	gds_dlist_pop_last(deque)
 
-/* Push into the stack */
-/*         S : pointer to the stack
- *      data : data to push
- * copy_data : true => make a copy of the data
- *             false => just take the pointer value */
-/* Return: Success => 0
- *         Failure => a negative value */
-	int8_t
-gds_stack_push(
-	gds_stack_t *S,
-	void *data,
-	bool copy_data
-);
+#define gds_typed_deque_free(deque, free_data) \
+	gds_dlist_free(deque, free_data)
 
-/* Pop from the stack */
-/* S : pointer to the stack */
-/* Return: Success => pointer to the data
- *         Failure => NULL */
-	void *
-gds_stack_pop(
-	gds_stack_t *S
-);
-
-/* Free memory */
-/* S : pointer to the stack
- * free_data : true => free memory occupied by data (use "free" custom
- *                     function)
- *             false => don't free memory occupied by data */
-	void
-gds_stack_free(
-	gds_stack_t *S,
-	bool free_data
-);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* Not stack_h_included */
+#endif /* Not gds_typed_deque_h_included */
 

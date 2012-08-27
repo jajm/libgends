@@ -1,32 +1,35 @@
 AM_CPPFLAGS = -I.. -I../../include/core -I../../include
 AM_CFLAGS = -Wall -Wextra -Werror -std=c99
 
-noinst_PROGRAMS = container slist_node slist dlist_node dlist stack \
-	compact_rbtree_node compact_rbtree rbtree_node rbtree types func_list
+noinst_PROGRAMS = slist_node dlist_node \
+	compact_rbtree_node compact_rbtree \
+	rbtree_node rbtree \
+	types func_list \
+	typed_container typed_dlist typed_stack typed_slist
 
-container_SOURCES = container.c
-container_LDADD = ../../src/libgends.la
-container_LDFLAGS = -lcunit -lexception
+typed_container_SOURCES = typed_container.c
+typed_container_LDADD = ../../src/libgends.la
+typed_container_LDFLAGS = -lcunit -lexception
 
 slist_node_SOURCES = slist_node.c
 slist_node_LDADD = ../../src/libgends.la
 slist_node_LDFLAGS = -lcunit -lexception
 
-slist_SOURCES = slist.c
-slist_LDADD = ../../src/libgends.la
-slist_LDFLAGS = -lcunit -lexception
+typed_slist_SOURCES = typed_slist.c
+typed_slist_LDADD = ../../src/libgends.la
+typed_slist_LDFLAGS = -lcunit -lexception
 
 dlist_node_SOURCES = dlist_node.c
 dlist_node_LDADD = ../../src/libgends.la
 dlist_node_LDFLAGS = -lcunit -lexception
 
-dlist_SOURCES = dlist.c
-dlist_LDADD = ../../src/libgends.la
-dlist_LDFLAGS = -lcunit -lexception
+typed_dlist_SOURCES = typed_dlist.c
+typed_dlist_LDADD = ../../src/libgends.la
+typed_dlist_LDFLAGS = -lcunit -lexception
 
-stack_SOURCES = stack.c
-stack_LDADD = ../../src/libgends.la
-stack_LDFLAGS = -lcunit -lexception
+typed_stack_SOURCES = typed_stack.c
+typed_stack_LDADD = ../../src/libgends.la
+typed_stack_LDFLAGS = -lcunit -lexception
 
 compact_rbtree_node_SOURCES = compact_rbtree_node.c ../test.c
 compact_rbtree_node_LDADD = ../../src/libgends.la

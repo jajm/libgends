@@ -1,92 +1,69 @@
-#include <stdint.h>
-#include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
-#include "types.h"
+#include <stdlib.h>
+
 #include "hash_map.h"
+#include "slist.h"
 
-typedef struct{
-	uint32_t i;
-	char *s;
-} test_t;
-
-test_t * test_new(uint32_t i, const char *s)
+uint32_t myhash_cb(int8_t i)
 {
-	test_t *t;
-	size_t len;
-
-	t = malloc(sizeof(test_t));
-	t->i = i;
-	len = strlen(s);
-	t->s = malloc(len+1);
-	strncpy(t->s, s, len);
-
-	return t;
+	return i;
 }
 
-void test_free(test_t *t)
+int8_t mygetkey_cb(int8_t i)
 {
-	if(t){
-		free(t->s);
-		free(t);
-	}
+	return i;
 }
 
-void test_print(test_t *t, uint32_t indent)
+int32_t mycmpkey_cb(int8_t a, int8_t b)
 {
-	uint32_t i;
-
-	if(t == NULL){
-		printf("NULL");
-	} else {
-		printf("{\n");
-		for(i=0; i<indent+4; i++) printf(" ");
-		printf("i => %d\n", t->i);
-		for(i=0; i<indent+4; i++) printf(" ");
-		printf("s => %s\n", t->s);
-		for(i=0; i<indent; i++) printf(" ");
-		printf("}");
-	}
-}
-
-int init(void)
-{
-	gds_types_init(512);
-	gds_type_register("test");
-	gds_type_register_func("test", "free", (gds_func_ptr_t)&test_free);
-	gds_type_register_func("test", "print", (gds_func_ptr_t)&test_print);
-	return 0;
-}
-
-int clean(void)
-{
-	gds_types_free();
-	return 0;
+	return (a - b);
 }
 
 int main()
 {
+	gds_hash_cb hash_cb = (gds_hash_cb) &myhash_cb;
+	gds_getkey_cb getkey_cb = (gds_getkey_cb) &mygetkey_cb;
+	gds_cmpkey_cb cmpkey_cb = (gds_cmpkey_cb) &mycmpkey_cb;
 	gds_hash_map_t *h;
-	uint32_t i;
+	gds_slist_node_t *l;
+	gds_iterator_t *it;
 
-	init();
+	h = gds_hash_map_new(8);
 
-	h = gds_hash_map_new("test", 512, NULL);
-	for(i=0; i<10; i++) {
-		char key[512];
-		char s[512];
-		sprintf(key, "test_%d", i);
-		sprintf(s, "s_%d", i);
-		gds_hash_map_set(
-			h,
-			key,
-			true,
-			test_new(i, s),
-			false
-		);
+	printf("Inserting values from 1 to 15...\n");
+	for (intptr_t i = 1; i < 16; i++) {
+		gds_hash_map_set(h, hash_cb, (void *)i, getkey_cb, cmpkey_cb,
+			NULL, NULL);
 	}
+	printf("done.\n");
 
-	clean();
+	printf("Values in the hash are:\n");
+	l = gds_hash_map_values(h, NULL);
+	it = gds_slist_iterator_new(l);
+	gds_iterator_reset(it);
+	while (!gds_iterator_step(it)) {
+		intptr_t i = (intptr_t) gds_iterator_get(it);
+		printf("%lu ", i);
+	}
+	printf("\n");
+	gds_slist_iterator_free(it);
+	gds_slist_free(l, NULL);
+
+	printf("Resizing hash...\n");
+	gds_hash_map_change_size(h, 2, hash_cb, getkey_cb, cmpkey_cb);
+	printf("done.\n");
+
+	printf("Values in the hash are:\n");
+	l = gds_hash_map_values(h, NULL);
+	it = gds_slist_iterator_new(l);
+	gds_iterator_reset(it);
+	while (!gds_iterator_step(it)) {
+		intptr_t i = (intptr_t) gds_iterator_get(it);
+		printf("%lu ", i);
+	}
+	printf("\n");
+	gds_slist_iterator_free(it);
+	gds_slist_free(l, NULL);
+
 	return 0;
 }
-

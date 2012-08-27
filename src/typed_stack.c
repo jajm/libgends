@@ -18,7 +18,7 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * File              : stack.c                                               *
+ * File              : typed_stack.c                                         *
  * Short description : Stack management (LIFO, Last In First Out)            *
  *****************************************************************************/
 
@@ -30,20 +30,20 @@
 #include "log.h"
 #include "types.h"
 #include "slist_node.h"
-#include "ll_slist.h"
-#include "stack.h"
+#include "slist.h"
+#include "typed_stack.h"
 
-gds_stack_t *gds_stack_new(const char *type_name)
+gds_typed_stack_t *gds_typed_stack_new(const char *type_name)
 {
-	gds_stack_t *S;
+	gds_typed_stack_t *S;
 	size_t len;
 
 	GDS_CHECK_ARG_NOT_NULL(type_name);
 
-	S = malloc(sizeof(gds_stack_t));
+	S = malloc(sizeof(gds_typed_stack_t));
 	if(S == NULL){
 		GDS_THROW(NotEnoughMemoryException, "failed to allocate %d "
-			"bytes", sizeof(gds_stack_t));
+			"bytes", sizeof(gds_typed_stack_t));
 	}
 	len = strlen(type_name);
 	S->type_name = malloc(len+1);
@@ -59,7 +59,7 @@ gds_stack_t *gds_stack_new(const char *type_name)
 	return S;
 }
 
-int8_t gds_stack_push(gds_stack_t *S, void *data, bool copy_data)
+int8_t gds_typed_stack_push(gds_typed_stack_t *S, void *data, bool copy_data)
 {
 	gds_slist_node_t *newnode;
 	gds_alloc_cb alloc_cb = NULL;
@@ -71,25 +71,25 @@ int8_t gds_stack_push(gds_stack_t *S, void *data, bool copy_data)
 		alloc_cb = (gds_alloc_cb)gds_type_get_func(S->type_name, "alloc");
 	}
 
-	newnode = gds_ll_slist_add_first(S->head, data, alloc_cb);
+	newnode = gds_slist_add_first(S->head, data, alloc_cb);
 	S->head = newnode;
 
 	return 0;
 }
 
-void *gds_stack_pop(gds_stack_t *S)
+void *gds_typed_stack_pop(gds_typed_stack_t *S)
 {
 	void *data;
 
 	GDS_CHECK_ARG_NOT_NULL(S);
 
 	data = gds_slist_node_get_data(S->head, NULL);
-	S->head = gds_ll_slist_del_first(S->head, NULL);
+	S->head = gds_slist_del_first(S->head, NULL);
 
 	return data;
 }
 
-void gds_stack_free(gds_stack_t *S, bool free_data)
+void gds_typed_stack_free(gds_typed_stack_t *S, bool free_data)
 {
 	gds_free_cb free_cb = NULL;
 
@@ -97,7 +97,7 @@ void gds_stack_free(gds_stack_t *S, bool free_data)
 		if(free_data) {
 			free_cb = (gds_free_cb)gds_type_get_func(S->type_name, "free");
 		}
-		gds_ll_slist_free(S->head, free_cb);
+		gds_slist_free(S->head, free_cb);
 		free(S->type_name);
 		free(S);
 	}

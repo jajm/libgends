@@ -18,7 +18,7 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * File              : container.c                                           *
+ * File              : typed_container.c                                     *
  * Short description : Generic data container                                *
  *****************************************************************************
  * A 'container' can contain one and only one generic data, represented by a *
@@ -34,22 +34,22 @@
 #include "types.h"
 #include "log.h"
 #include "check_arg.h"
-#include "container.h"
+#include "typed_container.h"
 #include "callbacks.h"
 
-gds_container_t * gds_container_new(const char *type_name, void *data_ptr,
+gds_typed_container_t * gds_typed_container_new(const char *type_name, void *data_ptr,
 	bool copy_data)
 {
-	gds_container_t *c;
+	gds_typed_container_t *c;
 	size_t length;
 
 	GDS_CHECK_ARG_NOT_NULL(type_name);
 	GDS_CHECK_ARG_NOT_NULL(data_ptr);
 
-	c = malloc(sizeof(gds_container_t));
+	c = malloc(sizeof(gds_typed_container_t));
 	if(c == NULL){
 		GDS_THROW(NotEnoughMemoryException, "Failed to allocate %d "
-			"bytes", sizeof(gds_container_t));
+			"bytes", sizeof(gds_typed_container_t));
 	}
 
 	length = strlen(type_name);
@@ -80,14 +80,14 @@ gds_container_t * gds_container_new(const char *type_name, void *data_ptr,
 	return c;
 }
 
-gds_container_t * gds_container_new_clone(const gds_container_t *src)
+gds_typed_container_t * gds_typed_container_new_clone(const gds_typed_container_t *src)
 {
 	GDS_CHECK_ARG_NOT_NULL(src);
 
-	return gds_container_new(src->type_name, src->data_ptr, true);
+	return gds_typed_container_new(src->type_name, src->data_ptr, true);
 }
 
-void gds_container_set(gds_container_t *c, const char *type_name,
+void gds_typed_container_set(gds_typed_container_t *c, const char *type_name,
 	void *data_ptr, bool free_old_data, bool copy_data)
 {
 	size_t length;
@@ -140,16 +140,16 @@ void gds_container_set(gds_container_t *c, const char *type_name,
 	c->data_ptr = _data_ptr;
 }
 
-void gds_container_set_clone(gds_container_t *dst, const gds_container_t *src,
+void gds_typed_container_set_clone(gds_typed_container_t *dst, const gds_typed_container_t *src,
                            bool free_old_data)
 {
 	GDS_CHECK_ARG_NOT_NULL(src);
 
-	gds_container_set(dst, src->type_name, src->data_ptr, free_old_data,
+	gds_typed_container_set(dst, src->type_name, src->data_ptr, free_old_data,
 		true);
 }
 
-void * gds_container_get(gds_container_t *c, bool copy)
+void * gds_typed_container_get(gds_typed_container_t *c, bool copy)
 {
 	void *data_ptr = NULL;
 
@@ -170,7 +170,7 @@ void * gds_container_get(gds_container_t *c, bool copy)
 	return data_ptr;
 }
 
-int32_t gds_container_cmp(const gds_container_t *c1, const gds_container_t *c2)
+int32_t gds_typed_container_cmp(const gds_typed_container_t *c1, const gds_typed_container_t *c2)
 {
 	gds_cmp_cb cmp_cb;
 
@@ -192,7 +192,7 @@ int32_t gds_container_cmp(const gds_container_t *c1, const gds_container_t *c2)
 	return cmp_cb(c1->data_ptr, c2->data_ptr);
 }
 
-void gds_container_free(gds_container_t *c, bool free_data)
+void gds_typed_container_free(gds_typed_container_t *c, bool free_data)
 {
 	if(c != NULL){
 		if(free_data) {
