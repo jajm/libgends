@@ -30,7 +30,7 @@
 
 #define foreach(var, iterator) \
 	for(bool _loop_ok = !gds_iterator_reset(iterator); _loop_ok; _loop_ok = false) \
-	while (!gds_iterator_step(iterator) && ((var = gds_iterator_get(iterator, false)) || !var))
+	while (!gds_iterator_step(iterator) && ((var = gds_iterator_get(iterator)) || !var))
 
 #endif /* Not foreach_h_included */
 
