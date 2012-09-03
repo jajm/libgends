@@ -26,7 +26,7 @@
 #define dlist_node_h_included
 
 #include <stdint.h>
-#include "callbacks.h"
+#include "core/callbacks.h"
 
 typedef struct gds_dlist_node_s {
 	void *data;

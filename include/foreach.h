@@ -26,7 +26,7 @@
 #define foreach_h_included
 
 #include <stdbool.h>
-#include "iterator.h"
+#include "core/iterator.h"
 
 #define foreach(var, iterator) \
 	for(bool _loop_ok = !gds_iterator_reset(iterator); _loop_ok; _loop_ok = false) \

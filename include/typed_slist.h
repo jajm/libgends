@@ -54,7 +54,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "slist_node.h"
-#include "iterator.h"
+#include "core/iterator.h"
 
 typedef struct{
 	char *type_name;

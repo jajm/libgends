@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "callbacks.h"
+#include "core/callbacks.h"
 
 struct gds_compact_rbtree_node_s {
 	void *data;

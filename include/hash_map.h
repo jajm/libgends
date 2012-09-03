@@ -26,7 +26,7 @@
 #define gds_hash_map_h_included
 
 #include <stdint.h>
-#include "callbacks.h"
+#include "core/callbacks.h"
 #include "compact_rbtree.h"
 
 struct gds_hash_map_s {

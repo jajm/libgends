@@ -2,7 +2,7 @@
 #define rbtree_h_included
 
 #include <stdint.h>
-#include "callbacks.h"
+#include "core/callbacks.h"
 #include "rbtree_node.h"
 
 /* Insert data into the tree */

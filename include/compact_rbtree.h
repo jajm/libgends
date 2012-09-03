@@ -2,7 +2,7 @@
 #define compact_rbtree_h_included
 
 #include "compact_rbtree_node.h"
-#include "callbacks.h"
+#include "core/callbacks.h"
 #include "slist_node.h"
 
 int8_t

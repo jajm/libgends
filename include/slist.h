@@ -25,8 +25,8 @@
 #ifndef gds_slist_h_included
 #define gds_slist_h_included
 
-#include "callbacks.h"
-#include "iterator.h"
+#include "core/callbacks.h"
+#include "core/iterator.h"
 #include "slist_node.h"
 
 #ifdef __cplusplus
