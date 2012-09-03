@@ -70,7 +70,7 @@ gds_typed_container_t * gds_typed_container_new(const char *type_name, void *dat
 			free(c);
 			GDS_THROW(FunctionNotFoundException, "Failed to "
 				"retrieve function 'alloc' for type %s",
-				c->type_name);
+				type_name);
 		}
 		c->data_ptr = alloc_cb(data_ptr);
 	} else {
