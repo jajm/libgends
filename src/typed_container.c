@@ -202,7 +202,7 @@ void gds_typed_container_free(gds_typed_container_t *c, bool free_data)
 				free_cb(c->data_ptr);
 			} else {
 				GDS_THROW(FunctionNotFoundException, "Failed to"
-					" retrieve function 'cmp' for type %s",
+					" retrieve function 'free' for type %s",
 					c->type_name);
 			}
 		}
