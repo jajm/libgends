@@ -73,6 +73,21 @@ int8_t gds_hash_map_set(gds_hash_map_t *h, gds_hash_cb hash_cb,
 		cmpkey_cb, free_cb, alloc_cb);
 }
 
+void * gds_hash_map_get(gds_hash_map_t *h, gds_hash_cb hash_cb,
+	void *key, gds_getkey_cb getkey_cb, gds_cmpkey_cb cmpkey_cb,
+	gds_alloc_cb alloc_cb)
+{
+	uint32_t hash;
+
+	GDS_CHECK_ARG_NOT_NULL(h);
+	GDS_CHECK_ARG_NOT_NULL(hash_cb);
+	GDS_CHECK_ARG_NOT_NULL(getkey_cb);
+
+	hash = gds_hash_map_hash(h, hash_cb, key);
+	return gds_compact_rbtree_get(h->map[hash], key, getkey_cb,
+		cmpkey_cb, alloc_cb);
+}
+
 int8_t gds_hash_map_unset(gds_hash_map_t *h, gds_hash_cb hash_cb,
 	void *key, gds_getkey_cb getkey_cb, gds_cmpkey_cb cmpkey_cb,
 	gds_free_cb free_cb)

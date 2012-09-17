@@ -68,6 +68,24 @@ gds_hash_map_set(
 	gds_alloc_cb alloc_cb
 );
 
+/* Get a value given its key */
+/*         h : pointer to the hash map
+ *   hash_cb : hash callback
+ *       key : key to unset
+ * getkey_cb : getkey callback
+ * cmpkey_cb : cmpkey callback
+ *  alloc_cb : alloc callback */
+/* Return: pointer to the data, or NULL if key doesn't exist */
+void *
+gds_hash_map_get(
+	gds_hash_map_t *h,
+	gds_hash_cb hash_cb,
+	void *key,
+	gds_getkey_cb getkey_cb,
+	gds_cmpkey_cb cmpkey_cb,
+	gds_alloc_cb alloc_cb
+);
+
 /* Unset a key/value pair in the hash map */
 /*         h : pointer to the hash map
  *   hash_cb : hash callback
