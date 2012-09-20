@@ -3,9 +3,10 @@ if CUNIT_TESTS
 SUBDIRS += cunit
 endif
 
-AM_CPPFLAGS = -I../include/core -I../include `pkg-config --cflags lll`
+AM_CPPFLAGS = -I../include/core -I../include \
+	`pkg-config --cflags libexception lll`
 AM_CFLAGS = -Wall -Wextra -Werror -std=c99
-AM_LDFLAGS = `pkg-config --libs lll`
+AM_LDFLAGS = `pkg-config --libs libexception lll`
 
 noinst_PROGRAMS = hash_map typed_hash_map
 

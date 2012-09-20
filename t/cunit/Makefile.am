@@ -1,6 +1,7 @@
-AM_CPPFLAGS = -I.. -I../../include/core -I../../include `pkg-config --cflags lll`
+AM_CPPFLAGS = -I.. -I../../include/core -I../../include \
+	`pkg-config --cflags libexception lll`
 AM_CFLAGS = -Wall -Wextra -Werror -std=c99
-AM_LDFLAGS = -lcunit -lexception `pkg-config --libs lll`
+AM_LDFLAGS = -lcunit `pkg-config --libs libexception lll`
 
 noinst_PROGRAMS = slist_node dlist_node \
 	compact_rbtree_node compact_rbtree \

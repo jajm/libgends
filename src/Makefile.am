@@ -15,5 +15,5 @@ libgends_la_SOURCES = slist_node.c slist.c \
 	typed_hash_map.c
 
 libgends_la_LIBADD = core/libcore.la
-libgends_la_LDFLAGS = -lexception \
+libgends_la_LDFLAGS = -lexception -llll \
 	-version-info ${LIBGENDS_CUR}:${LIBGENDS_REV}:${LIBGENDS_AGE}
