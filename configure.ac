@@ -44,6 +44,7 @@ AC_CONFIG_FILES([
 	src/core/Makefile
 	include/Makefile
 	t/Makefile
+	t/core/Makefile
 	t/cunit/Makefile
 	benchs/Makefile
 ])

@@ -26,6 +26,7 @@
 #define log_h_included
 
 #include <stdint.h>
+#include <lll/lll.h>
 
 #define GDS_LOG_LEVEL_FATAL 1
 #define GDS_LOG_LEVEL_ERROR 2
@@ -33,38 +34,38 @@
 #define GDS_LOG_LEVEL_INFO 4
 #define GDS_LOG_LEVEL_DEBUG 5
 
-int8_t
-gds_log_init(uint8_t level);
+#define GDS_LOG_DOMAIN "libgends"
 
 void
-gds_log_print(
-	uint8_t level,
-	const char *file,
-	const char *func,
-	uint32_t line,
-	const char *msg,
-	...
-);
+gds_log_init(uint8_t level);
 
-#define GDS_LOG_FATAL(msg, ...) \
-	gds_log_print(GDS_LOG_LEVEL_FATAL, __FILE__, __func__, \
-	__LINE__, msg, ##__VA_ARGS__)
+uint8_t
+gds_log_get_level(void);
 
-#define GDS_LOG_ERROR(msg, ...) \
-	gds_log_print(GDS_LOG_LEVEL_ERROR, __FILE__, __func__, \
-	__LINE__, msg, ##__VA_ARGS__)
+#define GDS_LOG_FATAL(...) \
+	lll_log_to_stream(stderr, "[%T][%d]FATAL: %m at %F:%L (%f)", \
+		GDS_LOG_DOMAIN, gds_log_get_level(), GDS_LOG_LEVEL_FATAL, \
+		__FILE__, __func__, __LINE__, __VA_ARGS__)
 
-#define GDS_LOG_WARNING(msg, ...) \
-	gds_log_print(GDS_LOG_LEVEL_WARNING, __FILE__, __func__, \
-	__LINE__, msg, ##__VA_ARGS__)
+#define GDS_LOG_ERROR(...) \
+	lll_log_to_stream(stderr, "[%T][%d]ERROR: %m at %F:%L (%f)", \
+		GDS_LOG_DOMAIN, gds_log_get_level(), GDS_LOG_LEVEL_ERROR, \
+		__FILE__, __func__, __LINE__, __VA_ARGS__)
 
-#define GDS_LOG_INFO(msg, ...) \
-	gds_log_print(GDS_LOG_LEVEL_INFO, __FILE__, __func__, \
-	__LINE__, msg, ##__VA_ARGS__)
+#define GDS_LOG_WARNING(...) \
+	lll_log_to_stream(stderr, "[%T][%d]WARNING: %m at %F:%L (%f)", \
+		GDS_LOG_DOMAIN, gds_log_get_level(), GDS_LOG_LEVEL_WARNING, \
+		__FILE__, __func__, __LINE__, __VA_ARGS__)
 
-#define GDS_LOG_DEBUG(msg, ...) \
-	gds_log_print(GDS_LOG_LEVEL_DEBUG, __FILE__, __func__, \
-	__LINE__, msg, ##__VA_ARGS__)
+#define GDS_LOG_INFO(...) \
+	lll_log_to_stream(stderr, "[%T][%d]INFO: %m at %F:%L (%f)", \
+		GDS_LOG_DOMAIN, gds_log_get_level(), GDS_LOG_LEVEL_INFO, \
+		__FILE__, __func__, __LINE__, __VA_ARGS__)
+
+#define GDS_LOG_DEBUG(...) \
+	lll_log_to_stream(stderr, "[%T][%d]DEBUG: %m at %F:%L (%f)", \
+		GDS_LOG_DOMAIN, gds_log_get_level(), GDS_LOG_LEVEL_DEBUG, \
+		__FILE__, __func__, __LINE__, __VA_ARGS__)
 
 #endif /* log_h_included */
 

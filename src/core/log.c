@@ -22,44 +22,17 @@
  * Short description    : libgends logging system                            *
  *****************************************************************************/
 
-#include <stdarg.h>
 #include <stdint.h>
-#include <stdio.h>
 #include "log.h"
 
 uint8_t gds_log_level = 0;
-const char * gds_log_level_label[] = {
-	"fatal",
-	"error",
-	"warning",
-	"info",
-	"debug"
-};
 
-int8_t gds_log_init(uint8_t level)
+void gds_log_init(uint8_t level)
 {
 	gds_log_level = level;
-	return 0;
 }
 
-void gds_log_print(uint8_t level, const char *file, const char *func,
-	uint32_t line, const char *msg, ...)
+uint8_t gds_log_get_level(void)
 {
-	va_list va_ptr;
-	if(level > 0 && level <= gds_log_level) {
-		va_start(va_ptr, msg);
-		fprintf(stderr, "[%s]", gds_log_level_label[level-1]);
-		if(file) {
-			fprintf(stderr, " In file %s:%d", file, line);
-		}
-		if(func) {
-			fprintf(stderr, " (%s)", func);
-		}
-		if(file || func) {
-			fprintf(stderr, " > ");
-		}
-		vfprintf(stderr, msg, va_ptr);
-		fprintf(stderr, "\n");
-		va_end(va_ptr);
-	}
+	return gds_log_level;
 }
