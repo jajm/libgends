@@ -36,3 +36,20 @@ uint8_t gds_log_get_level(void)
 {
 	return gds_log_level;
 }
+
+const char * level_str[] = {
+	NULL,
+	"FATAL",
+	"ERROR",
+	"WARNING",
+	"INFO",
+	"DEBUG"
+};
+
+const char * gds_log_get_level_str(uint8_t level)
+{
+	if (level <= GDS_LOG_LEVEL_DEBUG) {
+		return level_str[level];
+	}
+	return NULL;
+}

@@ -34,38 +34,31 @@
 #define GDS_LOG_LEVEL_INFO 4
 #define GDS_LOG_LEVEL_DEBUG 5
 
-#define GDS_LOG_DOMAIN "libgends"
+void gds_log_init(uint8_t level);
 
-void
-gds_log_init(uint8_t level);
+uint8_t gds_log_get_level(void);
+const char * gds_log_get_level_str(uint8_t level);
 
-uint8_t
-gds_log_get_level(void);
+#define gds_log(level, ...) \
+	if (level <= gds_log_get_level()) \
+		lll_fprint(stderr, "[%T][libgends]?0|$0:|| %m at $1:$2 ($3)", \
+			"%s", gds_log_get_level_str(level), "%s", __FILE__, \
+			"%d", __LINE__, "%s", __func__, NULL, NULL, __VA_ARGS__)
 
 #define GDS_LOG_FATAL(...) \
-	lll_log_to_stream(stderr, "[%T][%d]FATAL: %m at %F:%L (%f)", \
-		GDS_LOG_DOMAIN, gds_log_get_level(), GDS_LOG_LEVEL_FATAL, \
-		__FILE__, __func__, __LINE__, __VA_ARGS__)
+	gds_log(GDS_LOG_LEVEL_FATAL, __VA_ARGS__)
 
 #define GDS_LOG_ERROR(...) \
-	lll_log_to_stream(stderr, "[%T][%d]ERROR: %m at %F:%L (%f)", \
-		GDS_LOG_DOMAIN, gds_log_get_level(), GDS_LOG_LEVEL_ERROR, \
-		__FILE__, __func__, __LINE__, __VA_ARGS__)
+	gds_log(GDS_LOG_LEVEL_ERROR, __VA_ARGS__)
 
 #define GDS_LOG_WARNING(...) \
-	lll_log_to_stream(stderr, "[%T][%d]WARNING: %m at %F:%L (%f)", \
-		GDS_LOG_DOMAIN, gds_log_get_level(), GDS_LOG_LEVEL_WARNING, \
-		__FILE__, __func__, __LINE__, __VA_ARGS__)
+	gds_log(GDS_LOG_LEVEL_WARNING, __VA_ARGS__)
 
 #define GDS_LOG_INFO(...) \
-	lll_log_to_stream(stderr, "[%T][%d]INFO: %m at %F:%L (%f)", \
-		GDS_LOG_DOMAIN, gds_log_get_level(), GDS_LOG_LEVEL_INFO, \
-		__FILE__, __func__, __LINE__, __VA_ARGS__)
+	gds_log(GDS_LOG_LEVEL_INFO, __VA_ARGS__)
 
 #define GDS_LOG_DEBUG(...) \
-	lll_log_to_stream(stderr, "[%T][%d]DEBUG: %m at %F:%L (%f)", \
-		GDS_LOG_DOMAIN, gds_log_get_level(), GDS_LOG_LEVEL_DEBUG, \
-		__FILE__, __func__, __LINE__, __VA_ARGS__)
+	gds_log(GDS_LOG_LEVEL_DEBUG, __VA_ARGS__)
 
 #endif /* log_h_included */
 
