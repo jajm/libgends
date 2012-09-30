@@ -32,6 +32,9 @@
 struct gds_hash_map_s {
 	uint32_t size;
 	gds_compact_rbtree_node_t **map;
+	gds_hash_cb hash_cb;
+	gds_getkey_cb getkey_cb;
+	gds_cmpkey_cb cmpkey_cb;
 };
 typedef struct gds_hash_map_s gds_hash_map_t;
 
@@ -40,68 +43,56 @@ extern "C" {
 #endif
 
 /* Create a new hash map */
-/* size: the number of buckets */
+/* size: the number of buckets
+ *   hash_cb : hash callback
+ * getkey_cb : getkey callback
+ * cmpkey_cb : cmpkey callback */
 /* Return: a pointer to the new hash map */
 gds_hash_map_t *
 gds_hash_map_new(
-	uint32_t size
+	uint32_t size,
+	gds_hash_cb hash_cb,
+	gds_getkey_cb getkey_cb,
+	gds_cmpkey_cb cmpkey_cb
 );
 
 /* Set a key/value pair in the hash map */
 /* If key already exists, old value is replaced by the new one */
 /*         h : pointer to the hash map
- *   hash_cb : hash callback
  *      data : data to insert
- * getkey_cb : getkey callback
- * cmpkey_cb : cmpkey callback
  *  alloc_cb : alloc callback */
 /* Return: 0: key was already in the hash map
  *         1: key was just added */
 int8_t
 gds_hash_map_set(
 	gds_hash_map_t *h,
-	gds_hash_cb hash_cb,
 	void *data,
-	gds_getkey_cb getkey_cb,
-	gds_cmpkey_cb cmpkey_cb,
 	gds_free_cb free_cb,
 	gds_alloc_cb alloc_cb
 );
 
 /* Get a value given its key */
 /*         h : pointer to the hash map
- *   hash_cb : hash callback
  *       key : key to unset
- * getkey_cb : getkey callback
- * cmpkey_cb : cmpkey callback
  *  alloc_cb : alloc callback */
 /* Return: pointer to the data, or NULL if key doesn't exist */
 void *
 gds_hash_map_get(
 	gds_hash_map_t *h,
-	gds_hash_cb hash_cb,
 	void *key,
-	gds_getkey_cb getkey_cb,
-	gds_cmpkey_cb cmpkey_cb,
 	gds_alloc_cb alloc_cb
 );
 
 /* Unset a key/value pair in the hash map */
 /*         h : pointer to the hash map
- *   hash_cb : hash callback
  *       key : key to unset
- * getkey_cb : getkey callback
- * cmpkey_cb : cmpkey callback
  *  alloc_cb : alloc callback */
 /* Return: 0: key was correctly unset
  *         1: key was not in the hash map */
 int8_t
 gds_hash_map_unset(
 	gds_hash_map_t *h,
-	gds_hash_cb hash_cb,
 	void *key,
-	gds_getkey_cb getkey_cb,
-	gds_cmpkey_cb cmpkey_cb,
 	gds_free_cb free_cb
 );
 
@@ -118,17 +109,11 @@ gds_hash_map_values(
 /* Change the number of buckets of hash map */
 /*         h : pointer to the hash map
  *  new_size : New size (number of buckets)
- *   hash_cb : hash callback
- * getkey_cb : getkey callback
- * cmpkey_cb : cmpkey callback
  *  alloc_cb : alloc callback */
 void
 gds_hash_map_change_size(
 	gds_hash_map_t *h,
-	uint32_t new_size,
-	gds_hash_cb hash_cb,
-	gds_getkey_cb getkey_cb,
-	gds_cmpkey_cb cmpkey_cb
+	uint32_t new_size
 );
 
 /* Free hash map */

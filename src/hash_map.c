@@ -31,11 +31,15 @@
 #include "log.h"
 #include "hash_map.h"
 
-gds_hash_map_t * gds_hash_map_new(uint32_t size)
+gds_hash_map_t * gds_hash_map_new(uint32_t size, gds_hash_cb hash_cb,
+	gds_getkey_cb getkey_cb, gds_cmpkey_cb cmpkey_cb)
 {
 	gds_hash_map_t *h;
 
 	GDS_CHECK_ARG_NOT_ZERO(size);
+	GDS_CHECK_ARG_NOT_NULL(hash_cb)
+	GDS_CHECK_ARG_NOT_NULL(getkey_cb)
+	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb)
 
 	h = malloc(sizeof(gds_hash_map_t));
 	if (h == NULL) {
@@ -48,63 +52,55 @@ gds_hash_map_t * gds_hash_map_new(uint32_t size)
 	}
 
 	h->size = size;
+	h->hash_cb = hash_cb;
+	h->getkey_cb = getkey_cb;
+	h->cmpkey_cb = cmpkey_cb;
 
 	return h;
 }
 
-uint32_t gds_hash_map_hash(gds_hash_map_t *h, gds_hash_cb hash_cb,
-	void *key)
+uint32_t gds_hash_map_hash(gds_hash_map_t *h, void *key)
 {
-	return hash_cb(key, h->size) % h->size;
+	return h->hash_cb(key, h->size) % h->size;
 }
 
-int8_t gds_hash_map_set(gds_hash_map_t *h, gds_hash_cb hash_cb,
-	void *data, gds_getkey_cb getkey_cb, gds_cmpkey_cb cmpkey_cb,
-	gds_free_cb free_cb, gds_alloc_cb alloc_cb)
+int8_t gds_hash_map_set(gds_hash_map_t *h, void *data, gds_free_cb free_cb,
+	gds_alloc_cb alloc_cb)
 {
 	uint32_t hash;
 
 	GDS_CHECK_ARG_NOT_NULL(h);
-	GDS_CHECK_ARG_NOT_NULL(hash_cb);
-	GDS_CHECK_ARG_NOT_NULL(getkey_cb);
 
-	hash = gds_hash_map_hash(h, hash_cb, getkey_cb(data));
-	return gds_compact_rbtree_set(&(h->map[hash]), data, getkey_cb,
-		cmpkey_cb, free_cb, alloc_cb);
+	hash = gds_hash_map_hash(h, h->getkey_cb(data));
+	return gds_compact_rbtree_set(&(h->map[hash]), data, h->getkey_cb,
+		h->cmpkey_cb, free_cb, alloc_cb);
 }
 
-void * gds_hash_map_get(gds_hash_map_t *h, gds_hash_cb hash_cb,
-	void *key, gds_getkey_cb getkey_cb, gds_cmpkey_cb cmpkey_cb,
-	gds_alloc_cb alloc_cb)
+void * gds_hash_map_get(gds_hash_map_t *h, void *key, gds_alloc_cb alloc_cb)
 {
 	uint32_t hash;
 	void *data;
 
 	GDS_CHECK_ARG_NOT_NULL(h);
-	GDS_CHECK_ARG_NOT_NULL(hash_cb);
-	GDS_CHECK_ARG_NOT_NULL(getkey_cb);
 
-	hash = gds_hash_map_hash(h, hash_cb, key);
+	hash = gds_hash_map_hash(h, key);
 	data = h->map[hash]
-		? gds_compact_rbtree_get(h->map[hash], key, getkey_cb,
-			cmpkey_cb, alloc_cb)
+		? gds_compact_rbtree_get(h->map[hash], key, h->getkey_cb,
+			h->cmpkey_cb, alloc_cb)
 		: NULL;
 	return data;
 }
 
-int8_t gds_hash_map_unset(gds_hash_map_t *h, gds_hash_cb hash_cb,
-	void *key, gds_getkey_cb getkey_cb, gds_cmpkey_cb cmpkey_cb,
-	gds_free_cb free_cb)
+int8_t gds_hash_map_unset(gds_hash_map_t *h, void *key, gds_free_cb free_cb)
 {
 	uint32_t hash;
 	int8_t rv;
 
 	GDS_CHECK_ARG_NOT_NULL(h);
-	GDS_CHECK_ARG_NOT_NULL(hash_cb);
 
-	hash = gds_hash_map_hash(h, hash_cb, key);
-	rv = gds_compact_rbtree_del(&(h->map[hash]), key, getkey_cb,
-		cmpkey_cb, free_cb);
+	hash = gds_hash_map_hash(h, key);
+	rv = gds_compact_rbtree_del(&(h->map[hash]), key, h->getkey_cb,
+		h->cmpkey_cb, free_cb);
 	
 	return rv;
 }
@@ -128,8 +124,7 @@ gds_slist_node_t * gds_hash_map_values(gds_hash_map_t *h,
 }
 
 gds_compact_rbtree_node_t ** gds_hash_map_build_map(gds_hash_map_t *h,
-	uint32_t size, gds_hash_cb hash_cb, gds_getkey_cb getkey_cb,
-	gds_cmpkey_cb cmpkey_cb)
+	uint32_t size)
 {
 	gds_compact_rbtree_node_t **map;
 	gds_slist_node_t *l;
@@ -146,25 +141,23 @@ gds_compact_rbtree_node_t ** gds_hash_map_build_map(gds_hash_map_t *h,
 	gds_iterator_reset(it);
 	while (!gds_iterator_step(it)) {
 		data = gds_iterator_get(it);
-		hash = hash_cb(getkey_cb(data), size) % size;
-		gds_compact_rbtree_add(&(map[hash]), data, getkey_cb,
-			cmpkey_cb, NULL);
+		hash = h->hash_cb(h->getkey_cb(data), size) % size;
+		gds_compact_rbtree_add(&(map[hash]), data, h->getkey_cb,
+			h->cmpkey_cb, NULL);
 	}
 	gds_slist_iterator_free(it);
 
 	return map;
 }
 
-void gds_hash_map_change_size(gds_hash_map_t *h, uint32_t new_size,
-	gds_hash_cb hash_cb, gds_getkey_cb getkey_cb, gds_cmpkey_cb cmpkey_cb)
+void gds_hash_map_change_size(gds_hash_map_t *h, uint32_t new_size)
 {
 	gds_compact_rbtree_node_t **map;
 
 	GDS_CHECK_ARG_NOT_NULL(h);
 	GDS_CHECK_ARG_NOT_ZERO(new_size);
 
-	map = gds_hash_map_build_map(h, new_size, hash_cb, getkey_cb,
-		cmpkey_cb);
+	map = gds_hash_map_build_map(h, new_size);
 	for (uint32_t i = 0; i < h->size; i++) {
 		gds_compact_rbtree_free(h->map[i], NULL);
 	}

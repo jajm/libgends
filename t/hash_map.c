@@ -28,12 +28,11 @@ int main()
 	gds_slist_node_t *l;
 	gds_iterator_t *it;
 
-	h = gds_hash_map_new(8);
+	h = gds_hash_map_new(8, hash_cb, getkey_cb, cmpkey_cb);
 
 	printf("Inserting values from 1 to 15...\n");
 	for (intptr_t i = 1; i < 16; i++) {
-		gds_hash_map_set(h, hash_cb, (void *)i, getkey_cb, cmpkey_cb,
-			NULL, NULL);
+		gds_hash_map_set(h, (void *)i, NULL, NULL);
 	}
 	printf("done.\n");
 
@@ -50,7 +49,7 @@ int main()
 	gds_slist_free(l, NULL);
 
 	printf("Resizing hash...\n");
-	gds_hash_map_change_size(h, 2, hash_cb, getkey_cb, cmpkey_cb);
+	gds_hash_map_change_size(h, 2);
 	printf("done.\n");
 
 	printf("Values in the hash are:\n");
