@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <sys/time.h>
 #include "rbtree.h"
+#include "compact_rbtree_node.h"
 #include "compact_rbtree.h"
 #include <eina-1/eina/eina_rbtree.h>
 

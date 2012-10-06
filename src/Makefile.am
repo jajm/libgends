@@ -7,8 +7,10 @@ lib_LTLIBRARIES = libgends.la
 
 libgends_la_SOURCES = slist_node.c slist.c \
 	dlist_node.c \
+	inline_compact_rbtree.c \
 	rbtree_node.c rbtree.c \
 	compact_rbtree_node.c compact_rbtree.c \
+	kod_compact_rbtree_node.c kod_compact_rbtree.c \
 	hash_map.c \
 	func_list.c types.c \
 	typed_container.c typed_slist.c typed_dlist.c typed_stack.c \

@@ -1,0 +1,244 @@
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include "inline_compact_rbtree.h"
+#include "check_arg.h"
+
+void gds_inline_compact_rbtree_print_dbg_r(gds_inline_compact_rbtree_node_t *root, uint8_t d)
+{
+	if (root != NULL) {
+		gds_inline_compact_rbtree_print_dbg_r(root->son[1], d+1);
+		for (uint8_t i=0; i<d; i++)
+			printf("- ");
+		printf("rbtree %p [%s] (0: %p, 1: %p)\n", root,
+			root->red ? "red" : "black", root->son[0], root->son[1]);
+		gds_inline_compact_rbtree_print_dbg_r(root->son[0], d+1);
+	}
+}
+void gds_inline_compact_rbtree_print_dbg(gds_inline_compact_rbtree_node_t *root)
+{
+	printf("\n---------------------------------------------------------\n");
+	gds_inline_compact_rbtree_print_dbg_r(root, 0);
+	printf("---------------------------------------------------------\n");
+}
+
+_Bool gds_inline_compact_rbtree_node_is_red(gds_inline_compact_rbtree_node_t *node)
+{
+	return (node && node->red);
+}
+
+gds_inline_compact_rbtree_node_t * gds_inline_compact_rbtree_rotate(
+	gds_inline_compact_rbtree_node_t *node, uint8_t dir)
+{
+	gds_inline_compact_rbtree_node_t *tmp;
+
+	dir = (dir) ? 1 : 0;
+	tmp = node->son[!dir];
+
+	node->son[!dir] = tmp->son[dir];
+	tmp->son[dir] = node;
+
+	node->red = true;
+	tmp->red = false;
+
+	return tmp;
+}
+
+gds_inline_compact_rbtree_node_t * gds_inline_compact_rbtree_rotate_twice(
+	gds_inline_compact_rbtree_node_t *node, uint8_t dir)
+{
+	node->son[!dir] = gds_inline_compact_rbtree_rotate(node->son[!dir], !dir);
+	return gds_inline_compact_rbtree_rotate(node, dir);
+}
+
+void gds_inline_compact_rbtree_node_init(gds_inline_compact_rbtree_node_t *node)
+{
+	node->red = true;
+	node->son[0] = node->son[1] = NULL;
+}
+
+int8_t gds_inline_compact_rbtree_add(gds_inline_compact_rbtree_node_t **root,
+	gds_inline_compact_rbtree_node_t *node, gds_crbt_cmp_cb crbt_cmp_cb,
+	void *crbt_cmp_data)
+{
+	gds_inline_compact_rbtree_node_t head;      /* False tree root */
+	gds_inline_compact_rbtree_node_t *g, *t;    /* Grandparent & parent */
+	gds_inline_compact_rbtree_node_t *p, *q;    /* Iterator & parent */
+	uint8_t dir = 0, last = 0;
+	int32_t cmp;
+	int8_t added = 0;
+
+	GDS_CHECK_ARG_NOT_NULL(root);
+	GDS_CHECK_ARG_NOT_NULL(*root);
+	GDS_CHECK_ARG_NOT_NULL(node);
+	GDS_CHECK_ARG_NOT_NULL(crbt_cmp_cb);
+
+	/* Set up helpers */
+	t = &head;
+	g = p = NULL;
+	q = t->son[1] = *root;
+
+	/* Search down the tree */
+	while (true) {
+		if (q == NULL) {
+			/* Insert new node at the bottom */
+			p->son[dir] = q = node;
+			added = 1;
+		}
+		else if (gds_inline_compact_rbtree_node_is_red(q->son[0])
+		&& gds_inline_compact_rbtree_node_is_red(q->son[1])) {
+			/* Color flip */
+			q->red = true;
+			q->son[0]->red = false;
+			q->son[1]->red = false;
+		}
+
+		/* Fix red violation */
+		if (gds_inline_compact_rbtree_node_is_red(q)
+		&& gds_inline_compact_rbtree_node_is_red(p)) {
+			uint8_t dir2 = (t->son[1] == g) ? 1 : 0;
+
+			if (q == p->son[last]) {
+				t->son[dir2] = gds_inline_compact_rbtree_rotate(g, !last);
+			} else {
+				t->son[dir2] = gds_inline_compact_rbtree_rotate_twice(g, !last);
+			}
+		}
+
+		/* Stop if found */
+		cmp = crbt_cmp_cb(node, q, crbt_cmp_data);
+		if (cmp == 0)
+			break;
+
+		last = dir;
+		dir = (cmp > 0) ? 1 : 0;
+
+		/* Update helpers */
+		if (g != NULL)
+			t = g;
+		g = p, p = q;
+		q = q->son[dir];
+	}
+
+	/* Update root */
+	*root = head.son[1];
+	(*root)->red = false;
+
+	return added;
+}
+
+gds_inline_compact_rbtree_node_t * gds_inline_compact_rbtree_get_node(
+	gds_inline_compact_rbtree_node_t *root, void *key,
+	gds_crbt_cmp_with_key_cb crbt_cmp_with_key_cb, void *crbt_cmp_data)
+{
+	gds_inline_compact_rbtree_node_t *node;
+	int32_t cmp;
+	int8_t dir;
+
+	GDS_CHECK_ARG_NOT_NULL(crbt_cmp_with_key_cb);
+
+	node = root;
+	while (node != NULL) {
+		cmp = crbt_cmp_with_key_cb(node, key, crbt_cmp_data);
+		if (cmp == 0)
+			break;
+		dir = (cmp > 0) ? 1 : 0;
+		node = node->son[dir];
+	}
+
+	return node;
+}
+
+int8_t gds_inline_compact_rbtree_del(gds_inline_compact_rbtree_node_t **root,
+	void *key, gds_crbt_cmp_with_key_cb crbt_cmp_with_key_cb,
+	void *crbt_cmp_data, gds_crbt_replace_cb crbt_replace_cb,
+	void *crbt_replace_data)
+{
+	gds_inline_compact_rbtree_node_t head;       /* False tree root */
+	gds_inline_compact_rbtree_node_t *q, *p, *g; /* Helpers */
+	gds_inline_compact_rbtree_node_t *f = NULL;  /* Found item */
+	uint8_t dir = 1;
+	int8_t deleted = 0;
+
+	GDS_CHECK_ARG_NOT_NULL(root);
+	GDS_CHECK_ARG_NOT_NULL(*root);
+	GDS_CHECK_ARG_NOT_NULL(crbt_cmp_with_key_cb);
+	GDS_CHECK_ARG_NOT_NULL(crbt_replace_cb);
+
+	/* Set up helpers */
+	q = &head;
+	g = p = NULL;
+	q->son[0] = NULL;
+	q->son[1] = *root;
+
+	/* Search and push a red down */
+	while (q->son[dir] != NULL) {
+		uint8_t last = dir;
+		int32_t cmp;
+
+		/* Update helpers */
+		g = p, p = q;
+		q = q->son[dir];
+		cmp = crbt_cmp_with_key_cb(q, key, crbt_cmp_data);
+		dir = (cmp > 0) ? 1 : 0;
+
+		/* Save found node */
+		if (cmp == 0)
+			f = q;
+
+		if (gds_inline_compact_rbtree_node_is_red(q)
+		|| gds_inline_compact_rbtree_node_is_red(q->son[dir]))
+			continue;
+
+		/* Push the red node down */
+		if (gds_inline_compact_rbtree_node_is_red(q->son[!dir])) {
+			p = p->son[last] = gds_inline_compact_rbtree_rotate(q, dir);
+		}
+		else if (!gds_inline_compact_rbtree_node_is_red(q->son[!dir])) {
+			gds_inline_compact_rbtree_node_t *s = p->son[!last];
+
+			if (s == NULL)
+				continue;
+
+			if (!gds_inline_compact_rbtree_node_is_red(s->son[!last])
+			&& !gds_inline_compact_rbtree_node_is_red(s->son[last])) {
+				/* Color flip */
+				p->red = false;
+				s->red = true;
+				q->red = true;
+			} else {
+				uint8_t dir2 = (g->son[1] == p) ? 1 : 0;
+
+				if ( gds_inline_compact_rbtree_node_is_red ( s->son[last] ) )
+					g->son[dir2] = gds_inline_compact_rbtree_rotate_twice(p, last);
+				else if (gds_inline_compact_rbtree_node_is_red(s->son[!last]))
+					g->son[dir2] = gds_inline_compact_rbtree_rotate(p, last);
+
+				/* Ensure correct coloring */
+				q->red = g->son[dir2]->red = true;
+				g->son[dir2]->son[0]->red = false;
+				g->son[dir2]->son[1]->red = false;
+			}
+		}
+	}
+
+	/* Replace and remove if found */
+	if (f != NULL) {
+		uint8_t dir1, dir2;
+
+		dir1 = (p->son[1] == q) ? 1 : 0;
+		dir2 = (q->son[0] == NULL) ? 1 : 0;
+		p->son[dir1] = q->son[dir2];
+
+		crbt_replace_cb(f, q, crbt_replace_data);
+
+		deleted = 1;
+	}
+
+	/* Update root and make it black */
+	*root = head.son[1];
+	if (*root != NULL)
+		(*root)->red = false;
+
+	return deleted;
+}

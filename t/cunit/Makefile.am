@@ -5,6 +5,7 @@ AM_LDFLAGS = -lcunit `pkg-config --libs libexception lll`
 
 noinst_PROGRAMS = slist_node dlist_node \
 	compact_rbtree_node compact_rbtree \
+	kod_compact_rbtree_node kod_compact_rbtree \
 	rbtree_node rbtree \
 	types func_list \
 	typed_container typed_dlist typed_stack typed_slist
@@ -32,6 +33,12 @@ compact_rbtree_node_LDADD = ../../src/libgends.la
 
 compact_rbtree_SOURCES = compact_rbtree.c ../test.c
 compact_rbtree_LDADD = ../../src/libgends.la
+
+kod_compact_rbtree_node_SOURCES = kod_compact_rbtree_node.c ../test.c
+kod_compact_rbtree_node_LDADD = ../../src/libgends.la
+
+kod_compact_rbtree_SOURCES = kod_compact_rbtree.c ../test.c
+kod_compact_rbtree_LDADD = ../../src/libgends.la
 
 rbtree_node_SOURCES = rbtree_node.c ../test.c
 rbtree_node_LDADD = ../../src/libgends.la

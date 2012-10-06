@@ -1,6 +1,7 @@
 #ifndef compact_rbtree_h_included
 #define compact_rbtree_h_included
 
+#include <stdint.h>
 #include "compact_rbtree_node.h"
 #include "core/callbacks.h"
 #include "slist_node.h"

@@ -13,8 +13,7 @@ gds_compact_rbtree_node_t * gds_compact_rbtree_node_new(void *data,
 	node = malloc(sizeof(gds_compact_rbtree_node_t));
 
 	if(node == NULL) {
-		GDS_THROW(NotEnoughMemoryException, "failed to allocate %d "
-			"bytes", sizeof(gds_compact_rbtree_node_t)); 
+		GDS_THROW_ALLOC_ERROR(sizeof(gds_compact_rbtree_node_t));
 	}
 
 	if (alloc_cb != NULL) {
@@ -22,9 +21,7 @@ gds_compact_rbtree_node_t * gds_compact_rbtree_node_new(void *data,
 	} else {
 		node->data = data;
 	}
-	node->red = true;
-	node->son[0] = NULL;
-	node->son[1] = NULL;
+	gds_inline_compact_rbtree_node_init(&(node->rbtree));
 
 	return node;
 }
@@ -64,11 +61,6 @@ int8_t gds_compact_rbtree_node_set_data(gds_compact_rbtree_node_t *node,
 	node->data = d;
 
 	return 0;
-}
-
-bool gds_compact_rbtree_node_is_red(gds_compact_rbtree_node_t *node)
-{
-	return (node != NULL && node->red);
 }
 
 void gds_compact_rbtree_node_free(gds_compact_rbtree_node_t *node,

@@ -25,25 +25,21 @@ void t_compact_rbtree_node_new(void)
 
 	n = gds_compact_rbtree_node_new(NULL, NULL);
 	CU_ASSERT_PTR_NOT_NULL(n);
-	CU_ASSERT(gds_compact_rbtree_node_is_red(n));
 	CU_ASSERT_PTR_NULL(gds_compact_rbtree_node_get_data(n, NULL));
 	gds_compact_rbtree_node_free(n, NULL);
 
 	n = gds_compact_rbtree_node_new(NULL, (gds_alloc_cb)test_alloc);
 	CU_ASSERT_PTR_NOT_NULL(n);
-	CU_ASSERT(gds_compact_rbtree_node_is_red(n));
 	CU_ASSERT_PTR_NULL(gds_compact_rbtree_node_get_data(n, NULL));
 	gds_compact_rbtree_node_free(n, NULL);
 	
 	n = gds_compact_rbtree_node_new(t, NULL);
 	CU_ASSERT_PTR_NOT_NULL(n)
-	CU_ASSERT(gds_compact_rbtree_node_is_red(n));
 	CU_ASSERT_PTR_EQUAL(t, gds_compact_rbtree_node_get_data(n, NULL));
 	gds_compact_rbtree_node_free(n, NULL);
 	
 	n = gds_compact_rbtree_node_new(t, (gds_alloc_cb)test_alloc);
 	CU_ASSERT_PTR_NOT_NULL(n);
-	CU_ASSERT(gds_compact_rbtree_node_is_red(n));
 	CU_ASSERT_PTR_NOT_NULL(gds_compact_rbtree_node_get_data(n, NULL));
 	CU_ASSERT_PTR_NOT_EQUAL(t, gds_compact_rbtree_node_get_data(n, NULL));
 	gds_compact_rbtree_node_free(n, (gds_free_cb)test_free);

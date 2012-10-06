@@ -6,6 +6,7 @@
 #include <CUnit/Basic.h>
 #include "exception.h"
 #include "test_macros.h"
+#include "compact_rbtree_node.h"
 #include "compact_rbtree.h"
 #include "iterator.h"
 #include "slist.h"
@@ -21,11 +22,17 @@ int clean_suite(void)
 	return 0;
 }
 
+#define containerof(ptr) \
+	((ptr) != NULL) ? (gds_compact_rbtree_node_t *)((char *)ptr \
+		- offsetof(gds_compact_rbtree_node_t, rbtree)) : NULL
+
 void gds_compact_rbtree_print(gds_compact_rbtree_node_t *root, uint8_t depth)
 {
 	char *key;
+	gds_compact_rbtree_node_t *node;
 	if(root != NULL) {
-		gds_compact_rbtree_print(root->son[1], depth+1);
+		node = containerof(root->rbtree.son[1]);
+		gds_compact_rbtree_print(node, depth+1);
 		for (uint8_t i=0; i<depth; i++)
 			printf("- ");
 		key = test_getkey(root->data);
@@ -35,8 +42,30 @@ void gds_compact_rbtree_print(gds_compact_rbtree_node_t *root, uint8_t depth)
 			printf("%s", key);
 		}
 		printf(": %d\n", test_getvalue(root->data));
-		gds_compact_rbtree_print(root->son[0], depth+1);
+		node = containerof(root->rbtree.son[0]);
+		gds_compact_rbtree_print(node, depth+1);
 	}
+}
+
+void gds_compact_rbtree_print_dbg_r(gds_compact_rbtree_node_t *root, uint8_t d)
+{
+	char *key;
+	if (root != NULL) {
+		gds_compact_rbtree_print_dbg_r(containerof(root->rbtree.son[1]), d+1);
+		for (uint8_t i=0; i<d; i++)
+			printf("- ");
+		key = test_getkey(root->data);
+		printf("root %p rbtree %p [%s] (0: %p, 1: %p) %s\n",
+			root, &(root->rbtree), root->rbtree.red ? "red" : "black",
+			root->rbtree.son[0], root->rbtree.son[1], key);
+		gds_compact_rbtree_print_dbg_r(containerof(root->rbtree.son[0]), d+1);
+	}
+}
+void gds_compact_rbtree_print_dbg(gds_compact_rbtree_node_t *root)
+{
+	printf("\n---------------------------------------------------------\n");
+	gds_compact_rbtree_print_dbg_r(root, 0);
+	printf("---------------------------------------------------------\n");
 }
 
 int8_t gds_compact_rbtree_is_valid(gds_compact_rbtree_node_t *root, gds_getkey_cb getkey_cb,
@@ -44,30 +73,36 @@ int8_t gds_compact_rbtree_is_valid(gds_compact_rbtree_node_t *root, gds_getkey_c
 {
 	int lh, rh;
 	int cmp = 0, cmp2 = 0;
+	gds_compact_rbtree_node_t *node;
 
-	if ( root == NULL )
+	if (root == NULL)
 		return 1;
 
-	gds_compact_rbtree_node_t *ln = root->son[0];
-	gds_compact_rbtree_node_t *rn = root->son[1];
+	gds_inline_compact_rbtree_node_t *ln = root->rbtree.son[0];
+	gds_inline_compact_rbtree_node_t *rn = root->rbtree.son[1];
 
 	/* Consecutive red links */
-	if (gds_compact_rbtree_node_is_red(root)) {
-		if (gds_compact_rbtree_node_is_red(ln)
-		|| gds_compact_rbtree_node_is_red(rn)) {
+	if (root->rbtree.red) {
+		if ((ln && ln->red) || (rn && rn->red)) {
 			printf("Red violation\n");
 			return 0;
 		}
 	}
 
-	lh = gds_compact_rbtree_is_valid(ln, getkey_cb, cmpkey_cb);
-	rh = gds_compact_rbtree_is_valid(rn, getkey_cb, cmpkey_cb);
+	node = containerof(ln);
+	lh = gds_compact_rbtree_is_valid(node, getkey_cb, cmpkey_cb);
+	node = containerof(rn);
+	rh = gds_compact_rbtree_is_valid(node, getkey_cb, cmpkey_cb);
 
 	/* Invalid binary search tree */
-	if(ln != NULL)
-		cmp = cmpkey_cb(getkey_cb(root->data), getkey_cb(ln->data));
-	if(rn != NULL)
-		cmp2 = cmpkey_cb(getkey_cb(root->data), getkey_cb(rn->data));
+	if(ln != NULL) {
+		node = containerof(ln);
+		cmp = cmpkey_cb(getkey_cb(root->data), getkey_cb(node->data));
+	}
+	if(rn != NULL) {
+		node = containerof(rn);
+		cmp2 = cmpkey_cb(getkey_cb(root->data), getkey_cb(node->data));
+	}
 	if ((ln != NULL && cmp <= 0)
 	|| (rn != NULL && cmp2 >= 0)) {
 		printf("Binary tree violation\n");
@@ -82,7 +117,7 @@ int8_t gds_compact_rbtree_is_valid(gds_compact_rbtree_node_t *root, gds_getkey_c
 
 	/* Only count black links */
 	if (lh != 0 && rh != 0)
-		return gds_compact_rbtree_node_is_red(root) ? lh : lh + 1;
+		return root->rbtree.red ? lh : lh + 1;
 	else
 		return 0;
 }
@@ -179,7 +214,7 @@ void t_compact_rbtree_add(void)
 	root = NULL;
 
 	for (int i=0; i<100; i++) {
-		sprintf(buf, "key %d", i);
+		sprintf(buf, "key %02d", i);
 		CU_ASSERT(0 == gds_compact_rbtree_add(&root, test_new(buf, i),
 			getkey_cb, cmpkey_cb, NULL));
 		CU_ASSERT(gds_compact_rbtree_is_valid(root, getkey_cb,
@@ -190,7 +225,7 @@ void t_compact_rbtree_add(void)
 	root = NULL;
 
 	for (int i=100; i>0; i--) {
-		sprintf(buf, "key %d", i);
+		sprintf(buf, "key %02d", i);
 		CU_ASSERT(0 == gds_compact_rbtree_add(&root, test_new(buf, i),
 			getkey_cb, cmpkey_cb, NULL));
 		CU_ASSERT(gds_compact_rbtree_is_valid(root, getkey_cb,
@@ -203,7 +238,7 @@ void t_compact_rbtree_add(void)
 	srand(time(NULL));
 	for (int i=0; i<100; i++) {
 		int j = rand();
-		sprintf(buf, "key %d", j);
+		sprintf(buf, "key %02d", j);
 		CU_ASSERT(0 <= gds_compact_rbtree_add(&root, test_new(buf, j),
 			getkey_cb, cmpkey_cb, NULL));
 		CU_ASSERT(gds_compact_rbtree_is_valid(root, getkey_cb,
@@ -238,10 +273,8 @@ void t_compact_rbtree_get(void)
 		gds_compact_rbtree_get(NULL, NULL, getkey_cb, NULL, NULL));
 	GDS_ASSERT_THROW(BadArgumentException,
 		gds_compact_rbtree_get(NULL, NULL, getkey_cb, NULL, alloc_cb));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_compact_rbtree_get(NULL, NULL, getkey_cb, cmpkey_cb, NULL));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_compact_rbtree_get(NULL, NULL, getkey_cb, cmpkey_cb, alloc_cb));
+	CU_ASSERT_PTR_NULL(gds_compact_rbtree_get(NULL, NULL, getkey_cb, cmpkey_cb, NULL));
+	CU_ASSERT_PTR_NULL(gds_compact_rbtree_get(NULL, NULL, getkey_cb, cmpkey_cb, alloc_cb));
 	GDS_ASSERT_THROW(BadArgumentException,
 		gds_compact_rbtree_get(NULL, "key", NULL, NULL, NULL));
 	GDS_ASSERT_THROW(BadArgumentException,
@@ -254,10 +287,8 @@ void t_compact_rbtree_get(void)
 		gds_compact_rbtree_get(NULL, "key", getkey_cb, NULL, NULL));
 	GDS_ASSERT_THROW(BadArgumentException,
 		gds_compact_rbtree_get(NULL, "key", getkey_cb, NULL, alloc_cb));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_compact_rbtree_get(NULL, "key", getkey_cb, cmpkey_cb, NULL));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_compact_rbtree_get(NULL, "key", getkey_cb, cmpkey_cb, alloc_cb));
+	CU_ASSERT_PTR_NULL(gds_compact_rbtree_get(NULL, "key", getkey_cb, cmpkey_cb, NULL));
+	CU_ASSERT_PTR_NULL(gds_compact_rbtree_get(NULL, "key", getkey_cb, cmpkey_cb, alloc_cb));
 	GDS_ASSERT_THROW(BadArgumentException,
 		gds_compact_rbtree_get(root, NULL, NULL, NULL, NULL));
 	GDS_ASSERT_THROW(BadArgumentException,
@@ -270,10 +301,8 @@ void t_compact_rbtree_get(void)
 		gds_compact_rbtree_get(root, NULL, getkey_cb, NULL, NULL));
 	GDS_ASSERT_THROW(BadArgumentException,
 		gds_compact_rbtree_get(root, NULL, getkey_cb, NULL, alloc_cb));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_compact_rbtree_get(root, NULL, getkey_cb, cmpkey_cb, NULL));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_compact_rbtree_get(root, NULL, getkey_cb, cmpkey_cb, alloc_cb));
+	CU_ASSERT_PTR_NULL(gds_compact_rbtree_get(root, NULL, getkey_cb, cmpkey_cb, NULL));
+	CU_ASSERT_PTR_NULL(gds_compact_rbtree_get(root, NULL, getkey_cb, cmpkey_cb, alloc_cb));
 	GDS_ASSERT_THROW(BadArgumentException,
 		gds_compact_rbtree_get(root, "key", NULL, NULL, NULL));
 	GDS_ASSERT_THROW(BadArgumentException,
@@ -434,7 +463,8 @@ void t_compact_rbtree_values(void)
 		CU_ASSERT_EQUAL(i, t->value);
 		i++;
 	}
-	gds_iterator_free(it, free_cb);
+	gds_slist_iterator_free(it);
+	gds_slist_free(slist, NULL);
 	gds_compact_rbtree_free(root, free_cb);
 }
 
