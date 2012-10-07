@@ -64,8 +64,8 @@ gds_kod_compact_rbtree_values(
 );
 
 typedef struct {
-	const void *key;
-	const void *data;
+	void *key;
+	void *data;
 } gds_kod_compact_rbtree_list_node_t;
 
 gds_slist_node_t *
@@ -74,7 +74,6 @@ gds_kod_compact_rbtree_nodes(
 	gds_alloc_cb key_alloc_cb,
 	gds_alloc_cb alloc_cb
 );
-
 
 #endif /* Not defined kod_compact_rbtree_h_included */
 
