@@ -22,24 +22,24 @@ typedef struct {
 	gds_cmpkey_cb cmpkey_cb;
 } gds_compact_rbtree_callbacks_t;
 
-int8_t gds_compact_rbtree_node_cmp_with_key(
+int32_t gds_compact_rbtree_node_cmp_with_key(
 	gds_inline_compact_rbtree_node_t *inode, void *key,
 	gds_compact_rbtree_callbacks_t *callbacks)
 {
 	gds_compact_rbtree_node_t *node;
-	int8_t cmp;
+	int32_t cmp;
 
 	node = crbt_containerof(inode);
 	cmp = callbacks->cmpkey_cb(key, callbacks->getkey_cb(node->data));
 	return cmp;
 }
 
-int8_t gds_compact_rbtree_node_cmp(gds_inline_compact_rbtree_node_t *inode1,
+int32_t gds_compact_rbtree_node_cmp(gds_inline_compact_rbtree_node_t *inode1,
 	gds_inline_compact_rbtree_node_t *inode2,
 	gds_compact_rbtree_callbacks_t *callbacks)
 {
 	gds_compact_rbtree_node_t *node1, *node2;
-	int8_t cmp;
+	int32_t cmp;
 
 	node1 = crbt_containerof(inode1);
 	node2 = crbt_containerof(inode2);

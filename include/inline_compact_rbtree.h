@@ -10,9 +10,9 @@ struct gds_inline_compact_rbtree_node_s {
 };
 typedef struct gds_inline_compact_rbtree_node_s gds_inline_compact_rbtree_node_t;
 
-typedef int8_t (*gds_crbt_cmp_cb)(gds_inline_compact_rbtree_node_t *,
+typedef int32_t (*gds_crbt_cmp_cb)(gds_inline_compact_rbtree_node_t *,
 	gds_inline_compact_rbtree_node_t *, void *);
-typedef int8_t (*gds_crbt_cmp_with_key_cb)(gds_inline_compact_rbtree_node_t *,
+typedef int32_t (*gds_crbt_cmp_with_key_cb)(gds_inline_compact_rbtree_node_t *,
 	void *, void *);
 typedef void (*gds_crbt_replace_cb)(gds_inline_compact_rbtree_node_t *,
 	gds_inline_compact_rbtree_node_t *, void *);
