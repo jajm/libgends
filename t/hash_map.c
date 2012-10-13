@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "hash_map.h"
+#include "hash_map_keyin.h"
 #include "slist.h"
 
 uint32_t myhash_cb(int8_t i)
@@ -24,20 +24,20 @@ int main()
 	gds_hash_cb hash_cb = (gds_hash_cb) &myhash_cb;
 	gds_getkey_cb getkey_cb = (gds_getkey_cb) &mygetkey_cb;
 	gds_cmpkey_cb cmpkey_cb = (gds_cmpkey_cb) &mycmpkey_cb;
-	gds_hash_map_t *h;
+	gds_hash_map_keyin_t *h;
 	gds_slist_node_t *l;
 	gds_iterator_t *it;
 
-	h = gds_hash_map_new(8, hash_cb, getkey_cb, cmpkey_cb);
+	h = gds_hash_map_keyin_new(8, hash_cb, getkey_cb, cmpkey_cb);
 
 	printf("Inserting values from 1 to 15...\n");
 	for (intptr_t i = 1; i < 16; i++) {
-		gds_hash_map_set(h, (void *)i, NULL, NULL);
+		gds_hash_map_keyin_set(h, (void *)i, NULL, NULL);
 	}
 	printf("done.\n");
 
 	printf("Values in the hash are:\n");
-	l = gds_hash_map_values(h, NULL);
+	l = gds_hash_map_keyin_values(h, NULL);
 	it = gds_slist_iterator_new(l);
 	gds_iterator_reset(it);
 	while (!gds_iterator_step(it)) {
@@ -49,11 +49,11 @@ int main()
 	gds_slist_free(l, NULL);
 
 	printf("Resizing hash...\n");
-	gds_hash_map_change_size(h, 2);
+	gds_hash_map_keyin_change_size(h, 2);
 	printf("done.\n");
 
 	printf("Values in the hash are:\n");
-	l = gds_hash_map_values(h, NULL);
+	l = gds_hash_map_keyin_values(h, NULL);
 	it = gds_slist_iterator_new(l);
 	gds_iterator_reset(it);
 	while (!gds_iterator_step(it)) {

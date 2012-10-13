@@ -4,9 +4,9 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <sys/time.h>
-#include "rbtree.h"
-#include "compact_rbtree_node.h"
-#include "compact_rbtree.h"
+#include "rbtree_keyin_fast.h"
+#include "rbtree_keyin_node.h"
+#include "rbtree_keyin.h"
 #include <eina-1/eina/eina_rbtree.h>
 
 typedef struct {
@@ -101,16 +101,16 @@ int main()
 	gds_getkey_cb getkey_cb = (gds_getkey_cb) getkey;
 	gds_free_cb free_cb = (gds_free_cb) test_free;
 
-	/* gds_compact_rbtree */
-	printf("gds_compact_rbtree\n");
+	/* gds_rbtree_keyin */
+	printf("gds_rbtree_keyin\n");
 	gettimeofday(&g_start, NULL);
 	printf("\tInserting %ld nodes...\n", max);
 	gettimeofday(&start, NULL);
-	gds_compact_rbtree_node_t *croot = NULL;
+	gds_rbtree_keyin_node_t *croot = NULL;
 	test_t *t;
 	for(i=0; i<max; i++) {
 		t = test_new(i);
-		gds_compact_rbtree_add(&croot, t, getkey_cb, cmpkey_cb, NULL);
+		gds_rbtree_keyin_add(&croot, t, getkey_cb, cmpkey_cb, NULL);
 	}
 	gettimeofday(&end, NULL);
 	timeval_diff(&start, &end, &diff);
@@ -118,7 +118,7 @@ int main()
 	printf("\tGetting %ld nodes...\n", max);
 	gettimeofday(&start, NULL);
 	for(i=0; i<max; i++) {
-		gds_compact_rbtree_get(croot, (void *)i, getkey_cb, cmpkey_cb,
+		gds_rbtree_keyin_get(croot, (void *)i, getkey_cb, cmpkey_cb,
 			NULL);
 	}
 	gettimeofday(&end, NULL);
@@ -127,7 +127,7 @@ int main()
 	printf("\tDeleting %ld nodes...\n", max);
 	gettimeofday(&start, NULL);
 	for(i=0; i<max; i++) {
-		gds_compact_rbtree_del(&croot, (void*)i, getkey_cb, cmpkey_cb,
+		gds_rbtree_keyin_del(&croot, (void*)i, getkey_cb, cmpkey_cb,
 			free_cb);
 	}
 	gettimeofday(&end, NULL);
@@ -135,17 +135,17 @@ int main()
 	printf("\tTime: %lds %ldus\n", diff.tv_sec, diff.tv_usec);
 	timeval_diff(&g_start, &end, &diff);
 	printf("\tTotal time: %lds %ldus\n", diff.tv_sec, diff.tv_usec);
-	printf("\tEstimated size: %ld bytes\n", max * (sizeof(gds_compact_rbtree_node_t) + sizeof(test_t)));
+	printf("\tEstimated size: %ld bytes\n", max * (sizeof(gds_rbtree_keyin_node_t) + sizeof(test_t)));
 
-	/* gds_rbtree */
-	printf("gds_rbtree\n");
+	/* gds_rbtree_keyin_fast */
+	printf("gds_rbtree_keyin_fast\n");
 	gettimeofday(&g_start, NULL);
 	printf("\tInserting %ld nodes...\n", max);
 	gettimeofday(&start, NULL);
-	gds_rbtree_node_t *root = NULL;
+	gds_rbtree_keyin_fast_node_t *root = NULL;
 	for(i=0; i<max; i++) {
 		t = test_new(i);
-		gds_rbtree_add(&root, t, getkey_cb, cmpkey_cb, NULL);
+		gds_rbtree_keyin_fast_add(&root, t, getkey_cb, cmpkey_cb, NULL);
 	}
 	gettimeofday(&end, NULL);
 	timeval_diff(&start, &end, &diff);
@@ -153,7 +153,7 @@ int main()
 	printf("\tGetting %ld nodes...\n", max);
 	gettimeofday(&start, NULL);
 	for(i=0; i<max; i++) {
-		gds_rbtree_get(root, (void *)i, getkey_cb, cmpkey_cb, NULL);
+		gds_rbtree_keyin_fast_get(root, (void *)i, getkey_cb, cmpkey_cb, NULL);
 	}
 	gettimeofday(&end, NULL);
 	timeval_diff(&start, &end, &diff);
@@ -161,14 +161,14 @@ int main()
 	printf("\tDeleting %ld nodes...\n", max);
 	gettimeofday(&start, NULL);
 	for(i=0; i<max; i++) {
-		gds_rbtree_del(&root, (void*)i, getkey_cb, cmpkey_cb, free_cb);
+		gds_rbtree_keyin_fast_del(&root, (void*)i, getkey_cb, cmpkey_cb, free_cb);
 	}
 	gettimeofday(&end, NULL);
 	timeval_diff(&start, &end, &diff);
 	printf("\tTime: %lds %ldus\n", diff.tv_sec, diff.tv_usec);
 	timeval_diff(&g_start, &end, &diff);
 	printf("\tTotal time: %lds %ldus\n", diff.tv_sec, diff.tv_usec);
-	printf("\tEstimated size: %ld bytes\n", max * (sizeof(gds_rbtree_node_t) + sizeof(test_t)));
+	printf("\tEstimated size: %ld bytes\n", max * (sizeof(gds_rbtree_keyin_fast_node_t) + sizeof(test_t)));
 	
 	/* eina */
 	printf("eina\n");

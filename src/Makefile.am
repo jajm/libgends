@@ -7,12 +7,11 @@ lib_LTLIBRARIES = libgends.la
 
 libgends_la_SOURCES = slist_node.c slist.c \
 	dlist_node.c \
-	inline_compact_rbtree.c \
-	rbtree_node.c rbtree.c \
-	compact_rbtree_node.c compact_rbtree.c \
-	kod_compact_rbtree_node.c kod_compact_rbtree.c \
-	hash_map.c \
-	kod_hash_map.c \
+	rbtree_inline.c \
+	rbtree.c rbtree_node.c \
+	rbtree_keyin.c rbtree_keyin_node.c \
+	rbtree_keyin_fast.c rbtree_keyin_fast_node.c \
+	hash_map.c hash_map_keyin.c \
 	func_list.c types.c \
 	typed_container.c typed_slist.c typed_dlist.c typed_stack.c \
 	typed_hash_map.c

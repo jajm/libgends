@@ -18,24 +18,25 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * File              : kod_hash_map.h                                        *
+ * File              : hash_map_keyin.h                                      *
  * Short description : Low-level hash map management                         *
  *****************************************************************************/
 
-#ifndef gds_kod_hash_map_h_included
-#define gds_kod_hash_map_h_included
+#ifndef gds_hash_map_keyin_h_included
+#define gds_hash_map_keyin_h_included
 
 #include <stdint.h>
 #include "core/callbacks.h"
-#include "kod_compact_rbtree.h"
+#include "rbtree_keyin.h"
 
-struct gds_kod_hash_map_s {
+struct gds_hash_map_keyin_s {
 	uint32_t size;
-	gds_kod_compact_rbtree_node_t **map;
+	gds_rbtree_keyin_node_t **map;
 	gds_hash_cb hash_cb;
+	gds_getkey_cb getkey_cb;
 	gds_cmpkey_cb cmpkey_cb;
 };
-typedef struct gds_kod_hash_map_s gds_kod_hash_map_t;
+typedef struct gds_hash_map_keyin_s gds_hash_map_keyin_t;
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,31 +45,28 @@ extern "C" {
 /* Create a new hash map */
 /* size: the number of buckets
  *   hash_cb : hash callback
+ * getkey_cb : getkey callback
  * cmpkey_cb : cmpkey callback */
 /* Return: a pointer to the new hash map */
-gds_kod_hash_map_t *
-gds_kod_hash_map_new(
+gds_hash_map_keyin_t *
+gds_hash_map_keyin_new(
 	uint32_t size,
 	gds_hash_cb hash_cb,
+	gds_getkey_cb getkey_cb,
 	gds_cmpkey_cb cmpkey_cb
 );
 
 /* Set a key/value pair in the hash map */
 /* If key already exists, old value is replaced by the new one */
-/*            h : pointer to the hash map
- *          key : key to insert
- *         data : data to insert
- * key_alloc_cb : alloc callback for key
- *      free_cb : free callback for data
- *     alloc_cb : alloc callback for data */
+/*         h : pointer to the hash map
+ *      data : data to insert
+ *  alloc_cb : alloc callback */
 /* Return: 0: key was already in the hash map
  *         1: key was just added */
 int8_t
-gds_kod_hash_map_set(
-	gds_kod_hash_map_t *h,
-	void *key,
+gds_hash_map_keyin_set(
+	gds_hash_map_keyin_t *h,
 	void *data,
-	gds_alloc_cb key_alloc_cb,
 	gds_free_cb free_cb,
 	gds_alloc_cb alloc_cb
 );
@@ -79,76 +77,51 @@ gds_kod_hash_map_set(
  *  alloc_cb : alloc callback */
 /* Return: pointer to the data, or NULL if key doesn't exist */
 void *
-gds_kod_hash_map_get(
-	gds_kod_hash_map_t *h,
+gds_hash_map_keyin_get(
+	gds_hash_map_keyin_t *h,
 	void *key,
 	gds_alloc_cb alloc_cb
 );
 
 /* Unset a key/value pair in the hash map */
-/*           h : pointer to the hash map
- *         key : key to unset
- * key_free_cb : free callback for key
- *     free_cb : free callback for data */
+/*         h : pointer to the hash map
+ *       key : key to unset
+ *  alloc_cb : alloc callback */
 /* Return: 0: key was correctly unset
  *         1: key was not in the hash map */
 int8_t
-gds_kod_hash_map_unset(
-	gds_kod_hash_map_t *h,
+gds_hash_map_keyin_unset(
+	gds_hash_map_keyin_t *h,
 	void *key,
-	gds_free_cb key_free_cb,
 	gds_free_cb free_cb
 );
 
-/* Return keys contained in the hash map as a list */
-/*            h : pointer to the hash map
- * key_alloc_cb : alloc callback */
-/* Return: pointer to the list */
-gds_slist_node_t *
-gds_kod_hash_map_keys(
-	gds_kod_hash_map_t *h,
-	gds_alloc_cb key_alloc_cb
-);
-
 /* Return values contained in the hash map as a list */
-/*        h : pointer to the hash map
- * alloc_cb : alloc callback */
+/*         h : pointer to the hash map
+ *  alloc_cb : alloc callback */
 /* Return: pointer to the list */
 gds_slist_node_t *
-gds_kod_hash_map_values(
-	gds_kod_hash_map_t *h,
-	gds_alloc_cb alloc_cb
-);
-
-/* Return key/data nodes contained in the hash map as a list */
-/*            h : pointer to the hash map
- * key_alloc_cb : alloc callback for key
- *     alloc_cb : alloc callback */
-/* Return: pointer to the list */
-gds_slist_node_t *
-gds_kod_hash_map_nodes(
-	gds_kod_hash_map_t *h,
-	gds_alloc_cb key_alloc_cb,
+gds_hash_map_keyin_values(
+	gds_hash_map_keyin_t *h,
 	gds_alloc_cb alloc_cb
 );
 
 /* Change the number of buckets of hash map */
-/*        h : pointer to the hash map
- * new_size : New size (number of buckets) */
+/*         h : pointer to the hash map
+ *  new_size : New size (number of buckets)
+ *  alloc_cb : alloc callback */
 void
-gds_kod_hash_map_change_size(
-	gds_kod_hash_map_t *h,
+gds_hash_map_keyin_change_size(
+	gds_hash_map_keyin_t *h,
 	uint32_t new_size
 );
 
 /* Free hash map */
-/*           h : pointer to the hash map
- * key_free_cb : free callback for key
- *     free_cb : free callback for data */
+/*       h : pointer to the hash map
+ * free_cb : free callback */
 void
-gds_kod_hash_map_free(
-	gds_kod_hash_map_t *h,
-	gds_free_cb key_free_cb,
+gds_hash_map_keyin_free(
+	gds_hash_map_keyin_t *h,
 	gds_free_cb free_cb
 );
 
@@ -156,5 +129,5 @@ gds_kod_hash_map_free(
 }
 #endif
 
-#endif /* Not gds_kod_hash_map_h_included */
+#endif /* Not gds_hash_map_keyin_h_included */
 

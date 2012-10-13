@@ -1,41 +1,93 @@
 #include <stdlib.h>
-#include <stdint.h>
-#include <stdbool.h>
 #include "exception.h"
 #include "check_arg.h"
 #include "log.h"
 #include "rbtree_node.h"
 #include "callbacks.h"
 
-gds_rbtree_node_t * gds_rbtree_node_new(void *data, gds_alloc_cb alloc_cb)
+gds_rbtree_node_t * gds_rbtree_node_new(void *key,
+	gds_alloc_cb key_alloc_cb, void *data, gds_alloc_cb alloc_cb)
 {
-	gds_rbtree_node_t *n;
-
-	n = malloc(sizeof(gds_rbtree_node_t));
-	if(n == NULL) {
-		GDS_THROW(NotEnoughMemoryException, "failed to allocate %d "
-			"bytes", sizeof(gds_rbtree_node_t));
-	}
+	gds_rbtree_node_t *node;
 	
-	if (alloc_cb != NULL) {
-		n->data = alloc_cb(data);
+	node = malloc(sizeof(gds_rbtree_node_t));
+
+	if(node == NULL) {
+		GDS_THROW_ALLOC_ERROR(sizeof(gds_rbtree_node_t));
+	}
+
+	if (key_alloc_cb != NULL) {
+		node->key = key_alloc_cb(key);
 	} else {
-		n->data = data;
+		node->key = key;
 	}
 
-	n->red = true;
-	n->parent = n->left = n->right = NULL;
-	
-	return n;
+	if (alloc_cb != NULL) {
+		node->data = alloc_cb(data);
+	} else {
+		node->data = data;
+	}
+
+	gds_rbtree_inline_node_init(&(node->rbtree));
+
+	return node;
 }
 
-bool gds_rbtree_node_is_red(gds_rbtree_node_t *node)
+void * gds_rbtree_node_get_key(gds_rbtree_node_t *node,
+	gds_alloc_cb key_alloc_cb)
 {
-	return (node != NULL && node->red == true);
+	void *key;
+
+	GDS_CHECK_ARG_NOT_NULL(node);
+
+	if (key_alloc_cb != NULL) {
+		key = key_alloc_cb(node->key);
+	} else {
+		key = node->key;
+	}
+
+	return key;
 }
 
-int8_t gds_rbtree_node_set_data(gds_rbtree_node_t *node, void *data,
-	gds_alloc_cb alloc_cb, gds_free_cb free_cb)
+int8_t gds_rbtree_node_set_key(gds_rbtree_node_t *node,
+	void *key, gds_alloc_cb key_alloc_cb, gds_free_cb key_free_cb)
+{
+	void *d;
+
+	GDS_CHECK_ARG_NOT_NULL(node);
+
+	if (key_alloc_cb != NULL) {
+		d = key_alloc_cb(key);
+	} else {
+		d = key;
+	}
+
+	if (key_free_cb != NULL) {
+		key_free_cb(node->key);
+	}
+	node->key = d;
+
+	return 0;
+}
+
+void * gds_rbtree_node_get_data(gds_rbtree_node_t *node,
+	gds_alloc_cb alloc_cb)
+{
+	void *data;
+
+	GDS_CHECK_ARG_NOT_NULL(node);
+
+	if (alloc_cb != NULL) {
+		data = alloc_cb(node->data);
+	} else {
+		data = node->data;
+	}
+
+	return data;
+}
+
+int8_t gds_rbtree_node_set_data(gds_rbtree_node_t *node,
+	void *data, gds_alloc_cb alloc_cb, gds_free_cb free_cb)
 {
 	void *d;
 
@@ -55,25 +107,14 @@ int8_t gds_rbtree_node_set_data(gds_rbtree_node_t *node, void *data,
 	return 0;
 }
 
-void * gds_rbtree_node_get_data(gds_rbtree_node_t *node, gds_alloc_cb alloc_cb)
-{
-	void *data;
-
-	GDS_CHECK_ARG_NOT_NULL(node);
-
-	if (alloc_cb != NULL) {
-		data = alloc_cb(node->data);
-	} else {
-		data = node->data;
-	}
-
-	return data;
-}
-
-void gds_rbtree_node_free(gds_rbtree_node_t *node, gds_free_cb free_cb)
+void gds_rbtree_node_free(gds_rbtree_node_t *node,
+	gds_free_cb key_free_cb, gds_free_cb free_cb)
 {
 	if(node) {
-		if(free_cb != NULL) {
+		if (key_free_cb != NULL) {
+			key_free_cb(node->key);
+		}
+		if (free_cb != NULL) {
 			free_cb(node->data);
 		}
 		free(node);

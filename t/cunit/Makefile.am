@@ -4,9 +4,9 @@ AM_CFLAGS = -Wall -Wextra -Werror -std=c99
 AM_LDFLAGS = -lcunit `pkg-config --libs libexception lll`
 
 noinst_PROGRAMS = slist_node dlist_node \
-	compact_rbtree_node compact_rbtree \
-	kod_compact_rbtree_node kod_compact_rbtree \
+	rbtree_keyin_node rbtree_keyin \
 	rbtree_node rbtree \
+	rbtree_keyin_fast_node rbtree_keyin_fast \
 	types func_list \
 	typed_container typed_dlist typed_stack typed_slist
 
@@ -28,23 +28,23 @@ typed_dlist_LDADD = ../../src/libgends.la
 typed_stack_SOURCES = typed_stack.c
 typed_stack_LDADD = ../../src/libgends.la
 
-compact_rbtree_node_SOURCES = compact_rbtree_node.c ../test.c
-compact_rbtree_node_LDADD = ../../src/libgends.la
+rbtree_keyin_node_SOURCES = rbtree_keyin_node.c ../test.c
+rbtree_keyin_node_LDADD = ../../src/libgends.la
 
-compact_rbtree_SOURCES = compact_rbtree.c ../test.c
-compact_rbtree_LDADD = ../../src/libgends.la
-
-kod_compact_rbtree_node_SOURCES = kod_compact_rbtree_node.c ../test.c
-kod_compact_rbtree_node_LDADD = ../../src/libgends.la
-
-kod_compact_rbtree_SOURCES = kod_compact_rbtree.c ../test.c
-kod_compact_rbtree_LDADD = ../../src/libgends.la
+rbtree_keyin_SOURCES = rbtree_keyin.c ../test.c
+rbtree_keyin_LDADD = ../../src/libgends.la
 
 rbtree_node_SOURCES = rbtree_node.c ../test.c
 rbtree_node_LDADD = ../../src/libgends.la
 
 rbtree_SOURCES = rbtree.c ../test.c
 rbtree_LDADD = ../../src/libgends.la
+
+rbtree_keyin_fast_node_SOURCES = rbtree_keyin_fast_node.c ../test.c
+rbtree_keyin_fast_node_LDADD = ../../src/libgends.la
+
+rbtree_keyin_fast_SOURCES = rbtree_keyin_fast.c ../test.c
+rbtree_keyin_fast_LDADD = ../../src/libgends.la
 
 types_SOURCES = types.c
 types_LDADD = ../../src/libgends.la
