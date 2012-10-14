@@ -61,7 +61,6 @@ gds_typed_stack_t *gds_typed_stack_new(const char *type_name)
 
 int8_t gds_typed_stack_push(gds_typed_stack_t *S, void *data, bool copy_data)
 {
-	gds_slist_node_t *newnode;
 	gds_alloc_cb alloc_cb = NULL;
 
 	GDS_CHECK_ARG_NOT_NULL(S);
@@ -71,8 +70,7 @@ int8_t gds_typed_stack_push(gds_typed_stack_t *S, void *data, bool copy_data)
 		alloc_cb = (gds_alloc_cb)gds_type_get_func(S->type_name, "alloc");
 	}
 
-	newnode = gds_slist_add_first(S->head, data, alloc_cb);
-	S->head = newnode;
+	gds_slist_add_first(&(S->head), data, alloc_cb);
 
 	return 0;
 }
@@ -84,7 +82,7 @@ void *gds_typed_stack_pop(gds_typed_stack_t *S)
 	GDS_CHECK_ARG_NOT_NULL(S);
 
 	data = gds_slist_node_get_data(S->head, NULL);
-	S->head = gds_slist_del_first(S->head, NULL);
+	gds_slist_del_first(&(S->head), NULL);
 
 	return data;
 }

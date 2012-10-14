@@ -119,12 +119,7 @@ gds_slist_node_t *gds_typed_slist_add(gds_typed_slist_t *l, gds_slist_node_t *no
 
 	if (l->first == NULL || node == NULL) {
 		/* Add in first position */
-		newnode = gds_slist_add_first(l->first, data, alloc_cb);
-		if (newnode == NULL) {
-			GDS_LOG_ERROR("Failed to add data to the list");
-			return NULL;
-		}
-		l->first = newnode;
+		newnode = gds_slist_add_first(&(l->first), data, alloc_cb);
 	} else {
 		newnode = gds_slist_add_after(node, data, alloc_cb);
 	}
@@ -191,7 +186,7 @@ void *gds_typed_slist_pop(gds_typed_slist_t *l, gds_slist_node_t *node)
 
 	data = gds_slist_node_get_data(tmp, NULL);
 	if(tmp2 == NULL)
-		l->first = gds_slist_del_first(l->first, NULL);
+		gds_slist_del_first(&(l->first), NULL);
 	else
 		gds_slist_del_after(tmp2, NULL);
 	if(tmp2->next == NULL)
@@ -210,7 +205,7 @@ void *gds_typed_slist_pop_first(gds_typed_slist_t *l)
 	}
 
 	data = gds_slist_node_get_data(l->first, NULL);
-	l->first = gds_slist_del_first(l->first, NULL);
+	gds_slist_del_first(&(l->first), NULL);
 
 	return data;
 }
@@ -225,7 +220,7 @@ void *gds_typed_slist_pop_last(gds_typed_slist_t *l)
 	}
 
 	data = gds_slist_node_get_data(l->last, NULL);
-	l->first = gds_slist_del_last(l->first, NULL);
+	gds_slist_del_last(&(l->first), NULL);
 
 	return data;
 }

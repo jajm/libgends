@@ -7,30 +7,37 @@
 #include "slist_node.h"
 #include "slist.h"
 
-gds_slist_node_t * gds_slist_add_first(gds_slist_node_t *head, void *data,
+gds_slist_node_t * gds_slist_add_first(gds_slist_node_t **head, void *data,
 	gds_alloc_cb alloc_cb)
 {
 	gds_slist_node_t *n;
 
+	GDS_CHECK_ARG_NOT_NULL(head);
+
 	n = gds_slist_node_new(data, alloc_cb);
-	n->next = head;
+	n->next = *head;
+	*head = n;
 
 	return n;
 }
 
-gds_slist_node_t * gds_slist_add_last(gds_slist_node_t *head, void *data,
+gds_slist_node_t * gds_slist_add_last(gds_slist_node_t **head, void *data,
 	gds_alloc_cb alloc_cb)
 {
 	gds_slist_node_t *n, *tmp;
 
+	GDS_CHECK_ARG_NOT_NULL(head);
+
 	n = gds_slist_node_new(data, alloc_cb);
 
-	if (head != NULL) {
-		tmp = head;
+	if (*head != NULL) {
+		tmp = *head;
 		while (tmp->next != NULL) {
 			tmp = tmp->next;
 		}
 		tmp->next = n;
+	} else {
+		*head = n;
 	}
 
 	return n;
@@ -113,26 +120,27 @@ gds_slist_node_t * gds_slist_get_last(gds_slist_node_t *head)
 	return tmp;
 }
 
-gds_slist_node_t * gds_slist_del_first(gds_slist_node_t *head,
-	gds_free_cb free_cb)
+void gds_slist_del_first(gds_slist_node_t **head, gds_free_cb free_cb)
 {
 	gds_slist_node_t *n = NULL;
 
-	if (head != NULL) {
-		n = head->next;
-		gds_slist_node_free(head, free_cb);
-	}
+	GDS_CHECK_ARG_NOT_NULL(head);
 
-	return n;
+	if (*head != NULL) {
+		n = (*head)->next;
+		gds_slist_node_free(*head, free_cb);
+		*head = n;
+	}
 }
 
-gds_slist_node_t * gds_slist_del_last(gds_slist_node_t *head,
-	gds_free_cb free_cb)
+void gds_slist_del_last(gds_slist_node_t **head, gds_free_cb free_cb)
 {
 	gds_slist_node_t *tmp, *prev = NULL;
 
-	if (head != NULL) {
-		tmp = head;
+	GDS_CHECK_ARG_NOT_NULL(head);
+
+	if (*head != NULL) {
+		tmp = *head;
 		while (tmp->next != NULL) {
 			prev = tmp;
 			tmp = tmp->next;
@@ -141,11 +149,9 @@ gds_slist_node_t * gds_slist_del_last(gds_slist_node_t *head,
 		if (prev != NULL) {
 			prev->next = NULL;
 		} else {
-			head = NULL;
+			*head = NULL;
 		}
 	}
-
-	return head;
 }
 
 int8_t gds_slist_del_after(gds_slist_node_t *node, gds_free_cb free_cb)
@@ -156,7 +162,7 @@ int8_t gds_slist_del_after(gds_slist_node_t *node, gds_free_cb free_cb)
 
 	if (node->next == NULL) {
 		GDS_LOG_WARNING("node is the last node");
-		return 1;
+		return -1;
 	}
 
 	n = node->next->next;

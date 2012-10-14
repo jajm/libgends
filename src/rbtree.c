@@ -220,7 +220,7 @@ void gds_rbtree_build_keys_list(
 	if (root != NULL) {
 		gds_rbtree_build_keys_list(rbt_containerof(
 			root->rbtree.son[1]), key_alloc_cb, head);
-		*head = gds_slist_add_first(*head, root->key, key_alloc_cb);
+		gds_slist_add_first(head, root->key, key_alloc_cb);
 		gds_rbtree_build_keys_list(rbt_containerof(
 			root->rbtree.son[0]), key_alloc_cb, head);
 	}
@@ -242,7 +242,7 @@ void gds_rbtree_build_values_list(gds_rbtree_node_t *root,
 	if (root != NULL) {
 		gds_rbtree_build_values_list(
 			rbt_containerof(root->rbtree.son[1]), alloc_cb, head);
-		*head = gds_slist_add_first(*head, root->data, alloc_cb);
+		gds_slist_add_first(head, root->data, alloc_cb);
 		gds_rbtree_build_values_list(
 			rbt_containerof(root->rbtree.son[0]), alloc_cb, head);
 	}
@@ -274,7 +274,7 @@ void gds_rbtree_build_keys_values_list(gds_rbtree_node_t *root,
 
 		kv->key = root->key;
 		kv->value = root->data;
-		*head = gds_slist_add_first(*head, kv, NULL);
+		gds_slist_add_first(head, kv, NULL);
 
 		gds_rbtree_build_keys_values_list(
 			rbt_containerof(root->rbtree.son[0]), head);

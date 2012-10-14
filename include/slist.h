@@ -34,27 +34,27 @@ extern "C" {
 #endif
 
 /* Add new data at beginning of list */
-/* head     : pointer to first node of list
+/* head     : address of pointer to first node of list
  * data     : pointer to data
  * alloc_cb : callback to allocation function, if you want the data to be
  *            copied. NULL otherwise. */
 /* Return : pointer to the newly created node, or NULL if operation failed */
 gds_slist_node_t *
 gds_slist_add_first(
-	gds_slist_node_t *head,
+	gds_slist_node_t **head,
 	void *data,
 	gds_alloc_cb alloc_cb
 );
 
 /* Add new data at end of list */
-/* head     : pointer to first node of list
+/* head     : address of pointer to first node of list
  * data     : pointer to data
  * alloc_cb : callback to allocation function, if you want the data to be
  *            copied. NULL otherwise. */
 /* Return : pointer to the newly created node, or NULL if operation failed */
 gds_slist_node_t *
 gds_slist_add_last(
-	gds_slist_node_t *head,
+	gds_slist_node_t **head,
 	void *data,
 	gds_alloc_cb alloc_cb
 );
@@ -99,26 +99,22 @@ gds_slist_get_last(
 );
 
 /* Delete first node of list */
-/* head    : pointer to first node of list */
+/* head    : address of pointer to first node of list */
 /* free_cb : callback to free function, if you want the data to be freed.
  *           NULL otherwise. */
-/* Return : pointer to first node of list (after deletion). Can return NULL if
- *          it removed the last node or if list was empty */
-gds_slist_node_t *
+void
 gds_slist_del_first(
-	gds_slist_node_t *head,
+	gds_slist_node_t **head,
 	gds_free_cb free_cb
 );
 
 /* Delete last node of list */
-/* head    : pointer to first node of list
+/* head    : address of pointer to first node of list
  * free_cb : callback to free function, if you want the data to be freed.
  *           NULL otherwise. */
-/* Return : pointer to first node of list (after deletion). Can return NULL if
- *          it removed the last node or if list was empty */
-gds_slist_node_t *
+void
 gds_slist_del_last(
-	gds_slist_node_t *head,
+	gds_slist_node_t **head,
 	gds_free_cb free_cb
 );
 
@@ -127,7 +123,6 @@ gds_slist_del_last(
  * free_cb : callback to free function, if you want the data to be freed.
  *           NULL otherwise. */
 /* Return : a negative value if it was not able to remove the node.
- *          a positive value if node is the last node.
  *          0 otherwise. */
 int8_t
 gds_slist_del_after(
