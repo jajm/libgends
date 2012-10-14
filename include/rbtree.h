@@ -1,5 +1,5 @@
-#ifndef rbtree_h_included
-#define rbtree_h_included
+#ifndef gds_rbtree_h_included
+#define gds_rbtree_h_included
 
 #include <stdint.h>
 #include "rbtree_node.h"
@@ -63,17 +63,12 @@ gds_rbtree_values(
 	gds_alloc_cb alloc_cb
 );
 
-typedef struct {
-	void *key;
-	void *data;
-} gds_rbtree_list_node_t;
-
+/* Return a list of gds_key_value_t (see key_value.h) */
+/* Free with gds_slist_free(list, (gds_free_cb)free) */
 gds_slist_node_t *
-gds_rbtree_nodes(
-	gds_rbtree_node_t *root,
-	gds_alloc_cb key_alloc_cb,
-	gds_alloc_cb alloc_cb
+gds_rbtree_keys_values(
+	gds_rbtree_node_t *root
 );
 
-#endif /* Not defined rbtree_h_included */
+#endif /* Not defined gds_rbtree_h_included */
 

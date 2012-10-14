@@ -120,16 +120,12 @@ gds_hash_map_values(
 	gds_alloc_cb alloc_cb
 );
 
-/* Return key/data nodes contained in the hash map as a list */
-/*            h : pointer to the hash map
- * key_alloc_cb : alloc callback for key
- *     alloc_cb : alloc callback */
+/* Return key/value pairs contained in hash map as a list of gds_key_value_t */
+/*            h : pointer to the hash map */
 /* Return: pointer to the list */
 gds_slist_node_t *
-gds_hash_map_nodes(
-	gds_hash_map_t *h,
-	gds_alloc_cb key_alloc_cb,
-	gds_alloc_cb alloc_cb
+gds_hash_map_keys_values(
+	gds_hash_map_t *h
 );
 
 /* Change the number of buckets of hash map */

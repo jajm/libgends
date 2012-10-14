@@ -33,8 +33,8 @@
 #include "rbtree_keyin.h"
 #include "hash_map_keyin.h"
 
-gds_hash_map_keyin_t * gds_hash_map_keyin_new(uint32_t size, gds_hash_cb hash_cb,
-	gds_getkey_cb getkey_cb, gds_cmpkey_cb cmpkey_cb)
+gds_hash_map_keyin_t * gds_hash_map_keyin_new(uint32_t size,
+	gds_hash_cb hash_cb, gds_getkey_cb getkey_cb, gds_cmpkey_cb cmpkey_cb)
 {
 	gds_hash_map_keyin_t *h;
 
@@ -66,8 +66,8 @@ uint32_t gds_hash_map_keyin_hash(gds_hash_map_keyin_t *h, void *key)
 	return h->hash_cb(key, h->size) % h->size;
 }
 
-int8_t gds_hash_map_keyin_set(gds_hash_map_keyin_t *h, void *data, gds_free_cb free_cb,
-	gds_alloc_cb alloc_cb)
+int8_t gds_hash_map_keyin_set(gds_hash_map_keyin_t *h, void *data,
+	gds_free_cb free_cb, gds_alloc_cb alloc_cb)
 {
 	uint32_t hash;
 
@@ -78,7 +78,8 @@ int8_t gds_hash_map_keyin_set(gds_hash_map_keyin_t *h, void *data, gds_free_cb f
 		h->cmpkey_cb, free_cb, alloc_cb);
 }
 
-void * gds_hash_map_keyin_get(gds_hash_map_keyin_t *h, void *key, gds_alloc_cb alloc_cb)
+void * gds_hash_map_keyin_get(gds_hash_map_keyin_t *h, void *key,
+	gds_alloc_cb alloc_cb)
 {
 	uint32_t hash;
 	void *data;
@@ -93,7 +94,8 @@ void * gds_hash_map_keyin_get(gds_hash_map_keyin_t *h, void *key, gds_alloc_cb a
 	return data;
 }
 
-int8_t gds_hash_map_keyin_unset(gds_hash_map_keyin_t *h, void *key, gds_free_cb free_cb)
+int8_t gds_hash_map_keyin_unset(gds_hash_map_keyin_t *h, void *key,
+	gds_free_cb free_cb)
 {
 	uint32_t hash;
 	int8_t rv;
@@ -111,12 +113,13 @@ gds_slist_node_t * gds_hash_map_keyin_values(gds_hash_map_keyin_t *h,
 	gds_alloc_cb alloc_cb)
 {
 	gds_slist_node_t *l = NULL;
+	gds_slist_node_t *list;
+	uint32_t i;
 
 	GDS_CHECK_ARG_NOT_NULL(h);
 
-	for (uint32_t i = 0; i < h->size; i++) {
-		gds_slist_node_t *list = gds_rbtree_keyin_values(h->map[i],
-			alloc_cb);
+	for (i = h->size; i > 0; i--) {
+		list = gds_rbtree_keyin_values(h->map[i-1], alloc_cb);
 		if (list != NULL) {
 			gds_slist_add_list_first(&l, list);
 		}
