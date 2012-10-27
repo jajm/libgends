@@ -22,7 +22,7 @@
  * Short description : Generic double linked list management                 *
  *****************************************************************************
  * A generic linked list can contain data of any type, since a corresponding *
- * custom type is defined (see core/types.h)                                 *
+ * custom type is defined (see types.h)                                      *
  *****************************************************************************/
 
 #include <stdlib.h>

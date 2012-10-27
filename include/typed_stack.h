@@ -39,7 +39,7 @@ extern "C" {
 #endif
 
 /* Create a new stack */
-/* type_name : type name of stored data (see core/types.h) */
+/* type_name : type name of stored data (see types.h) */
 /* Return: Success => pointer to the newly created stack
  *         Failure => NULL */
 	gds_typed_stack_t *

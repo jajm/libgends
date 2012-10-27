@@ -26,7 +26,7 @@
 #define gds_hash_map_keyin_h_included
 
 #include <stdint.h>
-#include "core/callbacks.h"
+#include "callbacks.h"
 #include "rbtree_keyin.h"
 
 struct gds_hash_map_keyin_s {

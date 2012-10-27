@@ -22,7 +22,7 @@
  * Short description : Generic double linked list management                 *
  *****************************************************************************
  * A generic linked list can contain data of any type, since a corresponding *
- * custom type is defined (see core/types.h)                                 *
+ * custom type is defined (see types.h)                                      *
  *****************************************************************************/
 
 /*****************************************************************************
@@ -54,7 +54,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "dlist_node.h"
-#include "core/iterator.h"
+#include "iterator.h"
 
 typedef struct {
 	char *type_name;

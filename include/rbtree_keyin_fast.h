@@ -2,7 +2,7 @@
 #define rbtree_keyin_fast_h_included
 
 #include <stdint.h>
-#include "core/callbacks.h"
+#include "callbacks.h"
 #include "rbtree_keyin_fast_node.h"
 
 /* Insert data into the tree */

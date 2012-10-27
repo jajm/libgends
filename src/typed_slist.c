@@ -22,7 +22,7 @@
  * Short description : Generic singly linked list management                 *
  *****************************************************************************
  * A generic singly linked list can contain whatever type of data, since a   *
- * corresponding custom types exists (see core/types.h).                     *
+ * corresponding custom types exists (see types.h).                          *
  *****************************************************************************/
 
 #include <assert.h>

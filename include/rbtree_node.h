@@ -2,7 +2,7 @@
 #define rbtree_node_h_included
 
 #include <stdint.h>
-#include "core/callbacks.h"
+#include "callbacks.h"
 #include "rbtree_inline.h"
 
 struct gds_rbtree_node_s {

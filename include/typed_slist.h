@@ -22,7 +22,7 @@
  * Short description : Generic singly linked list management                 *
  *****************************************************************************
  * A generic singly linked list can contain whatever type of data, since a   *
- * corresponding custom types exists (see core/types.h).                     *
+ * corresponding custom types exists (see types.h).                          *
  *****************************************************************************/
 
 /*****************************************************************************
@@ -54,7 +54,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "slist_node.h"
-#include "core/iterator.h"
+#include "iterator.h"
 
 typedef struct{
 	char *type_name;
@@ -67,7 +67,7 @@ extern "C" {
 #endif
 
 /* Create a new list */
-/* type_name : name of data type (see core/types.h) */
+/* type_name : name of data type (see types.h) */
 /* Return: a pointer to the newly created list */
 gds_typed_slist_t *
 gds_typed_slist_new(

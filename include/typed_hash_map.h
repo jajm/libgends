@@ -42,7 +42,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "core/iterator.h"
+#include "iterator.h"
 
 /* Hash function pointer type */
 /* Hash functions take a string (the hash key) and an integer (the map size)

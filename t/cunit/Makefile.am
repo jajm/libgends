@@ -1,4 +1,4 @@
-AM_CPPFLAGS = -I.. -I../../include/core -I../../include \
+AM_CPPFLAGS = -I.. -I../../include \
 	`pkg-config --cflags libexception lll`
 AM_CFLAGS = -Wall -Wextra -Werror -std=c99
 AM_LDFLAGS = -lcunit `pkg-config --libs libexception lll`

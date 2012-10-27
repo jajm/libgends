@@ -84,7 +84,7 @@ gds_typed_container_new_clone(
 
 /* Set a new value to an existing container */
 /*             c : pointer to the container
- *     type_name : name of a registered type (see core/types.h)
+ *     type_name : name of a registered type (see types.h)
  *      data_ptr : pointer to the data
  * free_old_data : true => free memory taken by old value
  *                 false => don't free memory

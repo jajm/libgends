@@ -1,4 +1,4 @@
-AM_CPPFLAGS = -I../include/core -I../include `pkg-config --cflags eina lll`
+AM_CPPFLAGS = -I../include `pkg-config --cflags eina lll`
 AM_CFLAGS = -Wall -Wextra -Werror -std=c99
 noinst_PROGRAMS = rbtree
 

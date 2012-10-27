@@ -1,1 +1,1 @@
-nobase_pkginclude_HEADERS = *.h core/*.h
+nobase_pkginclude_HEADERS = *.h

@@ -41,10 +41,8 @@ AC_CONFIG_FILES([
 	Makefile
 	libgends.pc
 	src/Makefile
-	src/core/Makefile
 	include/Makefile
 	t/Makefile
-	t/core/Makefile
 	t/cunit/Makefile
 	benchs/Makefile
 ])
