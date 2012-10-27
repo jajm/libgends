@@ -345,13 +345,6 @@ gds_typed_slist_iterator_new(
 	gds_typed_slist_t *l
 );
 
-/* Free iterator */
-/* it : pointer to the iterator */
-void
-gds_typed_slist_iterator_free(
-	gds_iterator_t *it
-);
-
 
 /* ========================================================================= */
 /*                             Others functions                              */

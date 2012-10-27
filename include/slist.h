@@ -138,13 +138,6 @@ gds_slist_iterator_new(
 	gds_slist_node_t *head
 );
 
-/* Free iterator */
-/* it: pointer to iterator */
-void
-gds_slist_iterator_free(
-	gds_iterator_t *it
-);
-
 /* Free list */
 /* head    : pointer to first node of list */
 /* free_cb : callback to free function, if you want the data to be freed.

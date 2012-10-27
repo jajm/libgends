@@ -150,7 +150,7 @@ gds_rbtree_keyin_node_t ** gds_hash_map_keyin_build_map(gds_hash_map_keyin_t *h,
 		gds_rbtree_keyin_add(&(map[hash]), data, h->getkey_cb,
 			h->cmpkey_cb, NULL);
 	}
-	gds_slist_iterator_free(it);
+	gds_iterator_free(it);
 
 	return map;
 }

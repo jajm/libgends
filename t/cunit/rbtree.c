@@ -504,7 +504,7 @@ void t_rbtree_values(void)
 		CU_ASSERT_EQUAL(i, t->value);
 		i++;
 	}
-	gds_slist_iterator_free(it);
+	gds_iterator_free(it);
 	gds_slist_free(slist, NULL);
 	gds_rbtree_free(root, key_free_cb, free_cb);
 }

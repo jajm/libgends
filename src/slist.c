@@ -238,12 +238,8 @@ gds_iterator_t * gds_slist_iterator_new(gds_slist_node_t *head)
 	it = gds_iterator_new(it_data,
 		(gds_iterator_reset_cb) &gds_slist_iterator_reset,
 		(gds_iterator_step_cb) &gds_slist_iterator_step,
-		(gds_iterator_get_cb) &gds_slist_iterator_get);
+		(gds_iterator_get_cb) &gds_slist_iterator_get,
+		(gds_free_cb) &free);
 	
 	return it;
-}
-
-void gds_slist_iterator_free(gds_iterator_t *it)
-{
-	gds_iterator_free(it, (gds_free_cb)&free);
 }

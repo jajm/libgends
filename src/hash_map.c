@@ -181,7 +181,7 @@ gds_rbtree_node_t ** gds_hash_map_build_map(gds_hash_map_t *h, uint32_t size)
 		gds_rbtree_add(&(map[hash]), kv->key,
 			kv->value, h->cmpkey_cb, NULL, NULL);
 	}
-	gds_slist_iterator_free(it);
+	gds_iterator_free(it);
 	gds_slist_free(l, (gds_free_cb)free);
 
 	return map;

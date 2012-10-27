@@ -26,11 +26,12 @@
  * it's always the same API.                                                 *
  * To implement an iterator for your container, you have to:                 *
  *  - define a struct, or whatever you need to store iterator informations   *
- *  - define 3 functions (described below) which will deal with these        *
+ *  - define 4 functions (described below) which will deal with these        *
  *  informations:                                                            *
  *    . int8_t reset(void *data)                                             *
  *    . int8_t step(void *data)                                              *
  *    . void * get(void *data, bool copy_data)                               *
+ *    . void free(void *data)                                                *
  *  - and provide a way to get an initialized iterator for your container    *
  * See slist.h or dlist.h for examples of implementation                     *
  *****************************************************************************/
@@ -45,7 +46,8 @@
 #include "callbacks.h"
 
 gds_iterator_t *gds_iterator_new(void *data, gds_iterator_reset_cb reset_cb,
-	gds_iterator_step_cb step_cb, gds_iterator_get_cb get_cb)
+	gds_iterator_step_cb step_cb, gds_iterator_get_cb get_cb,
+	gds_free_cb free_cb)
 {
 	gds_iterator_t *it;
 
@@ -64,6 +66,7 @@ gds_iterator_t *gds_iterator_new(void *data, gds_iterator_reset_cb reset_cb,
 	it->reset_cb = reset_cb;
 	it->step_cb = step_cb;
 	it->get_cb = get_cb;
+	it->free_cb = free_cb;
 
 	return it;
 }
@@ -89,11 +92,11 @@ void * gds_iterator_get(gds_iterator_t *it)
 	return it->get_cb(it->data);
 }
 
-void gds_iterator_free(gds_iterator_t *it, gds_free_cb free_cb)
+void gds_iterator_free(gds_iterator_t *it)
 {
-	if(it){
-		if(free_cb) {
-			free_cb(it->data);
+	if (it != NULL) {
+		if (it->free_cb != NULL) {
+			it->free_cb(it->data);
 		}
 		free(it);
 	}

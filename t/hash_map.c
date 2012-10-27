@@ -45,7 +45,7 @@ int main()
 		printf("%lu ", i);
 	}
 	printf("\n");
-	gds_slist_iterator_free(it);
+	gds_iterator_free(it);
 	gds_slist_free(l, NULL);
 
 	printf("Resizing hash...\n");
@@ -61,7 +61,7 @@ int main()
 		printf("%lu ", i);
 	}
 	printf("\n");
-	gds_slist_iterator_free(it);
+	gds_iterator_free(it);
 	gds_slist_free(l, NULL);
 
 	return 0;

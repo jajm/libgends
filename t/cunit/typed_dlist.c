@@ -492,7 +492,7 @@ void t_gds_typed_dlist_it_add_before(void)
 	CU_ASSERT(node3 == gds_typed_dlist_prev(l, node4));
 	CU_ASSERT(node4 == gds_typed_dlist_last(l));
 
-	gds_typed_dlist_iterator_free(it);
+	gds_iterator_free(it);
 	gds_typed_dlist_free(l, true);
 	gds_type_unregister(type_name);
 }
@@ -542,7 +542,7 @@ void t_gds_typed_dlist_it_add_after(void)
 	CU_ASSERT(node3 == gds_typed_dlist_prev(l, node4));
 	CU_ASSERT(node4 == gds_typed_dlist_last(l));
 
-	gds_typed_dlist_iterator_free(it);
+	gds_iterator_free(it);
 	gds_typed_dlist_free(l, true);
 	gds_type_unregister(type_name);
 }
@@ -735,7 +735,7 @@ void t_gds_typed_dlist_it_pop(void)
 
 	test_free((test_structure_t *)data);
 
-	gds_typed_dlist_iterator_free(it);
+	gds_iterator_free(it);
 	test_free(test_ptr);
 	gds_typed_dlist_free(l, true);
 	gds_type_unregister(type_name);
@@ -910,7 +910,7 @@ void t_gds_typed_dlist_it_del(void)
 	CU_ASSERT_PTR_NULL(gds_typed_dlist_prev(l, node3));
 	CU_ASSERT(node3 == gds_typed_dlist_last(l));
 
-	gds_typed_dlist_iterator_free(it);
+	gds_iterator_free(it);
 	test_free(test_ptr);
 	gds_typed_dlist_free(l, true);
 	gds_type_unregister(type_name);
@@ -1065,7 +1065,7 @@ void t_gds_typed_dlist_it_get(void)
 		CU_ASSERT(0 == test_cmp(data, data2));
 	}
 
-	gds_typed_dlist_iterator_free(it);
+	gds_iterator_free(it);
 	test_free((test_structure_t *)data2);
 	gds_typed_dlist_free(l, true);
 	gds_type_unregister(type_name);
@@ -1096,7 +1096,7 @@ void t_gds_typed_dlist_iterator_new(void)
 
 	CU_ASSERT(0 < gds_iterator_step(it));
 
-	gds_typed_dlist_iterator_free(it);
+	gds_iterator_free(it);
 	gds_typed_dlist_free(l, false);
 	gds_type_unregister(type_name);
 }
@@ -1126,7 +1126,7 @@ void t_gds_typed_dlist_reverse_iterator_new(void)
 
 	CU_ASSERT(0 < gds_iterator_step(it));
 
-	gds_typed_dlist_iterator_free(it);
+	gds_iterator_free(it);
 	gds_typed_dlist_free(l, false);
 	gds_type_unregister(type_name);
 }

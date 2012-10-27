@@ -463,7 +463,7 @@ void t_rbtree_keyin_values(void)
 		CU_ASSERT_EQUAL(i, t->value);
 		i++;
 	}
-	gds_slist_iterator_free(it);
+	gds_iterator_free(it);
 	gds_slist_free(slist, NULL);
 	gds_rbtree_keyin_free(root, free_cb);
 }

@@ -417,13 +417,6 @@ gds_typed_dlist_reverse_iterator_new(
 	gds_typed_dlist_t *l
 );
 
-/* Free iterator */
-/* it : pointer to the iterator */
-void
-gds_typed_dlist_iterator_free(
-	gds_iterator_t *it
-);
-
 /* ========================================================================= */
 /*                             Others functions                              */
 /* ========================================================================= */

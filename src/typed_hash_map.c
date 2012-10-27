@@ -779,7 +779,8 @@ gds_iterator_t * gds_typed_hash_map_iterator_keys_new(gds_typed_hash_map_t *h)
 		hit,
 		(gds_iterator_reset_cb) &gds_typed_hash_map_iterator_reset,
 		(gds_iterator_step_cb) &gds_typed_hash_map_iterator_step,
-		(gds_iterator_get_cb) &gds_typed_hash_map_iterator_keys_get
+		(gds_iterator_get_cb) &gds_typed_hash_map_iterator_keys_get,
+		(gds_free_cb) &free
 	);
 
 	return it;
@@ -804,7 +805,8 @@ gds_iterator_t * gds_typed_hash_map_iterator_data_new(gds_typed_hash_map_t *h)
 		hit,
 		(gds_iterator_reset_cb) &gds_typed_hash_map_iterator_reset,
 		(gds_iterator_step_cb) &gds_typed_hash_map_iterator_step,
-		(gds_iterator_get_cb) &gds_typed_hash_map_iterator_data_get
+		(gds_iterator_get_cb) &gds_typed_hash_map_iterator_data_get,
+		(gds_free_cb) &free
 	);
 
 	return it;

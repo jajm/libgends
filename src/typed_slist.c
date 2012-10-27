@@ -430,14 +430,10 @@ gds_iterator_t *gds_typed_slist_iterator_new(gds_typed_slist_t *l)
 	it = gds_iterator_new(sit,
 		(gds_iterator_reset_cb)&gds_typed_slist_iterator_reset,
 		(gds_iterator_step_cb)&gds_typed_slist_iterator_step,
-		(gds_iterator_get_cb)&gds_typed_slist_iterator_get);
+		(gds_iterator_get_cb)&gds_typed_slist_iterator_get,
+		(gds_free_cb)&free);
 
 	return it;
-}
-
-void gds_typed_slist_iterator_free(gds_iterator_t *it)
-{
-	gds_iterator_free(it, &free);
 }
 
 gds_slist_node_t *gds_typed_slist_chk(gds_typed_slist_t *l, void *data)

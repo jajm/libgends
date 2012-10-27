@@ -497,7 +497,8 @@ gds_iterator_t *gds_typed_dlist_iterator_new(gds_typed_dlist_t *l)
 	it = gds_iterator_new(dit,
 		(gds_iterator_reset_cb)&gds_typed_dlist_iterator_reset,
 		(gds_iterator_step_cb)&gds_typed_dlist_iterator_step,
-		(gds_iterator_get_cb)&gds_typed_dlist_iterator_get);
+		(gds_iterator_get_cb)&gds_typed_dlist_iterator_get,
+		(gds_free_cb)&free);
 	
 	return it;
 }
@@ -520,14 +521,10 @@ gds_iterator_t *gds_typed_dlist_reverse_iterator_new(gds_typed_dlist_t *l)
 	it = gds_iterator_new(dit,
 		(gds_iterator_reset_cb)&gds_typed_dlist_iterator_reset,
 		(gds_iterator_step_cb)&gds_typed_dlist_reverse_iterator_step,
-		(gds_iterator_get_cb)&gds_typed_dlist_iterator_get);
+		(gds_iterator_get_cb)&gds_typed_dlist_iterator_get,
+		(gds_free_cb)&free);
 	
 	return it;
-}
-
-void gds_typed_dlist_iterator_free(gds_iterator_t *it)
-{
-	gds_iterator_free(it, &free);
 }
 
 gds_dlist_node_t *gds_typed_dlist_chk(gds_typed_dlist_t *l, void *data)
