@@ -106,7 +106,21 @@ void gds_slist_add_list_after(gds_slist_node_t *node,
 	node->next = list;
 }
 
-gds_slist_node_t * gds_slist_get_last(gds_slist_node_t *head)
+gds_slist_node_t * gds_slist_get_nth_node(gds_slist_node_t *head, uint32_t n)
+{
+	gds_slist_node_t *tmp = NULL;
+	uint32_t i = 0;
+
+	tmp = head;
+	while (tmp != NULL && i < n) {
+		tmp = tmp->next;
+		i++;
+	}
+
+	return tmp;
+}
+
+gds_slist_node_t * gds_slist_get_last_node(gds_slist_node_t *head)
 {
 	gds_slist_node_t *tmp = NULL;
 

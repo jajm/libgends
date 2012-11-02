@@ -90,11 +90,21 @@ gds_slist_add_list_after(
 	gds_slist_node_t *list
 );
 
+/* Get nth node of list */
+/* head : pointer to first node of list
+ * n    : position of the node we want to retrieve. first node is at pos 0 */
+/* Return : pointer to the nth node of list if it exists, NULL otherwise. */
+gds_slist_node_t *
+gds_slist_get_nth_node(
+	gds_slist_node_t *head,
+	int32_t n
+);
+
 /* Get last node of list */
 /* head : pointer to first node of list */
 /* Return : pointer to last node of list, or NULL if list is empty */
 gds_slist_node_t *
-gds_slist_get_last(
+gds_slist_node_get_last_node(
 	gds_slist_node_t *head
 );
 
