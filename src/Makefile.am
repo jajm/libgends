@@ -7,7 +7,7 @@ libgends_la_SOURCES = \
 	log.c iterator.c \
 	slist_node.c slist.c \
 	dlist_node.c \
-	rbtree_inline.c \
+	rbtree_inline.c rbtree_fast_inline.c \
 	rbtree.c rbtree_node.c \
 	rbtree_keyin.c rbtree_keyin_node.c \
 	rbtree_keyin_fast.c rbtree_keyin_fast_node.c \

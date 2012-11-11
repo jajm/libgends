@@ -27,25 +27,21 @@ void t_rbtree_keyin_fast_node_new(void)
 
 	n = gds_rbtree_keyin_fast_node_new(NULL, NULL);
 	CU_ASSERT(NULL != n);
-	CU_ASSERT(true == gds_rbtree_keyin_fast_node_is_red(n));
 	CU_ASSERT(NULL == gds_rbtree_keyin_fast_node_get_data(n, NULL));
 	gds_rbtree_keyin_fast_node_free(n, NULL);
 
 	n = gds_rbtree_keyin_fast_node_new(NULL, alloc_cb);
 	CU_ASSERT(NULL != n);
-	CU_ASSERT(true == gds_rbtree_keyin_fast_node_is_red(n));
 	CU_ASSERT(NULL == gds_rbtree_keyin_fast_node_get_data(n, NULL));
 	gds_rbtree_keyin_fast_node_free(n, NULL);
 
 	n = gds_rbtree_keyin_fast_node_new(t, NULL);
 	CU_ASSERT(NULL != n)
-	CU_ASSERT(true == gds_rbtree_keyin_fast_node_is_red(n));
 	CU_ASSERT(t == gds_rbtree_keyin_fast_node_get_data(n, NULL));
 	gds_rbtree_keyin_fast_node_free(n, NULL);
 	
 	n = gds_rbtree_keyin_fast_node_new(t, alloc_cb);
 	CU_ASSERT(NULL != n);
-	CU_ASSERT(true == gds_rbtree_keyin_fast_node_is_red(n));
 	CU_ASSERT(NULL != gds_rbtree_keyin_fast_node_get_data(n, NULL));
 	CU_ASSERT(t != gds_rbtree_keyin_fast_node_get_data(n, NULL));
 	gds_rbtree_keyin_fast_node_free(n, free_cb);

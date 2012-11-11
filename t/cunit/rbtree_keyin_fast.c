@@ -19,11 +19,17 @@ int clean_suite(void)
 	return 0;
 }
 
+#define containerof(ptr) \
+	((ptr) != NULL) ? (gds_rbtree_keyin_fast_node_t *)((char *)ptr \
+		- offsetof(gds_rbtree_keyin_fast_node_t, rbtree)) : NULL
+
 void gds_rbtree_keyin_fast_print(gds_rbtree_keyin_fast_node_t *root, uint8_t depth)
 {
 	char *key;
+	gds_rbtree_keyin_fast_node_t *node;
 	if(root != NULL) {
-		gds_rbtree_keyin_fast_print(root->right, depth+1);
+		node = containerof(root->rbtree.right);
+		gds_rbtree_keyin_fast_print(node, depth+1);
 		for (uint8_t i=0; i<depth; i++)
 			printf("- ");
 		key = test_getkey(root->data);
@@ -33,7 +39,8 @@ void gds_rbtree_keyin_fast_print(gds_rbtree_keyin_fast_node_t *root, uint8_t dep
 			printf("%s", key);
 		}
 		printf(": %d\n", test_getvalue(root->data));
-		gds_rbtree_keyin_fast_print(root->left, depth+1);
+		node = containerof(root->rbtree.left);
+		gds_rbtree_keyin_fast_print(node, depth+1);
 	}
 }
 
@@ -42,30 +49,36 @@ int8_t gds_rbtree_keyin_fast_is_valid(gds_rbtree_keyin_fast_node_t *root, gds_ge
 {
 	int lh, rh;
 	int cmp = 0, cmp2 = 0;
+	gds_rbtree_keyin_fast_node_t *node;
 
 	if ( root == NULL )
 		return 1;
 
-	gds_rbtree_keyin_fast_node_t *ln = root->left;
-	gds_rbtree_keyin_fast_node_t *rn = root->right;
+	gds_rbtree_fast_inline_node_t *ln = root->rbtree.left;
+	gds_rbtree_fast_inline_node_t *rn = root->rbtree.right;
 
 	/* Consecutive red links */
-	if (gds_rbtree_keyin_fast_node_is_red(root)) {
-		if (gds_rbtree_keyin_fast_node_is_red(ln)
-		|| gds_rbtree_keyin_fast_node_is_red(rn)) {
+	if (root && root->rbtree.red) {
+		if ((ln && ln->red) || (rn && rn->red)) {
 			printf("Red violation\n");
 			return 0;
 		}
 	}
 
-	lh = gds_rbtree_keyin_fast_is_valid(ln, getkey_cb, cmpkey_cb);
-	rh = gds_rbtree_keyin_fast_is_valid(rn, getkey_cb, cmpkey_cb);
+	node = containerof(ln);
+	lh = gds_rbtree_keyin_fast_is_valid(node, getkey_cb, cmpkey_cb);
+	node = containerof(rn);
+	rh = gds_rbtree_keyin_fast_is_valid(node, getkey_cb, cmpkey_cb);
 
 	/* Invalid binary search tree */
-	if(ln != NULL)
-		cmp = cmpkey_cb((void *)getkey_cb(root->data), getkey_cb(ln->data));
-	if(rn != NULL)
-		cmp2 = cmpkey_cb((void *)getkey_cb(root->data), getkey_cb(rn->data));
+	if(ln != NULL) {
+		node = containerof(ln);
+		cmp = cmpkey_cb((void *)getkey_cb(root->data), getkey_cb(node->data));
+	}
+	if(rn != NULL) {
+		node = containerof(rn);
+		cmp2 = cmpkey_cb((void *)getkey_cb(root->data), getkey_cb(node->data));
+	}
 	if ((ln != NULL && cmp <= 0)
 	|| (rn != NULL && cmp2 >= 0)) {
 		printf("Binary tree violation\n");
@@ -80,7 +93,7 @@ int8_t gds_rbtree_keyin_fast_is_valid(gds_rbtree_keyin_fast_node_t *root, gds_ge
 
 	/* Only count black links */
 	if (lh != 0 && rh != 0)
-		return gds_rbtree_keyin_fast_node_is_red(root) ? lh : lh + 1;
+		return (root && root->rbtree.red) ? lh : lh + 1;
 	else
 		return 0;
 }

@@ -7,7 +7,8 @@
 #include "rbtree_keyin_fast_node.h"
 #include "callbacks.h"
 
-gds_rbtree_keyin_fast_node_t * gds_rbtree_keyin_fast_node_new(void *data, gds_alloc_cb alloc_cb)
+gds_rbtree_keyin_fast_node_t * gds_rbtree_keyin_fast_node_new(void *data,
+	gds_alloc_cb alloc_cb)
 {
 	gds_rbtree_keyin_fast_node_t *n;
 
@@ -23,19 +24,13 @@ gds_rbtree_keyin_fast_node_t * gds_rbtree_keyin_fast_node_new(void *data, gds_al
 		n->data = data;
 	}
 
-	n->red = true;
-	n->parent = n->left = n->right = NULL;
+	gds_rbtree_fast_inline_node_init(&(n->rbtree));
 	
 	return n;
 }
 
-bool gds_rbtree_keyin_fast_node_is_red(gds_rbtree_keyin_fast_node_t *node)
-{
-	return (node != NULL && node->red == true);
-}
-
-int8_t gds_rbtree_keyin_fast_node_set_data(gds_rbtree_keyin_fast_node_t *node, void *data,
-	gds_alloc_cb alloc_cb, gds_free_cb free_cb)
+int8_t gds_rbtree_keyin_fast_node_set_data(gds_rbtree_keyin_fast_node_t *node,
+	void *data, gds_alloc_cb alloc_cb, gds_free_cb free_cb)
 {
 	void *d;
 
@@ -55,7 +50,8 @@ int8_t gds_rbtree_keyin_fast_node_set_data(gds_rbtree_keyin_fast_node_t *node, v
 	return 0;
 }
 
-void * gds_rbtree_keyin_fast_node_get_data(gds_rbtree_keyin_fast_node_t *node, gds_alloc_cb alloc_cb)
+void * gds_rbtree_keyin_fast_node_get_data(gds_rbtree_keyin_fast_node_t *node,
+	gds_alloc_cb alloc_cb)
 {
 	void *data;
 
@@ -70,7 +66,8 @@ void * gds_rbtree_keyin_fast_node_get_data(gds_rbtree_keyin_fast_node_t *node, g
 	return data;
 }
 
-void gds_rbtree_keyin_fast_node_free(gds_rbtree_keyin_fast_node_t *node, gds_free_cb free_cb)
+void gds_rbtree_keyin_fast_node_free(gds_rbtree_keyin_fast_node_t *node,
+	gds_free_cb free_cb)
 {
 	if(node) {
 		if(free_cb != NULL) {

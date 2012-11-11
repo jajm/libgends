@@ -5,234 +5,129 @@
 #include "exception.h"
 #include "check_arg.h"
 #include "log.h"
+#include "rbtree_fast_inline.h"
 #include "rbtree_keyin_fast.h"
 #include "rbtree_keyin_fast_node.h"
 #include "callbacks.h"
 
-gds_rbtree_keyin_fast_node_t * gds_rbtree_keyin_fast_node_grandparent(gds_rbtree_keyin_fast_node_t *n)
-{
-	gds_rbtree_keyin_fast_node_t *g = NULL;
+#define rbt_containerof(ptr) \
+	((ptr) != NULL) \
+	? (gds_rbtree_keyin_fast_node_t *) \
+		((char *)ptr - offsetof(gds_rbtree_keyin_fast_node_t, rbtree)) \
+	: NULL
 
-	if(n != NULL && n->parent != NULL)
-		g = n->parent->parent;
+typedef struct {
+	gds_getkey_cb getkey_cb;
+	gds_cmpkey_cb cmpkey_cb;
+} gds_rbtree_keyin_callbacks_t;
 
-	return g;
-}
-
-gds_rbtree_keyin_fast_node_t * gds_rbtree_keyin_fast_node_uncle(gds_rbtree_keyin_fast_node_t *n)
-{
-	gds_rbtree_keyin_fast_node_t *g, *u = NULL;
-
-	g = gds_rbtree_keyin_fast_node_grandparent(n);
-	if(g != NULL) {
-		if(g->left == n->parent)
-			u = g->right;
-		else
-			u = g->left;
-	}
-
-	return u;
-}
-
-gds_rbtree_keyin_fast_node_t * gds_rbtree_keyin_fast_node_sibling(gds_rbtree_keyin_fast_node_t *n)
-{
-	gds_rbtree_keyin_fast_node_t *s = NULL;
-
-	if(n != NULL && n->parent != NULL) {
-		if(n->parent->left == n)
-			s = n->parent->right;
-		else
-			s = n->parent->left;
-	}
-
-	return s;
-}
-
-gds_rbtree_keyin_fast_node_t * gds_rbtree_keyin_fast_rotate_left(gds_rbtree_keyin_fast_node_t *n)
-{
-	if(n != NULL && n->right != NULL) {
-		n->right->parent = n->parent;
-		if(n->parent != NULL) {
-			if(n->parent->left == n)
-				n->parent->left = n->right;
-			else
-				n->parent->right = n->right;
-		}
-		n->parent = n->right;
-		n->right = n->right->left;
-		if(n->right != NULL)
-			n->right->parent = n;
-		n->parent->left = n;
-		return n->parent;
-	}
-	return NULL;
-}
-
-gds_rbtree_keyin_fast_node_t * gds_rbtree_keyin_fast_rotate_right(gds_rbtree_keyin_fast_node_t *n)
-{
-	if(n != NULL && n->left != NULL) {
-		n->left->parent = n->parent;
-		if(n->parent != NULL) {
-			if(n->parent->left == n)
-				n->parent->left = n->left;
-			else
-				n->parent->right = n->left;
-		}
-		n->parent = n->left;
-		n->left = n->left->right;
-		if(n->left != NULL)
-			n->left->parent = n;
-		n->parent->right = n;
-		return n->parent;
-	}
-	return NULL;
-}
-
-int8_t gds_rbtree_keyin_fast_insert_bottom(gds_rbtree_keyin_fast_node_t **root,
-	void *data, gds_getkey_cb getkey_cb, gds_cmpkey_cb cmpkey_cb,
-	gds_alloc_cb alloc_cb, gds_rbtree_keyin_fast_node_t **node_p)
+int32_t gds_rbtree_keyin_fast_node_cmp_data(void *data,
+	gds_rbtree_fast_inline_node_t *inode,
+	gds_rbtree_keyin_callbacks_t *callbacks)
 {
 	gds_rbtree_keyin_fast_node_t *node;
-	gds_rbtree_keyin_fast_node_t *tmp, *parent = NULL;
-	void *nkey, *key;
-	int32_t cmp;
+	gds_getkey_cb getkey_cb;
+	gds_cmpkey_cb cmpkey_cb;
 
-	GDS_CHECK_ARG_NOT_NULL(root);
-	GDS_CHECK_ARG_NOT_NULL(getkey_cb);
-	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb);
+	node = rbt_containerof(inode);
+	getkey_cb = callbacks->getkey_cb;
+	cmpkey_cb = callbacks->cmpkey_cb;
 
-	nkey = getkey_cb(data);
-	tmp = *root;
-	while(tmp != NULL) {
-		key = getkey_cb(tmp->data);
-		cmp = cmpkey_cb(nkey, key);
-		parent = tmp;
-		if(cmp < 0) {
-			tmp = tmp->left;
-		} else if(cmp > 0) {
-			tmp = tmp->right;
-		} else {
-			break;
-		}
-	}
-
-	if(tmp != NULL) {
-		GDS_LOG_WARNING("Node key already exists in tree");
-		return 1;
-	}
-
-	node = gds_rbtree_keyin_fast_node_new(data, alloc_cb);
-	*node_p = node;
-
-	if(parent != NULL) {
-		if(cmp < 0) {
-			parent->left = node;
-		} else {
-			parent->right = node;
-		}
-		node->parent = parent;
-	} else {
-		*root = node;
-	}
-	
-	return 0;
+	return cmpkey_cb(getkey_cb(data), getkey_cb(node->data));
 }
 
-void gds_rbtree_keyin_fast_rebalance_after_insert(gds_rbtree_keyin_fast_node_t **root,
-	gds_rbtree_keyin_fast_node_t *node)
+int32_t gds_rbtree_keyin_fast_node_cmp_key(void *key,
+	gds_rbtree_fast_inline_node_t *inode,
+	gds_rbtree_keyin_callbacks_t *callbacks)
 {
-	gds_rbtree_keyin_fast_node_t *u, *g;
-	bool valid = 0;
+	gds_rbtree_keyin_fast_node_t *node;
+	gds_getkey_cb getkey_cb;
+	gds_cmpkey_cb cmpkey_cb;
 
-	GDS_CHECK_ARG_NOT_NULL(root);
-	GDS_CHECK_ARG_NOT_NULL(node);
+	node = rbt_containerof(inode);
+	getkey_cb = callbacks->getkey_cb;
+	cmpkey_cb = callbacks->cmpkey_cb;
 
-	while(!valid) {
-		if (node->parent == NULL) {
-			/* node is the root node */
-			node->red = false;
-			*root = node;
-			valid = 1;
-		} else if (node->parent->red == false) {
-			valid = 1;
-		} else {
-			u = gds_rbtree_keyin_fast_node_uncle(node);
-			if ((u != NULL) && (u->red == true)) {
-				/* Parent and uncle are both red */
-				node->parent->red = false;
-				u->red = false;
-				g = gds_rbtree_keyin_fast_node_grandparent(node);
-				g->red = true;
-				node = g;
-			} else {
-				break;
-			}
-		}
-	}
-	if(!valid) {
-		/* Parent is red, but uncle is black */
-		g = gds_rbtree_keyin_fast_node_grandparent(node);
-
-		if ((node == node->parent->right)
-		&& (node->parent == g->left)) {
-			gds_rbtree_keyin_fast_rotate_left(node->parent);
-			node = node->left;
-		} else if ((node == node->parent->left)
-		&& (node->parent == g->right)) {
-			gds_rbtree_keyin_fast_rotate_right(node->parent);
-			node = node->right;
-		}
-
-		g = gds_rbtree_keyin_fast_node_grandparent(node);
-		node->parent->red = false;
-		g->red = true;
-		if (node == node->parent->left) {
-			node = gds_rbtree_keyin_fast_rotate_right(g);
-		} else {
-			node = gds_rbtree_keyin_fast_rotate_left(g);
-		}
-		if(node->parent == NULL)
-			*root = node;
-	}
+	return cmpkey_cb(key, getkey_cb(node->data));
 }
 
-int8_t gds_rbtree_keyin_fast_add(gds_rbtree_keyin_fast_node_t **root, void *data,
-	gds_getkey_cb getkey_cb, gds_cmpkey_cb cmpkey_cb,
+gds_rbtree_fast_inline_node_t * gds_rbtree_keyin_fast_create_node(void *data,
 	gds_alloc_cb alloc_cb)
 {
-	gds_rbtree_keyin_fast_node_t *node = NULL;
-	int8_t ret;
+	gds_rbtree_keyin_fast_node_t *node;
 
-	ret = gds_rbtree_keyin_fast_insert_bottom(root, data, getkey_cb, cmpkey_cb,
-		alloc_cb, &node);
-	if (node != NULL) {
-		gds_rbtree_keyin_fast_rebalance_after_insert(root, node);
-	}
-
-	return ret;
+	node = gds_rbtree_keyin_fast_node_new(data, alloc_cb);
+	return &(node->rbtree);
 }
 
-gds_rbtree_keyin_fast_node_t * gds_rbtree_keyin_fast_get_node(gds_rbtree_keyin_fast_node_t *root,
-	void *key, gds_getkey_cb getkey_cb, gds_cmpkey_cb cmpkey_cb)
+void gds_rbtree_keyin_fast_replace(gds_rbtree_fast_inline_node_t *inode1,
+	gds_rbtree_fast_inline_node_t *inode2, gds_free_cb free_cb)
 {
-	gds_rbtree_keyin_fast_node_t *node = root;
-	int32_t cmp;
+	gds_rbtree_keyin_fast_node_t *node1, *node2;
+
+	node1 = rbt_containerof(inode1);
+	node2 = rbt_containerof(inode2);
+	if (free_cb != NULL) {
+		free_cb(node1->data);
+	}
+	node1->data = node2->data;
+	gds_rbtree_keyin_fast_node_free(node2, NULL);
+}
+
+int8_t gds_rbtree_keyin_fast_add(gds_rbtree_keyin_fast_node_t **root,
+	void *data, gds_getkey_cb getkey_cb, gds_cmpkey_cb cmpkey_cb,
+	gds_alloc_cb alloc_cb)
+{
+	gds_rbtree_fast_inline_node_t *inode;
+	gds_rbtree_keyin_callbacks_t callbacks;
+	gds_rbtf_cmp_data_cb cmp_data_cb =
+		(gds_rbtf_cmp_data_cb) gds_rbtree_keyin_fast_node_cmp_data;
+	gds_rbtf_create_node_cb create_node_cb =
+		(gds_rbtf_create_node_cb) gds_rbtree_keyin_fast_create_node;
+	int8_t already_in_tree = 0;
+
+	GDS_CHECK_ARG_NOT_NULL(root);
+	GDS_CHECK_ARG_NOT_NULL(getkey_cb);
+	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb);
+
+	if (*root == NULL) {
+		*root = gds_rbtree_keyin_fast_node_new(data, alloc_cb);
+		(*root)->rbtree.red = false;
+	} else {
+		callbacks.getkey_cb = getkey_cb;
+		callbacks.cmpkey_cb = cmpkey_cb;
+		inode = &((*root)->rbtree);
+		already_in_tree = gds_rbtree_fast_inline_add(&inode, data,
+			cmp_data_cb, &callbacks, create_node_cb, alloc_cb);
+		*root = rbt_containerof(inode);
+	}
+
+	return already_in_tree;
+}
+
+gds_rbtree_keyin_fast_node_t * gds_rbtree_keyin_fast_get_node(
+	gds_rbtree_keyin_fast_node_t *root, void *key, gds_getkey_cb getkey_cb,
+	gds_cmpkey_cb cmpkey_cb)
+{
+	gds_rbtree_keyin_callbacks_t callbacks;
+	gds_rbtree_fast_inline_node_t *inode = NULL;
+	gds_rbtf_cmp_key_cb cmp_key_cb =
+		(gds_rbtf_cmp_key_cb) gds_rbtree_keyin_fast_node_cmp_key;
 
 	GDS_CHECK_ARG_NOT_NULL(getkey_cb);
 	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb);
 
-	while(node != NULL) {
-		cmp = cmpkey_cb(key, getkey_cb(node->data));
-		if(cmp < 0) {
-			node = node->left;
-		} else if(cmp > 0) {
-			node = node->right;
-		} else {
-			break;
-		}
+	if (root == NULL) {
+		return NULL;
 	}
-	
-	return node;
+
+	callbacks.getkey_cb = getkey_cb;
+	callbacks.cmpkey_cb = cmpkey_cb;
+
+	inode = gds_rbtree_fast_inline_get_node(&(root->rbtree), key,
+		cmp_key_cb, &callbacks);
+
+	return rbt_containerof(inode);
 }
 
 void * gds_rbtree_keyin_fast_get(gds_rbtree_keyin_fast_node_t *root, void *key,
@@ -247,183 +142,49 @@ void * gds_rbtree_keyin_fast_get(gds_rbtree_keyin_fast_node_t *root, void *key,
 	return gds_rbtree_keyin_fast_node_get_data(n, alloc_cb);
 }
 
-void gds_rbtree_keyin_fast_rebalance_after_delete(gds_rbtree_keyin_fast_node_t **root,
-	gds_rbtree_keyin_fast_node_t *parent, gds_rbtree_keyin_fast_node_t *child)
-{
-	gds_rbtree_keyin_fast_node_t *sibling, *tmp;
-	bool valid = false;
-
-	GDS_CHECK_ARG_NOT_NULL(root);
-
-	/* If we are here, we removed a black node which had one black child
-	 * or no child at all */
-
-	while (!valid) {
-		if (parent == NULL) {
-			/* Case 1: child is the new root */
-			valid = true;
-			break;
-		}
-
-		sibling = (child == parent->left) ? parent->right : parent->left;
-		if (gds_rbtree_keyin_fast_node_is_red(sibling)) {
-			/* Case 2: sibling is red */
-			parent->red = true;
-			sibling->red = false;
-			if (child == parent->left) {
-				tmp = gds_rbtree_keyin_fast_rotate_left(parent);
-				sibling = parent->right;
-			} else {
-				tmp = gds_rbtree_keyin_fast_rotate_right(parent);
-				sibling = parent->left;
-			}
-			if(tmp->parent == NULL)
-				*root = tmp;
-		}
-
-		if ((parent->red == false) && (sibling->red == false)
-		&& (!gds_rbtree_keyin_fast_node_is_red(sibling->left))
-		&& (!gds_rbtree_keyin_fast_node_is_red(sibling->right)) ) {
-			/* Case 3:
-			 * parent, sibling and sibling's children are black */
-			sibling->red = true;
-			child = parent;
-			parent = parent->parent;
-		} else {
-			break;
-		}
-	}
-
-	/* Just to save one indentation level */
-	if (valid) return;
-
-	if ((parent->red == true) && (sibling->red == false)
-	&& (!gds_rbtree_keyin_fast_node_is_red(sibling->left))
-	&& (!gds_rbtree_keyin_fast_node_is_red(sibling->right)) ) {
-		/* Case 4: sibling and sibling's children are black,
-		 * but parent is red. */
-		sibling->red = true;
-		parent->red = false;
-	} else {
-		if ( (child == parent->left)
-		&& (!gds_rbtree_keyin_fast_node_is_red(sibling->right)) ) {
-			/* Case 5: sibling is black, sibling's left child is
-			 * red, sibling's right child is black, and child is the
-			 * left child of its parent. */
-			/* We continue to case 6 */
-			sibling->red = true;
-			sibling->left->red = false;
-			sibling = gds_rbtree_keyin_fast_rotate_right(sibling);
-		} else if ( (child == parent->right)
-		&& (!gds_rbtree_keyin_fast_node_is_red(sibling->left)) ) {
-			/* Case 5bis: sibling is black, sibling's left child is
-			 * black, sibling's right child is red, and child is the
-			 * right child of its parent. */
-			/* Same as above, but replace 'left' by 'right' and
-			 * 'right' by 'left'. We continue to case 6bis. */
-			sibling->red = true;
-			sibling->right->red = false;
-			sibling = gds_rbtree_keyin_fast_rotate_left(sibling);
-		}
-
-		sibling->red = parent->red;
-		parent->red = false;
-		if (child == parent->left) {
-			/* Case 6: sibling is black, sibling's right child is
-			 * red and child is the left child of its parent */
-			sibling->right->red = false;
-			tmp = gds_rbtree_keyin_fast_rotate_left(parent);
-			if(tmp->parent == NULL)
-				*root = tmp;
-		} else {
-			/* Case 6bis: sibling is black, sibling's left child is
-			 * red and child is the right child of its parent */
-			/* Same as above, but replace 'left' by 'right' and
-			 * 'right' by 'left' */
-			sibling->left->red = false;
-			tmp = gds_rbtree_keyin_fast_rotate_right(parent);
-			if(tmp->parent == NULL)
-				*root = tmp;
-		}
-	}
-}
-
-void gds_rbtree_keyin_fast_replace_with_child(gds_rbtree_keyin_fast_node_t **root,
-	gds_rbtree_keyin_fast_node_t *node, gds_rbtree_keyin_fast_node_t *child)
-{
-	if (root != NULL && node != NULL) {
-		if (node->parent != NULL) {
-			if(node->parent->left == node) {
-				node->parent->left = child;
-			} else {
-				node->parent->right = child;
-			}
-		} else {
-			*root = child;
-		}
-		if (child != NULL) {
-			child->parent = node->parent;
-		}
-	}
-}
 
 int8_t gds_rbtree_keyin_fast_del(gds_rbtree_keyin_fast_node_t **root, void *key,
-	gds_getkey_cb getkey_cb, gds_cmpkey_cb cmpkey_cb,
-	gds_free_cb free_cb)
+	gds_getkey_cb getkey_cb, gds_cmpkey_cb cmpkey_cb, gds_free_cb free_cb)
 {
-	gds_rbtree_keyin_fast_node_t *node, *child;
-	bool data_freed = false;
+	gds_rbtree_fast_inline_node_t *inode;
+	gds_rbtree_keyin_callbacks_t callbacks;
+	gds_rbtf_cmp_key_cb cmp_key_cb =
+		(gds_rbtf_cmp_key_cb) gds_rbtree_keyin_fast_node_cmp_key;
+	gds_rbtf_replace_cb replace_cb =
+		(gds_rbtf_replace_cb) gds_rbtree_keyin_fast_replace;
+	int8_t not_in_tree = 1;
 
 	GDS_CHECK_ARG_NOT_NULL(root);
 	GDS_CHECK_ARG_NOT_NULL(getkey_cb);
 	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb);
 
-	node = gds_rbtree_keyin_fast_get_node(*root, key, getkey_cb, cmpkey_cb);
-	if(node == NULL) {
-		GDS_LOG_WARNING("key doesn't exist in tree");
-		return 1;
+	callbacks.getkey_cb = getkey_cb;
+	callbacks.cmpkey_cb = cmpkey_cb;
+
+	if (*root != NULL) {
+		inode = &((*root)->rbtree);
+
+		not_in_tree = gds_rbtree_fast_inline_del(&inode, key,
+			cmp_key_cb, &callbacks, replace_cb, free_cb);
+
+		*root = rbt_containerof(inode);
 	}
 
-	if(node->left != NULL && node->right != NULL) {
-		/* node has two children */
-		/* we retrieve the right-most child of its left subtree and
-		 * replace its value in node, so we'll have to delete a node
-		 * which have at most one child */
-		child = node->left;
-		while(child->right != NULL) {
-			child = child->right;
-		}
-		if (free_cb != NULL) {
-			free_cb(node->data);
-			data_freed = true;
-		}
-		node->data = child->data;
-		node = child;
-	}
-
-	/* Node has at most one child */
-	/* Replace node by its child */
-	child = (node->left != NULL) ? node->left : node->right;
-	gds_rbtree_keyin_fast_replace_with_child(root, node, child);
-
-	/* Rebalance tree */
-	if (node->red == false) {
-		if (child != NULL && child->red == true) {
-			child->red = false;
-		} else {
-			gds_rbtree_keyin_fast_rebalance_after_delete(root, node->parent, child);
-		}
-	}
-
-	gds_rbtree_keyin_fast_node_free(node, data_freed ? NULL : free_cb);
-	return 0;
+	return not_in_tree;
 }
 
-void gds_rbtree_keyin_fast_free(gds_rbtree_keyin_fast_node_t *root, gds_free_cb free_cb)
+void gds_rbtree_keyin_fast_free(gds_rbtree_keyin_fast_node_t *root,
+	gds_free_cb free_cb)
 {
+	gds_rbtree_keyin_fast_node_t *node;
+
 	if (root != NULL) {
-		gds_rbtree_keyin_fast_free(root->left, free_cb);
-		gds_rbtree_keyin_fast_free(root->right, free_cb);
+		node = rbt_containerof(root->rbtree.left);
+		gds_rbtree_keyin_fast_free(node, free_cb);
+
+		node = rbt_containerof(root->rbtree.right);
+		gds_rbtree_keyin_fast_free(node, free_cb);
+
 		gds_rbtree_keyin_fast_node_free(root, free_cb);
 	}
 }
