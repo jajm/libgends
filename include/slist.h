@@ -97,7 +97,7 @@ gds_slist_add_list_after(
 gds_slist_node_t *
 gds_slist_get_nth_node(
 	gds_slist_node_t *head,
-	int32_t n
+	uint32_t n
 );
 
 /* Get last node of list */
