@@ -36,6 +36,13 @@ typedef int32_t (*gds_rbtf_cmp_key_cb)(
 	void *                              // user data
 );
 
+/* Change data of a red-black tree node */
+typedef void (*gds_rbtf_set_data_cb)(
+	gds_rbtree_fast_inline_node_t *,    // node
+	void *,                             // data
+	void *                              // user data
+);
+
 /* Replace a node by another one */
 /* Used during deletion. It should override node1's data by node2's data and
  * remove (free) node2 */
@@ -72,6 +79,31 @@ gds_rbtree_fast_inline_add(
 	void *rbtf_cmp_key_data,
 	gds_rbtf_create_node_cb rbtf_create_node_cb,
 	void *rbtf_create_node_data
+);
+
+/* Insert data or change it if it is already in the tree */
+/* root                  : root node of tree
+ * data                  : data to insert
+ * getkey_cb             : see documentation in callbacks.h
+ * rbtf_cmp_key_cb       : see above documentation about gds_rbtf_cmp_key_cb
+ * rbtf_cmp_key_data     : user data passed to rbtf_cmp_key_cb
+ * rbtf_create_node_cb   : see above documentation about gds_rbtf_create_node_cb
+ * rbtf_create_node_data : user data passed to rbtf_create_node_cb
+ * rbtf_set_data_cb      : see above documentation about gds_rbtf_set_data_cb
+ * rbtf_set_data_data    : user data passed to rbtf_set_data_cb */
+/* NOTE: root will be modified so it will always point to the root of tree after
+ * the function call. You should consider this when using this function. */
+void
+gds_rbtree_fast_inline_set(
+	gds_rbtree_fast_inline_node_t **root,
+	void *data,
+	gds_getkey_cb getkey_cb,
+	gds_rbtf_cmp_key_cb rbtf_cmp_key_cb,
+	void *rbtf_cmp_key_data,
+	gds_rbtf_create_node_cb rbtf_create_node_cb,
+	void *rbtf_create_node_data,
+	gds_rbtf_set_data_cb rbtf_set_data_cb,
+	void *rbtf_set_data_data
 );
 
 /* Search a node by key */

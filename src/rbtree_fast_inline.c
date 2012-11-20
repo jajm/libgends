@@ -230,6 +230,75 @@ int8_t gds_rbtree_fast_inline_add(gds_rbtree_fast_inline_node_t **root,
 	return (node != NULL) ? 0 : 1;
 }
 
+gds_rbtree_fast_inline_node_t * gds_rbtree_fast_inline_replace_or_insert_bottom(
+	gds_rbtree_fast_inline_node_t **root, void *data,
+	gds_getkey_cb getkey_cb, gds_rbtf_cmp_key_cb rbtf_cmp_key_cb,
+	void *rbtf_cmp_key_data, gds_rbtf_create_node_cb rbtf_create_node_cb,
+	void *rbtf_create_node_data, gds_rbtf_set_data_cb rbtf_set_data_cb,
+	void *rbtf_set_data_data)
+{
+	gds_rbtree_fast_inline_node_t *node = NULL, *tmp, *parent = NULL;
+	int32_t cmp;
+	void *key;
+
+	GDS_CHECK_ARG_NOT_NULL(root);
+	GDS_CHECK_ARG_NOT_NULL(getkey_cb);
+	GDS_CHECK_ARG_NOT_NULL(rbtf_cmp_key_cb);
+	GDS_CHECK_ARG_NOT_NULL(rbtf_create_node_cb);
+	GDS_CHECK_ARG_NOT_NULL(rbtf_set_data_cb);
+
+	key = getkey_cb(data);
+	tmp = *root;
+	while (tmp != NULL) {
+		parent = tmp;
+		cmp = rbtf_cmp_key_cb(key, tmp, rbtf_cmp_key_data);
+		if (cmp < 0) {
+			tmp = tmp->left;
+		} else if (cmp > 0) {
+			tmp = tmp->right;
+		} else {
+			break;
+		}
+	}
+
+	if (tmp != NULL) {
+		rbtf_set_data_cb(tmp, data, rbtf_set_data_data);
+	} else {
+		node = rbtf_create_node_cb(data, rbtf_create_node_data);
+		node->left = node->right = NULL;
+		node->parent = parent;
+		if (parent != NULL) {
+			if (cmp < 0) {
+				parent->left = node;
+			} else {
+				parent->right = node;
+			}
+		} else {
+			*root = node;
+		}
+	}
+
+	return node;
+}
+
+void gds_rbtree_fast_inline_set(gds_rbtree_fast_inline_node_t **root,
+	void *data, gds_getkey_cb getkey_cb,
+	gds_rbtf_cmp_key_cb rbtf_cmp_key_cb, void *rbtf_cmp_key_data,
+	gds_rbtf_create_node_cb rbtf_create_node_cb,
+	void *rbtf_create_node_data, gds_rbtf_set_data_cb rbtf_set_data_cb,
+	void *rbtf_set_data_data)
+{
+	gds_rbtree_fast_inline_node_t *node = NULL;
+
+	node = gds_rbtree_fast_inline_replace_or_insert_bottom(root, data,
+		getkey_cb, rbtf_cmp_key_cb, rbtf_cmp_key_data,
+		rbtf_create_node_cb, rbtf_create_node_data, rbtf_set_data_cb,
+		rbtf_set_data_data);
+	if (node != NULL) {
+		gds_rbtree_fast_inline_rebalance_after_insert(root, node);
+	}
+}
+
 gds_rbtree_fast_inline_node_t * gds_rbtree_fast_inline_get_node(
 	gds_rbtree_fast_inline_node_t *root, void *key,
 	gds_rbtf_cmp_key_cb rbtf_cmp_key_cb, void *rbtf_cmp_key_data)
