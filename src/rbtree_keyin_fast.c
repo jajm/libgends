@@ -21,21 +21,6 @@ typedef struct {
 	gds_cmpkey_cb cmpkey_cb;
 } gds_rbtree_keyin_callbacks_t;
 
-int32_t gds_rbtree_keyin_fast_node_cmp_data(void *data,
-	gds_rbtree_fast_inline_node_t *inode,
-	gds_rbtree_keyin_callbacks_t *callbacks)
-{
-	gds_rbtree_keyin_fast_node_t *node;
-	gds_getkey_cb getkey_cb;
-	gds_cmpkey_cb cmpkey_cb;
-
-	node = rbt_containerof(inode);
-	getkey_cb = callbacks->getkey_cb;
-	cmpkey_cb = callbacks->cmpkey_cb;
-
-	return cmpkey_cb(getkey_cb(data), getkey_cb(node->data));
-}
-
 int32_t gds_rbtree_keyin_fast_node_cmp_key(void *key,
 	gds_rbtree_fast_inline_node_t *inode,
 	gds_rbtree_keyin_callbacks_t *callbacks)
@@ -80,8 +65,8 @@ int8_t gds_rbtree_keyin_fast_add(gds_rbtree_keyin_fast_node_t **root,
 {
 	gds_rbtree_fast_inline_node_t *inode;
 	gds_rbtree_keyin_callbacks_t callbacks;
-	gds_rbtf_cmp_data_cb cmp_data_cb =
-		(gds_rbtf_cmp_data_cb) gds_rbtree_keyin_fast_node_cmp_data;
+	gds_rbtf_cmp_key_cb cmp_key_cb =
+		(gds_rbtf_cmp_key_cb) gds_rbtree_keyin_fast_node_cmp_key;
 	gds_rbtf_create_node_cb create_node_cb =
 		(gds_rbtf_create_node_cb) gds_rbtree_keyin_fast_create_node;
 	int8_t already_in_tree = 0;
@@ -98,7 +83,8 @@ int8_t gds_rbtree_keyin_fast_add(gds_rbtree_keyin_fast_node_t **root,
 		callbacks.cmpkey_cb = cmpkey_cb;
 		inode = &((*root)->rbtree);
 		already_in_tree = gds_rbtree_fast_inline_add(&inode, data,
-			cmp_data_cb, &callbacks, create_node_cb, alloc_cb);
+			getkey_cb, cmp_key_cb, &callbacks, create_node_cb,
+			alloc_cb);
 		*root = rbt_containerof(inode);
 	}
 

@@ -104,21 +104,24 @@ void gds_rbtree_fast_inline_node_init(gds_rbtree_fast_inline_node_t *node)
 
 gds_rbtree_fast_inline_node_t * gds_rbtree_fast_inline_insert_bottom(
 	gds_rbtree_fast_inline_node_t **root, void *data,
-	gds_rbtf_cmp_data_cb rbtf_cmp_data_cb, void *rbtf_cmp_data_data,
-	gds_rbtf_create_node_cb rbtf_create_node_cb,
+	gds_getkey_cb getkey_cb, gds_rbtf_cmp_key_cb rbtf_cmp_key_cb,
+	void *rbtf_cmp_key_data, gds_rbtf_create_node_cb rbtf_create_node_cb,
 	void *rbtf_create_node_data)
 {
 	gds_rbtree_fast_inline_node_t *node, *tmp, *parent = NULL;
 	int32_t cmp;
+	void *key;
 
 	GDS_CHECK_ARG_NOT_NULL(root);
-	GDS_CHECK_ARG_NOT_NULL(rbtf_cmp_data_cb);
+	GDS_CHECK_ARG_NOT_NULL(getkey_cb);
+	GDS_CHECK_ARG_NOT_NULL(rbtf_cmp_key_cb);
 	GDS_CHECK_ARG_NOT_NULL(rbtf_create_node_cb);
 
+	key = getkey_cb(data);
 	tmp = *root;
 	while (tmp != NULL) {
 		parent = tmp;
-		cmp = rbtf_cmp_data_cb(data, tmp, rbtf_cmp_data_data);
+		cmp = rbtf_cmp_key_cb(key, tmp, rbtf_cmp_key_data);
 		if (cmp < 0) {
 			tmp = tmp->left;
 		} else if (cmp > 0) {
@@ -210,14 +213,15 @@ void gds_rbtree_fast_inline_rebalance_after_insert(
 }
 
 int8_t gds_rbtree_fast_inline_add(gds_rbtree_fast_inline_node_t **root,
-	void *data, gds_rbtf_cmp_data_cb rbtf_cmp_data_cb,
-	void *rbtf_cmp_data_data, gds_rbtf_create_node_cb rbtf_create_node_cb,
+	void *data, gds_getkey_cb getkey_cb,
+	gds_rbtf_cmp_key_cb rbtf_cmp_key_cb, void *rbtf_cmp_key_data,
+	gds_rbtf_create_node_cb rbtf_create_node_cb,
 	void *rbtf_create_node_data)
 {
 	gds_rbtree_fast_inline_node_t *node = NULL;
 
-	node = gds_rbtree_fast_inline_insert_bottom(root, data,
-		rbtf_cmp_data_cb, rbtf_cmp_data_data, rbtf_create_node_cb,
+	node = gds_rbtree_fast_inline_insert_bottom(root, data, getkey_cb,
+		rbtf_cmp_key_cb, rbtf_cmp_key_data, rbtf_create_node_cb,
 		rbtf_create_node_data);
 	if (node != NULL) {
 		gds_rbtree_fast_inline_rebalance_after_insert(root, node);

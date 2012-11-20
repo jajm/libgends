@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include "callbacks.h"
 
 struct gds_rbtree_fast_inline_node_s {
 	_Bool red;
@@ -12,17 +13,6 @@ struct gds_rbtree_fast_inline_node_s {
 };
 
 typedef struct gds_rbtree_fast_inline_node_s gds_rbtree_fast_inline_node_t;
-
-/* Compare a data and a red-black tree node */
-/* Used during data insertion to determine where to place the future node. */
-/* Must return a negative value if data should go to the left of node,
- * zero if data is already contained in node, and a positive value if data
- * should go to the right of node. */
-typedef int32_t (*gds_rbtf_cmp_data_cb)(
-	void *,                             // data
-	gds_rbtree_fast_inline_node_t *,    // red-black tree node
-	void *                              // user data
-);
 
 /* Create a red-black tree node */
 /* Used during data insertion. It should create the node structure containing a
@@ -64,8 +54,9 @@ gds_rbtree_fast_inline_node_init(
 /* Insert data */
 /* root                  : root node of tree
  * data                  : data to insert
- * rbtf_cmp_data_cb      : see above documentation about gds_rbtf_cmp_data_cb
- * rbtf_cmp_data_data    : user data passed to rbtf_cmp_data_cb
+ * getkey_cb             : see documentation in callbacks.h
+ * rbtf_cmp_key_cb       : see above documentation about gds_rbtf_cmp_key_cb
+ * rbtf_cmp_key_data     : user data passed to rbtf_cmp_key_cb
  * rbtf_create_node_cb   : see above documentation about gds_rbtf_create_node_cb
  * rbtf_create_node_data : user data passed to rbtf_create_node_data */
 /* Return: 0 if data was successfully inserted
@@ -76,8 +67,9 @@ int8_t
 gds_rbtree_fast_inline_add(
 	gds_rbtree_fast_inline_node_t **root,
 	void *data,
-	gds_rbtf_cmp_data_cb rbtf_cmp_data_cb,
-	void *rbtf_cmp_data_data,
+	gds_getkey_cb getkey_cb,
+	gds_rbtf_cmp_key_cb rbtf_cmp_key_cb,
+	void *rbtf_cmp_key_data,
 	gds_rbtf_create_node_cb rbtf_create_node_cb,
 	void *rbtf_create_node_data
 );
