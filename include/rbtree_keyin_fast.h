@@ -30,6 +30,16 @@ gds_rbtree_keyin_fast_add(
 	gds_alloc_cb alloc_cb
 );
 
+void
+gds_rbtree_keyin_fast_set(
+	gds_rbtree_keyin_fast_node_t **root,
+	void *data,
+	gds_getkey_cb getkey_cb,
+	gds_cmpkey_cb cmpkey_cb,
+	gds_free_cb free_cb,
+	gds_alloc_cb alloc_cb
+);
+
 void *
 gds_rbtree_keyin_fast_get(
 	gds_rbtree_keyin_fast_node_t *root,
