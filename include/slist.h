@@ -35,41 +35,32 @@ extern "C" {
 
 /* Add new data at beginning of list */
 /* head     : address of pointer to first node of list
- * data     : pointer to data
- * alloc_cb : callback to allocation function, if you want the data to be
- *            copied. NULL otherwise. */
+ * data     : pointer to data */
 /* Return : pointer to the newly created node, or NULL if operation failed */
 gds_slist_node_t *
 gds_slist_add_first(
 	gds_slist_node_t **head,
-	void *data,
-	gds_alloc_cb alloc_cb
+	void *data
 );
 
 /* Add new data at end of list */
 /* head     : address of pointer to first node of list
- * data     : pointer to data
- * alloc_cb : callback to allocation function, if you want the data to be
- *            copied. NULL otherwise. */
+ * data     : pointer to data */
 /* Return : pointer to the newly created node, or NULL if operation failed */
 gds_slist_node_t *
 gds_slist_add_last(
 	gds_slist_node_t **head,
-	void *data,
-	gds_alloc_cb alloc_cb
+	void *data
 );
 
 /* Add new data after a given node */
 /* node     : pointer to the node that will precede the new node
- * data     : pointer to data
- * alloc_cb : callback to allocation function, if you want the data to be
- *            copied. NULL otherwise. */
+ * data     : pointer to data */
 /* Return : pointer to the newly created node, or NULL if operation failed */
 gds_slist_node_t *
 gds_slist_add_after(
 	gds_slist_node_t *node,
-	void *data,
-	gds_alloc_cb alloc_cb
+	void *data
 );
 
 void

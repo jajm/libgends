@@ -23,25 +23,20 @@ void t_rbtree_keyin_node_new(void)
 	test_t *t = test_new("key", 4);
 	gds_rbtree_keyin_node_t *n;
 
-	n = gds_rbtree_keyin_node_new(NULL, NULL);
+	n = gds_rbtree_keyin_node_new(NULL);
 	CU_ASSERT_PTR_NOT_NULL(n);
-	CU_ASSERT_PTR_NULL(gds_rbtree_keyin_node_get_data(n, NULL));
+	CU_ASSERT_PTR_NULL(gds_rbtree_keyin_node_get_data(n));
 	gds_rbtree_keyin_node_free(n, NULL);
 
-	n = gds_rbtree_keyin_node_new(NULL, (gds_alloc_cb)test_alloc);
-	CU_ASSERT_PTR_NOT_NULL(n);
-	CU_ASSERT_PTR_NULL(gds_rbtree_keyin_node_get_data(n, NULL));
-	gds_rbtree_keyin_node_free(n, NULL);
-	
-	n = gds_rbtree_keyin_node_new(t, NULL);
+	n = gds_rbtree_keyin_node_new(t);
 	CU_ASSERT_PTR_NOT_NULL(n)
-	CU_ASSERT_PTR_EQUAL(t, gds_rbtree_keyin_node_get_data(n, NULL));
+	CU_ASSERT_PTR_EQUAL(t, gds_rbtree_keyin_node_get_data(n));
 	gds_rbtree_keyin_node_free(n, NULL);
 	
-	n = gds_rbtree_keyin_node_new(t, (gds_alloc_cb)test_alloc);
+	n = gds_rbtree_keyin_node_new(test_alloc(t));
 	CU_ASSERT_PTR_NOT_NULL(n);
-	CU_ASSERT_PTR_NOT_NULL(gds_rbtree_keyin_node_get_data(n, NULL));
-	CU_ASSERT_PTR_NOT_EQUAL(t, gds_rbtree_keyin_node_get_data(n, NULL));
+	CU_ASSERT_PTR_NOT_NULL(gds_rbtree_keyin_node_get_data(n));
+	CU_ASSERT_PTR_NOT_EQUAL(t, gds_rbtree_keyin_node_get_data(n));
 	gds_rbtree_keyin_node_free(n, (gds_free_cb)test_free);
 
 	test_free(t);
@@ -54,26 +49,17 @@ void t_rbtree_keyin_node_get_data(void)
 	gds_rbtree_keyin_node_t *n;
 
 	t = test_new("key", 4);
-	n = gds_rbtree_keyin_node_new(t, NULL);
+	n = gds_rbtree_keyin_node_new(t);
 
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_node_get_data(NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_node_get_data(NULL, (gds_alloc_cb)test_alloc));
+	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_node_get_data(NULL));
 
-	data = gds_rbtree_keyin_node_get_data(n, NULL);
+	data = gds_rbtree_keyin_node_get_data(n);
 	CU_ASSERT_PTR_NOT_NULL(data);
 	CU_ASSERT_PTR_EQUAL(t, data);
 	CU_ASSERT_EQUAL(test_getvalue(t), test_getvalue(data));
 	CU_ASSERT_PTR_EQUAL(test_getkey(t), test_getkey(data));
 	CU_ASSERT(0 == test_cmpkey(test_getkey(t), test_getkey(data)));
 
-	data = gds_rbtree_keyin_node_get_data(n, (gds_alloc_cb)test_alloc);
-	CU_ASSERT_PTR_NOT_NULL(data);
-	CU_ASSERT_PTR_NOT_EQUAL(t, data);
-	CU_ASSERT_EQUAL(test_getvalue(t), test_getvalue(data));
-	CU_ASSERT_PTR_NOT_EQUAL(test_getkey(t), test_getkey(data));
-	CU_ASSERT(0 == test_cmpkey(test_getkey(t), test_getkey(data)));
-
-	test_free(data);
 	gds_rbtree_keyin_node_free(n, (gds_free_cb)test_free);
 }
 
@@ -81,40 +67,29 @@ void t_rbtree_keyin_node_set_data(void)
 {
 	test_t *t = test_new("key", 4);
 	gds_rbtree_keyin_node_t *n;
-	gds_alloc_cb alloc_cb = (gds_alloc_cb)test_alloc;
 	gds_free_cb free_cb = (gds_free_cb)test_free;
 
-	n = gds_rbtree_keyin_node_new(NULL, NULL);
+	n = gds_rbtree_keyin_node_new(NULL);
 
 	/* Returns always a negative value if first parameter is NULL */
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_rbtree_keyin_node_set_data(NULL, NULL, NULL    , NULL   ));
+		gds_rbtree_keyin_node_set_data(NULL, NULL, NULL   ));
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_rbtree_keyin_node_set_data(NULL, NULL, NULL    , free_cb));
+		gds_rbtree_keyin_node_set_data(NULL, NULL, free_cb));
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_rbtree_keyin_node_set_data(NULL, NULL, alloc_cb, NULL   ));
+		gds_rbtree_keyin_node_set_data(NULL, t   , NULL   ));
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_rbtree_keyin_node_set_data(NULL, NULL, alloc_cb, free_cb));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_rbtree_keyin_node_set_data(NULL, t   , NULL    , NULL   ));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_rbtree_keyin_node_set_data(NULL, t   , NULL    , free_cb));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_rbtree_keyin_node_set_data(NULL, t   , alloc_cb, NULL   ));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_rbtree_keyin_node_set_data(NULL, t   , alloc_cb, free_cb));
+		gds_rbtree_keyin_node_set_data(NULL, t   , free_cb));
 
 	/* Set NULL as data. */
-	CU_ASSERT(0 == gds_rbtree_keyin_node_set_data(n   , NULL, NULL    , NULL   ));
-	CU_ASSERT(0 == gds_rbtree_keyin_node_set_data(n   , NULL, alloc_cb, NULL   ));
-	CU_ASSERT(0 == gds_rbtree_keyin_node_set_data(n   , NULL, alloc_cb, free_cb));
-	CU_ASSERT(0 == gds_rbtree_keyin_node_set_data(n   , NULL, NULL    , free_cb));
+	CU_ASSERT(0 == gds_rbtree_keyin_node_set_data(n, NULL, NULL   ));
+	CU_ASSERT(0 == gds_rbtree_keyin_node_set_data(n, NULL, NULL   ));
+	CU_ASSERT(0 == gds_rbtree_keyin_node_set_data(n, NULL, free_cb));
+	CU_ASSERT(0 == gds_rbtree_keyin_node_set_data(n, NULL, free_cb));
 
 	/* Set t as data. */
-	CU_ASSERT(0 == gds_rbtree_keyin_node_set_data(n   , t   , NULL    , NULL   ));
-	CU_ASSERT(0 == gds_rbtree_keyin_node_set_data(n   , t   , alloc_cb, NULL   ));
-	CU_ASSERT(0 == gds_rbtree_keyin_node_set_data(n   , t   , alloc_cb, free_cb));
-	CU_ASSERT(0 == gds_rbtree_keyin_node_set_data(n   , t   , NULL    , free_cb));
+	CU_ASSERT(0 == gds_rbtree_keyin_node_set_data(n, test_alloc(t), NULL   ));
+	CU_ASSERT(0 == gds_rbtree_keyin_node_set_data(n, t, free_cb));
 
 	gds_rbtree_keyin_node_free(n, free_cb);
 }

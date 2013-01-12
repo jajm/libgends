@@ -67,7 +67,7 @@ uint32_t gds_hash_map_keyin_hash(gds_hash_map_keyin_t *h, void *key)
 }
 
 int8_t gds_hash_map_keyin_set(gds_hash_map_keyin_t *h, void *data,
-	gds_free_cb free_cb, gds_alloc_cb alloc_cb)
+	gds_free_cb free_cb)
 {
 	uint32_t hash;
 
@@ -75,11 +75,10 @@ int8_t gds_hash_map_keyin_set(gds_hash_map_keyin_t *h, void *data,
 
 	hash = gds_hash_map_keyin_hash(h, h->getkey_cb(data));
 	return gds_rbtree_keyin_set(&(h->map[hash]), data, h->getkey_cb,
-		h->cmpkey_cb, free_cb, alloc_cb);
+		h->cmpkey_cb, free_cb);
 }
 
-void * gds_hash_map_keyin_get(gds_hash_map_keyin_t *h, void *key,
-	gds_alloc_cb alloc_cb)
+void * gds_hash_map_keyin_get(gds_hash_map_keyin_t *h, void *key)
 {
 	uint32_t hash;
 	void *data;
@@ -89,7 +88,7 @@ void * gds_hash_map_keyin_get(gds_hash_map_keyin_t *h, void *key,
 	hash = gds_hash_map_keyin_hash(h, key);
 	data = h->map[hash]
 		? gds_rbtree_keyin_get(h->map[hash], key, h->getkey_cb,
-			h->cmpkey_cb, alloc_cb)
+			h->cmpkey_cb)
 		: NULL;
 	return data;
 }
@@ -109,8 +108,7 @@ int8_t gds_hash_map_keyin_unset(gds_hash_map_keyin_t *h, void *key,
 	return rv;
 }
 
-gds_slist_node_t * gds_hash_map_keyin_values(gds_hash_map_keyin_t *h,
-	gds_alloc_cb alloc_cb)
+gds_slist_node_t * gds_hash_map_keyin_values(gds_hash_map_keyin_t *h)
 {
 	gds_slist_node_t *l = NULL;
 	gds_slist_node_t *list;
@@ -119,7 +117,7 @@ gds_slist_node_t * gds_hash_map_keyin_values(gds_hash_map_keyin_t *h,
 	GDS_CHECK_ARG_NOT_NULL(h);
 
 	for (i = h->size; i > 0; i--) {
-		list = gds_rbtree_keyin_values(h->map[i-1], alloc_cb);
+		list = gds_rbtree_keyin_values(h->map[i-1]);
 		if (list != NULL) {
 			gds_slist_add_list_first(&l, list);
 		}
@@ -141,14 +139,14 @@ gds_rbtree_keyin_node_t ** gds_hash_map_keyin_build_map(gds_hash_map_keyin_t *h,
 	if (map == NULL) {
 		GDS_THROW_ALLOC_ERROR(sizeof(gds_rbtree_keyin_node_t *));
 	}
-	l = gds_hash_map_keyin_values(h, NULL);
+	l = gds_hash_map_keyin_values(h);
 	it = gds_slist_iterator_new(l);
 	gds_iterator_reset(it);
 	while (!gds_iterator_step(it)) {
 		data = gds_iterator_get(it);
 		hash = h->hash_cb(h->getkey_cb(data), size) % size;
 		gds_rbtree_keyin_add(&(map[hash]), data, h->getkey_cb,
-			h->cmpkey_cb, NULL);
+			h->cmpkey_cb);
 	}
 	gds_iterator_free(it);
 

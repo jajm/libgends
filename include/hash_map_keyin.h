@@ -59,34 +59,30 @@ gds_hash_map_keyin_new(
 /* Set a key/value pair in the hash map */
 /* If key already exists, old value is replaced by the new one */
 /*         h : pointer to the hash map
- *      data : data to insert
- *  alloc_cb : alloc callback */
+ *      data : data to insert */
 /* Return: 0: key was already in the hash map
  *         1: key was just added */
 int8_t
 gds_hash_map_keyin_set(
 	gds_hash_map_keyin_t *h,
 	void *data,
-	gds_free_cb free_cb,
-	gds_alloc_cb alloc_cb
+	gds_free_cb free_cb
 );
 
 /* Get a value given its key */
 /*         h : pointer to the hash map
- *       key : key to unset
- *  alloc_cb : alloc callback */
+ *       key : key to unset */
 /* Return: pointer to the data, or NULL if key doesn't exist */
 void *
 gds_hash_map_keyin_get(
 	gds_hash_map_keyin_t *h,
-	void *key,
-	gds_alloc_cb alloc_cb
+	void *key
 );
 
 /* Unset a key/value pair in the hash map */
 /*         h : pointer to the hash map
  *       key : key to unset
- *  alloc_cb : alloc callback */
+ *   free_cb : free callback */
 /* Return: 0: key was correctly unset
  *         1: key was not in the hash map */
 int8_t
@@ -97,19 +93,16 @@ gds_hash_map_keyin_unset(
 );
 
 /* Return values contained in the hash map as a list */
-/*         h : pointer to the hash map
- *  alloc_cb : alloc callback */
+/*         h : pointer to the hash map */
 /* Return: pointer to the list */
 gds_slist_node_t *
 gds_hash_map_keyin_values(
-	gds_hash_map_keyin_t *h,
-	gds_alloc_cb alloc_cb
+	gds_hash_map_keyin_t *h
 );
 
 /* Change the number of buckets of hash map */
 /*         h : pointer to the hash map
- *  new_size : New size (number of buckets)
- *  alloc_cb : alloc callback */
+ *  new_size : New size (number of buckets) */
 void
 gds_hash_map_keyin_change_size(
 	gds_hash_map_keyin_t *h,

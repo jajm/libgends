@@ -41,50 +41,35 @@ extern "C" {
 /* Create a new node */
 /*      data : pointer to the data
  * copy_data : true => make a copy of the data,
- *             false => just take the pointer value
- *  alloc_cb : function that takes a pointer and returns a copy of pointed
- *             data. Unused if copy_data is false */
+ *             false => just take the pointer value */
 /* Return: Success => pointer to the newly created node
  *         Failure => NULL*/
-	gds_dlist_node_t *
+gds_dlist_node_t *
 gds_dlist_node_new(
-	void *data,
-	gds_alloc_cb alloc_cb
+	void *data
 );
 
 /* Set a new value to an existing node */
 /*          node : pointer to the node
  *          data : pointer to the data
- * free_old_data : true => free memory taken by old value
- *                 false => don't free memory
  *       free_cb : pointer to a free function, can be NULL. In this case and
- *                 if free_old_data is true, call standard free() function.
- *     copy_data : true => copy the data
- *                 false => just take the pointer value
- *      alloc_cb : function that takes a pointer and return a copy of pointed
- *                 data. Unused if copy_data is false */
+ *                 if free_old_data is true, call standard free() function. */
 /* Return: Success => 0
  *         Failure => a negative value */
-	int8_t
+int8_t
 gds_dlist_node_set_data(
 	gds_dlist_node_t *node,
 	void *data,
-	gds_free_cb free_cb,
-	gds_alloc_cb alloc_cb
+	gds_free_cb free_cb
 );
 
 /* Get the node data */
-/*      node : pointer to the node
- * copy_data : true => return a pointer to a copy of the data
- *             false => return a direct pointer to the data
- *  alloc_cb : function that takes a pointer and returns a copy of pointed
- *             data. Unused if copy_data is false */
+/* node : pointer to the node */
 /* Return: Success => pointer to the data
  *         Failure => NULL */
-	void *
+void *
 gds_dlist_node_get_data(
-	gds_dlist_node_t *node,
-	gds_alloc_cb alloc_cb
+	gds_dlist_node_t *node
 );
 
 /* Set next node */
@@ -92,7 +77,7 @@ gds_dlist_node_get_data(
  * next : pointer to the future next node */
 /* Return: Success => 0
  *         Failure => a negative value */
-	int8_t
+int8_t
 gds_dlist_node_set_next(
 	gds_dlist_node_t *node,
 	gds_dlist_node_t *next
@@ -101,7 +86,7 @@ gds_dlist_node_set_next(
 /* Get next node */
 /* node : pointer to the node */
 /* Return: pointer to the next node */
-	gds_dlist_node_t *
+gds_dlist_node_t *
 gds_dlist_node_get_next(
 	gds_dlist_node_t *node
 );
@@ -111,7 +96,7 @@ gds_dlist_node_get_next(
  * prev : pointer to the future previous node */
 /* Return: Success => 0
  *         Failure => a negative value */
-	int8_t
+int8_t
 gds_dlist_node_set_prev(
 	gds_dlist_node_t *node,
 	gds_dlist_node_t *prev
@@ -120,18 +105,16 @@ gds_dlist_node_set_prev(
 /* Get previous node */
 /* node : pointer to the node */
 /* Return: pointer to the previous node */
-	gds_dlist_node_t *
+gds_dlist_node_t *
 gds_dlist_node_get_prev(
 	gds_dlist_node_t *node
 );
 
 /* Free a node */
-/*      node : pointer to the node
- * free_data : true => free data
- *             false => don't free memory occupied by data
- *   free_cb : pointer to a free function, can be NULL. In this case and if
- *             free_data is true, standard free() function is called. */
-	void
+/*    node : pointer to the node
+ * free_cb : pointer to a free function, can be NULL. In this case and if
+ *           free_data is true, standard free() function is called. */
+void
 gds_dlist_node_free(
 	gds_dlist_node_t *node,
 	gds_free_cb free_cb

@@ -38,43 +38,34 @@ extern "C" {
 #endif
 
 /* Create a new node */
-/*     data : pointer to the data
- * alloc_cb : function that take a pointer and returns a copy of pointed
- *            data. The copy is stored in the node. NULL to disable copy */
+/*     data : pointer to the data */
 /* Return: Success => pointer to the newly created node
  *         Failure => NULL */
 gds_slist_node_t *
 gds_slist_node_new(
-	void *data,
-	gds_alloc_cb alloc_cb
+	void *data
 );
 
 /* Set a new value to an existing node */
 /*     node : pointer to the node
  *     data : pointer to the data
  *  free_cb : function that takes a pointer and free pointed data.
- *            NULL to disable freeing old data
- * alloc_cb : function that takes a pointer and returns a copy of pointed
- *            data. The copy is stored in the node. NULL to disable copy */
+ *            NULL to disable freeing old data */
 /* Return: Success => 0
  *         Failure => a negative value */
 int8_t
 gds_slist_node_set_data(
 	gds_slist_node_t *node,
 	void *data,
-	gds_free_cb free_cb,
-	gds_alloc_cb alloc_cb
+	gds_free_cb free_cb
 );
 
 /* Get the node data */
-/*     node : pointer to the node
- * alloc_cb : function that takes a pointer and returns a copy of pointed
- *             data. The copy is returned. NULL to disable copy */
+/*     node : pointer to the node */
 /* Return: pointer to the data */
 void *
 gds_slist_node_get_data(
-	gds_slist_node_t *node,
-	gds_alloc_cb alloc_cb
+	gds_slist_node_t *node
 );
 
 /* Set next node */

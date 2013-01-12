@@ -22,9 +22,8 @@ typedef struct {
 	gds_cmpkey_cb cmpkey_cb;
 } gds_rbtree_keyin_callbacks_t;
 
-int32_t gds_rbtree_keyin_node_cmp_with_key(
-	gds_rbtree_inline_node_t *inode, void *key,
-	gds_rbtree_keyin_callbacks_t *callbacks)
+int32_t gds_rbtree_keyin_node_cmp_with_key(gds_rbtree_inline_node_t *inode,
+	void *key, gds_rbtree_keyin_callbacks_t *callbacks)
 {
 	gds_rbtree_keyin_node_t *node;
 	int32_t cmp;
@@ -65,7 +64,7 @@ void gds_rbtree_keyin_node_replace(gds_rbtree_inline_node_t *inode1,
 }
 
 int8_t gds_rbtree_keyin_add(gds_rbtree_keyin_node_t **root, void *data,
-	gds_getkey_cb getkey_cb, gds_cmpkey_cb cmpkey_cb, gds_alloc_cb alloc_cb)
+	gds_getkey_cb getkey_cb, gds_cmpkey_cb cmpkey_cb)
 {
 	gds_rbtree_keyin_node_t *node;
 	gds_rbtree_keyin_callbacks_t callbacks;
@@ -80,7 +79,7 @@ int8_t gds_rbtree_keyin_add(gds_rbtree_keyin_node_t **root, void *data,
 	callbacks.cmpkey_cb = cmpkey_cb;
 
 	if (*root == NULL) {
-		*root = gds_rbtree_keyin_node_new(data, alloc_cb);
+		*root = gds_rbtree_keyin_node_new(data);
 		(*root)->rbtree.red = false;
 		added = 1;
 	} else {
@@ -88,10 +87,9 @@ int8_t gds_rbtree_keyin_add(gds_rbtree_keyin_node_t **root, void *data,
 			getkey_cb(data), (gds_rbt_cmp_with_key_cb)
 			gds_rbtree_keyin_node_cmp_with_key, &callbacks);
 		if (inode == NULL) {
-			node = gds_rbtree_keyin_node_new(data, alloc_cb);
+			node = gds_rbtree_keyin_node_new(data);
 			inode = &((*root)->rbtree);
-			added = gds_rbtree_inline_add(
-				&inode, &(node->rbtree),
+			added = gds_rbtree_inline_add(&inode, &(node->rbtree),
 				(gds_rbt_cmp_cb)gds_rbtree_keyin_node_cmp,
 				&callbacks);
 			*root = rbt_containerof(inode);
@@ -126,7 +124,7 @@ gds_rbtree_keyin_node_t * gds_rbtree_keyin_get_node(
 }
 
 void * gds_rbtree_keyin_get(gds_rbtree_keyin_node_t *root, void *key,
-	gds_getkey_cb getkey_cb, gds_cmpkey_cb cmpkey_cb, gds_alloc_cb alloc_cb)
+	gds_getkey_cb getkey_cb, gds_cmpkey_cb cmpkey_cb)
 {
 	gds_rbtree_keyin_node_t *node;
 
@@ -135,13 +133,12 @@ void * gds_rbtree_keyin_get(gds_rbtree_keyin_node_t *root, void *key,
 	if (node == NULL) {
 		return NULL;
 	} else {
-		return gds_rbtree_keyin_node_get_data(node, alloc_cb);
+		return gds_rbtree_keyin_node_get_data(node);
 	}
 }
 
 int8_t gds_rbtree_keyin_set(gds_rbtree_keyin_node_t **root, void *data,
-	gds_getkey_cb getkey_cb, gds_cmpkey_cb cmpkey_cb, gds_free_cb free_cb,
-	gds_alloc_cb alloc_cb)
+	gds_getkey_cb getkey_cb, gds_cmpkey_cb cmpkey_cb, gds_free_cb free_cb)
 {
 	void *key;
 	gds_rbtree_keyin_node_t *node;
@@ -158,16 +155,11 @@ int8_t gds_rbtree_keyin_set(gds_rbtree_keyin_node_t **root, void *data,
 		if (free_cb != NULL) {
 			free_cb(node->data);
 		}
-		if (alloc_cb != NULL) {
-			node->data = alloc_cb(data);
-		} else {
-			node->data = data;
-		}
+		node->data = data;
 		ret = 0;
 	} else {
 		/* Node not found: add a new node */
-		gds_rbtree_keyin_add(root, data, getkey_cb, cmpkey_cb,
-			alloc_cb);
+		gds_rbtree_keyin_add(root, data, getkey_cb, cmpkey_cb);
 		ret = 1;
 	}
 
@@ -203,8 +195,7 @@ int8_t gds_rbtree_keyin_del(gds_rbtree_keyin_node_t **root, void *key,
 	return deleted ? 0 : 1;
 }
 
-void gds_rbtree_keyin_free(gds_rbtree_keyin_node_t *root,
-	gds_free_cb free_cb)
+void gds_rbtree_keyin_free(gds_rbtree_keyin_node_t *root, gds_free_cb free_cb)
 {
 	gds_rbtree_keyin_node_t *node;
 
@@ -220,23 +211,22 @@ void gds_rbtree_keyin_free(gds_rbtree_keyin_node_t *root,
 }
 
 void gds_rbtree_keyin_build_values_list(gds_rbtree_keyin_node_t *root,
-	gds_alloc_cb alloc_cb, gds_slist_node_t **head)
+	gds_slist_node_t **head)
 {
 	if (root != NULL) {
 		gds_rbtree_keyin_build_values_list(
-			rbt_containerof(root->rbtree.son[1]), alloc_cb, head);
-		gds_slist_add_first(head, root->data, alloc_cb);
+			rbt_containerof(root->rbtree.son[1]), head);
+		gds_slist_add_first(head, root->data);
 		gds_rbtree_keyin_build_values_list(
-			rbt_containerof(root->rbtree.son[0]), alloc_cb, head);
+			rbt_containerof(root->rbtree.son[0]), head);
 	}
 }
 
-gds_slist_node_t * gds_rbtree_keyin_values(gds_rbtree_keyin_node_t *root,
-	gds_alloc_cb alloc_cb)
+gds_slist_node_t * gds_rbtree_keyin_values(gds_rbtree_keyin_node_t *root)
 {
 	gds_slist_node_t *head = NULL;
 
-	gds_rbtree_keyin_build_values_list(root, alloc_cb, &head);
+	gds_rbtree_keyin_build_values_list(root, &head);
 
 	return head;
 }

@@ -110,7 +110,7 @@ int main()
 	test_t *t;
 	for(i=0; i<max; i++) {
 		t = test_new(i);
-		gds_rbtree_keyin_add(&croot, t, getkey_cb, cmpkey_cb, NULL);
+		gds_rbtree_keyin_add(&croot, t, getkey_cb, cmpkey_cb);
 	}
 	gettimeofday(&end, NULL);
 	timeval_diff(&start, &end, &diff);
@@ -118,8 +118,7 @@ int main()
 	printf("\tGetting %ld nodes...\n", max);
 	gettimeofday(&start, NULL);
 	for(i=0; i<max; i++) {
-		gds_rbtree_keyin_get(croot, (void *)i, getkey_cb, cmpkey_cb,
-			NULL);
+		gds_rbtree_keyin_get(croot, (void *)i, getkey_cb, cmpkey_cb);
 	}
 	gettimeofday(&end, NULL);
 	timeval_diff(&start, &end, &diff);
@@ -145,7 +144,7 @@ int main()
 	gds_rbtree_keyin_fast_node_t *root = NULL;
 	for(i=0; i<max; i++) {
 		t = test_new(i);
-		gds_rbtree_keyin_fast_add(&root, t, getkey_cb, cmpkey_cb, NULL);
+		gds_rbtree_keyin_fast_add(&root, t, getkey_cb, cmpkey_cb);
 	}
 	gettimeofday(&end, NULL);
 	timeval_diff(&start, &end, &diff);
@@ -153,7 +152,7 @@ int main()
 	printf("\tGetting %ld nodes...\n", max);
 	gettimeofday(&start, NULL);
 	for(i=0; i<max; i++) {
-		gds_rbtree_keyin_fast_get(root, (void *)i, getkey_cb, cmpkey_cb, NULL);
+		gds_rbtree_keyin_fast_get(root, (void *)i, getkey_cb, cmpkey_cb);
 	}
 	gettimeofday(&end, NULL);
 	timeval_diff(&start, &end, &diff);

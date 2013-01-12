@@ -15,27 +15,19 @@ typedef struct gds_rbtree_keyin_fast_node_s gds_rbtree_keyin_fast_node_t;
 
 gds_rbtree_keyin_fast_node_t *
 gds_rbtree_keyin_fast_node_new(
-	void *data,
-	gds_alloc_cb alloc_cb
+	void *data
 );
 
 void *
 gds_rbtree_keyin_fast_node_get_data(
-	gds_rbtree_keyin_fast_node_t *node,
-	gds_alloc_cb alloc_cb
+	gds_rbtree_keyin_fast_node_t *node
 );
 
 int8_t
 gds_rbtree_keyin_fast_node_set_data(
 	gds_rbtree_keyin_fast_node_t *node,
 	void *data,
-	gds_alloc_cb alloc_cb,
 	gds_free_cb free_cb
-);
-
-bool
-gds_rbtree_keyin_fast_node_is_red(
-	gds_rbtree_keyin_fast_node_t *node
 );
 
 void

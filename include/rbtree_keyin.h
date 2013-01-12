@@ -11,8 +11,7 @@ gds_rbtree_keyin_add(
 	gds_rbtree_keyin_node_t **root,
 	void *data,
 	gds_getkey_cb getkey_cb,
-	gds_cmpkey_cb cmpkey_cb,
-	gds_alloc_cb alloc_cb
+	gds_cmpkey_cb cmpkey_cb
 );
 
 int8_t
@@ -21,8 +20,7 @@ gds_rbtree_keyin_set(
 	void *data,
 	gds_getkey_cb getkey_cb,
 	gds_cmpkey_cb cmpkey_cb,
-	gds_free_cb free_cb,
-	gds_alloc_cb alloc_cb
+	gds_free_cb free_cb
 );
 
 void *
@@ -30,8 +28,7 @@ gds_rbtree_keyin_get(
 	gds_rbtree_keyin_node_t *root,
 	void *key,
 	gds_getkey_cb getkey_cb,
-	gds_cmpkey_cb cmpkey_cb,
-	gds_alloc_cb alloc_cb
+	gds_cmpkey_cb cmpkey_cb
 );
 
 int8_t
@@ -51,8 +48,7 @@ gds_rbtree_keyin_free(
 
 gds_slist_node_t *
 gds_rbtree_keyin_values(
-	gds_rbtree_keyin_node_t *root,
-	gds_alloc_cb alloc_cb
+	gds_rbtree_keyin_node_t *root
 );
 
 #endif /* Not defined rbtree_keyin_h_included */

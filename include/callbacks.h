@@ -3,12 +3,6 @@
 
 #include <stdint.h>
 
-/* Callback: gds_alloc_cb */
-/* Purpose: Make a copy of an object */
-/* 1st parameter: pointer to object */
-/* Should returns: pointer to a copy of object */
-typedef void * (*gds_alloc_cb)(void *);
-
 /* Callback: gds_free_cb */
 /* Purpose: Free memory used by an object */
 /* 1st parameter: pointer to object */

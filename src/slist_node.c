@@ -30,7 +30,7 @@
 #include "slist_node.h"
 #include "callbacks.h"
 
-gds_slist_node_t *gds_slist_node_new(void *data, gds_alloc_cb alloc_cb)
+gds_slist_node_t *gds_slist_node_new(void *data)
 {
 	gds_slist_node_t *node;
 
@@ -41,11 +41,7 @@ gds_slist_node_t *gds_slist_node_new(void *data, gds_alloc_cb alloc_cb)
 		GDS_THROW(NotEnoughMemoryException, "failed to allocate %d "
 			"bytes", sizeof(gds_slist_node_t));
 	}
-	if (alloc_cb != NULL) {
-		node->data = alloc_cb(data);
-	} else {
-		node->data = data;
-	}
+	node->data = data;
 	node->next = NULL;
 
 	return node;
@@ -53,7 +49,7 @@ gds_slist_node_t *gds_slist_node_new(void *data, gds_alloc_cb alloc_cb)
 
 
 int8_t gds_slist_node_set_data(gds_slist_node_t *node, void *data,
-	gds_free_cb free_cb, gds_alloc_cb alloc_cb)
+	gds_free_cb free_cb)
 {
 	GDS_CHECK_ARG_NOT_NULL(node);
 	GDS_CHECK_ARG_NOT_NULL(data);
@@ -62,26 +58,18 @@ int8_t gds_slist_node_set_data(gds_slist_node_t *node, void *data,
 		free_cb(node->data);
 	}
 
-	if (alloc_cb != NULL) {
-		node->data = alloc_cb(data);
-	} else {
-		node->data = data;
-	}
+	node->data = data;
 
 	return 0;
 }
 
-void *gds_slist_node_get_data(gds_slist_node_t *node, gds_alloc_cb alloc_cb)
+void *gds_slist_node_get_data(gds_slist_node_t *node)
 {
 	void *data;
 
 	GDS_CHECK_ARG_NOT_NULL(node);
 
-	if (alloc_cb) {
-		data = alloc_cb(node->data);
-	} else {
-		data = node->data;
-	}
+	data = node->data;
 
 	return data;
 }

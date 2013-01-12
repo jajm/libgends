@@ -7,28 +7,26 @@
 #include "slist_node.h"
 #include "slist.h"
 
-gds_slist_node_t * gds_slist_add_first(gds_slist_node_t **head, void *data,
-	gds_alloc_cb alloc_cb)
+gds_slist_node_t * gds_slist_add_first(gds_slist_node_t **head, void *data)
 {
 	gds_slist_node_t *n;
 
 	GDS_CHECK_ARG_NOT_NULL(head);
 
-	n = gds_slist_node_new(data, alloc_cb);
+	n = gds_slist_node_new(data);
 	n->next = *head;
 	*head = n;
 
 	return n;
 }
 
-gds_slist_node_t * gds_slist_add_last(gds_slist_node_t **head, void *data,
-	gds_alloc_cb alloc_cb)
+gds_slist_node_t * gds_slist_add_last(gds_slist_node_t **head, void *data)
 {
 	gds_slist_node_t *n, *tmp;
 
 	GDS_CHECK_ARG_NOT_NULL(head);
 
-	n = gds_slist_node_new(data, alloc_cb);
+	n = gds_slist_node_new(data);
 
 	if (*head != NULL) {
 		tmp = *head;
@@ -43,12 +41,11 @@ gds_slist_node_t * gds_slist_add_last(gds_slist_node_t **head, void *data,
 	return n;
 }
 
-gds_slist_node_t * gds_slist_add_after(gds_slist_node_t *node, void *data,
-	gds_alloc_cb alloc_cb)
+gds_slist_node_t * gds_slist_add_after(gds_slist_node_t *node, void *data)
 {
 	gds_slist_node_t *n;
 
-	n = gds_slist_node_new(data, alloc_cb);
+	n = gds_slist_node_new(data);
 		
 	if (node != NULL) {
 		n->next = node->next;
@@ -58,8 +55,7 @@ gds_slist_node_t * gds_slist_add_after(gds_slist_node_t *node, void *data,
 	return n;
 }
 
-void gds_slist_add_list_first(gds_slist_node_t **head,
-	gds_slist_node_t *list)
+void gds_slist_add_list_first(gds_slist_node_t **head, gds_slist_node_t *list)
 {
 	gds_slist_node_t *node;
 	GDS_CHECK_ARG_NOT_NULL(head);
@@ -73,8 +69,7 @@ void gds_slist_add_list_first(gds_slist_node_t **head,
 	*head = list;
 }
 
-void gds_slist_add_list_last(gds_slist_node_t **head,
-	gds_slist_node_t *list)
+void gds_slist_add_list_last(gds_slist_node_t **head, gds_slist_node_t *list)
 {
 	gds_slist_node_t *node;
 	GDS_CHECK_ARG_NOT_NULL(head);
@@ -91,8 +86,7 @@ void gds_slist_add_list_last(gds_slist_node_t **head,
 	}
 }
 
-void gds_slist_add_list_after(gds_slist_node_t *node,
-	gds_slist_node_t *list)
+void gds_slist_add_list_after(gds_slist_node_t *node, gds_slist_node_t *list)
 {
 	gds_slist_node_t *n;
 	GDS_CHECK_ARG_NOT_NULL(node);
@@ -232,7 +226,7 @@ void * gds_slist_iterator_get(gds_slist_iterator_data_t *it_data)
 {
 	GDS_CHECK_ARG_NOT_NULL(it_data);
 
-	return gds_slist_node_get_data(it_data->cur, NULL);
+	return gds_slist_node_get_data(it_data->cur);
 }
 
 gds_iterator_t * gds_slist_iterator_new(gds_slist_node_t *head)
