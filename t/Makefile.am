@@ -2,7 +2,7 @@ if CUNIT_TESTS
 SUBDIRS = cunit
 endif
 
-AM_CPPFLAGS = -I../include \
+AM_CPPFLAGS = -I../include -I../src \
 	`pkg-config --cflags libexception lll`
 AM_CFLAGS = -Wall -Wextra -Werror -std=c99
 AM_LDFLAGS = `pkg-config --libs libexception lll`
