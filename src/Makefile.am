@@ -11,10 +11,7 @@ libgends_la_SOURCES = \
 	rbtree.c rbtree_node.c \
 	rbtree_keyin.c rbtree_keyin_node.c \
 	rbtree_keyin_fast.c rbtree_keyin_fast_node.c \
-	hash_map.c hash_map_keyin.c \
-	func_list.c types.c \
-	typed_container.c typed_slist.c typed_dlist.c typed_stack.c \
-	typed_hash_map.c
+	hash_map.c hash_map_keyin.c
 
 libgends_la_LDFLAGS = -lexception -llll \
 	-version-info ${LIBGENDS_CUR}:${LIBGENDS_REV}:${LIBGENDS_AGE}
