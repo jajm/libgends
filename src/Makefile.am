@@ -4,7 +4,7 @@ AM_CFLAGS = -Wall -Wextra -Werror -std=c99
 lib_LTLIBRARIES = libgends.la
 
 libgends_la_SOURCES = \
-	log.c iterator.c \
+	iterator.c \
 	slist_node.c slist.c \
 	dlist_node.c \
 	rbtree_inline.c rbtree_fast_inline.c \

@@ -22,43 +22,37 @@
  * Short description    : libgends logging system                            *
  *****************************************************************************/
 
-#ifndef log_h_included
-#define log_h_included
+#ifndef gds_log_h_included
+#define gds_log_h_included
 
 #include <stdint.h>
+#include <stdlib.h>
 #include <lll/lll.h>
 
-#define GDS_LOG_LEVEL_FATAL 1
-#define GDS_LOG_LEVEL_ERROR 2
-#define GDS_LOG_LEVEL_WARNING 3
-#define GDS_LOG_LEVEL_INFO 4
-#define GDS_LOG_LEVEL_DEBUG 5
-
-void gds_log_init(uint8_t level);
-
-uint8_t gds_log_get_level(void);
-const char * gds_log_get_level_str(uint8_t level);
-
-#define gds_log(level, ...) \
-	if (level <= gds_log_get_level()) \
+#define gds_log(level, level_str, ...) do { \
+	char *verbosity_str = getenv("LIBGENDS_VERBOSITY"); \
+	int verbosity = verbosity_str ? atoi(verbosity_str) : 0; \
+	if (level <= verbosity) { \
 		lll_fprint(stderr, "[%T][libgends]?0|$0:|| %m at $1:$2 ($3)", \
-			"%s", gds_log_get_level_str(level), "%s", __FILE__, \
-			"%d", __LINE__, "%s", __func__, NULL, NULL, __VA_ARGS__)
+			"%s", level_str, "%s", __FILE__, "%d", __LINE__, \
+			"%s", __func__, NULL, NULL, __VA_ARGS__); \
+	} \
+} while(0)
 
 #define GDS_LOG_FATAL(...) \
-	gds_log(GDS_LOG_LEVEL_FATAL, __VA_ARGS__)
+	gds_log(1, "fatal", __VA_ARGS__)
 
 #define GDS_LOG_ERROR(...) \
-	gds_log(GDS_LOG_LEVEL_ERROR, __VA_ARGS__)
+	gds_log(2, "error", __VA_ARGS__)
 
 #define GDS_LOG_WARNING(...) \
-	gds_log(GDS_LOG_LEVEL_WARNING, __VA_ARGS__)
+	gds_log(3, "warning", __VA_ARGS__)
 
 #define GDS_LOG_INFO(...) \
-	gds_log(GDS_LOG_LEVEL_INFO, __VA_ARGS__)
+	gds_log(4, "info", __VA_ARGS__)
 
 #define GDS_LOG_DEBUG(...) \
-	gds_log(GDS_LOG_LEVEL_DEBUG, __VA_ARGS__)
+	gds_log(5, "debug", __VA_ARGS__)
 
-#endif /* log_h_included */
+#endif /* gds_log_h_included */
 
