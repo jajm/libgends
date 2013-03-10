@@ -211,23 +211,23 @@ void gds_rbtree_keyin_free(gds_rbtree_keyin_node_t *root, gds_free_cb free_cb)
 }
 
 void gds_rbtree_keyin_build_values_list(gds_rbtree_keyin_node_t *root,
-	gds_slist_node_t **head)
+	gds_slist_t *list)
 {
 	if (root != NULL) {
 		gds_rbtree_keyin_build_values_list(
-			rbt_containerof(root->rbtree.son[1]), head);
-		gds_slist_add_first(head, root->data);
+			rbt_containerof(root->rbtree.son[1]), list);
+		gds_slist_unshift(list, root->data);
 		gds_rbtree_keyin_build_values_list(
-			rbt_containerof(root->rbtree.son[0]), head);
+			rbt_containerof(root->rbtree.son[0]), list);
 	}
 }
 
-gds_slist_node_t * gds_rbtree_keyin_values(gds_rbtree_keyin_node_t *root)
+gds_slist_t * gds_rbtree_keyin_values(gds_rbtree_keyin_node_t *root)
 {
-	gds_slist_node_t *head = NULL;
+	gds_slist_t *list = gds_slist_new();
 
-	gds_rbtree_keyin_build_values_list(root, &head);
+	gds_rbtree_keyin_build_values_list(root, list);
 
-	return head;
+	return list;
 }
 

@@ -4,6 +4,7 @@ AM_CFLAGS = -Wall -Wextra -Werror -std=c99
 lib_LTLIBRARIES = libgends.la
 
 libgends_la_SOURCES = \
+	inline/slist.c \
 	iterator.c \
 	slist_node.c slist.c \
 	dlist_node.c \

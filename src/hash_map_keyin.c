@@ -108,10 +108,10 @@ int8_t gds_hash_map_keyin_unset(gds_hash_map_keyin_t *h, void *key,
 	return rv;
 }
 
-gds_slist_node_t * gds_hash_map_keyin_values(gds_hash_map_keyin_t *h)
+gds_slist_t * gds_hash_map_keyin_values(gds_hash_map_keyin_t *h)
 {
-	gds_slist_node_t *l = NULL;
-	gds_slist_node_t *list;
+	gds_slist_t *l = gds_slist_new();
+	gds_slist_t *list;
 	uint32_t i;
 
 	GDS_CHECK_ARG_NOT_NULL(h);
@@ -119,7 +119,7 @@ gds_slist_node_t * gds_hash_map_keyin_values(gds_hash_map_keyin_t *h)
 	for (i = h->size; i > 0; i--) {
 		list = gds_rbtree_keyin_values(h->map[i-1]);
 		if (list != NULL) {
-			gds_slist_add_list_first(&l, list);
+			gds_slist_unshift(l, list);
 		}
 	}
 
@@ -130,7 +130,7 @@ gds_rbtree_keyin_node_t ** gds_hash_map_keyin_build_map(gds_hash_map_keyin_t *h,
 	uint32_t size)
 {
 	gds_rbtree_keyin_node_t **map;
-	gds_slist_node_t *l;
+	gds_slist_t *l;
 	gds_iterator_t *it;
 	void *data;
 	uint32_t hash;

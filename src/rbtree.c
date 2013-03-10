@@ -202,55 +202,55 @@ void gds_rbtree_free(gds_rbtree_node_t *root, gds_free_cb key_free_cb,
 }
 
 void gds_rbtree_build_keys_list(gds_rbtree_node_t *root,
-	gds_slist_node_t **head)
+	gds_slist_t *list)
 {
 	if (root != NULL) {
 		gds_rbtree_build_keys_list(rbt_containerof(
-			root->rbtree.son[1]), head);
-		gds_slist_add_first(head, root->key);
+			root->rbtree.son[1]), list);
+		gds_slist_unshift(list, root->key);
 		gds_rbtree_build_keys_list(rbt_containerof(
-			root->rbtree.son[0]), head);
+			root->rbtree.son[0]), list);
 	}
 }
 
-gds_slist_node_t * gds_rbtree_keys(gds_rbtree_node_t *root)
+gds_slist_t * gds_rbtree_keys(gds_rbtree_node_t *root)
 {
-	gds_slist_node_t *head = NULL;
+	gds_slist_t *list = gds_slist_new();
 
-	gds_rbtree_build_keys_list(root, &head);
+	gds_rbtree_build_keys_list(root, list);
 
-	return head;
+	return list;
 }
 
 void gds_rbtree_build_values_list(gds_rbtree_node_t *root,
-	gds_slist_node_t **head)
+	gds_slist_t *list)
 {
 	if (root != NULL) {
 		gds_rbtree_build_values_list(
-			rbt_containerof(root->rbtree.son[1]), head);
-		gds_slist_add_first(head, root->data);
+			rbt_containerof(root->rbtree.son[1]), list);
+		gds_slist_unshift(list, root->data);
 		gds_rbtree_build_values_list(
-			rbt_containerof(root->rbtree.son[0]), head);
+			rbt_containerof(root->rbtree.son[0]), list);
 	}
 }
 
-gds_slist_node_t * gds_rbtree_values(gds_rbtree_node_t *root)
+gds_slist_t * gds_rbtree_values(gds_rbtree_node_t *root)
 {
-	gds_slist_node_t *head = NULL;
+	gds_slist_t *list = gds_slist_new();
 
-	gds_rbtree_build_values_list(root, &head);
+	gds_rbtree_build_values_list(root, list);
 
-	return head;
+	return list;
 }
 
 void gds_rbtree_build_keys_values_list(gds_rbtree_node_t *root,
-	gds_slist_node_t **head)
+	gds_slist_t *list)
 {
 	gds_key_value_t *kv;
 
 	if (root != NULL) {
 		gds_rbtree_build_keys_values_list(
-			rbt_containerof(root->rbtree.son[1]), head);
+			rbt_containerof(root->rbtree.son[1]), list);
 
 		kv = malloc(sizeof(gds_key_value_t));
 		if (kv == NULL) {
@@ -259,19 +259,19 @@ void gds_rbtree_build_keys_values_list(gds_rbtree_node_t *root,
 
 		kv->key = root->key;
 		kv->value = root->data;
-		gds_slist_add_first(head, kv);
+		gds_slist_unshift(list, kv);
 
 		gds_rbtree_build_keys_values_list(
-			rbt_containerof(root->rbtree.son[0]), head);
+			rbt_containerof(root->rbtree.son[0]), list);
 	}
 }
 
-gds_slist_node_t * gds_rbtree_keys_values(gds_rbtree_node_t *root)
+gds_slist_t * gds_rbtree_keys_values(gds_rbtree_node_t *root)
 {
-	gds_slist_node_t *head = NULL;
+	gds_slist_t *list = gds_slist_new();
 
-	gds_rbtree_build_keys_values_list(root, &head);
+	gds_rbtree_build_keys_values_list(root, list);
 
-	return head;
+	return list;
 }
 

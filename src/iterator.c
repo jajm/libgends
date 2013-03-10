@@ -68,6 +68,8 @@ gds_iterator_t *gds_iterator_new(void *data, gds_iterator_reset_cb reset_cb,
 	it->get_cb = get_cb;
 	it->free_cb = free_cb;
 
+	gds_iterator_reset(it);
+
 	return it;
 }
 

@@ -29,6 +29,27 @@
 #include "log.h"
 #include "slist_node.h"
 #include "callbacks.h"
+#include "container_of.h"
+
+gds_slist_node_t * gds_slist_node_get_container_of(
+	gds_inline_slist_node_t *node_inline)
+{
+	gds_slist_node_t *node = NULL;
+
+	if (node_inline) {
+		node = container_of(node_inline, gds_slist_node_t,
+			slist_node_inline);
+	}
+
+	return node;
+}
+
+gds_inline_slist_node_t *gds_slist_node_get_inline(gds_slist_node_t *node)
+{
+	GDS_CHECK_ARG_NOT_NULL(node);
+
+	return &(node->slist_node_inline);
+}
 
 gds_slist_node_t *gds_slist_node_new(void *data)
 {
@@ -42,20 +63,21 @@ gds_slist_node_t *gds_slist_node_new(void *data)
 			"bytes", sizeof(gds_slist_node_t));
 	}
 	node->data = data;
-	node->next = NULL;
+	gds_inline_slist_node_init(&(node->slist_node_inline));
 
 	return node;
 }
 
 
 int8_t gds_slist_node_set_data(gds_slist_node_t *node, void *data,
-	gds_free_cb free_cb)
+	void *callback, void *callback_data)
 {
-	GDS_CHECK_ARG_NOT_NULL(node);
-	GDS_CHECK_ARG_NOT_NULL(data);
+	void (*cb)(void *, void *) = callback;
 
-	if (free_cb != NULL) {
-		free_cb(node->data);
+	GDS_CHECK_ARG_NOT_NULL(node);
+
+	if (cb != NULL) {
+		cb(node->data, callback_data);
 	}
 
 	node->data = data;
@@ -74,26 +96,37 @@ void *gds_slist_node_get_data(gds_slist_node_t *node)
 	return data;
 }
 
-int8_t gds_slist_node_set_next(gds_slist_node_t *node, gds_slist_node_t *next)
+gds_slist_node_t * gds_slist_node_copy(gds_slist_node_t *node)
 {
+	gds_slist_node_t *head, *tmp, *tmp2, *n;
+	gds_inline_slist_node_t *i, *ti, *t2i;
+
 	GDS_CHECK_ARG_NOT_NULL(node);
 
-	node->next = next;
-	
-	return 0;
+	head = gds_slist_node_new(node->data);
+	tmp = head;
+	ti = gds_slist_node_get_inline(tmp);
+	tmp2 = node;
+	t2i = gds_slist_node_get_inline(tmp2);
+	while ( (t2i = gds_inline_slist_node_get_next(t2i)) != NULL ) {
+		tmp2 = gds_slist_node_get_container_of(t2i);
+		n = gds_slist_node_new(tmp2->data);
+		i = gds_slist_node_get_inline(n);
+		gds_inline_slist_node_set_next(ti, i);
+
+		ti = gds_inline_slist_node_get_next(ti);
+	}
+
+	return head;
 }
 
-gds_slist_node_t *gds_slist_node_get_next(gds_slist_node_t *node)
+void gds_slist_node_free(gds_slist_node_t *node, void *callback,
+	void *callback_data)
 {
-	GDS_CHECK_ARG_NOT_NULL(node);
+	void (*cb)(void *, void *) = callback;
 
-	return node->next;
-}
-
-void gds_slist_node_free(gds_slist_node_t *node, gds_free_cb free_cb)
-{
-	if(free_cb != NULL && node != NULL) {
-		free_cb(node->data);
+	if (cb != NULL && node != NULL) {
+		cb(node->data, callback_data);
 	}
 	free(node);
 }

@@ -25,7 +25,7 @@ int main()
 	gds_getkey_cb getkey_cb = (gds_getkey_cb) &mygetkey_cb;
 	gds_cmpkey_cb cmpkey_cb = (gds_cmpkey_cb) &mycmpkey_cb;
 	gds_hash_map_keyin_t *h;
-	gds_slist_node_t *l;
+	gds_slist_t *l;
 	gds_iterator_t *it;
 
 	h = gds_hash_map_keyin_new(8, hash_cb, getkey_cb, cmpkey_cb);
@@ -46,7 +46,7 @@ int main()
 	}
 	printf("\n");
 	gds_iterator_free(it);
-	gds_slist_free(l, NULL);
+	gds_slist_free(l, NULL, NULL);
 
 	printf("Resizing hash...\n");
 	gds_hash_map_keyin_change_size(h, 2);
@@ -62,7 +62,7 @@ int main()
 	}
 	printf("\n");
 	gds_iterator_free(it);
-	gds_slist_free(l, NULL);
+	gds_slist_free(l, NULL, NULL);
 
 	return 0;
 }

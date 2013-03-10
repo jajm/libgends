@@ -25,128 +25,248 @@
 #ifndef gds_slist_h_included
 #define gds_slist_h_included
 
-#include "callbacks.h"
 #include "iterator.h"
-#include "slist_node.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+typedef struct gds_slist_s gds_slist_t;
+
+gds_slist_t *
+gds_slist_new(void);
+
+gds_slist_t *
+gds_slist_new_from_array(
+	unsigned int n,
+	void *data[]
+);
+
+#define gds_slist(...) ({                                                     \
+	void *gds_va_args[] = {__VA_ARGS__};                                  \
+	gds_slist_new_from_array(sizeof(gds_va_args) / sizeof(*gds_va_args),  \
+		gds_va_args);                                                 \
+})
+
 /* Add new data at beginning of list */
-/* head     : address of pointer to first node of list
+/* list     : pointer to list
  * data     : pointer to data */
-/* Return : pointer to the newly created node, or NULL if operation failed */
-gds_slist_node_t *
-gds_slist_add_first(
-	gds_slist_node_t **head,
+/* Return : 0 in case of success, a negative value otherwise */
+int
+gds_slist_unshift(
+	gds_slist_t *list,
 	void *data
 );
 
 /* Add new data at end of list */
-/* head     : address of pointer to first node of list
+/* list     : pointer to list
  * data     : pointer to data */
-/* Return : pointer to the newly created node, or NULL if operation failed */
-gds_slist_node_t *
-gds_slist_add_last(
-	gds_slist_node_t **head,
+/* Return : 0 in case of success, a negative value otherwise */
+int
+gds_slist_push(
+	gds_slist_t *list,
 	void *data
 );
 
-/* Add new data after a given node */
-/* node     : pointer to the node that will precede the new node
- * data     : pointer to data */
-/* Return : pointer to the newly created node, or NULL if operation failed */
-gds_slist_node_t *
-gds_slist_add_after(
-	gds_slist_node_t *node,
-	void *data
-);
-
-void
-gds_slist_add_list_first(
-	gds_slist_node_t **head,
-	gds_slist_node_t *list
-);
-
-void
-gds_slist_add_list_last(
-	gds_slist_node_t **head,
-	gds_slist_node_t *list
-);
-
-void
-gds_slist_add_list_after(
-	gds_slist_node_t *node,
-	gds_slist_node_t *list
-);
-
-/* Get nth node of list */
-/* head : pointer to first node of list
- * n    : position of the node we want to retrieve. first node is at pos 0 */
-/* Return : pointer to the nth node of list if it exists, NULL otherwise. */
-gds_slist_node_t *
-gds_slist_get_nth_node(
-	gds_slist_node_t *head,
-	uint32_t n
-);
-
-/* Get last node of list */
-/* head : pointer to first node of list */
-/* Return : pointer to last node of list, or NULL if list is empty */
-gds_slist_node_t *
-gds_slist_node_get_last_node(
-	gds_slist_node_t *head
-);
-
-/* Delete first node of list */
-/* head    : address of pointer to first node of list */
-/* free_cb : callback to free function, if you want the data to be freed.
- *           NULL otherwise. */
-void
-gds_slist_del_first(
-	gds_slist_node_t **head,
-	gds_free_cb free_cb
+/* Delete list */
+/* list    : pointer to list */
+/* Return : NULL if free_cb is not NULL, a pointer to the shifted data
+ *          otherwise */
+void *
+gds_slist_shift(
+	gds_slist_t *list
 );
 
 /* Delete last node of list */
-/* head    : address of pointer to first node of list
- * free_cb : callback to free function, if you want the data to be freed.
- *           NULL otherwise. */
-void
-gds_slist_del_last(
-	gds_slist_node_t **head,
-	gds_free_cb free_cb
+/* list    : pointer to list */
+/* Return : NULL if free_cb is not NULL, a pointer to the poped data
+ *          otherwise */
+void *
+gds_slist_pop(
+	gds_slist_t *list
 );
 
-/* Delete node after a given node */
-/* node    : pointer to the node that precedes the node you want to remove
- * free_cb : callback to free function, if you want the data to be freed.
- *           NULL otherwise. */
-/* Return : a negative value if it was not able to remove the node.
- *          0 otherwise. */
-int8_t
-gds_slist_del_after(
-	gds_slist_node_t *node,
-	gds_free_cb free_cb
+/**
+ * Get a value from the list.
+ *
+ * Parameters:
+ *   list   : pointer to the list
+ *   offset : offset of value to retrieve
+ *
+ * Returns:
+ *   Pointer to data contained in node at the given offset
+ */
+void *
+gds_slist_get(
+	gds_slist_t *list,
+	unsigned int offset
+);
+
+/**
+ * Remove a portion of list and replace it by another list.
+ *
+ * Parameters:
+ *   list          : Pointer to the list.
+ *   offset        : Offset of the first node to remove.
+ *   length        : Number of nodes to remove. 0 to not remove anything.
+ *                   (insertion only)
+ *   callback      : Function to call on data for removed nodes. Parameters are:
+ *                   - (void *) data
+ *                   - (void *) callback_data
+ *   callback_data : Data to pass to callback as 2nd parameter.
+ *   replacement   : Pointer to the list to insert at given offset. This list is
+ *                   not modified.
+ */
+void
+gds_slist_splice(
+	gds_slist_t *list,
+	unsigned int offset,
+	unsigned int length,
+	void *callback,
+	void *callback_data,
+	gds_slist_t *replacement
+);
+
+/**
+ * Creates a new list from a portion of another list.
+ *
+ * Parameters:
+ *   list          : Pointer to the list.
+ *   offset        : Offset of the first node to keep for the new list.
+ *   length        : Number of nodes to copy to the new list.
+ *   callback      : Function to apply on data. Its return value will be stored
+ *                   into the new list instead of the original data. Can be
+ *                   NULL. Parameters are:
+ *                   - (void *) data
+ *                   - (void *) callback_data
+ *   callback_data : Data to pass to callback as 2nd parameter.
+ *
+ * Returns:
+ *   Pointer to the new list.
+ */
+gds_slist_t *
+gds_slist_slice(
+	gds_slist_t *list,
+	unsigned int offset,
+	unsigned int length,
+	void *callback,
+	void *callback_data
+);
+
+/**
+ * Maps a function to data contained in list.
+ *
+ * Parameters:
+ *   list          : Pointer to the list.
+ *   callback      : Function to apply on data. Parameters are:
+ *                   - (void *) data
+ *                   - (unsigned int) offset of node being processed
+ *                   - (void *) callback_data
+ *   callback_data : Data to pass to callback as 3rd parameter.
+ */
+void
+gds_slist_map(
+	gds_slist_t *list,
+	void *callback,
+	void *callback_data
+);
+
+/**
+ * Filter a list to create a new one.
+ *
+ * Parameters:
+ *   list          : Pointer to the list.
+ *   callback      : Function that defines if data is kept or not. If return
+ *                   value is true (not zero), data is kept for the new list.
+ *                   Otherwise data is not kept. Parameters are:
+ *                   - (void *) data
+ *                   - (void *) callback_data
+ *   callback_data : Data passed to callback as 2nd parameter.
+ *
+ * Returns:
+ *   Pointer to the new list.
+ */
+gds_slist_t *
+gds_slist_filter(
+	gds_slist_t *list,
+	void *callback,
+	void *callback_data
+);
+
+/**
+ * Reduce a list into a single value.
+ *
+ * To reduce a list into a single value, a callback function is called on every
+ * node's data, with the value of the previous invocation of callback.
+ *
+ * Parameters:
+ *   list          : Pointer to the list.
+ *   callback      : Function to apply on data. Parameters are:
+ *                   - (void *) return value of previous invocation of callback,
+ *                     or NULL if this is the first invocation.
+ *                   - (void *) data of the current node
+ *                   - (unsigned int) offset of the current node
+ *                   - (void *) callback_data
+ *                   This function should reduce 1st and 2nd parameter into a
+ *                   single value and return this single value.
+ *   callback_data : Data passed to callback as 4th parameter.
+ *
+ * Returns:
+ *   Result of list reduction.
+ */
+void *
+gds_slist_reduce(
+	gds_slist_t *list,
+	void *callback,
+	void *callback_data
+);
+
+/**
+ * Get size (length) of list.
+ *
+ * Parameters:
+ *   list : Pointer to the list.
+ *
+ * Return:
+ *   Number of nodes in list.
+ */
+unsigned int
+gds_slist_size(
+	gds_slist_t *list
 );
 
 /* Create an iterator on list */
-/* head : pointer to first node of list */
+/* list : pointer to list */
 /* Return : pointer to iterator, or NULL if an error occured */
 gds_iterator_t *
 gds_slist_iterator_new(
-	gds_slist_node_t *head
+	gds_slist_t *list
 );
 
-/* Free list */
-/* head    : pointer to first node of list */
-/* free_cb : callback to free function, if you want the data to be freed.
- *           NULL otherwise. */
+#define gds_slist_foreach(var, list)                                     \
+	for (gds_iterator_t *gds_slist_it = gds_slist_iterator_new(list) \
+		; gds_slist_it != NULL                                   \
+		; gds_iterator_free(gds_slist_it), gds_slist_it = NULL)  \
+	while (!gds_iterator_step(gds_slist_it)                          \
+		&& ((var = gds_iterator_get(gds_slist_it)) || !var))
+
+/**
+ * Free list
+ *
+ * Parameters:
+ *   list          : Pointer to list
+ *   callback      : Callback function that will be called on data before
+ *                   freeing the node.
+ *                   Prototype is: void callback(void *, void *)
+ *                   1st parameter is data of the node being freed.
+ *                   2nd parameter is <callback_data>.
+ *   callback_data : Data passed to callback
+ */
 void
 gds_slist_free(
-	gds_slist_node_t *head,
-	gds_free_cb free_cb
+	gds_slist_t *list,
+	void *callback,
+	void *callback_data
 );
 
 #ifdef __cplusplus

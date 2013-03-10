@@ -97,7 +97,7 @@ gds_hash_map_unset(
 /* Return keys contained in the hash map as a list */
 /* h : pointer to the hash map */
 /* Return: pointer to the list */
-gds_slist_node_t *
+gds_slist_t *
 gds_hash_map_keys(
 	gds_hash_map_t *h
 );
@@ -105,7 +105,7 @@ gds_hash_map_keys(
 /* Return values contained in the hash map as a list */
 /* h : pointer to the hash map */
 /* Return: pointer to the list */
-gds_slist_node_t *
+gds_slist_t *
 gds_hash_map_values(
 	gds_hash_map_t *h
 );
@@ -113,7 +113,7 @@ gds_hash_map_values(
 /* Return key/value pairs contained in hash map as a list of gds_key_value_t */
 /* h : pointer to the hash map */
 /* Return: pointer to the list */
-gds_slist_node_t *
+gds_slist_t *
 gds_hash_map_keys_values(
 	gds_hash_map_t *h
 );

@@ -26,38 +26,53 @@
 #define slist_node_h_included
 
 #include <stdint.h>
+#include "inline/slist.h"
 #include "callbacks.h"
 
-typedef struct gds_slist_node_s{
+typedef struct {
 	void *data;
-	struct gds_slist_node_s *next;
+	gds_inline_slist_node_t slist_node_inline;
 } gds_slist_node_t;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* Create a new node */
-/*     data : pointer to the data */
-/* Return: Success => pointer to the newly created node
- *         Failure => NULL */
+/**
+ * Create a new node
+ *
+ * Parameters
+ *   data : pointer to the data
+ *
+ * Return
+ *   Success => pointer to the newly created node
+ *   Failure => NULL
+ */
 gds_slist_node_t *
 gds_slist_node_new(
 	void *data
 );
 
-/* Set a new value to an existing node */
-/*     node : pointer to the node
- *     data : pointer to the data
- *  free_cb : function that takes a pointer and free pointed data.
- *            NULL to disable freeing old data */
-/* Return: Success => 0
- *         Failure => a negative value */
+/**
+ * Set a new value to an existing node
+ *
+ * Parameters:
+ *   node          : pointer to the node
+ *   data          : pointer to the data
+ *   callback      : Function called on data before setting the new data.
+ *                   Can be NULL. Prototype is void callback(void *, void *)
+ *   callback_data : Data passed to callback as 2nd parameter.
+ *
+ * Return:
+ *   Success => 0
+ *   Failure => a negative value
+ */
 int8_t
 gds_slist_node_set_data(
 	gds_slist_node_t *node,
 	void *data,
-	gds_free_cb free_cb
+	void *callback,
+	void *callback_data
 );
 
 /* Get the node data */
@@ -68,33 +83,35 @@ gds_slist_node_get_data(
 	gds_slist_node_t *node
 );
 
-/* Set next node */
-/* node : pointer to the node
- * next : pointer to the future next node */
-/* Return: Success => 0
- *         Failure => a negative value */
-int8_t
-gds_slist_node_set_next(
-	gds_slist_node_t *node,
-	gds_slist_node_t *next
-);
-
-/* Get the next node */
-/* node : pointer to the node */
-/* Return: pointer to the next node */
-gds_slist_node_t *
-gds_slist_node_get_next(
+gds_inline_slist_node_t *
+gds_slist_node_get_inline(
 	gds_slist_node_t *node
 );
 
-/* Free a node */
-/*    node : pointer to the node
- * free_cb : function that takes a pointer and free pointed data.
- *           NULL to disable freeing data */
+gds_slist_node_t *
+gds_slist_node_get_container_of(
+	gds_inline_slist_node_t *node_inline
+);
+
+gds_slist_node_t *
+gds_slist_node_copy(
+	gds_slist_node_t *node
+);
+
+/**
+ * Free a node
+ *
+ * Parameters:
+ *   node          : Pointer to the node.
+ *   callback      : Function called on data before freeing the node.
+ *                   Can be NULL. Prototype is void callback(void *, void *)
+ *   callback_data : Data passed to callback as 2nd parameter.
+ */
 void
 gds_slist_node_free(
 	gds_slist_node_t *node,
-	gds_free_cb free_cb
+	void *callback,
+	void *callback_data
 );
 
 #ifdef __cplusplus

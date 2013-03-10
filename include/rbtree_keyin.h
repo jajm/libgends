@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include "rbtree_keyin_node.h"
 #include "callbacks.h"
-#include "slist_node.h"
+#include "slist.h"
 
 int8_t
 gds_rbtree_keyin_add(
@@ -46,7 +46,7 @@ gds_rbtree_keyin_free(
 	gds_free_cb free_cb
 );
 
-gds_slist_node_t *
+gds_slist_t *
 gds_rbtree_keyin_values(
 	gds_rbtree_keyin_node_t *root
 );

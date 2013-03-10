@@ -375,7 +375,7 @@ void t_rbtree_keyin_del(void)
 void t_rbtree_keyin_values(void)
 {
 	gds_rbtree_keyin_node_t *root = NULL;
-	gds_slist_node_t *slist;
+	gds_slist_t *slist;
 	gds_iterator_t *it;
 	test_t *t;
 	char buf[512];
@@ -403,7 +403,7 @@ void t_rbtree_keyin_values(void)
 		i++;
 	}
 	gds_iterator_free(it);
-	gds_slist_free(slist, NULL);
+	gds_slist_free(slist, NULL, NULL);
 	gds_rbtree_keyin_free(root, free_cb);
 }
 

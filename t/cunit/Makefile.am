@@ -3,10 +3,13 @@ AM_CPPFLAGS = -I.. -I../../include -I../../src \
 AM_CFLAGS = -Wall -Wextra -Werror -std=c99
 AM_LDFLAGS = -lcunit `pkg-config --libs libexception lll`
 
+SUBDIRS = inline
+
 noinst_PROGRAMS = slist_node dlist_node \
 	rbtree_keyin_node rbtree_keyin \
 	rbtree_node rbtree \
-	rbtree_keyin_fast_node rbtree_keyin_fast
+	rbtree_keyin_fast_node rbtree_keyin_fast \
+	slist
 
 slist_node_SOURCES = slist_node.c
 slist_node_LDADD = ../../src/libgends.la
@@ -31,3 +34,6 @@ rbtree_keyin_fast_node_LDADD = ../../src/libgends.la
 
 rbtree_keyin_fast_SOURCES = rbtree_keyin_fast.c ../test.c
 rbtree_keyin_fast_LDADD = ../../src/libgends.la
+
+slist_SOURCES = slist.c
+slist_LDADD = ../../src/libgends.la

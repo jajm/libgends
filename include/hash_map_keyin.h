@@ -95,7 +95,7 @@ gds_hash_map_keyin_unset(
 /* Return values contained in the hash map as a list */
 /*         h : pointer to the hash map */
 /* Return: pointer to the list */
-gds_slist_node_t *
+gds_slist_t *
 gds_hash_map_keyin_values(
 	gds_hash_map_keyin_t *h
 );
