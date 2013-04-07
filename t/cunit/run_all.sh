@@ -16,39 +16,55 @@ for file in ${files}; do
 		maxlen=${len}
 	fi
 done
-length=$(expr ${maxlen} + length " memcheck " + 3)
+length=$(expr ${maxlen} + length " (memcheck) " + 3)
 
-print_status_line() {
+print_string_and_dots() {
 	local string="$1"
+	local length="$2"
 	local strlen=$(expr length "${string}")
 	local dotslen=$(expr ${length} - ${strlen} - 1)
 	echo -n "${string} "
 	for var in $(seq ${dotslen}); do
 		echo -n "."
 	done
+	echo -n " "
 }
 
-print_ok_ko() {
-	local status="$1"
-	local errormsg="$2"
-	if [ ${status} -eq 0 ]; then
-		${echo} -e " \x1b[32mOK\x1b[0m"
-	else
-		${echo} -e " \x1b[31;1mKO!\x1b[0m"
-		${echo} "${errormsg}"
-		exitcode=1
+print_ok() {
+	local msg="$1"
+	${echo} -e "\x1b[32mOK\x1b[0m"
+	if [ -n "${msg}" ]; then
+		${echo} "${msg}"
+	fi
+}
+
+print_ko() {
+	local msg="$1"
+	${echo} -e "\x1b[31;1mKO!\x1b[0m"
+	if [ -n "${msg}" ]; then
+		${echo} "${msg}"
 	fi
 }
 
 for file in ${files}; do
-	print_status_line "${file}"
-	$file >/dev/null 2>&1
-	print_ok_ko $?
+	print_string_and_dots "${file}" ${length}
+	${file} >/dev/null 2>&1
+	if [ $? -eq 0 ]; then
+		print_ok
+	else
+		print_ko
+		exitcode=1
+	fi
 
-	print_status_line "${file} memcheck"
-	valgrind_cmd="${libtool} --mode=execute ${valgrind} -q --error-exitcode=1 --suppressions=${cwd}/valgrind_suppressions --leak-check=full $file"
+	print_string_and_dots "${file} (memcheck)" ${length}
+	valgrind_cmd="${libtool} --mode=execute ${valgrind} -q --error-exitcode=2 --suppressions=${cwd}/valgrind_suppressions --leak-check=full $file"
 	valgrind_output=$(${valgrind_cmd} 2>&1 1>/dev/null)
-	print_ok_ko $? "${valgrind_output}"
+	if [ $? -ne 2 ]; then
+		print_ok
+	else
+		print_ko "${valgrind_output}"
+		exitcode=1
+	fi
 done
 
-exit $exitcode
+exit ${exitcode}
