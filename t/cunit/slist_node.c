@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <CUnit/Basic.h>
-#include "exception.h"
 #include "test_macros.h"
 #include "slist_node.h"
 #include "callbacks.h"
@@ -150,6 +149,7 @@ void t_gds_slist_node_get_next(void)
 int main()
 {
 	CU_pSuite pSuite = NULL;
+	int fails = 0;
 
 	/* initialize the CUnit test registry */
 	if (CUE_SUCCESS != CU_initialize_registry())
@@ -188,6 +188,9 @@ int main()
 		fprintf(stderr, "\tLine: %d\n", e->line());
 		return EXIT_FAILURE;
 	}
+
+	fails = CU_get_number_of_failures();
 	CU_cleanup_registry();
-	return CU_get_error();
+
+	return fails ? EXIT_FAILURE : EXIT_SUCCESS;
 }
