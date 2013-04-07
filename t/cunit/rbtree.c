@@ -198,7 +198,7 @@ void t_rbtree_add(void)
 
 	CU_ASSERT(gds_rbtree_is_valid(root, cmpkey_cb));
 
-	gds_rbtree_free(root, NULL, NULL);
+	gds_rbtree_free(root, NULL, (gds_free_cb)test_free);
 	root = NULL;
 
 	for (int i=0; i<100; i++) {
