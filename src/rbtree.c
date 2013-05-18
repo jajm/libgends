@@ -5,7 +5,7 @@
 #include "exception.h"
 #include "check_arg.h"
 #include "log.h"
-#include "rbtree_inline.h"
+#include "inline/rbtree.h"
 #include "rbtree_node.h"
 #include "rbtree.h"
 #include "callbacks.h"
@@ -19,7 +19,7 @@
 	: NULL
 
 int8_t gds_rbtree_node_cmp_with_key(
-	gds_rbtree_inline_node_t *inode, void *key,
+	gds_inline_rbtree_node_t *inode, void *key,
 	gds_cmpkey_cb cmpkey_cb)
 {
 	gds_rbtree_node_t *node;
@@ -30,8 +30,8 @@ int8_t gds_rbtree_node_cmp_with_key(
 	return cmp;
 }
 
-int8_t gds_rbtree_node_cmp(gds_rbtree_inline_node_t *inode1,
-	gds_rbtree_inline_node_t *inode2, gds_cmpkey_cb cmpkey_cb)
+int8_t gds_rbtree_node_cmp(gds_inline_rbtree_node_t *inode1,
+	gds_inline_rbtree_node_t *inode2, gds_cmpkey_cb cmpkey_cb)
 {
 	gds_rbtree_node_t *node1, *node2;
 	int8_t cmp;
@@ -50,8 +50,8 @@ typedef struct {
 } gds_rbtree_callbacks_t;
 
 void gds_rbtree_node_replace(
-	gds_rbtree_inline_node_t *inode1,
-	gds_rbtree_inline_node_t *inode2,
+	gds_inline_rbtree_node_t *inode1,
+	gds_inline_rbtree_node_t *inode2,
 	gds_rbtree_callbacks_t *callbacks)
 {
 	gds_rbtree_node_t *node1, *node2;
@@ -73,7 +73,7 @@ int8_t gds_rbtree_add(gds_rbtree_node_t **root, void *key, void *data,
 	gds_cmpkey_cb cmpkey_cb)
 {
 	gds_rbtree_node_t *node;
-	gds_rbtree_inline_node_t *inode;
+	gds_inline_rbtree_node_t *inode;
 	int8_t added = 0;
 
 	GDS_CHECK_ARG_NOT_NULL(root);
@@ -84,13 +84,13 @@ int8_t gds_rbtree_add(gds_rbtree_node_t **root, void *key, void *data,
 		(*root)->rbtree.red = false;
 		added = 1;
 	} else {
-		inode = gds_rbtree_inline_get_node(&((*root)->rbtree),
+		inode = gds_inline_rbtree_get_node(&((*root)->rbtree),
 			key, (gds_rbt_cmp_with_key_cb)
 			gds_rbtree_node_cmp_with_key, cmpkey_cb);
 		if (inode == NULL) {
 			node = gds_rbtree_node_new(key, data);
 			inode = &((*root)->rbtree);
-			added = gds_rbtree_inline_add(&inode, &(node->rbtree),
+			added = gds_inline_rbtree_add(&inode, &(node->rbtree),
 				(gds_rbt_cmp_cb)gds_rbtree_node_cmp, cmpkey_cb);
 			*root = rbt_containerof(inode);
 		}
@@ -102,7 +102,7 @@ int8_t gds_rbtree_add(gds_rbtree_node_t **root, void *key, void *data,
 gds_rbtree_node_t * gds_rbtree_get_node(gds_rbtree_node_t *root, void *key,
 	gds_cmpkey_cb cmpkey_cb)
 {
-	gds_rbtree_inline_node_t *inode = NULL;
+	gds_inline_rbtree_node_t *inode = NULL;
 
 	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb);
 
@@ -110,7 +110,7 @@ gds_rbtree_node_t * gds_rbtree_get_node(gds_rbtree_node_t *root, void *key,
 		return NULL;
 	}
 
-	inode = gds_rbtree_inline_get_node(&(root->rbtree), key,
+	inode = gds_inline_rbtree_get_node(&(root->rbtree), key,
 		(gds_rbt_cmp_with_key_cb) gds_rbtree_node_cmp_with_key,
 		cmpkey_cb);
 
@@ -160,7 +160,7 @@ int8_t gds_rbtree_set(gds_rbtree_node_t **root, void *key, void *data,
 int8_t gds_rbtree_del(gds_rbtree_node_t **root, void *key,
 	gds_cmpkey_cb cmpkey_cb, gds_free_cb key_free_cb, gds_free_cb free_cb)
 {
-	gds_rbtree_inline_node_t *inode;
+	gds_inline_rbtree_node_t *inode;
 	gds_rbtree_callbacks_t callbacks;
 	int8_t deleted = 0;
 
@@ -176,7 +176,7 @@ int8_t gds_rbtree_del(gds_rbtree_node_t **root, void *key,
 	callbacks.free_cb = free_cb;
 
 	inode = &((*root)->rbtree);
-	deleted = gds_rbtree_inline_del(&inode, key,
+	deleted = gds_inline_rbtree_del(&inode, key,
 		(gds_rbt_cmp_with_key_cb) gds_rbtree_node_cmp_with_key,
 		cmpkey_cb,
 		(gds_rbt_replace_cb) gds_rbtree_node_replace, &callbacks);

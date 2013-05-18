@@ -3,11 +3,11 @@
 
 #include <stdint.h>
 #include "callbacks.h"
-#include "rbtree_inline.h"
+#include "inline/rbtree.h"
 
 struct gds_rbtree_keyin_node_s {
 	void *data;
-	gds_rbtree_inline_node_t rbtree;
+	gds_inline_rbtree_node_t rbtree;
 };
 typedef struct gds_rbtree_keyin_node_s gds_rbtree_keyin_node_t;
 

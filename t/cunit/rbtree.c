@@ -77,8 +77,8 @@ int8_t gds_rbtree_is_valid(gds_rbtree_node_t *root,
 	if (root == NULL)
 		return 1;
 
-	gds_rbtree_inline_node_t *ln = root->rbtree.son[0];
-	gds_rbtree_inline_node_t *rn = root->rbtree.son[1];
+	gds_inline_rbtree_node_t *ln = root->rbtree.son[0];
+	gds_inline_rbtree_node_t *rn = root->rbtree.son[1];
 
 	/* Consecutive red links */
 	if (root->rbtree.red) {

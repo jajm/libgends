@@ -5,7 +5,7 @@
 #include "exception.h"
 #include "check_arg.h"
 #include "log.h"
-#include "rbtree_fast_inline.h"
+#include "inline/rbtree_fast.h"
 #include "rbtree_keyin_fast.h"
 #include "rbtree_keyin_fast_node.h"
 #include "callbacks.h"
@@ -17,7 +17,7 @@
 	: NULL
 
 int32_t gds_rbtree_keyin_fast_node_cmp_key(void *key,
-	gds_rbtree_fast_inline_node_t *inode,
+	gds_inline_rbtree_fast_node_t *inode,
 	void *params[2])
 {
 	gds_rbtree_keyin_fast_node_t *node;
@@ -31,7 +31,7 @@ int32_t gds_rbtree_keyin_fast_node_cmp_key(void *key,
 	return cmpkey_cb(key, getkey_cb(node->data));
 }
 
-gds_rbtree_fast_inline_node_t * gds_rbtree_keyin_fast_create_node(void *data)
+gds_inline_rbtree_fast_node_t * gds_rbtree_keyin_fast_create_node(void *data)
 {
 	gds_rbtree_keyin_fast_node_t *node;
 
@@ -39,7 +39,7 @@ gds_rbtree_fast_inline_node_t * gds_rbtree_keyin_fast_create_node(void *data)
 	return &(node->rbtree);
 }
 
-void gds_rbtree_keyin_fast_set_data(gds_rbtree_fast_inline_node_t *inode,
+void gds_rbtree_keyin_fast_set_data(gds_inline_rbtree_fast_node_t *inode,
 	void *data, gds_free_cb free_cb)
 {
 	gds_rbtree_keyin_fast_node_t *node;
@@ -49,8 +49,8 @@ void gds_rbtree_keyin_fast_set_data(gds_rbtree_fast_inline_node_t *inode,
 	gds_rbtree_keyin_fast_node_set_data(node, data, free_cb);
 }
 
-void gds_rbtree_keyin_fast_replace(gds_rbtree_fast_inline_node_t *inode1,
-	gds_rbtree_fast_inline_node_t *inode2, gds_free_cb free_cb)
+void gds_rbtree_keyin_fast_replace(gds_inline_rbtree_fast_node_t *inode1,
+	gds_inline_rbtree_fast_node_t *inode2, gds_free_cb free_cb)
 {
 	gds_rbtree_keyin_fast_node_t *node1, *node2;
 
@@ -66,7 +66,7 @@ void gds_rbtree_keyin_fast_replace(gds_rbtree_fast_inline_node_t *inode1,
 int8_t gds_rbtree_keyin_fast_add(gds_rbtree_keyin_fast_node_t **root,
 	void *data, gds_getkey_cb getkey_cb, gds_cmpkey_cb cmpkey_cb)
 {
-	gds_rbtree_fast_inline_node_t *inode;
+	gds_inline_rbtree_fast_node_t *inode;
 	gds_rbtf_cmp_key_cb cmp_key_cb =
 		(gds_rbtf_cmp_key_cb) gds_rbtree_keyin_fast_node_cmp_key;
 	gds_rbtf_create_node_cb create_node_cb =
@@ -83,7 +83,7 @@ int8_t gds_rbtree_keyin_fast_add(gds_rbtree_keyin_fast_node_t **root,
 	} else {
 		void *cmp_key_params[] = {getkey_cb, cmpkey_cb};
 		inode = &((*root)->rbtree);
-		already_in_tree = gds_rbtree_fast_inline_add(&inode, data,
+		already_in_tree = gds_inline_rbtree_fast_add(&inode, data,
 			getkey_cb, cmp_key_cb, &cmp_key_params, create_node_cb,
 			NULL);
 		*root = rbt_containerof(inode);
@@ -96,7 +96,7 @@ void gds_rbtree_keyin_fast_set(gds_rbtree_keyin_fast_node_t **root,
 	void *data, gds_getkey_cb getkey_cb, gds_cmpkey_cb cmpkey_cb,
 	gds_free_cb free_cb)
 {
-	gds_rbtree_fast_inline_node_t *inode;
+	gds_inline_rbtree_fast_node_t *inode;
 	gds_rbtf_cmp_key_cb cmp_key_cb =
 		(gds_rbtf_cmp_key_cb) gds_rbtree_keyin_fast_node_cmp_key;
 	gds_rbtf_create_node_cb create_node_cb =
@@ -114,7 +114,7 @@ void gds_rbtree_keyin_fast_set(gds_rbtree_keyin_fast_node_t **root,
 	} else {
 		void *cmp_key_params[] = {getkey_cb, cmpkey_cb};
 		inode = &((*root)->rbtree);
-		gds_rbtree_fast_inline_set(&inode, data, getkey_cb, cmp_key_cb,
+		gds_inline_rbtree_fast_set(&inode, data, getkey_cb, cmp_key_cb,
 			&cmp_key_params, create_node_cb, NULL, set_data_cb,
 			free_cb);
 		*root = rbt_containerof(inode);
@@ -126,7 +126,7 @@ gds_rbtree_keyin_fast_node_t * gds_rbtree_keyin_fast_get_node(
 	gds_cmpkey_cb cmpkey_cb)
 {
 	void *cmp_key_params[] = {getkey_cb, cmpkey_cb};
-	gds_rbtree_fast_inline_node_t *inode = NULL;
+	gds_inline_rbtree_fast_node_t *inode = NULL;
 	gds_rbtf_cmp_key_cb cmp_key_cb =
 		(gds_rbtf_cmp_key_cb) gds_rbtree_keyin_fast_node_cmp_key;
 
@@ -137,7 +137,7 @@ gds_rbtree_keyin_fast_node_t * gds_rbtree_keyin_fast_get_node(
 		return NULL;
 	}
 
-	inode = gds_rbtree_fast_inline_get_node(&(root->rbtree), key,
+	inode = gds_inline_rbtree_fast_get_node(&(root->rbtree), key,
 		cmp_key_cb, &cmp_key_params);
 
 	return rbt_containerof(inode);
@@ -158,7 +158,7 @@ void * gds_rbtree_keyin_fast_get(gds_rbtree_keyin_fast_node_t *root, void *key,
 int8_t gds_rbtree_keyin_fast_del(gds_rbtree_keyin_fast_node_t **root, void *key,
 	gds_getkey_cb getkey_cb, gds_cmpkey_cb cmpkey_cb, gds_free_cb free_cb)
 {
-	gds_rbtree_fast_inline_node_t *inode;
+	gds_inline_rbtree_fast_node_t *inode;
 	gds_rbtf_cmp_key_cb cmp_key_cb =
 		(gds_rbtf_cmp_key_cb) gds_rbtree_keyin_fast_node_cmp_key;
 	gds_rbtf_replace_cb replace_cb =
@@ -173,7 +173,7 @@ int8_t gds_rbtree_keyin_fast_del(gds_rbtree_keyin_fast_node_t **root, void *key,
 		void *cmp_key_params[] = {getkey_cb, cmpkey_cb};
 		inode = &((*root)->rbtree);
 
-		not_in_tree = gds_rbtree_fast_inline_del(&inode, key,
+		not_in_tree = gds_inline_rbtree_fast_del(&inode, key,
 			cmp_key_cb, &cmp_key_params, replace_cb, free_cb);
 
 		*root = rbt_containerof(inode);

@@ -19,7 +19,7 @@ gds_rbtree_keyin_fast_node_t * gds_rbtree_keyin_fast_node_new(void *data)
 	
 	n->data = data;
 
-	gds_rbtree_fast_inline_node_init(&(n->rbtree));
+	gds_inline_rbtree_fast_node_init(&(n->rbtree));
 	
 	return n;
 }

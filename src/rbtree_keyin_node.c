@@ -16,7 +16,7 @@ gds_rbtree_keyin_node_t * gds_rbtree_keyin_node_new(void *data)
 	}
 
 	node->data = data;
-	gds_rbtree_inline_node_init(&(node->rbtree));
+	gds_inline_rbtree_node_init(&(node->rbtree));
 
 	return node;
 }

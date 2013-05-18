@@ -53,8 +53,8 @@ int8_t gds_rbtree_keyin_fast_is_valid(gds_rbtree_keyin_fast_node_t *root, gds_ge
 	if ( root == NULL )
 		return 1;
 
-	gds_rbtree_fast_inline_node_t *ln = root->rbtree.left;
-	gds_rbtree_fast_inline_node_t *rn = root->rbtree.right;
+	gds_inline_rbtree_fast_node_t *ln = root->rbtree.left;
+	gds_inline_rbtree_fast_node_t *rn = root->rbtree.right;
 
 	/* Consecutive red links */
 	if (root && root->rbtree.red) {

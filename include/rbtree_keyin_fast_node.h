@@ -4,11 +4,11 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "callbacks.h"
-#include "rbtree_fast_inline.h"
+#include "inline/rbtree_fast.h"
 
 struct gds_rbtree_keyin_fast_node_s {
 	void *data;
-	gds_rbtree_fast_inline_node_t rbtree;
+	gds_inline_rbtree_fast_node_t rbtree;
 };
 
 typedef struct gds_rbtree_keyin_fast_node_s gds_rbtree_keyin_fast_node_t;

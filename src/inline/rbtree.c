@@ -1,36 +1,36 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include "rbtree_inline.h"
-#include "check_arg.h"
+#include "inline/rbtree.h"
+#include "../check_arg.h"
 
-void gds_rbtree_inline_print_dbg_r(gds_rbtree_inline_node_t *root, uint8_t d)
+void gds_inline_rbtree_print_dbg_r(gds_inline_rbtree_node_t *root, uint8_t d)
 {
 	if (root != NULL) {
-		gds_rbtree_inline_print_dbg_r(root->son[1], d+1);
+		gds_inline_rbtree_print_dbg_r(root->son[1], d+1);
 		for (uint8_t i=0; i<d; i++)
 			printf("- ");
 		printf("rbtree %p [%s] (0: %p, 1: %p)\n", root,
 			root->red ? "red" : "black", root->son[0], root->son[1]);
-		gds_rbtree_inline_print_dbg_r(root->son[0], d+1);
+		gds_inline_rbtree_print_dbg_r(root->son[0], d+1);
 	}
 }
-void gds_rbtree_inline_print_dbg(gds_rbtree_inline_node_t *root)
+void gds_inline_rbtree_print_dbg(gds_inline_rbtree_node_t *root)
 {
 	printf("\n---------------------------------------------------------\n");
-	gds_rbtree_inline_print_dbg_r(root, 0);
+	gds_inline_rbtree_print_dbg_r(root, 0);
 	printf("---------------------------------------------------------\n");
 }
 
-_Bool gds_rbtree_inline_node_is_red(gds_rbtree_inline_node_t *node)
+_Bool gds_inline_rbtree_node_is_red(gds_inline_rbtree_node_t *node)
 {
 	return (node && node->red);
 }
 
-gds_rbtree_inline_node_t * gds_rbtree_inline_rotate(
-	gds_rbtree_inline_node_t *node, uint8_t dir)
+gds_inline_rbtree_node_t * gds_inline_rbtree_rotate(
+	gds_inline_rbtree_node_t *node, uint8_t dir)
 {
-	gds_rbtree_inline_node_t *tmp;
+	gds_inline_rbtree_node_t *tmp;
 
 	dir = (dir) ? 1 : 0;
 	tmp = node->son[!dir];
@@ -44,26 +44,26 @@ gds_rbtree_inline_node_t * gds_rbtree_inline_rotate(
 	return tmp;
 }
 
-gds_rbtree_inline_node_t * gds_rbtree_inline_rotate_twice(
-	gds_rbtree_inline_node_t *node, uint8_t dir)
+gds_inline_rbtree_node_t * gds_inline_rbtree_rotate_twice(
+	gds_inline_rbtree_node_t *node, uint8_t dir)
 {
-	node->son[!dir] = gds_rbtree_inline_rotate(node->son[!dir], !dir);
-	return gds_rbtree_inline_rotate(node, dir);
+	node->son[!dir] = gds_inline_rbtree_rotate(node->son[!dir], !dir);
+	return gds_inline_rbtree_rotate(node, dir);
 }
 
-void gds_rbtree_inline_node_init(gds_rbtree_inline_node_t *node)
+void gds_inline_rbtree_node_init(gds_inline_rbtree_node_t *node)
 {
 	node->red = true;
 	node->son[0] = node->son[1] = NULL;
 }
 
-int8_t gds_rbtree_inline_add(gds_rbtree_inline_node_t **root,
-	gds_rbtree_inline_node_t *node, gds_rbt_cmp_cb rbt_cmp_cb,
+int8_t gds_inline_rbtree_add(gds_inline_rbtree_node_t **root,
+	gds_inline_rbtree_node_t *node, gds_rbt_cmp_cb rbt_cmp_cb,
 	void *rbt_cmp_data)
 {
-	gds_rbtree_inline_node_t head;      /* False tree root */
-	gds_rbtree_inline_node_t *g, *t;    /* Grandparent & parent */
-	gds_rbtree_inline_node_t *p, *q;    /* Iterator & parent */
+	gds_inline_rbtree_node_t head;      /* False tree root */
+	gds_inline_rbtree_node_t *g, *t;    /* Grandparent & parent */
+	gds_inline_rbtree_node_t *p, *q;    /* Iterator & parent */
 	uint8_t dir = 0, last = 0;
 	int32_t cmp;
 	int8_t added = 0;
@@ -85,8 +85,8 @@ int8_t gds_rbtree_inline_add(gds_rbtree_inline_node_t **root,
 			p->son[dir] = q = node;
 			added = 1;
 		}
-		else if (gds_rbtree_inline_node_is_red(q->son[0])
-		&& gds_rbtree_inline_node_is_red(q->son[1])) {
+		else if (gds_inline_rbtree_node_is_red(q->son[0])
+		&& gds_inline_rbtree_node_is_red(q->son[1])) {
 			/* Color flip */
 			q->red = true;
 			q->son[0]->red = false;
@@ -94,14 +94,14 @@ int8_t gds_rbtree_inline_add(gds_rbtree_inline_node_t **root,
 		}
 
 		/* Fix red violation */
-		if (gds_rbtree_inline_node_is_red(q)
-		&& gds_rbtree_inline_node_is_red(p)) {
+		if (gds_inline_rbtree_node_is_red(q)
+		&& gds_inline_rbtree_node_is_red(p)) {
 			uint8_t dir2 = (t->son[1] == g) ? 1 : 0;
 
 			if (q == p->son[last]) {
-				t->son[dir2] = gds_rbtree_inline_rotate(g, !last);
+				t->son[dir2] = gds_inline_rbtree_rotate(g, !last);
 			} else {
-				t->son[dir2] = gds_rbtree_inline_rotate_twice(g, !last);
+				t->son[dir2] = gds_inline_rbtree_rotate_twice(g, !last);
 			}
 		}
 
@@ -127,11 +127,11 @@ int8_t gds_rbtree_inline_add(gds_rbtree_inline_node_t **root,
 	return added;
 }
 
-gds_rbtree_inline_node_t * gds_rbtree_inline_get_node(
-	gds_rbtree_inline_node_t *root, void *key,
+gds_inline_rbtree_node_t * gds_inline_rbtree_get_node(
+	gds_inline_rbtree_node_t *root, void *key,
 	gds_rbt_cmp_with_key_cb rbt_cmp_with_key_cb, void *rbt_cmp_data)
 {
-	gds_rbtree_inline_node_t *node;
+	gds_inline_rbtree_node_t *node;
 	int32_t cmp;
 	int8_t dir;
 
@@ -149,14 +149,14 @@ gds_rbtree_inline_node_t * gds_rbtree_inline_get_node(
 	return node;
 }
 
-int8_t gds_rbtree_inline_del(gds_rbtree_inline_node_t **root,
+int8_t gds_inline_rbtree_del(gds_inline_rbtree_node_t **root,
 	void *key, gds_rbt_cmp_with_key_cb rbt_cmp_with_key_cb,
 	void *rbt_cmp_data, gds_rbt_replace_cb rbt_replace_cb,
 	void *rbt_replace_data)
 {
-	gds_rbtree_inline_node_t head;       /* False tree root */
-	gds_rbtree_inline_node_t *q, *p, *g; /* Helpers */
-	gds_rbtree_inline_node_t *f = NULL;  /* Found item */
+	gds_inline_rbtree_node_t head;       /* False tree root */
+	gds_inline_rbtree_node_t *q, *p, *g; /* Helpers */
+	gds_inline_rbtree_node_t *f = NULL;  /* Found item */
 	uint8_t dir = 1;
 	int8_t deleted = 0;
 
@@ -186,22 +186,22 @@ int8_t gds_rbtree_inline_del(gds_rbtree_inline_node_t **root,
 		if (cmp == 0)
 			f = q;
 
-		if (gds_rbtree_inline_node_is_red(q)
-		|| gds_rbtree_inline_node_is_red(q->son[dir]))
+		if (gds_inline_rbtree_node_is_red(q)
+		|| gds_inline_rbtree_node_is_red(q->son[dir]))
 			continue;
 
 		/* Push the red node down */
-		if (gds_rbtree_inline_node_is_red(q->son[!dir])) {
-			p = p->son[last] = gds_rbtree_inline_rotate(q, dir);
+		if (gds_inline_rbtree_node_is_red(q->son[!dir])) {
+			p = p->son[last] = gds_inline_rbtree_rotate(q, dir);
 		}
-		else if (!gds_rbtree_inline_node_is_red(q->son[!dir])) {
-			gds_rbtree_inline_node_t *s = p->son[!last];
+		else if (!gds_inline_rbtree_node_is_red(q->son[!dir])) {
+			gds_inline_rbtree_node_t *s = p->son[!last];
 
 			if (s == NULL)
 				continue;
 
-			if (!gds_rbtree_inline_node_is_red(s->son[!last])
-			&& !gds_rbtree_inline_node_is_red(s->son[last])) {
+			if (!gds_inline_rbtree_node_is_red(s->son[!last])
+			&& !gds_inline_rbtree_node_is_red(s->son[last])) {
 				/* Color flip */
 				p->red = false;
 				s->red = true;
@@ -209,10 +209,10 @@ int8_t gds_rbtree_inline_del(gds_rbtree_inline_node_t **root,
 			} else {
 				uint8_t dir2 = (g->son[1] == p) ? 1 : 0;
 
-				if ( gds_rbtree_inline_node_is_red ( s->son[last] ) )
-					g->son[dir2] = gds_rbtree_inline_rotate_twice(p, last);
-				else if (gds_rbtree_inline_node_is_red(s->son[!last]))
-					g->son[dir2] = gds_rbtree_inline_rotate(p, last);
+				if ( gds_inline_rbtree_node_is_red ( s->son[last] ) )
+					g->son[dir2] = gds_inline_rbtree_rotate_twice(p, last);
+				else if (gds_inline_rbtree_node_is_red(s->son[!last]))
+					g->son[dir2] = gds_inline_rbtree_rotate(p, last);
 
 				/* Ensure correct coloring */
 				q->red = g->son[dir2]->red = true;
