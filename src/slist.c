@@ -7,6 +7,7 @@
 #include "inline/slist.h"
 #include "slist_node.h"
 #include "slist.h"
+#include "undefined.h"
 
 struct gds_slist_s {
 	gds_slist_node_t *first;
@@ -87,7 +88,7 @@ void * gds_slist_shift(gds_slist_t *list)
 {
 	gds_slist_node_t *n = NULL;
 	gds_inline_slist_node_t *i, *fi;
-	void *d = NULL;
+	void *d = UNDEFINED;
 
 	GDS_CHECK_ARG_NOT_NULL(list);
 
@@ -109,7 +110,7 @@ void * gds_slist_shift(gds_slist_t *list)
 void * gds_slist_pop(gds_slist_t *list)
 {
 	gds_inline_slist_node_t *fi, *li;
-	void *d = NULL;
+	void *d = UNDEFINED;
 
 	GDS_CHECK_ARG_NOT_NULL(list);
 
@@ -129,7 +130,7 @@ void * gds_slist_pop(gds_slist_t *list)
 
 void * gds_slist_get(gds_slist_t *list, unsigned int offset)
 {
-	void *d = NULL;
+	void *d = UNDEFINED;
 	gds_slist_node_t *n;
 	gds_inline_slist_node_t *i;
 	GDS_CHECK_ARG_NOT_NULL(list);

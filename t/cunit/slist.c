@@ -96,7 +96,7 @@ void t_gds_slist_shift(void)
 
 	b = gds_slist_shift(list);
 	assert_list_equals(list, 0, (void *[]){});
-	CU_ASSERT_PTR_NULL(b);
+	CU_ASSERT_PTR_EQUAL(b, UNDEFINED);
 
 	gds_slist_free(list, NULL, NULL);
 }
@@ -125,7 +125,7 @@ void t_gds_slist_pop(void)
 
 	b = gds_slist_pop(list);
 	assert_list_equals(list, 0, (void *[]){});
-	CU_ASSERT_PTR_NULL(b);
+	CU_ASSERT_PTR_EQUAL(b, UNDEFINED);
 
 	gds_slist_free(list, NULL, NULL);
 }
@@ -140,7 +140,7 @@ void t_gds_slist_get(void)
 	for (i = 0; i < 3; i++) {
 		CU_ASSERT_PTR_EQUAL(gds_slist_get(list, i), &a[i]);
 	}
-	CU_ASSERT_PTR_NULL(gds_slist_get(list, i));
+	CU_ASSERT_PTR_EQUAL(gds_slist_get(list, i), UNDEFINED);
 	gds_slist_free(list, NULL, NULL);
 }
 
