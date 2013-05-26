@@ -1,40 +1,40 @@
-/*****************************************************************************
- * Copyright (C) 2010-2011 Julian Maurice                                    *
- *                                                                           *
- * This file is part of libgends.                                            *
- *                                                                           *
- * libgends is free software: you can redistribute it and/or modify          *
- * it under the terms of the GNU General Public License as published by      *
- * the Free Software Foundation, either version 3 of the License, or         *
- * (at your option) any later version.                                       *
- *                                                                           *
- * libgends is distributed in the hope that it will be useful,               *
- * but WITHOUT ANY WARRANTY; without even the implied warranty of            *
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             *
- * GNU General Public License for more details.                              *
- *                                                                           *
- * You should have received a copy of the GNU General Public License         *
- * along with libgends.  If not, see <http://www.gnu.org/licenses/>.         *
- *****************************************************************************/
+/*
+ * Copyright 2010-2013 Julian Maurice
+ *
+ * This file is part of libgends
+ *
+ * libgends is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * libgends is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with libgends.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
-/*****************************************************************************
- * File                 : iterator.h                                         *
- * Short description    : Iterators management                               *
- *****************************************************************************
- * What this file contains is just an interface for containers which want to *
- * provide an iterator. By using this interface, whatever container is used, *
- * it's always the same API.                                                 *
- * To implement an iterator for your container, you have to:                 *
- *  - define a struct, or whatever you need to store iterator informations   *
- *  - define 4 functions (described below) which will deal with these        *
- *  informations:                                                            *
- *    . int8_t reset(void *data)                                             *
- *    . int8_t step(void *data)                                              *
- *    . void * get(void *data)                                               *
- *    . void free(void *data)                                                *
- *  - and provide a way to get an initialized iterator for your container    *
- * See slist.h or dlist.h for examples of implementation                     *
- *****************************************************************************/
+/*
+ * File              : iterator.h
+ * Short description : Iterators management
+ *
+ * What this file contains is just an interface for containers which want to
+ * provide an iterator. By using this interface, whatever container is used,
+ * it's always the same API.
+ * To implement an iterator for your container, you have to:
+ *  - define a struct, or whatever you need to store iterator informations
+ *  - define 4 functions (described below) which will deal with these
+ *  informations:
+ *    . int8_t reset(void *data)
+ *    . int8_t step(void *data)
+ *    . void * get(void *data)
+ *    . void free(void *data)
+ *  - and provide a way to get an initialized iterator for your container
+ * See slist.h or dlist.h for examples of implementation
+ */
 
 #ifndef iterator_h_included
 #define iterator_h_included
