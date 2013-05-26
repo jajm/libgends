@@ -19,7 +19,7 @@
 
 /*
  * File              : slist.h
- * Short description : Low-level singly linked list
+ * Short description : singly linked list
  */
 
 #ifndef gds_slist_h_included
