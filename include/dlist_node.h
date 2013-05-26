@@ -19,105 +19,104 @@
 
 /*
  * File              : dlist_node.h
- * Short description : Double linked list node management
+ * Short description : Double linked list node
  */
 
 #ifndef dlist_node_h_included
 #define dlist_node_h_included
 
 #include <stdint.h>
+#include "inline/dlist.h"
 #include "callbacks.h"
 
-typedef struct gds_dlist_node_s {
+typedef struct {
 	void *data;
-	struct gds_dlist_node_s *prev;
-	struct gds_dlist_node_s *next;
+	gds_inline_dlist_node_t inline_dlist_node;
 } gds_dlist_node_t;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* Create a new node */
-/*      data : pointer to the data
- * copy_data : true => make a copy of the data,
- *             false => just take the pointer value */
-/* Return: Success => pointer to the newly created node
- *         Failure => NULL*/
+/**
+ * Create a new node
+ *
+ * Parameters
+ *   data : pointer to the data
+ *
+ * Return
+ *   Success => pointer to the newly created node
+ *   Failure => NULL
+ */
 gds_dlist_node_t *
 gds_dlist_node_new(
 	void *data
 );
 
-/* Set a new value to an existing node */
-/*          node : pointer to the node
- *          data : pointer to the data
- *       free_cb : pointer to a free function, can be NULL. In this case and
- *                 if free_old_data is true, call standard free() function. */
-/* Return: Success => 0
- *         Failure => a negative value */
+/*
+ * Set a new value to an existing node
+ *
+ * Parameters:
+ *   node          : pointer to the node
+ *   data          : pointer to the data
+ *   callback      : Function called on data before setting the new data.
+ *                   Can be NULL. Prototype is void callback(void *, void *)
+ *   callback_data : Data passed to callback as 2nd parameter.
+ *
+ * Return:
+ *   Success => 0
+ *   Failure => a negative value
+ */
 int8_t
 gds_dlist_node_set_data(
 	gds_dlist_node_t *node,
 	void *data,
-	gds_free_cb free_cb
+	void *callback,
+	void *callback_data
 );
 
-/* Get the node data */
-/* node : pointer to the node */
-/* Return: Success => pointer to the data
- *         Failure => NULL */
+/*
+ * Get the node data
+ *
+ * Parameters:
+ *     node: pointer to the node
+ *
+ * Returns:
+ * pointer to the data */
 void *
 gds_dlist_node_get_data(
 	gds_dlist_node_t *node
 );
 
-/* Set next node */
-/* node : pointer to the node
- * next : pointer to the future next node */
-/* Return: Success => 0
- *         Failure => a negative value */
-int8_t
-gds_dlist_node_set_next(
-	gds_dlist_node_t *node,
-	gds_dlist_node_t *next
-);
-
-/* Get next node */
-/* node : pointer to the node */
-/* Return: pointer to the next node */
-gds_dlist_node_t *
-gds_dlist_node_get_next(
+gds_inline_dlist_node_t *
+gds_dlist_node_get_inline(
 	gds_dlist_node_t *node
 );
 
-/* Set previous node */
-/* node : pointer to the node
- * prev : pointer to the future previous node */
-/* Return: Success => 0
- *         Failure => a negative value */
-int8_t
-gds_dlist_node_set_prev(
-	gds_dlist_node_t *node,
-	gds_dlist_node_t *prev
+gds_dlist_node_t *
+gds_dlist_node_get_container_of(
+	gds_inline_dlist_node_t *node_inline
 );
 
-/* Get previous node */
-/* node : pointer to the node */
-/* Return: pointer to the previous node */
 gds_dlist_node_t *
-gds_dlist_node_get_prev(
+gds_dlist_node_copy(
 	gds_dlist_node_t *node
 );
 
-/* Free a node */
-/*    node : pointer to the node
- * free_cb : pointer to a free function, can be NULL. In this case and if
- *           free_data is true, standard free() function is called. */
+/**
+ * Free a node
+ *
+ * Parameters:
+ *   node          : Pointer to the node.
+ *   callback      : Function called on data before freeing the node.
+ *                   Can be NULL. Prototype is void callback(void *, void *)
+ *   callback_data : Data passed to callback as 2nd parameter.
+ */
 void
 gds_dlist_node_free(
 	gds_dlist_node_t *node,
-	gds_free_cb free_cb
+	void *callback,
+	void *callback_data
 );
 
 #ifdef __cplusplus
@@ -125,3 +124,4 @@ gds_dlist_node_free(
 #endif
 
 #endif /* Not dlist_node_h_included */
+

@@ -19,44 +19,64 @@
 
 /*
  * File              : dlist_node.c
- * Short description : Double linked list node management
+ * Short description : Double linked list node
  */
 
-#include <stdint.h>
 #include <stdlib.h>
-#include <string.h>
+#include <stdint.h>
 #include "exception.h"
 #include "check_arg.h"
-#include "callbacks.h"
 #include "log.h"
 #include "dlist_node.h"
+#include "callbacks.h"
+#include "container_of.h"
+
+gds_dlist_node_t * gds_dlist_node_get_container_of(
+	gds_inline_dlist_node_t *node_inline)
+{
+	gds_dlist_node_t *node = NULL;
+
+	if (node_inline) {
+		node = container_of(node_inline, gds_dlist_node_t,
+			inline_dlist_node);
+	}
+
+	return node;
+}
+
+gds_inline_dlist_node_t *gds_dlist_node_get_inline(gds_dlist_node_t *node)
+{
+	GDS_CHECK_ARG_NOT_NULL(node);
+
+	return &(node->inline_dlist_node);
+}
 
 gds_dlist_node_t *gds_dlist_node_new(void *data)
 {
-	gds_dlist_node_t *newnode;
+	gds_dlist_node_t *node;
 
-	GDS_CHECK_ARG_NOT_NULL(data);
-
-	newnode = malloc(sizeof(gds_dlist_node_t));
-	if(newnode == NULL){
-		GDS_THROW(NotEnoughMemoryException, "failed to allocate %d "
-			"bytes", sizeof(gds_dlist_node_t));
+	node = malloc(sizeof(gds_dlist_node_t));
+	if (node == NULL) {
+		GDS_THROW(NotEnoughMemoryException,
+			"failed to allocate %d bytes",
+			sizeof(gds_dlist_node_t));
 	}
-	newnode->data = data;
-	newnode->next = NULL;
-	newnode->prev = NULL;
+	node->data = data;
+	gds_inline_dlist_node_init(gds_dlist_node_get_inline(node));
 
-	return newnode;
+	return node;
 }
 
-int8_t gds_dlist_node_set_data(gds_dlist_node_t *node, void *data,
-	gds_free_cb free_cb)
-{
-	GDS_CHECK_ARG_NOT_NULL(node);
-	GDS_CHECK_ARG_NOT_NULL(data);
 
-	if (free_cb != NULL) {
-		free_cb(node->data);
+int8_t gds_dlist_node_set_data(gds_dlist_node_t *node, void *data,
+	void *callback, void *callback_data)
+{
+	void (*cb)(void *, void *) = callback;
+
+	GDS_CHECK_ARG_NOT_NULL(node);
+
+	if (cb != NULL) {
+		cb(node->data, callback_data);
 	}
 
 	node->data = data;
@@ -71,45 +91,38 @@ void * gds_dlist_node_get_data(gds_dlist_node_t *node)
 	return node->data;
 }
 
-int8_t gds_dlist_node_set_next(gds_dlist_node_t *node, gds_dlist_node_t *next)
+gds_dlist_node_t * gds_dlist_node_copy(gds_dlist_node_t *node)
 {
+	gds_dlist_node_t *head, *tmp, *tmp2, *n;
+	gds_inline_dlist_node_t *i, *ti, *t2i;
+
 	GDS_CHECK_ARG_NOT_NULL(node);
 
-	node->next = next;
-	
-	return 0;
-}
+	head = gds_dlist_node_new(node->data);
+	tmp = head;
+	ti = gds_dlist_node_get_inline(tmp);
+	tmp2 = node;
+	t2i = gds_dlist_node_get_inline(tmp2);
+	while ( (t2i = gds_inline_dlist_node_get_next(t2i)) != NULL ) {
+		tmp2 = gds_dlist_node_get_container_of(t2i);
+		n = gds_dlist_node_new(tmp2->data);
+		i = gds_dlist_node_get_inline(n);
+		gds_inline_dlist_node_set_next(ti, i);
+		gds_inline_dlist_node_set_prev(i, ti);
 
-gds_dlist_node_t *gds_dlist_node_get_next(gds_dlist_node_t *node)
-{
-	GDS_CHECK_ARG_NOT_NULL(node);
-
-	return node->next;
-}
-
-int8_t gds_dlist_node_set_prev(gds_dlist_node_t *node, gds_dlist_node_t *prev)
-{
-	GDS_CHECK_ARG_NOT_NULL(node);
-
-	node->prev = prev;
-	
-	return 0;
-}
-
-gds_dlist_node_t *gds_dlist_node_get_prev(gds_dlist_node_t *node)
-{
-	GDS_CHECK_ARG_NOT_NULL(node);
-
-	return node->prev;
-}
-
-void gds_dlist_node_free(gds_dlist_node_t *node, gds_free_cb free_cb)
-{
-	if (node) {
-		if (free_cb) {
-			free_cb(node->data);
-		}
-		free(node);
+		ti = gds_inline_dlist_node_get_next(ti);
 	}
+
+	return head;
 }
 
+void gds_dlist_node_free(gds_dlist_node_t *node, void *callback,
+	void *callback_data)
+{
+	void (*cb)(void *, void *) = callback;
+
+	if (cb != NULL && node != NULL) {
+		cb(node->data, callback_data);
+	}
+	free(node);
+}
