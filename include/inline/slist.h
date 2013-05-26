@@ -53,7 +53,7 @@ gds_inline_slist_node_set_next(
  * So if we have 2 lists:
  *   N -> N1 -> N2
  *   P -> P1 -> P2
- * calling gds_inline_slist_node_set_next(N, P) will result in:
+ * calling gds_inline_slist_node_append_list(N, P, NULL) will result in:
  *   N -> P -> P1 -> P2 -> N1 -> N2
  *
  * Note: <head> should be the first node of its list and should not be already
