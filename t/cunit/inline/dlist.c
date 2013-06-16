@@ -231,6 +231,10 @@ void t_gds_inline_dlist_get_head(void)
 		CU_ASSERT_PTR_NOT_NULL(idn);
 		CU_ASSERT_PTR_EQUAL(idn, head);
 	}
+
+	for (i = 0; i < 10; i++) {
+		test_list_node_free(nodes[i]);
+	}
 }
 
 void t_gds_inline_dlist_get_tail(void)
@@ -257,6 +261,10 @@ void t_gds_inline_dlist_get_tail(void)
 		CU_ASSERT_PTR_NOT_NULL(idn);
 		CU_ASSERT_PTR_EQUAL(idn, tail);
 	}
+
+	for (i = 0; i < 10; i++) {
+		test_list_node_free(nodes[i]);
+	}
 }
 
 void t_gds_inline_dlist_size(void)
@@ -274,6 +282,10 @@ void t_gds_inline_dlist_size(void)
 		gds_inline_dlist_splice(head, i, 0, NULL, NULL,
 			&(nodes[i]->inline_node), NULL, NULL);
 		CU_ASSERT_EQUAL(gds_inline_dlist_size(head), i+1);
+	}
+
+	for (i = 0; i < 10; i++) {
+		test_list_node_free(nodes[i]);
 	}
 }
 
@@ -299,6 +311,10 @@ void t_gds_inline_dlist_map(void)
 		*sum += test_list_node_get_container(n)->data;
 	}), &sum);
 	CU_ASSERT_EQUAL(sum, 1+2+3+4+5+6+7+8+9);
+
+	for (i = 0; i < 10; i++) {
+		test_list_node_free(nodes[i]);
+	}
 }
 
 int main()
