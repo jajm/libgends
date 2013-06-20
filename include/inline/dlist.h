@@ -20,6 +20,8 @@
 #ifndef gds_inline_dlist_h_included
 #define gds_inline_dlist_h_included
 
+#include "undefined.h"
+
 typedef struct gds_inline_dlist_node_s {
 	struct gds_inline_dlist_node_s *prev;
 	struct gds_inline_dlist_node_s *next;
@@ -34,32 +36,45 @@ gds_inline_dlist_node_init(
 );
 
 /*
- * Returns the previous node
+ * Get or set the previous node
+ *
+ * Parameters
+ *   node: The node to modify
+ *   prev: Node to set as the previous node, or UNDEFINED to only get the
+ *         previous node
+ *
+ * Returns:
+ *   The previous node, if it exists, NULL if it doesn't, or UNDEFINED if node
+ *   is invalid (NULL or UNDEFINED).
  */
 gds_inline_dlist_node_t *
-gds_inline_dlist_get_prev(
-	gds_inline_dlist_node_t *node
+gds_inline_dlist_node_prev(
+	gds_inline_dlist_node_t *node,
+	gds_inline_dlist_node_t *prev
 );
+
+#define gds_inline_dlist_node_get_prev(node) \
+	gds_inline_dlist_node_prev(node, UNDEFINED)
 
 /*
- * Returns the next node
+ * Get or set the next node
+ *
+ * Parameters
+ *   node: The node to modify
+ *   next: Node to set as the next node, or UNDEFINED to only get the next node
+ *
+ * Returns:
+ *   The next node, if it exists, NULL if it doesn't, or UNDEFINED if node
+ *   is invalid (NULL or UNDEFINED).
  */
 gds_inline_dlist_node_t *
-gds_inline_dlist_node_get_next(
-	gds_inline_dlist_node_t *node
+gds_inline_dlist_node_next(
+	gds_inline_dlist_node_t *node,
+	gds_inline_dlist_node_t *next
 );
 
-int
-gds_inline_dlist_node_set_prev(
-	gds_inline_dlist_node_t *node,
-	gds_inline_dlist_node_t *head
-);
-
-int
-gds_inline_dlist_node_set_next(
-	gds_inline_dlist_node_t *node,
-	gds_inline_dlist_node_t *head
-);
+#define gds_inline_dlist_node_get_next(node) \
+	gds_inline_dlist_node_next(node, UNDEFINED)
 
 /*
  * Insert <node2> list immediately before <node1>.

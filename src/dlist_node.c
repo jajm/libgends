@@ -107,8 +107,8 @@ gds_dlist_node_t * gds_dlist_node_copy(gds_dlist_node_t *node)
 		tmp2 = gds_dlist_node_get_container_of(t2i);
 		n = gds_dlist_node_new(tmp2->data);
 		i = gds_dlist_node_get_inline(n);
-		gds_inline_dlist_node_set_next(ti, i);
-		gds_inline_dlist_node_set_prev(i, ti);
+		gds_inline_dlist_node_next(ti, i);
+		gds_inline_dlist_node_prev(i, ti);
 
 		ti = gds_inline_dlist_node_get_next(ti);
 	}

@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include "../check_arg.h"
 #include "inline/dlist.h"
+#include "undefined.h"
 
 void gds_inline_dlist_node_init(gds_inline_dlist_node_t *node)
 {
@@ -28,40 +29,34 @@ void gds_inline_dlist_node_init(gds_inline_dlist_node_t *node)
 	node->next = node->prev = NULL;
 }
 
-gds_inline_dlist_node_t * gds_inline_dlist_node_get_prev(
-	gds_inline_dlist_node_t *node)
+gds_inline_dlist_node_t * gds_inline_dlist_node_prev(
+	gds_inline_dlist_node_t *node, gds_inline_dlist_node_t *prev)
 {
-	GDS_CHECK_ARG_NOT_NULL(node);
+	gds_inline_dlist_node_t *_prev = UNDEFINED;
 
-	return node->prev;
+	if (!NULL_OR_UNDEFINED(node)) {
+		if (prev != UNDEFINED) {
+			node->prev = prev;
+		}
+		_prev = node->prev;
+	}
+
+	return _prev;
 }
 
-gds_inline_dlist_node_t * gds_inline_dlist_node_get_next(
-	gds_inline_dlist_node_t *node)
+gds_inline_dlist_node_t * gds_inline_dlist_node_next(
+	gds_inline_dlist_node_t *node, gds_inline_dlist_node_t *next)
 {
-	GDS_CHECK_ARG_NOT_NULL(node);
+	gds_inline_dlist_node_t *_next = UNDEFINED;
 
-	return node->next;
-}
+	if (!NULL_OR_UNDEFINED(node)) {
+		if (next != UNDEFINED) {
+			node->next = next;
+		}
+		_next = node->next;
+	}
 
-int gds_inline_dlist_node_set_prev(gds_inline_dlist_node_t *node,
-	gds_inline_dlist_node_t *prev)
-{
-	GDS_CHECK_ARG_NOT_NULL(node);
-
-	node->prev = prev;
-
-	return 0;
-}
-
-int gds_inline_dlist_node_set_next(gds_inline_dlist_node_t *node,
-	gds_inline_dlist_node_t *next)
-{
-	GDS_CHECK_ARG_NOT_NULL(node);
-
-	node->next = next;
-
-	return 0;
+	return _next;
 }
 
 static int _gds_inline_dlist_head_tail(gds_inline_dlist_node_t *node,
@@ -154,10 +149,10 @@ int _gds_inline_dlist_remove(gds_inline_dlist_node_t *node, int offset,
 	int length, void *callback, void *callback_data, int backward,
 	gds_inline_dlist_node_t **before, gds_inline_dlist_node_t **after)
 {
-	gds_inline_dlist_node_t * (*prev)(gds_inline_dlist_node_t *);
-	int (*set_prev)(gds_inline_dlist_node_t *, gds_inline_dlist_node_t *);
-	gds_inline_dlist_node_t * (*next)(gds_inline_dlist_node_t *);
-	int (*set_next)(gds_inline_dlist_node_t *, gds_inline_dlist_node_t *);
+	gds_inline_dlist_node_t * (*prev)(gds_inline_dlist_node_t *,
+		gds_inline_dlist_node_t *);
+	gds_inline_dlist_node_t * (*next)(gds_inline_dlist_node_t *,
+		gds_inline_dlist_node_t *);
 	void (*cb)(gds_inline_dlist_node_t *, void *) = callback;
 	gds_inline_dlist_node_t *a, *b, *tmp, *tmp2;
 	int i, n;
@@ -166,29 +161,25 @@ int _gds_inline_dlist_remove(gds_inline_dlist_node_t *node, int offset,
 	length = abs(length);
 
 	if (backward) {
-		prev = gds_inline_dlist_node_get_next;
-		set_prev = gds_inline_dlist_node_set_next;
-		next = gds_inline_dlist_node_get_prev;
-		set_next = gds_inline_dlist_node_set_prev;
+		prev = gds_inline_dlist_node_next;
+		next = gds_inline_dlist_node_prev;
 	} else {
-		prev = gds_inline_dlist_node_get_prev;
-		set_prev = gds_inline_dlist_node_set_prev;
-		next = gds_inline_dlist_node_get_next;
-		set_next = gds_inline_dlist_node_set_next;
+		prev = gds_inline_dlist_node_prev;
+		next = gds_inline_dlist_node_next;
 	}
 
-	b = prev(node);
+	b = prev(node, UNDEFINED);
 	tmp = node;
 	i = 0;
 	while (tmp != NULL && i != offset) {
 		b = tmp;
-		tmp = next(tmp);
+		tmp = next(tmp, UNDEFINED);
 		i++;
 	}
 
 	n = 0;
 	while (tmp != NULL && i != offset+length) {
-		tmp2 = next(tmp);
+		tmp2 = next(tmp, UNDEFINED);
 		if (cb != NULL) {
 			cb(tmp, callback_data);
 		}
@@ -198,8 +189,8 @@ int _gds_inline_dlist_remove(gds_inline_dlist_node_t *node, int offset,
 	}
 	a = tmp;
 
-	if (a != NULL) set_prev(a, b);
-	if (b != NULL) set_next(b, a);
+	if (a != NULL) prev(a, b);
+	if (b != NULL) next(b, a);
 
 	if (before != NULL) {
 		*before = backward ? a : b;

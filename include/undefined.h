@@ -21,5 +21,6 @@
 #define gds_undefined_h_included
 
 #define UNDEFINED ((void *)-1)
+#define NULL_OR_UNDEFINED(ptr) ( ((ptr) == NULL) || ((ptr) == UNDEFINED) )
 
 #endif /* ! gds_undefined_h_included */
