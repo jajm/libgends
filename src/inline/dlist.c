@@ -75,7 +75,7 @@ static int _gds_inline_dlist_head_tail(gds_inline_dlist_node_t *node,
 	if (check != NULL && tmp->prev == check) {
 		return -1;
 	}
-	*head = tmp;
+	if (head != NULL) *head = tmp;
 
 	/* Get tail */
 	tmp = node;
@@ -86,7 +86,7 @@ static int _gds_inline_dlist_head_tail(gds_inline_dlist_node_t *node,
 	if (check != NULL && tmp->next == check) {
 		return -1;
 	}
-	*tail = tmp;
+	if (tail != NULL) *tail = tmp;
 
 	return size;
 }
@@ -145,61 +145,79 @@ int gds_inline_dlist_node_append_list(gds_inline_dlist_node_t *node1,
 	return added;
 }
 
-int _gds_inline_dlist_remove(gds_inline_dlist_node_t *node, int offset,
-	int length, void *callback, void *callback_data, int backward,
-	gds_inline_dlist_node_t **before, gds_inline_dlist_node_t **after)
+unsigned int _gds_inline_dlist_node_remove(gds_inline_dlist_node_t *node,
+	unsigned int length_before, unsigned int length_after, void *callback,
+	void *callback_data, gds_inline_dlist_node_t **before,
+	gds_inline_dlist_node_t **after)
 {
-	gds_inline_dlist_node_t * (*prev)(gds_inline_dlist_node_t *,
-		gds_inline_dlist_node_t *);
-	gds_inline_dlist_node_t * (*next)(gds_inline_dlist_node_t *,
-		gds_inline_dlist_node_t *);
+	unsigned int i, deleted_nodes = 0;
+	gds_inline_dlist_node_t *it, *a, *b;
 	void (*cb)(gds_inline_dlist_node_t *, void *) = callback;
-	gds_inline_dlist_node_t *a, *b, *tmp, *tmp2;
-	int i, n;
 
-	offset = abs(offset);
-	length = abs(length);
-
-	if (backward) {
-		prev = gds_inline_dlist_node_next;
-		next = gds_inline_dlist_node_prev;
-	} else {
-		prev = gds_inline_dlist_node_prev;
-		next = gds_inline_dlist_node_next;
-	}
-
-	b = prev(node, UNDEFINED);
-	tmp = node;
-	i = 0;
-	while (tmp != NULL && i != offset) {
-		b = tmp;
-		tmp = next(tmp, UNDEFINED);
-		i++;
-	}
-
-	n = 0;
-	while (tmp != NULL && i != offset+length) {
-		tmp2 = next(tmp, UNDEFINED);
-		if (cb != NULL) {
-			cb(tmp, callback_data);
+	if (node != NULL) {
+		i = 0; it = b = node->prev;
+		while (it != NULL && i < length_before) {
+			b = it->prev;
+			if (cb != NULL) cb(it, callback_data);
+			it = b;
+			i++;
 		}
-		tmp = tmp2;
-		n++;
-		i++;
-	}
-	a = tmp;
+		deleted_nodes += i;
 
-	if (a != NULL) prev(a, b);
-	if (b != NULL) next(b, a);
+		i = 0; it = a = node->next;
+		while (it != NULL && i < length_after) {
+			a = it->next;
+			if (cb != NULL) cb(it, callback_data);
+			it = a;
+			i++;
+		}
+		deleted_nodes += i;
 
-	if (before != NULL) {
-		*before = backward ? a : b;
-	}
-	if (after != NULL) {
-		*after = backward ? b : a;
+		if (cb != NULL) cb(node, callback_data);
+		deleted_nodes++;
+
+		if (b != NULL) b->next = a;
+		if (a != NULL) a->prev = b;
+
+		if (before != NULL) *before = b;
+		if (after != NULL) *after = a;
 	}
 
-	return n;
+	return deleted_nodes;
+}
+
+gds_inline_dlist_node_t * _gds_inline_dlist_get(gds_inline_dlist_node_t *node,
+	int offset, gds_inline_dlist_node_t **before,
+	gds_inline_dlist_node_t **after)
+{
+	gds_inline_dlist_node_t *it = NULL, *a = NULL, *b = NULL;
+	int i = 0;
+
+	if (node != NULL) {
+		b = node->prev;
+		a = node->next;
+		it = node;
+		if (offset >= 0) {
+			while (it != NULL && i < offset) {
+				b = it;
+				it = it->next;
+				i++;
+			}
+			a = (it != NULL) ? it->next : it;
+		} else {
+			while (it != NULL && i > offset) {
+				a = it;
+				it = it->prev;
+				i--;
+			}
+			b = (it != NULL) ? it->prev : NULL;
+		}
+	}
+
+	if (before != NULL) *before = b;
+	if (after != NULL) *after = a;
+
+	return it;
 }
 
 int gds_inline_dlist_splice(gds_inline_dlist_node_t *node, int offset,
@@ -214,33 +232,40 @@ int gds_inline_dlist_splice(gds_inline_dlist_node_t *node, int offset,
 
 	GDS_CHECK_ARG_NOT_NULL(node);
 
-	if (length < 0) {
-		offset1 = offset + length + 1;
-		offset2 = offset;
-	} else {
-		offset1 = offset;
-		offset2 = offset + length - 1;
-	}
+	if (length != 0) {
+		unsigned int length_before = 0, length_after = 0;
 
-	if (offset1 >= 0) {
-		added -= _gds_inline_dlist_remove(node, offset1, length,
-			callback, callback_data, 0, &before_rm, &after_rm);
-	} else if (offset2 <= 0) {
-		added -= _gds_inline_dlist_remove(node, offset2, length,
-			callback, callback_data, 1, &before_rm, &after_rm);
-	} else {
-		/* offset1 < 0 && offset2 > 0 */
-		added -= _gds_inline_dlist_remove(node, 1, offset1, callback,
-			callback_data, 1, &before_rm, NULL);
-		added -= _gds_inline_dlist_remove(node, 0, offset2 + 1,
-			callback, callback_data, 0, NULL, &after_rm);
-	}
+		if (length < 0) {
+			offset1 = offset + length + 1;
+			offset2 = offset;
+		} else {
+			offset1 = offset;
+			offset2 = offset + length - 1;
+		}
 
-	if (before_rm == NULL && newhead != NULL) {
-		*newhead = after_rm;
-	}
-	if (after_rm == NULL && newtail != NULL) {
-		*newtail = before_rm;
+		if (offset1 >= 0) {
+			length_after = offset2 - offset1;
+			node = gds_inline_dlist_get(node, offset1);
+		} else if (offset2 <= 0) {
+			length_before = offset2 - offset1;
+			node = gds_inline_dlist_get(node, offset2);
+		} else {
+			/* offset1 < 0 && offset2 > 0 */
+			length_before = -offset1;
+			length_after = offset2;
+		}
+		added -= _gds_inline_dlist_node_remove(node, length_before,
+			length_after, callback, callback_data, &before_rm,
+			&after_rm);
+	} else {
+		if (offset >= 0) {
+			after_rm = _gds_inline_dlist_get(node, offset,
+				&before_rm, NULL);
+		} else {
+			node = _gds_inline_dlist_get(node, offset, &before_rm,
+				&after_rm);
+			if (node != NULL) after_rm = node;
+		}
 	}
 
 	if (replacement != NULL) {
@@ -253,6 +278,13 @@ int gds_inline_dlist_splice(gds_inline_dlist_node_t *node, int offset,
 		} else {
 			added += _gds_inline_dlist_head_tail(replacement, NULL, newhead,
 				newtail);
+		}
+	} else {
+		if (before_rm == NULL && newhead != NULL) {
+			*newhead = after_rm;
+		}
+		if (after_rm == NULL && newtail != NULL) {
+			*newtail = before_rm;
 		}
 	}
 
