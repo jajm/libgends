@@ -186,6 +186,57 @@ unsigned int _gds_inline_dlist_node_remove(gds_inline_dlist_node_t *node,
 	return deleted_nodes;
 }
 
+unsigned int _gds_inline_dlist_remove(gds_inline_dlist_node_t *node, int offset,
+	int length, void *callback, void *callback_data,
+	gds_inline_dlist_node_t **before, gds_inline_dlist_node_t **after)
+{
+	unsigned int length_before = 0, length_after = 0;
+	int offset1, offset2;
+	unsigned int removed = 0;
+
+	if (length != 0) {
+		if (length < 0) {
+			offset1 = offset + length + 1;
+			offset2 = offset;
+		} else {
+			offset1 = offset;
+			offset2 = offset + length - 1;
+		}
+
+		if (offset1 >= 0) {
+			length_after = offset2 - offset1;
+			node = gds_inline_dlist_get(node, offset1);
+		} else if (offset2 <= 0) {
+			length_before = offset2 - offset1;
+			node = gds_inline_dlist_get(node, offset2);
+		} else {
+			/* offset1 < 0 && offset2 > 0 */
+			length_before = -offset1;
+			length_after = offset2;
+		}
+		removed = _gds_inline_dlist_node_remove(node, length_before,
+			length_after, callback, callback_data, before, after);
+	}
+
+	return removed;
+}
+
+unsigned int gds_inline_dlist_remove(gds_inline_dlist_node_t *node, int offset,
+	int length, void *callback, void *callback_data,
+	gds_inline_dlist_node_t **newhead, gds_inline_dlist_node_t **newtail)
+{
+	gds_inline_dlist_node_t *before, *after;
+	unsigned int removed;
+
+	removed = _gds_inline_dlist_remove(node, offset, length, callback,
+		callback_data, &before, &after);
+
+	if (before == NULL && newhead != NULL) *newhead = after;
+	if (after == NULL && newtail != NULL) *newtail = before;
+
+	return removed;
+}
+
 gds_inline_dlist_node_t * _gds_inline_dlist_get(gds_inline_dlist_node_t *node,
 	int offset, gds_inline_dlist_node_t **before,
 	gds_inline_dlist_node_t **after)
@@ -227,36 +278,13 @@ int gds_inline_dlist_splice(gds_inline_dlist_node_t *node, int offset,
 {
 	gds_inline_dlist_node_t *before_rm;
 	gds_inline_dlist_node_t *after_rm;
-	int offset1, offset2;
 	int added = 0;
 
 	GDS_CHECK_ARG_NOT_NULL(node);
 
 	if (length != 0) {
-		unsigned int length_before = 0, length_after = 0;
-
-		if (length < 0) {
-			offset1 = offset + length + 1;
-			offset2 = offset;
-		} else {
-			offset1 = offset;
-			offset2 = offset + length - 1;
-		}
-
-		if (offset1 >= 0) {
-			length_after = offset2 - offset1;
-			node = gds_inline_dlist_get(node, offset1);
-		} else if (offset2 <= 0) {
-			length_before = offset2 - offset1;
-			node = gds_inline_dlist_get(node, offset2);
-		} else {
-			/* offset1 < 0 && offset2 > 0 */
-			length_before = -offset1;
-			length_after = offset2;
-		}
-		added -= _gds_inline_dlist_node_remove(node, length_before,
-			length_after, callback, callback_data, &before_rm,
-			&after_rm);
+		added -= _gds_inline_dlist_remove(node, offset, length,
+			callback, callback_data, &before_rm, &after_rm);
 	} else {
 		if (offset >= 0) {
 			after_rm = _gds_inline_dlist_get(node, offset,

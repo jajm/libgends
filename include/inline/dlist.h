@@ -137,6 +137,42 @@ gds_inline_dlist_node_append_list(
 );
 
 /*
+ * Remove nodes from list.
+ *
+ * Parameters:
+ *   node: a node in the list
+ *   offset: removal starting point
+ *           if offset > 0, start removal <offset> nodes after <node>
+ *           if offset < 0, start removal <offset> nodes before <node>
+ *           if offset = 0, start removal at <node>
+ *   length: number of nodes to remove
+ *           if length > 0, remove in direction of tail
+ *           if length < 0, remove in direction of head
+ *   callback: function called on node before removal
+ *             prototype is void callback(gds_inline_dlist_node_t *, void *)
+ *             first parameter is the node that will be removed
+ *             second parameter is <callback_data>
+ *   callback_data: data passed to <callback>
+ *   newhead: if not NULL, and if head of list was just removed, address of new
+ *            head is affected to *newhead
+ *   newtail: if not NULL, and if tail of list was just removed, address of new
+ *            tail is affected to *newtail
+ *
+ * Returns:
+ *   Number of removed nodes.
+ */
+unsigned int
+gds_inline_dlist_remove(
+	gds_inline_dlist_node_t *node,
+	int offset,
+	int length,
+	void *callback,
+	void *callback_data,
+	gds_inline_dlist_node_t **newhead,
+	gds_inline_dlist_node_t **newtail
+);
+
+/*
  * Remove nodes from list and insert other nodes in place.
  *
  * Parameters:
