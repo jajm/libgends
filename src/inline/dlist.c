@@ -276,8 +276,8 @@ int gds_inline_dlist_splice(gds_inline_dlist_node_t *node, int offset,
 	gds_inline_dlist_node_t *replacement, gds_inline_dlist_node_t **newhead,
 	gds_inline_dlist_node_t **newtail)
 {
-	gds_inline_dlist_node_t *before_rm;
-	gds_inline_dlist_node_t *after_rm;
+	gds_inline_dlist_node_t *before_rm = UNDEFINED;
+	gds_inline_dlist_node_t *after_rm = UNDEFINED;
 	int added = 0;
 
 	GDS_CHECK_ARG_NOT_NULL(node);
