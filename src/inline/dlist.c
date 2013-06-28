@@ -56,7 +56,7 @@ static int _gds_inline_dlist_head_tail(gds_inline_dlist_node_t *node,
 	return size;
 }
 
-unsigned int _gds_inline_dlist_node_remove(gds_inline_dlist_node_t *node,
+static unsigned int _gds_inline_dlist_node_remove(gds_inline_dlist_node_t *node,
 	unsigned int length_before, unsigned int length_after, void *callback,
 	void *callback_data, gds_inline_dlist_node_t **before,
 	gds_inline_dlist_node_t **after)
@@ -97,8 +97,8 @@ unsigned int _gds_inline_dlist_node_remove(gds_inline_dlist_node_t *node,
 	return deleted_nodes;
 }
 
-unsigned int _gds_inline_dlist_remove(gds_inline_dlist_node_t *node, int offset,
-	int length, void *callback, void *callback_data,
+static unsigned int _gds_inline_dlist_remove(gds_inline_dlist_node_t *node,
+	int offset, int length, void *callback, void *callback_data,
 	gds_inline_dlist_node_t **before, gds_inline_dlist_node_t **after)
 {
 	unsigned int length_before = 0, length_after = 0;
@@ -132,9 +132,9 @@ unsigned int _gds_inline_dlist_remove(gds_inline_dlist_node_t *node, int offset,
 	return removed;
 }
 
-gds_inline_dlist_node_t * _gds_inline_dlist_get(gds_inline_dlist_node_t *node,
-	int offset, gds_inline_dlist_node_t **before,
-	gds_inline_dlist_node_t **after)
+static gds_inline_dlist_node_t * _gds_inline_dlist_get(
+	gds_inline_dlist_node_t *node, int offset,
+	gds_inline_dlist_node_t **before, gds_inline_dlist_node_t **after)
 {
 	gds_inline_dlist_node_t *it = NULL, *a = NULL, *b = NULL;
 	int i = 0;
