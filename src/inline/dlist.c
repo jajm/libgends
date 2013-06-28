@@ -263,7 +263,7 @@ unsigned int gds_inline_dlist_remove(gds_inline_dlist_node_t *node, int offset,
 	int length, void *callback, void *callback_data,
 	gds_inline_dlist_node_t **newhead, gds_inline_dlist_node_t **newtail)
 {
-	gds_inline_dlist_node_t *before, *after;
+	gds_inline_dlist_node_t *before = UNDEFINED, *after = UNDEFINED;
 	unsigned int removed;
 
 	removed = _gds_inline_dlist_remove(node, offset, length, callback,
