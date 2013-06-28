@@ -265,14 +265,6 @@ int gds_inline_dlist_node_append_list(gds_inline_dlist_node_t *node1,
 	return added;
 }
 
-unsigned int gds_inline_dlist_remove(gds_inline_dlist_node_t *node, int offset,
-	int length, void *callback, void *callback_data,
-	gds_inline_dlist_node_t **newhead, gds_inline_dlist_node_t **newtail)
-{
-	return _gds_inline_dlist_remove(node, offset, length, callback,
-		callback_data, NULL, NULL, newhead, newtail);
-}
-
 int gds_inline_dlist_insert(gds_inline_dlist_node_t *node, int offset,
 	gds_inline_dlist_node_t *list, gds_inline_dlist_node_t **newhead,
 	gds_inline_dlist_node_t **newtail)
@@ -297,6 +289,14 @@ int gds_inline_dlist_insert(gds_inline_dlist_node_t *node, int offset,
 	}
 
 	return added;
+}
+
+unsigned int gds_inline_dlist_remove(gds_inline_dlist_node_t *node, int offset,
+	int length, void *callback, void *callback_data,
+	gds_inline_dlist_node_t **newhead, gds_inline_dlist_node_t **newtail)
+{
+	return _gds_inline_dlist_remove(node, offset, length, callback,
+		callback_data, NULL, NULL, newhead, newtail);
 }
 
 int gds_inline_dlist_splice(gds_inline_dlist_node_t *node, int offset,
