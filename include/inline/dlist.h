@@ -137,6 +137,30 @@ gds_inline_dlist_node_append_list(
 );
 
 /*
+ * Insert nodes in list.
+ *
+ * Parameters:
+ *   node: A node in the list.
+ *   offset: Where to insert the nodes in the list. Can be negative.
+ *   list: A node in the list to insert.
+ *   newhead: if not NULL, and if head of list was just changed, address of new
+ *            head is affected to *newhead
+ *   newtail: if not NULL, and if tail of list was just changed, address of new
+ *            tail is affected to *newtail
+ *
+ * Returns:
+ *   number of added nodes, ie. size of inserted list
+ *   or a negative value in case of failure.
+ */
+int gds_inline_dlist_insert(
+	gds_inline_dlist_node_t *node,
+	int offset,
+	gds_inline_dlist_node_t *list,
+	gds_inline_dlist_node_t **newhead,
+	gds_inline_dlist_node_t **newtail
+);
+
+/*
  * Remove nodes from list.
  *
  * Parameters:

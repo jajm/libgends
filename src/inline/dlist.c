@@ -271,52 +271,67 @@ gds_inline_dlist_node_t * _gds_inline_dlist_get(gds_inline_dlist_node_t *node,
 	return it;
 }
 
+int gds_inline_dlist_insert(gds_inline_dlist_node_t *node, int offset,
+	gds_inline_dlist_node_t *list, gds_inline_dlist_node_t **newhead,
+	gds_inline_dlist_node_t **newtail)
+{
+	gds_inline_dlist_node_t *before, *after;
+	int added = 0;
+
+	if (list != NULL) {
+		node = _gds_inline_dlist_get(node, offset, &before, &after);
+		if (node == NULL) node = after;
+
+		if (node != NULL) {
+			added = gds_inline_dlist_node_prepend_list(node,
+				list, newhead);
+		} else if (before != NULL) {
+			added = gds_inline_dlist_node_append_list(before,
+				list, newtail);
+		} else {
+			added = _gds_inline_dlist_head_tail(list, NULL,
+				newhead, newtail);
+		}
+	}
+
+	return added;
+}
+
 int gds_inline_dlist_splice(gds_inline_dlist_node_t *node, int offset,
 	int length, void *callback, void *callback_data,
 	gds_inline_dlist_node_t *replacement, gds_inline_dlist_node_t **newhead,
 	gds_inline_dlist_node_t **newtail)
 {
-	gds_inline_dlist_node_t *before_rm = UNDEFINED;
-	gds_inline_dlist_node_t *after_rm = UNDEFINED;
-	int added = 0;
+	gds_inline_dlist_node_t *before_rm, *after_rm;
+	int removed = 0, added = 0, ret;
 
 	GDS_CHECK_ARG_NOT_NULL(node);
 
 	if (length != 0) {
-		added -= _gds_inline_dlist_remove(node, offset, length,
+		removed = _gds_inline_dlist_remove(node, offset, length,
 			callback, callback_data, &before_rm, &after_rm);
-	} else {
-		if (offset >= 0) {
-			after_rm = _gds_inline_dlist_get(node, offset,
-				&before_rm, NULL);
+
+		if (before_rm == NULL && newhead != NULL) *newhead = after_rm;
+		if (after_rm == NULL && newtail != NULL) *newtail = before_rm;
+
+		/* Set node and offset for insert. */
+		if (after_rm != NULL) {
+			node = after_rm;
+			offset = 0;
+		} else if (before_rm != NULL) {
+			node = before_rm;
+			offset = 1;
 		} else {
-			node = _gds_inline_dlist_get(node, offset, &before_rm,
-				&after_rm);
-			if (node != NULL) after_rm = node;
+			node = NULL;
 		}
 	}
 
-	if (replacement != NULL) {
-		if (before_rm != NULL) {
-			added += gds_inline_dlist_node_append_list(before_rm,
-				replacement, newtail);
-		} else if (after_rm != NULL) {
-			added += gds_inline_dlist_node_prepend_list(after_rm,
-				replacement, newhead);
-		} else {
-			added += _gds_inline_dlist_head_tail(replacement, NULL, newhead,
-				newtail);
-		}
-	} else {
-		if (before_rm == NULL && newhead != NULL) {
-			*newhead = after_rm;
-		}
-		if (after_rm == NULL && newtail != NULL) {
-			*newtail = before_rm;
-		}
-	}
+	added = gds_inline_dlist_insert(node, offset, replacement, newhead,
+		newtail);
 
-	return added;
+	ret = (added > 0) ? added - removed : -removed;
+
+	return ret;
 }
 
 gds_inline_dlist_node_t * gds_inline_dlist_get(gds_inline_dlist_node_t *node,
