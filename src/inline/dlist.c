@@ -59,7 +59,8 @@ static int _gds_inline_dlist_head_tail(gds_inline_dlist_node_t *node,
 static unsigned int _gds_inline_dlist_node_remove(gds_inline_dlist_node_t *node,
 	unsigned int length_before, unsigned int length_after, void *callback,
 	void *callback_data, gds_inline_dlist_node_t **before,
-	gds_inline_dlist_node_t **after)
+	gds_inline_dlist_node_t **after, gds_inline_dlist_node_t **newhead,
+	gds_inline_dlist_node_t **newtail)
 {
 	unsigned int i, deleted_nodes = 0;
 	gds_inline_dlist_node_t *it, *a, *b;
@@ -88,7 +89,9 @@ static unsigned int _gds_inline_dlist_node_remove(gds_inline_dlist_node_t *node,
 		deleted_nodes++;
 
 		if (b != NULL) b->next = a;
+		else if (newhead != NULL) *newhead = a;
 		if (a != NULL) a->prev = b;
+		else if (newtail != NULL) *newtail = b;
 
 		if (before != NULL) *before = b;
 		if (after != NULL) *after = a;
@@ -99,7 +102,8 @@ static unsigned int _gds_inline_dlist_node_remove(gds_inline_dlist_node_t *node,
 
 static unsigned int _gds_inline_dlist_remove(gds_inline_dlist_node_t *node,
 	int offset, int length, void *callback, void *callback_data,
-	gds_inline_dlist_node_t **before, gds_inline_dlist_node_t **after)
+	gds_inline_dlist_node_t **before, gds_inline_dlist_node_t **after,
+	gds_inline_dlist_node_t **newhead, gds_inline_dlist_node_t **newtail)
 {
 	unsigned int length_before = 0, length_after = 0;
 	int offset1, offset2;
@@ -126,7 +130,9 @@ static unsigned int _gds_inline_dlist_remove(gds_inline_dlist_node_t *node,
 			length_after = offset2;
 		}
 		removed = _gds_inline_dlist_node_remove(node, length_before,
-			length_after, callback, callback_data, before, after);
+			length_after, callback, callback_data, before, after,
+				newhead, newtail);
+
 	}
 
 	return removed;
@@ -263,16 +269,8 @@ unsigned int gds_inline_dlist_remove(gds_inline_dlist_node_t *node, int offset,
 	int length, void *callback, void *callback_data,
 	gds_inline_dlist_node_t **newhead, gds_inline_dlist_node_t **newtail)
 {
-	gds_inline_dlist_node_t *before = UNDEFINED, *after = UNDEFINED;
-	unsigned int removed;
-
-	removed = _gds_inline_dlist_remove(node, offset, length, callback,
-		callback_data, &before, &after);
-
-	if (before == NULL && newhead != NULL) *newhead = after;
-	if (after == NULL && newtail != NULL) *newtail = before;
-
-	return removed;
+	return _gds_inline_dlist_remove(node, offset, length, callback,
+		callback_data, NULL, NULL, newhead, newtail);
 }
 
 int gds_inline_dlist_insert(gds_inline_dlist_node_t *node, int offset,
@@ -311,10 +309,8 @@ int gds_inline_dlist_splice(gds_inline_dlist_node_t *node, int offset,
 
 	if (length != 0) {
 		removed = _gds_inline_dlist_remove(node, offset, length,
-			callback, callback_data, &before_rm, &after_rm);
-
-		if (before_rm == NULL && newhead != NULL) *newhead = after_rm;
-		if (after_rm == NULL && newtail != NULL) *newtail = before_rm;
+			callback, callback_data, &before_rm, &after_rm, newhead,
+			newtail);
 
 		/* Set node and offset for insert. */
 		if (after_rm != NULL) {
