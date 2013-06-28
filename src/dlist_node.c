@@ -46,9 +46,7 @@ gds_dlist_node_t * gds_dlist_node_get_container_of(
 
 gds_inline_dlist_node_t *gds_dlist_node_get_inline(gds_dlist_node_t *node)
 {
-	GDS_CHECK_ARG_NOT_NULL(node);
-
-	return &(node->inline_dlist_node);
+	return (node != NULL) ? &(node->inline_dlist_node) : NULL;
 }
 
 gds_dlist_node_t *gds_dlist_node_new(void *data)
