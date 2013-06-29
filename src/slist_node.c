@@ -46,9 +46,7 @@ gds_slist_node_t * gds_slist_node_get_container_of(
 
 gds_inline_slist_node_t *gds_slist_node_get_inline(gds_slist_node_t *node)
 {
-	GDS_CHECK_ARG_NOT_NULL(node);
-
-	return &(node->slist_node_inline);
+	return (node != NULL) ? &(node->slist_node_inline) : NULL;
 }
 
 gds_slist_node_t *gds_slist_node_new(void *data)
@@ -112,7 +110,7 @@ gds_slist_node_t * gds_slist_node_copy(gds_slist_node_t *node)
 		tmp2 = gds_slist_node_get_container_of(t2i);
 		n = gds_slist_node_new(tmp2->data);
 		i = gds_slist_node_get_inline(n);
-		gds_inline_slist_node_set_next(ti, i);
+		gds_inline_slist_node_next(ti, i);
 
 		ti = gds_inline_slist_node_get_next(ti);
 	}

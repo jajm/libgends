@@ -64,19 +64,22 @@ void t_gds_inline_slist_insert(void)
 
 	/* Create two list of two nodes */
 	fi = &(nodes[0]->inline_node);
-	gds_inline_slist_insert(&fi, 1, &(nodes[4]->inline_node), NULL);
+	gds_inline_slist_insert(fi, 1, &(nodes[4]->inline_node), &fi, NULL);
+	assert_list_equal(nodes[0], 2, (int[]) {0,4});
 	fi2 = &(nodes[1]->inline_node);
-	gds_inline_slist_insert(&fi2, 1, &(nodes[2]->inline_node), NULL);
+	gds_inline_slist_insert(fi2, 1, &(nodes[2]->inline_node), &fi2, NULL);
+	assert_list_equal(nodes[1], 2, (int[]) {1,2});
 	/* And insert one list into the other */
-	gds_inline_slist_insert(&fi, 1, fi2, NULL);
+	gds_inline_slist_insert(fi, 1, fi2, &fi, NULL);
+	assert_list_equal(nodes[0], 4, (int[]) {0,1,2,4});
 	/* Add a node at a specified offset */
-	gds_inline_slist_insert(&fi, 3, &(nodes[3]->inline_node), NULL);
+	gds_inline_slist_insert(fi, 3, &(nodes[3]->inline_node), &fi, NULL);
 
 	assert_list_equal(nodes[0], 5, (int[]) {0,1,2,3,4});
 
-	gds_inline_slist_insert(&fi, 5, &(nodes[9]->inline_node), NULL);
+	gds_inline_slist_insert(fi, 5, &(nodes[9]->inline_node), &fi, NULL);
 	for (i = 5; i < 9; i++) {
-		gds_inline_slist_insert(&fi, i, &(nodes[i]->inline_node),
+		gds_inline_slist_insert(fi, i, &(nodes[i]->inline_node), &fi,
 			NULL);
 	}
 
@@ -103,34 +106,34 @@ void t_gds_inline_slist_remove(void)
 	}
 	fi = &(nodes[0]->inline_node);
 	for (i = 1; i < 10; i++) {
-		gds_inline_slist_insert(&fi, i, &(nodes[i]->inline_node),
+		gds_inline_slist_insert(fi, i, &(nodes[i]->inline_node), &fi,
 			NULL);
 	}
 
 	assert_list_equal(test_list_node_get_container(fi), 10, (int[]) {0,1,2,3,4,5,6,7,8,9});
 
-	gds_inline_slist_remove(&fi, 0, 0, test_list_node_inline_free,
-		NULL, &li);
+	gds_inline_slist_remove(fi, 0, 0, test_list_node_inline_free,
+		NULL, &fi, &li);
 	assert_list_equal(test_list_node_get_container(fi), 10, (int[]) {0,1,2,3,4,5,6,7,8,9});
 	CU_ASSERT_PTR_NULL(li);
 
-	gds_inline_slist_remove(&fi, 0, 1, test_list_node_inline_free,
-		NULL, &li);
+	gds_inline_slist_remove(fi, 0, 1, test_list_node_inline_free,
+		NULL, &fi, &li);
 	assert_list_equal(test_list_node_get_container(fi), 9, (int[]) {1,2,3,4,5,6,7,8,9});
 	CU_ASSERT_PTR_NULL(li);
 
-	gds_inline_slist_remove(&fi, 3, 3, test_list_node_inline_free,
-		NULL, &li);
+	gds_inline_slist_remove(fi, 3, 3, test_list_node_inline_free,
+		NULL, &fi, &li);
 	assert_list_equal(test_list_node_get_container(fi), 6, (int[]) {1,2,3,7,8,9});
 	CU_ASSERT_PTR_NULL(li);
 
-	gds_inline_slist_remove(&fi, 3, 10, test_list_node_inline_free,
-		NULL, &li);
+	gds_inline_slist_remove(fi, 3, 10, test_list_node_inline_free,
+		NULL, &fi, &li);
 	assert_list_equal(test_list_node_get_container(fi), 3, (int[]) {1,2,3});
 	CU_ASSERT_PTR_EQUAL(li, &(nodes[3]->inline_node));
 
-	gds_inline_slist_remove(&fi, 0, 10, test_list_node_inline_free,
-		NULL, &li);
+	gds_inline_slist_remove(fi, 0, 10, test_list_node_inline_free,
+		NULL, &fi, &li);
 	assert_list_equal(test_list_node_get_container(fi), 0, (int[]) {});
 	CU_ASSERT_PTR_NULL(li);
 }
@@ -147,7 +150,7 @@ void t_gds_inline_slist_get(void)
 	}
 	fi = &(nodes[0]->inline_node);
 	for (i = 1; i < 10; i++) {
-		gds_inline_slist_insert(&fi, i, &(nodes[i]->inline_node),
+		gds_inline_slist_insert(fi, i, &(nodes[i]->inline_node), &fi,
 			NULL);
 	}
 
