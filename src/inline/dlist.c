@@ -211,26 +211,26 @@ gds_inline_dlist_node_t * gds_inline_dlist_node_next(
 	return _next;
 }
 
-int gds_inline_dlist_node_prepend_list(gds_inline_dlist_node_t *node1,
-	gds_inline_dlist_node_t *node2, gds_inline_dlist_node_t **newhead)
+int gds_inline_dlist_node_prepend(gds_inline_dlist_node_t *node,
+	gds_inline_dlist_node_t *list, gds_inline_dlist_node_t **newhead)
 {
 	gds_inline_dlist_node_t *head, *tail;
 	int added = 0;
 
-	GDS_CHECK_ARG_NOT_NULL(node1);
+	GDS_CHECK_ARG_NOT_NULL(node);
 
-	if (node2 != NULL) {
-		added = _gds_inline_dlist_head_tail(node2, node1, &head, &tail);
+	if (list != NULL) {
+		added = _gds_inline_dlist_head_tail(list, node, &head, &tail);
 		if (added < 0) {
-			GDS_LOG_ERROR("node1 and node2 are in the same list. "
+			GDS_LOG_ERROR("<node> and <list> are in the same list. "
 				"Refusing to continue.");
 			return -1;
 		}
 
-		head->prev = node1->prev;
+		head->prev = node->prev;
 		if (head->prev != NULL) head->prev->next = head;
-		tail->next = node1;
-		node1->prev = tail;
+		tail->next = node;
+		node->prev = tail;
 
 		if (head->prev == NULL && newhead != NULL) *newhead = head;
 	}
@@ -238,26 +238,26 @@ int gds_inline_dlist_node_prepend_list(gds_inline_dlist_node_t *node1,
 	return added;
 }
 
-int gds_inline_dlist_node_append_list(gds_inline_dlist_node_t *node1,
-	gds_inline_dlist_node_t *node2, gds_inline_dlist_node_t **newtail)
+int gds_inline_dlist_node_append(gds_inline_dlist_node_t *node,
+	gds_inline_dlist_node_t *list, gds_inline_dlist_node_t **newtail)
 {
 	gds_inline_dlist_node_t *head, *tail;
 	int added = 0;
 
-	GDS_CHECK_ARG_NOT_NULL(node1);
+	GDS_CHECK_ARG_NOT_NULL(node);
 
-	if (node2 != NULL) {
-		added = _gds_inline_dlist_head_tail(node2, node1, &head, &tail);
+	if (list != NULL) {
+		added = _gds_inline_dlist_head_tail(list, node, &head, &tail);
 		if (added < 0) {
-			GDS_LOG_ERROR("node1 and node2 are in the same list. "
+			GDS_LOG_ERROR("node and list are in the same list. "
 				"Refusing to continue.");
 			return -1;
 		}
 
-		tail->next = node1->next;
+		tail->next = node->next;
 		if (tail->next != NULL) tail->next->prev = tail;
-		head->prev = node1;
-		node1->next = head;
+		head->prev = node;
+		node->next = head;
 
 		if (tail->next == NULL && newtail != NULL) *newtail = tail;
 	}
@@ -277,10 +277,10 @@ int gds_inline_dlist_insert(gds_inline_dlist_node_t *node, int offset,
 		if (node == NULL) node = after;
 
 		if (node != NULL) {
-			added = gds_inline_dlist_node_prepend_list(node,
+			added = gds_inline_dlist_node_prepend(node,
 				list, newhead);
 		} else if (before != NULL) {
-			added = gds_inline_dlist_node_append_list(before,
+			added = gds_inline_dlist_node_append(before,
 				list, newtail);
 		} else {
 			added = _gds_inline_dlist_head_tail(list, NULL,
@@ -301,7 +301,7 @@ unsigned int gds_inline_dlist_remove(gds_inline_dlist_node_t *node, int offset,
 
 int gds_inline_dlist_splice(gds_inline_dlist_node_t *node, int offset,
 	int length, void *callback, void *callback_data,
-	gds_inline_dlist_node_t *replacement, gds_inline_dlist_node_t **newhead,
+	gds_inline_dlist_node_t *list, gds_inline_dlist_node_t **newhead,
 	gds_inline_dlist_node_t **newtail)
 {
 	gds_inline_dlist_node_t *before_rm = UNDEFINED, *after_rm = UNDEFINED;
@@ -324,7 +324,7 @@ int gds_inline_dlist_splice(gds_inline_dlist_node_t *node, int offset,
 		}
 	}
 
-	added = gds_inline_dlist_insert(node, offset, replacement, newhead,
+	added = gds_inline_dlist_insert(node, offset, list, newhead,
 		newtail);
 
 	ret = (added > 0) ? added - removed : -removed;

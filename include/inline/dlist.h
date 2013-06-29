@@ -77,22 +77,22 @@ gds_inline_dlist_node_next(
 	gds_inline_dlist_node_next(node, UNDEFINED)
 
 /*
- * Insert <node2> list immediately before <node1>.
+ * Insert <list> immediately before <node>.
  *
  * Parameters:
- *   node1: reference node
- *   node2: a node in the list to insert
- *   newhead: if not NULL, and if node1 was the head of the list, *newhead will
+ *   node: reference node
+ *   list: a node in the list to insert
+ *   newhead: if not NULL, and if <node> was the head of the list, *newhead will
  *            contain the address of the new head of the list
  *
  * Example:
  *   If we have 2 lists:
  *     N <-> N1 <-> N2
  *     P <-> P1 <-> P2
- *   calling gds_inline_dlist_node_prepend_list(N1, P1) will result in:
+ *   calling gds_inline_dlist_node_prepend(N1, P1) will result in:
  *     N <-> P <-> P1 <-> P2 <-> N1 <-> N2
  *
- * Note: <node2> should not be already in the same list than <node1>, otherwise
+ * Note: <list> should not be already in the same list than <node>, otherwise
  * you may experience problems.
  *
  * Returns:
@@ -100,29 +100,29 @@ gds_inline_dlist_node_next(
  *   or a negative value in case of failure.
  */
 int
-gds_inline_dlist_node_prepend_list(
-	gds_inline_dlist_node_t *node1,
-	gds_inline_dlist_node_t *node2,
+gds_inline_dlist_node_prepend(
+	gds_inline_dlist_node_t *node,
+	gds_inline_dlist_node_t *list,
 	gds_inline_dlist_node_t **newhead
 );
 
 /*
- * Insert <node2> list immediately after <node1>.
+ * Insert <list> immediately after <node>.
  *
  * Parameters:
- *   node1: reference node
- *   node2: a node in the list to insert
- *   newtail: if not NULL, and if node1 was the tail of the list, *newtail will
+ *   node: reference node
+ *   list: a node in the list to insert
+ *   newtail: if not NULL, and if <node> was the tail of the list, *newtail will
  *            contain the address of the new tail of the list
  *
  * Example:
  *   If we have 2 lists:
  *     N <-> N1 <-> N2
  *     P <-> P1 <-> P2
- *   calling gds_inline_dlist_node_prepend_list(N1, P1) will result in:
+ *   calling gds_inline_dlist_node_append(N1, P1) will result in:
  *     N <-> N1 <-> P <-> P1 <-> P2 <-> N2
  *
- * Note: <node2> should not be already in the same list than <node1>, otherwise
+ * Note: <list> should not be already in the same list than <node>, otherwise
  * you may experience problems.
  *
  * Returns:
@@ -130,9 +130,9 @@ gds_inline_dlist_node_prepend_list(
  *   or a negative value in case of failure.
  */
 int
-gds_inline_dlist_node_append_list(
-	gds_inline_dlist_node_t *node1,
-	gds_inline_dlist_node_t *node2,
+gds_inline_dlist_node_append(
+	gds_inline_dlist_node_t *node,
+	gds_inline_dlist_node_t *list,
 	gds_inline_dlist_node_t **newtail
 );
 
@@ -213,7 +213,7 @@ gds_inline_dlist_remove(
  *             first parameter is the node that will be removed
  *             second parameter is <callback_data>
  *   callback_data: data passed to <callback>
- *   replacement: A node in the list to insert in place.
+ *   list: A node in the list to insert in place.
  *   newhead: if not NULL, and if head of list was just removed, address of new
  *            head is affected to *newhead
  *   newtail: if not NULL, and if tail of list was just removed, address of new
@@ -231,7 +231,7 @@ gds_inline_dlist_splice(
 	int length,
 	void *callback,
 	void *callback_data,
-	gds_inline_dlist_node_t *replacement,
+	gds_inline_dlist_node_t *list,
 	gds_inline_dlist_node_t **newhead,
 	gds_inline_dlist_node_t **newtail
 );
