@@ -119,7 +119,8 @@ gds_slist_t * gds_hash_map_keyin_values(gds_hash_map_keyin_t *h)
 	for (i = h->size; i > 0; i--) {
 		list = gds_rbtree_keyin_values(h->map[i-1]);
 		if (list != NULL) {
-			gds_slist_unshift(l, list);
+			gds_slist_splice(l, 0, 0, NULL, NULL, list);
+			gds_slist_free(list, NULL, NULL);
 		}
 	}
 
