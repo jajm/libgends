@@ -201,20 +201,18 @@ void gds_dlist_splice(gds_dlist_t *list, unsigned int offset,
 
 	GDS_CHECK_ARG_NOT_NULL(list);
 
-	if (list->head) {
-		head = gds_dlist_node_get_inline(list->head);
-		tail = gds_dlist_node_get_inline(list->tail);
+	head = gds_dlist_node_get_inline(list->head);
+	tail = gds_dlist_node_get_inline(list->tail);
 
-		if (replacement != NULL) {
-			copy = gds_dlist_node_copy(replacement->head);
-			ci = gds_dlist_node_get_inline(copy);
-		}
-		list->size += gds_inline_dlist_splice(head, offset, length,
-			cb, (void *[]){callback, callback_data}, ci,
-			&head, &tail);
-		list->head = gds_dlist_node_get_container_of(head);
-		list->tail = gds_dlist_node_get_container_of(tail);
+	if (replacement != NULL && replacement->head != NULL) {
+		copy = gds_dlist_node_copy(replacement->head);
+		ci = gds_dlist_node_get_inline(copy);
 	}
+	list->size += gds_inline_dlist_splice(head, offset, length,
+		cb, (void *[]){callback, callback_data}, ci,
+		&head, &tail);
+	list->head = gds_dlist_node_get_container_of(head);
+	list->tail = gds_dlist_node_get_container_of(tail);
 }
 
 gds_dlist_t * gds_dlist_slice(gds_dlist_t *list, unsigned int offset,
