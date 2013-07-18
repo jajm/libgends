@@ -45,14 +45,14 @@ gds_rbtree_set(
 void *
 gds_rbtree_get(
 	gds_rbtree_node_t *root,
-	void *key,
+	const void *key,
 	gds_cmpkey_cb cmpkey_cb
 );
 
 int8_t
 gds_rbtree_del(
 	gds_rbtree_node_t **root,
-	void *key,
+	const void *key,
 	gds_cmpkey_cb cmpkey_cb,
 	gds_free_cb key_free_cb,
 	gds_free_cb free_cb

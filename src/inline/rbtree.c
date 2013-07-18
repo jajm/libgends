@@ -147,7 +147,7 @@ int8_t gds_inline_rbtree_add(gds_inline_rbtree_node_t **root,
 }
 
 gds_inline_rbtree_node_t * gds_inline_rbtree_get_node(
-	gds_inline_rbtree_node_t *root, void *key,
+	gds_inline_rbtree_node_t *root, const void *key,
 	gds_rbt_cmp_with_key_cb rbt_cmp_with_key_cb, void *rbt_cmp_data)
 {
 	gds_inline_rbtree_node_t *node;
@@ -169,7 +169,7 @@ gds_inline_rbtree_node_t * gds_inline_rbtree_get_node(
 }
 
 int8_t gds_inline_rbtree_del(gds_inline_rbtree_node_t **root,
-	void *key, gds_rbt_cmp_with_key_cb rbt_cmp_with_key_cb,
+	const void *key, gds_rbt_cmp_with_key_cb rbt_cmp_with_key_cb,
 	void *rbt_cmp_data, gds_rbt_replace_cb rbt_replace_cb,
 	void *rbt_replace_data)
 {

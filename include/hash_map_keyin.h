@@ -76,7 +76,7 @@ gds_hash_map_keyin_set(
 void *
 gds_hash_map_keyin_get(
 	gds_hash_map_keyin_t *h,
-	void *key
+	const void *key
 );
 
 /* Unset a key/value pair in the hash map */
@@ -88,7 +88,7 @@ gds_hash_map_keyin_get(
 int8_t
 gds_hash_map_keyin_unset(
 	gds_hash_map_keyin_t *h,
-	void *key,
+	const void *key,
 	gds_free_cb free_cb
 );
 

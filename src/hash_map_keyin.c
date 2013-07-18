@@ -61,7 +61,7 @@ gds_hash_map_keyin_t * gds_hash_map_keyin_new(uint32_t size,
 	return h;
 }
 
-uint32_t gds_hash_map_keyin_hash(gds_hash_map_keyin_t *h, void *key)
+uint32_t gds_hash_map_keyin_hash(gds_hash_map_keyin_t *h, const void *key)
 {
 	return h->hash_cb(key, h->size) % h->size;
 }
@@ -78,7 +78,7 @@ int8_t gds_hash_map_keyin_set(gds_hash_map_keyin_t *h, void *data,
 		h->cmpkey_cb, free_cb);
 }
 
-void * gds_hash_map_keyin_get(gds_hash_map_keyin_t *h, void *key)
+void * gds_hash_map_keyin_get(gds_hash_map_keyin_t *h, const void *key)
 {
 	uint32_t hash;
 	void *data;
@@ -93,7 +93,7 @@ void * gds_hash_map_keyin_get(gds_hash_map_keyin_t *h, void *key)
 	return data;
 }
 
-int8_t gds_hash_map_keyin_unset(gds_hash_map_keyin_t *h, void *key,
+int8_t gds_hash_map_keyin_unset(gds_hash_map_keyin_t *h, const void *key,
 	gds_free_cb free_cb)
 {
 	uint32_t hash;

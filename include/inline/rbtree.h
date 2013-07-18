@@ -30,9 +30,9 @@ struct gds_inline_rbtree_node_s {
 typedef struct gds_inline_rbtree_node_s gds_inline_rbtree_node_t;
 
 typedef int32_t (*gds_rbt_cmp_cb)(gds_inline_rbtree_node_t *,
-	gds_inline_rbtree_node_t *, void *);
+	gds_inline_rbtree_node_t *, const void *);
 typedef int32_t (*gds_rbt_cmp_with_key_cb)(gds_inline_rbtree_node_t *,
-	void *, void *);
+	const void *, const void *);
 typedef void (*gds_rbt_replace_cb)(gds_inline_rbtree_node_t *,
 	gds_inline_rbtree_node_t *, void *);
 
@@ -52,7 +52,7 @@ gds_inline_rbtree_add(
 gds_inline_rbtree_node_t *
 gds_inline_rbtree_get_node(
 	gds_inline_rbtree_node_t *root,
-	void *key,
+	const void *key,
 	gds_rbt_cmp_with_key_cb rbt_cmp_with_key_cb,
 	void *rbt_cmp_data
 );
@@ -60,7 +60,7 @@ gds_inline_rbtree_get_node(
 int8_t
 gds_inline_rbtree_del(
 	gds_inline_rbtree_node_t **root,
-	void *key,
+	const void *key,
 	gds_rbt_cmp_with_key_cb rbt_cmp_with_key_cb,
 	void *rbt_cmp_data,
 	gds_rbt_replace_cb rbt_replace_cb,

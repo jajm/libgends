@@ -119,7 +119,7 @@ int8_t gds_rbtree_keyin_add(gds_rbtree_keyin_node_t **root, void *data,
 }
 
 gds_rbtree_keyin_node_t * gds_rbtree_keyin_get_node(
-	gds_rbtree_keyin_node_t *root, void *key, gds_getkey_cb getkey_cb,
+	gds_rbtree_keyin_node_t *root, const void *key, gds_getkey_cb getkey_cb,
 	gds_cmpkey_cb cmpkey_cb)
 {
 	gds_rbtree_keyin_callbacks_t callbacks;
@@ -142,7 +142,7 @@ gds_rbtree_keyin_node_t * gds_rbtree_keyin_get_node(
 	return rbt_containerof(inode);
 }
 
-void * gds_rbtree_keyin_get(gds_rbtree_keyin_node_t *root, void *key,
+void * gds_rbtree_keyin_get(gds_rbtree_keyin_node_t *root, const void *key,
 	gds_getkey_cb getkey_cb, gds_cmpkey_cb cmpkey_cb)
 {
 	gds_rbtree_keyin_node_t *node;
@@ -185,7 +185,7 @@ int8_t gds_rbtree_keyin_set(gds_rbtree_keyin_node_t **root, void *data,
 	return ret;
 }
 
-int8_t gds_rbtree_keyin_del(gds_rbtree_keyin_node_t **root, void *key,
+int8_t gds_rbtree_keyin_del(gds_rbtree_keyin_node_t **root, const void *key,
 	gds_getkey_cb getkey_cb, gds_cmpkey_cb cmpkey_cb, gds_free_cb free_cb)
 {
 	gds_inline_rbtree_node_t *inode;

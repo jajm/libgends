@@ -45,7 +45,7 @@ gds_rbtree_keyin_set(
 void *
 gds_rbtree_keyin_get(
 	gds_rbtree_keyin_node_t *root,
-	void *key,
+	const void *key,
 	gds_getkey_cb getkey_cb,
 	gds_cmpkey_cb cmpkey_cb
 );
@@ -53,7 +53,7 @@ gds_rbtree_keyin_get(
 int8_t
 gds_rbtree_keyin_del(
 	gds_rbtree_keyin_node_t **root,
-	void *key,
+	const void *key,
 	gds_getkey_cb getkey_cb,
 	gds_cmpkey_cb cmpkey_cb,
 	gds_free_cb free_cb

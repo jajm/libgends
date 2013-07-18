@@ -118,8 +118,8 @@ int8_t gds_rbtree_add(gds_rbtree_node_t **root, void *key, void *data,
 	return added ? 0 : 1;
 }
 
-gds_rbtree_node_t * gds_rbtree_get_node(gds_rbtree_node_t *root, void *key,
-	gds_cmpkey_cb cmpkey_cb)
+gds_rbtree_node_t * gds_rbtree_get_node(gds_rbtree_node_t *root,
+	const void *key, gds_cmpkey_cb cmpkey_cb)
 {
 	gds_inline_rbtree_node_t *inode = NULL;
 
@@ -136,7 +136,7 @@ gds_rbtree_node_t * gds_rbtree_get_node(gds_rbtree_node_t *root, void *key,
 	return rbt_containerof(inode);
 }
 
-void * gds_rbtree_get(gds_rbtree_node_t *root, void *key,
+void * gds_rbtree_get(gds_rbtree_node_t *root, const void *key,
 	gds_cmpkey_cb cmpkey_cb)
 {
 	gds_rbtree_node_t *node;
@@ -176,7 +176,7 @@ int8_t gds_rbtree_set(gds_rbtree_node_t **root, void *key, void *data,
 	return ret;
 }
 
-int8_t gds_rbtree_del(gds_rbtree_node_t **root, void *key,
+int8_t gds_rbtree_del(gds_rbtree_node_t **root, const void *key,
 	gds_cmpkey_cb cmpkey_cb, gds_free_cb key_free_cb, gds_free_cb free_cb)
 {
 	gds_inline_rbtree_node_t *inode;
