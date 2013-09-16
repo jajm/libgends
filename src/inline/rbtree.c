@@ -20,6 +20,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include "iterator.h"
+#include "slist.h"
 #include "inline/rbtree.h"
 #include "../check_arg.h"
 
@@ -91,6 +93,9 @@ int8_t gds_inline_rbtree_add(gds_inline_rbtree_node_t **root,
 	GDS_CHECK_ARG_NOT_NULL(*root);
 	GDS_CHECK_ARG_NOT_NULL(node);
 	GDS_CHECK_ARG_NOT_NULL(rbt_cmp_cb);
+
+	/* Root node should be black */
+	(*root)->red = false;
 
 	/* Set up helpers */
 	t = &head;
@@ -260,4 +265,71 @@ int8_t gds_inline_rbtree_del(gds_inline_rbtree_node_t **root,
 		(*root)->red = false;
 
 	return deleted;
+}
+
+typedef struct {
+	gds_inline_rbtree_node_t *root;
+	gds_slist_t *nodes;
+	gds_iterator_t *slist_it;
+} gds_inline_rbtree_iterator_data_t;
+
+void gds_inline_rbtree_iterator_fill_list(gds_slist_t *nodes,
+	gds_inline_rbtree_node_t *root)
+{
+	if (root != NULL) {
+		gds_inline_rbtree_iterator_fill_list(nodes, root->son[0]);
+		gds_slist_push(nodes, root);
+		gds_inline_rbtree_iterator_fill_list(nodes, root->son[1]);
+	}
+}
+
+int8_t gds_inline_rbtree_iterator_reset(gds_inline_rbtree_iterator_data_t *data)
+{
+	gds_iterator_free(data->slist_it);
+	gds_slist_free(data->nodes, NULL, NULL);
+
+	data->nodes = gds_slist_new();
+	gds_inline_rbtree_iterator_fill_list(data->nodes, data->root);
+	data->slist_it = gds_slist_iterator_new(data->nodes);
+
+	return 0;
+}
+
+int8_t gds_inline_rbtree_iterator_step(gds_inline_rbtree_iterator_data_t *data)
+{
+	return gds_iterator_step(data->slist_it);
+}
+
+const gds_inline_rbtree_node_t * gds_inline_rbtree_iterator_get(
+	gds_inline_rbtree_iterator_data_t *data)
+{
+	return gds_iterator_get(data->slist_it);
+}
+
+void gds_inline_rbtree_iterator_data_free(
+	gds_inline_rbtree_iterator_data_t *data)
+{
+	gds_iterator_free(data->slist_it);
+	gds_slist_free(data->nodes, NULL, NULL);
+	free(data);
+}
+
+gds_iterator_t * gds_inline_rbtree_iterator_new(
+	gds_inline_rbtree_node_t *root)
+{
+	gds_inline_rbtree_iterator_data_t *it_data;
+	gds_iterator_t *it;
+
+	it_data = malloc(sizeof(gds_inline_rbtree_iterator_data_t));
+	it_data->root = root;
+	it_data->nodes = NULL;
+	it_data->slist_it = NULL;
+
+	it = gds_iterator_new(it_data,
+		(gds_iterator_reset_cb) gds_inline_rbtree_iterator_reset,
+		(gds_iterator_step_cb) gds_inline_rbtree_iterator_step,
+		(gds_iterator_get_cb) gds_inline_rbtree_iterator_get,
+		(gds_free_cb) gds_inline_rbtree_iterator_data_free);
+
+	return it;
 }

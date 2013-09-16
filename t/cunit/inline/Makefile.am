@@ -3,10 +3,13 @@ AM_CPPFLAGS = -I.. -I../../../include -I../../../src \
 AM_CFLAGS = -Wall -Wextra -Werror -std=c99
 AM_LDFLAGS = -lcunit `pkg-config --libs libexception lll`
 
-noinst_PROGRAMS = slist dlist
+noinst_PROGRAMS = slist dlist rbtree
 
 slist_SOURCES = slist.c
 slist_LDADD = ../../../src/libgends.la
 
 dlist_SOURCES = dlist.c
 dlist_LDADD = ../../../src/libgends.la
+
+rbtree_SOURCES = rbtree.c
+rbtree_LDADD = ../../../src/libgends.la

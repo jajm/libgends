@@ -22,6 +22,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include "iterator.h"
 
 struct gds_inline_rbtree_node_s {
 	_Bool red;
@@ -65,6 +66,11 @@ gds_inline_rbtree_del(
 	void *rbt_cmp_data,
 	gds_rbt_replace_cb rbt_replace_cb,
 	void *rbt_free_data
+);
+
+gds_iterator_t *
+gds_inline_rbtree_iterator_new(
+	gds_inline_rbtree_node_t *root
 );
 
 #endif /* Not gds_inline_rbtree_h_included */
