@@ -46,6 +46,7 @@
 typedef int8_t (*gds_iterator_reset_cb)(void *);
 typedef int8_t (*gds_iterator_step_cb)(void *);
 typedef void * (*gds_iterator_get_cb)(void *);
+typedef const void * (*gds_iterator_getkey_cb)(void *);
 
 typedef struct {
 	/* Used to store iterator-specific information
@@ -68,6 +69,11 @@ typedef struct {
 	 * success, or NULL otherwise */
 	gds_iterator_get_cb get_cb;
 
+	/* This function must return key of element pointed by iterator, if any.
+	 * It must take one argument (data) and return a valid pointer on
+	 * success, or NULL otherwise. */
+	gds_iterator_getkey_cb getkey_cb;
+
 	/* This function must free data referenced by 'data' member.
 	 * It must take one argument (data).
 	 * It can be NULL, in this case data won't be freed. */
@@ -78,7 +84,7 @@ typedef struct {
 extern "C" {
 #endif
 
-/* Create a new iterator. You will have to use it_reset before to use it
+/* Create a new iterator and call reset_cb.
  * This function only allocate memory for the structure and affect parameters
  * to corresponding members.
  * Return a pointer on the new iterator, or NULL if an error occurs */
@@ -88,6 +94,7 @@ gds_iterator_new(
 	gds_iterator_reset_cb reset_cb,
 	gds_iterator_step_cb step_cb,
 	gds_iterator_get_cb get_cb,
+	gds_iterator_getkey_cb getkey_cb,
 	gds_free_cb free_cb
 );
 
@@ -106,6 +113,12 @@ gds_iterator_step(
 /* Alias for it->get_cb(it->data) */
 void *
 gds_iterator_get(
+	gds_iterator_t *it
+);
+
+/* Alias for it->getkey_cb(it->data) */
+const void *
+gds_iterator_getkey(
 	gds_iterator_t *it
 );
 

@@ -220,6 +220,76 @@ void gds_rbtree_free(gds_rbtree_node_t *root, gds_free_cb key_free_cb,
 	}
 }
 
+typedef struct {
+	gds_rbtree_node_t *root;
+	gds_iterator_t *inline_rbtree_it;
+} gds_rbtree_iterator_data_t;
+
+int gds_rbtree_iterator_reset(gds_rbtree_iterator_data_t *data)
+{
+	gds_iterator_free(data->inline_rbtree_it);
+	data->inline_rbtree_it =
+		gds_inline_rbtree_iterator_new(&(data->root->rbtree));
+
+	return 0;
+}
+
+int gds_rbtree_iterator_step(gds_rbtree_iterator_data_t *data)
+{
+	return gds_iterator_step(data->inline_rbtree_it);
+}
+
+void * gds_rbtree_iterator_get(gds_rbtree_iterator_data_t *data)
+{
+	gds_inline_rbtree_node_t *inline_node;
+	gds_rbtree_node_t *node;
+
+	inline_node = gds_iterator_get(data->inline_rbtree_it);
+	node = rbt_containerof(inline_node);
+
+	return (node != NULL) ? node->data : NULL;
+}
+
+const void * gds_rbtree_iterator_getkey(gds_rbtree_iterator_data_t *data)
+{
+	gds_inline_rbtree_node_t *inline_node;
+	gds_rbtree_node_t *node;
+
+	inline_node = gds_iterator_get(data->inline_rbtree_it);
+	node = rbt_containerof(inline_node);
+
+	return (node != NULL) ? node->key : NULL;
+}
+
+void gds_rbtree_iterator_data_free(gds_rbtree_iterator_data_t *data)
+{
+	gds_iterator_free(data->inline_rbtree_it);
+	free(data);
+}
+
+gds_iterator_t * gds_rbtree_iterator_new(gds_rbtree_node_t *root)
+{
+	gds_rbtree_iterator_data_t *data;
+	gds_iterator_t *it;
+
+	data = malloc(sizeof(gds_rbtree_iterator_data_t));
+	if (data == NULL) {
+		GDS_THROW_ALLOC_ERROR(sizeof(gds_rbtree_iterator_data_t));
+	}
+
+	data->root = root;
+	data->inline_rbtree_it = NULL;
+
+	it = gds_iterator_new(data,
+		(gds_iterator_reset_cb) gds_rbtree_iterator_reset,
+		(gds_iterator_step_cb) gds_rbtree_iterator_step,
+		(gds_iterator_get_cb) gds_rbtree_iterator_get,
+		(gds_iterator_getkey_cb) gds_rbtree_iterator_getkey,
+		(gds_free_cb) gds_rbtree_iterator_data_free);
+
+	return it;
+}
+
 void gds_rbtree_build_keys_list(gds_rbtree_node_t *root,
 	gds_slist_t *list)
 {

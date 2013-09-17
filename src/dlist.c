@@ -357,6 +357,7 @@ void gds_dlist_free(gds_dlist_t *list, void *callback, void *callback_data)
 typedef struct {
 	gds_dlist_t *list;
 	gds_inline_dlist_node_t *cur;
+	int i;
 } gds_dlist_iterator_data_t;
 
 int8_t gds_dlist_iterator_reset(gds_dlist_iterator_data_t *it_data)
@@ -364,6 +365,7 @@ int8_t gds_dlist_iterator_reset(gds_dlist_iterator_data_t *it_data)
 	GDS_CHECK_ARG_NOT_NULL(it_data);
 
 	it_data->cur = NULL;
+	it_data->i = -1;
 
 	return 0;
 }
@@ -385,6 +387,7 @@ int8_t gds_dlist_iterator_step(gds_dlist_iterator_data_t *it_data)
 	}
 
 	it_data->cur = next;
+	it_data->i++;
 
 	return 0;
 }
@@ -397,6 +400,13 @@ void * gds_dlist_iterator_get(gds_dlist_iterator_data_t *it_data)
 
 	node = gds_dlist_node_get_container_of(it_data->cur);
 	return gds_dlist_node_get_data(node);
+}
+
+const void * gds_dlist_iterator_getkey(gds_dlist_iterator_data_t *it_data)
+{
+	GDS_CHECK_ARG_NOT_NULL(it_data);
+
+	return &(it_data->i);
 }
 
 gds_iterator_t * gds_dlist_iterator_new(gds_dlist_t *list)
@@ -417,6 +427,7 @@ gds_iterator_t * gds_dlist_iterator_new(gds_dlist_t *list)
 		(gds_iterator_reset_cb) &gds_dlist_iterator_reset,
 		(gds_iterator_step_cb) &gds_dlist_iterator_step,
 		(gds_iterator_get_cb) &gds_dlist_iterator_get,
+		(gds_iterator_getkey_cb) &gds_dlist_iterator_getkey,
 		(gds_free_cb) &free);
 
 	return it;

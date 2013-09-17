@@ -283,7 +283,7 @@ void gds_inline_rbtree_iterator_fill_list(gds_slist_t *nodes,
 	}
 }
 
-int8_t gds_inline_rbtree_iterator_reset(gds_inline_rbtree_iterator_data_t *data)
+int gds_inline_rbtree_iterator_reset(gds_inline_rbtree_iterator_data_t *data)
 {
 	gds_iterator_free(data->slist_it);
 	gds_slist_free(data->nodes, NULL, NULL);
@@ -295,15 +295,21 @@ int8_t gds_inline_rbtree_iterator_reset(gds_inline_rbtree_iterator_data_t *data)
 	return 0;
 }
 
-int8_t gds_inline_rbtree_iterator_step(gds_inline_rbtree_iterator_data_t *data)
+int gds_inline_rbtree_iterator_step(gds_inline_rbtree_iterator_data_t *data)
 {
 	return gds_iterator_step(data->slist_it);
 }
 
-const gds_inline_rbtree_node_t * gds_inline_rbtree_iterator_get(
+gds_inline_rbtree_node_t * gds_inline_rbtree_iterator_get(
 	gds_inline_rbtree_iterator_data_t *data)
 {
 	return gds_iterator_get(data->slist_it);
+}
+
+const void * gds_inline_rbtree_iterator_getkey(
+	gds_inline_rbtree_iterator_data_t *data)
+{
+	return gds_iterator_getkey(data->slist_it);
 }
 
 void gds_inline_rbtree_iterator_data_free(
@@ -329,6 +335,7 @@ gds_iterator_t * gds_inline_rbtree_iterator_new(
 		(gds_iterator_reset_cb) gds_inline_rbtree_iterator_reset,
 		(gds_iterator_step_cb) gds_inline_rbtree_iterator_step,
 		(gds_iterator_get_cb) gds_inline_rbtree_iterator_get,
+		(gds_iterator_getkey_cb) gds_inline_rbtree_iterator_getkey,
 		(gds_free_cb) gds_inline_rbtree_iterator_data_free);
 
 	return it;

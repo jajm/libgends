@@ -65,6 +65,11 @@ gds_rbtree_free(
 	gds_free_cb free_cb
 );
 
+gds_iterator_t *
+gds_rbtree_iterator_new(
+	gds_rbtree_node_t *root
+);
+
 gds_slist_t *
 gds_rbtree_keys(
 	gds_rbtree_node_t *root

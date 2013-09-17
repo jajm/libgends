@@ -26,11 +26,12 @@
  * it's always the same API.
  * To implement an iterator for your container, you have to:
  *  - define a struct, or whatever you need to store iterator informations
- *  - define 4 functions (described below) which will deal with these
+ *  - define 5 functions (described below) which will deal with these
  *  informations:
  *    . int8_t reset(void *data)
  *    . int8_t step(void *data)
- *    . void * get(void *data, bool copy_data)
+ *    . void * get(void *data)
+ *    . void * getkey(void *data)
  *    . void free(void *data)
  *  - and provide a way to get an initialized iterator for your container
  * See slist.h or dlist.h for examples of implementation
@@ -47,7 +48,7 @@
 
 gds_iterator_t *gds_iterator_new(void *data, gds_iterator_reset_cb reset_cb,
 	gds_iterator_step_cb step_cb, gds_iterator_get_cb get_cb,
-	gds_free_cb free_cb)
+	gds_iterator_getkey_cb getkey_cb, gds_free_cb free_cb)
 {
 	gds_iterator_t *it;
 
@@ -55,6 +56,7 @@ gds_iterator_t *gds_iterator_new(void *data, gds_iterator_reset_cb reset_cb,
 	GDS_CHECK_ARG_NOT_NULL(reset_cb);
 	GDS_CHECK_ARG_NOT_NULL(step_cb);
 	GDS_CHECK_ARG_NOT_NULL(get_cb);
+	GDS_CHECK_ARG_NOT_NULL(getkey_cb);
 
 	it = malloc(sizeof(gds_iterator_t));
 	if (it == NULL) {
@@ -66,6 +68,7 @@ gds_iterator_t *gds_iterator_new(void *data, gds_iterator_reset_cb reset_cb,
 	it->reset_cb = reset_cb;
 	it->step_cb = step_cb;
 	it->get_cb = get_cb;
+	it->getkey_cb = getkey_cb;
 	it->free_cb = free_cb;
 
 	gds_iterator_reset(it);
@@ -92,6 +95,13 @@ void * gds_iterator_get(gds_iterator_t *it)
 	GDS_CHECK_ARG_NOT_NULL(it);
 
 	return it->get_cb(it->data);
+}
+
+const void * gds_iterator_getkey(gds_iterator_t *it)
+{
+	GDS_CHECK_ARG_NOT_NULL(it);
+
+	return it->getkey_cb(it->data);
 }
 
 void gds_iterator_free(gds_iterator_t *it)

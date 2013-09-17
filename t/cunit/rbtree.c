@@ -354,6 +354,71 @@ void t_rbtree_del(void)
 	}
 }
 
+void t_rbtree_iterator(void)
+{
+	gds_rbtree_node_t *root;
+	gds_iterator_t *it;
+	test_t *t;
+	char buf[512];
+	int i;
+	const char *key;
+	gds_cmpkey_cb cmpkey_cb = (gds_cmpkey_cb)test_cmpkey;
+	gds_free_cb free_cb = (gds_free_cb)test_free;
+	gds_free_cb key_free_cb = (gds_free_cb)free;
+
+	for(i=0; i<5; i++) {
+		sprintf(buf, "key %02d", i);
+		t = test_new(buf, i);
+		gds_rbtree_add(&root, key_alloc(buf), t, cmpkey_cb);
+	}
+
+	it = gds_rbtree_iterator_new(root);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(it);
+
+	CU_ASSERT_PTR_NULL(gds_iterator_get(it));
+	CU_ASSERT_PTR_NULL(gds_iterator_getkey(it));
+
+	CU_ASSERT(0 == gds_iterator_step(it));
+	t = gds_iterator_get(it);
+	key = gds_iterator_getkey(it);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(t);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(key);
+	CU_ASSERT_STRING_EQUAL(key, "key 00");
+
+	CU_ASSERT(0 == gds_iterator_step(it));
+	t = gds_iterator_get(it);
+	key = gds_iterator_getkey(it);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(t);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(key);
+	CU_ASSERT_STRING_EQUAL(key, "key 01");
+
+	CU_ASSERT(0 == gds_iterator_step(it));
+	t = gds_iterator_get(it);
+	key = gds_iterator_getkey(it);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(t);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(key);
+	CU_ASSERT_STRING_EQUAL(key, "key 02");
+
+	CU_ASSERT(0 == gds_iterator_step(it));
+	t = gds_iterator_get(it);
+	key = gds_iterator_getkey(it);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(t);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(key);
+	CU_ASSERT_STRING_EQUAL(key, "key 03");
+
+	CU_ASSERT(0 == gds_iterator_step(it));
+	t = gds_iterator_get(it);
+	key = gds_iterator_getkey(it);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(t);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(key);
+	CU_ASSERT_STRING_EQUAL(key, "key 04");
+
+	CU_ASSERT(0 < gds_iterator_step(it));
+
+	gds_iterator_free(it);
+	gds_rbtree_free(root, key_free_cb, free_cb);
+}
+
 void t_rbtree_values(void)
 {
 	gds_rbtree_node_t *root = NULL;
@@ -410,6 +475,7 @@ int main()
 	   (NULL == CU_add_test(pSuite, "gds_rbtree_add()", t_rbtree_add))
 	|| (NULL == CU_add_test(pSuite, "gds_rbtree_get()", t_rbtree_get))
 	|| (NULL == CU_add_test(pSuite, "gds_rbtree_del()", t_rbtree_del))
+	|| (NULL == CU_add_test(pSuite, "gds_rbtree_iterator", t_rbtree_iterator))
 	|| (NULL == CU_add_test(pSuite, "gds_rbtree_values()", t_rbtree_values))
 	) {
 		CU_cleanup_registry();
