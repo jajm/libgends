@@ -80,12 +80,5 @@ gds_rbtree_values(
 	gds_rbtree_node_t *root
 );
 
-/* Return a list of gds_key_value_t (see key_value.h) */
-/* Free with gds_slist_free(list, (gds_free_cb)free) */
-gds_slist_t *
-gds_rbtree_keys_values(
-	gds_rbtree_node_t *root
-);
-
 #endif /* Not defined gds_rbtree_h_included */
 

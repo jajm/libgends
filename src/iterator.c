@@ -97,7 +97,7 @@ void * gds_iterator_get(gds_iterator_t *it)
 	return it->get_cb(it->data);
 }
 
-const void * gds_iterator_getkey(gds_iterator_t *it)
+void * gds_iterator_getkey(gds_iterator_t *it)
 {
 	GDS_CHECK_ARG_NOT_NULL(it);
 

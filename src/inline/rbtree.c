@@ -326,6 +326,8 @@ gds_iterator_t * gds_inline_rbtree_iterator_new(
 	gds_inline_rbtree_iterator_data_t *it_data;
 	gds_iterator_t *it;
 
+	GDS_CHECK_ARG_NOT_NULL(root);
+
 	it_data = malloc(sizeof(gds_inline_rbtree_iterator_data_t));
 	it_data->root = root;
 	it_data->nodes = NULL;

@@ -46,7 +46,7 @@
 typedef int8_t (*gds_iterator_reset_cb)(void *);
 typedef int8_t (*gds_iterator_step_cb)(void *);
 typedef void * (*gds_iterator_get_cb)(void *);
-typedef const void * (*gds_iterator_getkey_cb)(void *);
+typedef void * (*gds_iterator_getkey_cb)(void *);
 
 typedef struct {
 	/* Used to store iterator-specific information
@@ -117,7 +117,7 @@ gds_iterator_get(
 );
 
 /* Alias for it->getkey_cb(it->data) */
-const void *
+void *
 gds_iterator_getkey(
 	gds_iterator_t *it
 );

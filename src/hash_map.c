@@ -26,7 +26,6 @@
 #include "log.h"
 #include "rbtree.h"
 #include "hash_map.h"
-#include "key_value.h"
 
 gds_hash_map_t * gds_hash_map_new(uint32_t size, gds_hash_cb hash_cb,
 	gds_cmpkey_cb cmpkey_cb)
@@ -98,6 +97,96 @@ int8_t gds_hash_map_unset(gds_hash_map_t *h, const void *key,
 	return rv;
 }
 
+typedef struct {
+	gds_hash_map_t *hash;
+	uint32_t i;
+	gds_iterator_t *rbtree_it;
+} gds_hash_map_iterator_data_t;
+
+void gds_hash_map_iterator_find_next_rbtree(gds_hash_map_iterator_data_t *data)
+{
+	gds_hash_map_t *hash = data->hash;
+	uint32_t i = data->i;
+
+	while (i < hash->size && hash->map[i] == NULL)
+		i++;
+
+	gds_iterator_free(data->rbtree_it);
+	data->rbtree_it = NULL;
+
+	if (i < hash->size) {
+		data->rbtree_it = gds_rbtree_iterator_new(hash->map[i]);
+	}
+
+	data->i = i;
+}
+
+int gds_hash_map_iterator_reset(gds_hash_map_iterator_data_t *data)
+{
+	data->i = 0;
+	gds_hash_map_iterator_find_next_rbtree(data);
+
+	return 0;
+}
+
+int gds_hash_map_iterator_step(gds_hash_map_iterator_data_t *data)
+{
+	int rc;
+
+	if (data->rbtree_it == NULL)
+		return 1;
+
+	rc = gds_iterator_step(data->rbtree_it);
+	if (rc > 0) {
+		data->i++;
+		gds_hash_map_iterator_find_next_rbtree(data);
+		if (data->rbtree_it != NULL) {
+			rc = gds_iterator_step(data->rbtree_it);
+		}
+	}
+
+	return rc;
+}
+
+void * gds_hash_map_iterator_get(gds_hash_map_iterator_data_t *data)
+{
+	return gds_iterator_get(data->rbtree_it);
+}
+
+void * gds_hash_map_iterator_getkey(gds_hash_map_iterator_data_t *data)
+{
+	return gds_iterator_getkey(data->rbtree_it);
+}
+
+void gds_hash_map_iterator_data_free(gds_hash_map_iterator_data_t *data)
+{
+	gds_iterator_free(data->rbtree_it);
+	free(data);
+}
+
+gds_iterator_t * gds_hash_map_iterator_new(gds_hash_map_t *h)
+{
+	gds_hash_map_iterator_data_t *data;
+	gds_iterator_t *it;
+
+	data = malloc(sizeof(gds_hash_map_iterator_data_t));
+	if (data == NULL) {
+		GDS_THROW_ALLOC_ERROR(sizeof(gds_hash_map_iterator_data_t));
+	}
+
+	data->hash = h;
+	data->rbtree_it = NULL;
+
+	it = gds_iterator_new(data,
+		(gds_iterator_reset_cb) gds_hash_map_iterator_reset,
+		(gds_iterator_step_cb) gds_hash_map_iterator_step,
+		(gds_iterator_get_cb) gds_hash_map_iterator_get,
+		(gds_iterator_getkey_cb) gds_hash_map_iterator_getkey,
+		(gds_free_cb) gds_hash_map_iterator_data_free);
+
+	return it;
+}
+
 gds_slist_t * gds_hash_map_keys(gds_hash_map_t *h)
 {
 	gds_slist_t *l = gds_slist_new();
@@ -136,47 +225,26 @@ gds_slist_t * gds_hash_map_values(gds_hash_map_t *h)
 	return l;
 }
 
-gds_slist_t * gds_hash_map_keys_values(gds_hash_map_t *h)
-{
-	gds_slist_t *l = NULL;
-	gds_slist_t *list;
-	uint32_t i;
-
-	GDS_CHECK_ARG_NOT_NULL(h);
-
-	for (i = h->size; i > 0; i--) {
-		list = gds_rbtree_keys_values(h->map[i-1]);
-		if (list != NULL) {
-			gds_slist_unshift(l, list);
-		}
-	}
-
-	return l;
-}
-
 gds_rbtree_node_t ** gds_hash_map_build_map(gds_hash_map_t *h, uint32_t size)
 {
 	gds_rbtree_node_t **map;
-	gds_slist_t *l;
 	gds_iterator_t *it;
-	gds_key_value_t *kv;
 	uint32_t hash;
+	void *k, *v;
 
 	map = calloc(size, sizeof(gds_rbtree_node_t *));
 	if (map == NULL) {
 		GDS_THROW_ALLOC_ERROR(sizeof(gds_rbtree_node_t *));
 	}
-	l = gds_hash_map_keys_values(h);
-	it = gds_slist_iterator_new(l);
+	it = gds_hash_map_iterator_new(h);
 	gds_iterator_reset(it);
 	while (!gds_iterator_step(it)) {
-		kv = gds_iterator_get(it);
-		hash = h->hash_cb(kv->key, size) % size;
-		gds_rbtree_add(&(map[hash]), kv->key,
-			kv->value, h->cmpkey_cb);
+		v = gds_iterator_get(it);
+		k = gds_iterator_getkey(it);
+		hash = h->hash_cb(k, size) % size;
+		gds_rbtree_add(&(map[hash]), k, v, h->cmpkey_cb);
 	}
 	gds_iterator_free(it);
-	gds_slist_free(l, free, NULL);
 
 	return map;
 }

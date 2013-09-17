@@ -30,7 +30,6 @@
 #include "callbacks.h"
 #include "slist_node.h"
 #include "slist.h"
-#include "key_value.h"
 
 #define rbt_containerof(ptr) \
 	((ptr) != NULL) \
@@ -272,6 +271,8 @@ gds_iterator_t * gds_rbtree_iterator_new(gds_rbtree_node_t *root)
 	gds_rbtree_iterator_data_t *data;
 	gds_iterator_t *it;
 
+	GDS_CHECK_ARG_NOT_NULL(root);
+
 	data = malloc(sizeof(gds_rbtree_iterator_data_t));
 	if (data == NULL) {
 		GDS_THROW_ALLOC_ERROR(sizeof(gds_rbtree_iterator_data_t));
@@ -328,38 +329,6 @@ gds_slist_t * gds_rbtree_values(gds_rbtree_node_t *root)
 	gds_slist_t *list = gds_slist_new();
 
 	gds_rbtree_build_values_list(root, list);
-
-	return list;
-}
-
-void gds_rbtree_build_keys_values_list(gds_rbtree_node_t *root,
-	gds_slist_t *list)
-{
-	gds_key_value_t *kv;
-
-	if (root != NULL) {
-		gds_rbtree_build_keys_values_list(
-			rbt_containerof(root->rbtree.son[1]), list);
-
-		kv = malloc(sizeof(gds_key_value_t));
-		if (kv == NULL) {
-			GDS_THROW_ALLOC_ERROR(sizeof(gds_key_value_t));
-		}
-
-		kv->key = root->key;
-		kv->value = root->data;
-		gds_slist_unshift(list, kv);
-
-		gds_rbtree_build_keys_values_list(
-			rbt_containerof(root->rbtree.son[0]), list);
-	}
-}
-
-gds_slist_t * gds_rbtree_keys_values(gds_rbtree_node_t *root)
-{
-	gds_slist_t *list = gds_slist_new();
-
-	gds_rbtree_build_keys_values_list(root, list);
 
 	return list;
 }

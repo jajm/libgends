@@ -9,7 +9,7 @@ noinst_PROGRAMS = slist_node dlist_node \
 	rbtree_keyin_node rbtree_keyin \
 	rbtree_node rbtree \
 	rbtree_keyin_fast_node rbtree_keyin_fast \
-	slist dlist
+	slist dlist hash_map
 
 slist_node_SOURCES = slist_node.c
 slist_node_LDADD = ../../src/libgends.la
@@ -40,3 +40,6 @@ slist_LDADD = ../../src/libgends.la
 
 dlist_SOURCES = dlist.c
 dlist_LDADD = ../../src/libgends.la
+
+hash_map_SOURCES = hash_map.c
+hash_map_LDADD = ../../src/libgends.la

@@ -94,6 +94,19 @@ gds_hash_map_unset(
 	gds_free_cb free_cb
 );
 
+gds_iterator_t *
+gds_hash_map_iterator_new(
+	gds_hash_map_t *h
+);
+
+#define gds_hash_map_foreach(key, val, hash) \
+	for (gds_iterator_t *gds_hash_map_it = gds_hash_map_iterator_new(hash) \
+		; gds_hash_map_it != NULL \
+		; gds_iterator_free(gds_hash_map_it), gds_hash_map_it = NULL) \
+	while (!gds_iterator_step(gds_hash_map_it) \
+		&& ((key = gds_iterator_getkey(gds_hash_map_it)) || !key) \
+		&& ((val = gds_iterator_get(gds_hash_map_it)) || !val))
+
 /* Return keys contained in the hash map as a list */
 /* h : pointer to the hash map */
 /* Return: pointer to the list */
@@ -107,14 +120,6 @@ gds_hash_map_keys(
 /* Return: pointer to the list */
 gds_slist_t *
 gds_hash_map_values(
-	gds_hash_map_t *h
-);
-
-/* Return key/value pairs contained in hash map as a list of gds_key_value_t */
-/* h : pointer to the hash map */
-/* Return: pointer to the list */
-gds_slist_t *
-gds_hash_map_keys_values(
 	gds_hash_map_t *h
 );
 
