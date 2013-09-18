@@ -23,6 +23,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "callbacks.h"
+#include "iterator.h"
 
 struct gds_inline_rbtree_fast_node_s {
 	_Bool red;
@@ -158,6 +159,19 @@ gds_inline_rbtree_fast_del(
 	void *rbtf_cmp_key_data,
 	gds_rbtf_replace_cb rbtf_replace_cb,
 	void *rbtf_replace_data
+);
+
+/* Create an iterator on tree
+ *
+ * Parameters:
+ *   root: root node of tree
+ *
+ * Returns:
+ *   Pointer to the new iterator. Free with gds_iterator_free.
+ */
+gds_iterator_t *
+gds_inline_rbtree_fast_iterator_new(
+	gds_inline_rbtree_fast_node_t *root
 );
 
 #endif /* Not gds_inline_rbtree_fast_h_included */

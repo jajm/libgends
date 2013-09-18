@@ -19,6 +19,8 @@
 
 #include <stdbool.h>
 #include <stdlib.h>
+#include "iterator.h"
+#include "slist.h"
 #include "../check_arg.h"
 #include "inline/rbtree_fast.h"
 
@@ -513,4 +515,82 @@ int8_t gds_inline_rbtree_fast_del(gds_inline_rbtree_fast_node_t **root,
 
 	rbtf_replace_cb(node, node_to_delete, rbtf_replace_data);
 	return 0;
+}
+
+typedef struct {
+	gds_inline_rbtree_fast_node_t *root;
+	gds_slist_t *nodes;
+	gds_iterator_t *slist_it;
+} gds_inline_rbtree_fast_iterator_data_t;
+
+void gds_inline_rbtree_fast_iterator_fill_list(gds_slist_t *nodes,
+	gds_inline_rbtree_fast_node_t *root)
+{
+	if (root != NULL) {
+		gds_inline_rbtree_fast_iterator_fill_list(nodes, root->left);
+		gds_slist_push(nodes, root);
+		gds_inline_rbtree_fast_iterator_fill_list(nodes, root->right);
+	}
+}
+
+int gds_inline_rbtree_fast_iterator_reset(
+	gds_inline_rbtree_fast_iterator_data_t *data)
+{
+	gds_iterator_free(data->slist_it);
+	gds_slist_free(data->nodes, NULL, NULL);
+
+	data->nodes = gds_slist_new();
+	gds_inline_rbtree_fast_iterator_fill_list(data->nodes, data->root);
+	data->slist_it = gds_slist_iterator_new(data->nodes);
+
+	return 0;
+}
+
+int gds_inline_rbtree_fast_iterator_step(
+	gds_inline_rbtree_fast_iterator_data_t *data)
+{
+	return gds_iterator_step(data->slist_it);
+}
+
+gds_inline_rbtree_fast_node_t * gds_inline_rbtree_fast_iterator_get(
+	gds_inline_rbtree_fast_iterator_data_t *data)
+{
+	return gds_iterator_get(data->slist_it);
+}
+
+const void * gds_inline_rbtree_fast_iterator_getkey(
+	gds_inline_rbtree_fast_iterator_data_t *data)
+{
+	return gds_iterator_getkey(data->slist_it);
+}
+
+void gds_inline_rbtree_fast_iterator_data_free(
+	gds_inline_rbtree_fast_iterator_data_t *data)
+{
+	gds_iterator_free(data->slist_it);
+	gds_slist_free(data->nodes, NULL, NULL);
+	free(data);
+}
+
+gds_iterator_t * gds_inline_rbtree_fast_iterator_new(
+	gds_inline_rbtree_fast_node_t *root)
+{
+	gds_inline_rbtree_fast_iterator_data_t *it_data;
+	gds_iterator_t *it;
+
+	GDS_CHECK_ARG_NOT_NULL(root);
+
+	it_data = malloc(sizeof(gds_inline_rbtree_fast_iterator_data_t));
+	it_data->root = root;
+	it_data->nodes = NULL;
+	it_data->slist_it = NULL;
+
+	it = gds_iterator_new(it_data,
+		(gds_iterator_reset_cb) gds_inline_rbtree_fast_iterator_reset,
+		(gds_iterator_step_cb) gds_inline_rbtree_fast_iterator_step,
+		(gds_iterator_get_cb) gds_inline_rbtree_fast_iterator_get,
+		(gds_iterator_getkey_cb) gds_inline_rbtree_fast_iterator_getkey,
+		(gds_free_cb) gds_inline_rbtree_fast_iterator_data_free);
+
+	return it;
 }
