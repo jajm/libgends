@@ -40,7 +40,7 @@
 /* Return: 0: success
  *         a negative value: failure
  *         a positive value: key of data is already in the tree: nothing done */
-int8_t
+int
 gds_rbtree_keyin_fast_add(
 	gds_rbtree_keyin_fast_node_t **root,
 	void *data,
@@ -65,7 +65,7 @@ gds_rbtree_keyin_fast_get(
 	gds_cmpkey_cb cmpkey_cb
 );
 
-int8_t
+int
 gds_rbtree_keyin_fast_del(
 	gds_rbtree_keyin_fast_node_t **root,
 	void *key,

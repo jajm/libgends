@@ -76,6 +76,16 @@ void test_rbtree_fast_node_set_data(gds_inline_rbtree_fast_node_t *inode,
 	node->data = *i;
 }
 
+int32_t test_rbtree_fast_node_cmp(gds_inline_rbtree_fast_node_t *n1, gds_inline_rbtree_fast_node_t *n2)
+{
+	test_rbtree_fast_node_t *trfn1, *trfn2;
+
+	trfn1 = test_rbtree_fast_node_get_container(n1);
+	trfn2 = test_rbtree_fast_node_get_container(n2);
+
+	return trfn1->data - trfn2->data;
+}
+
 int32_t test_rbtree_fast_node_cmp_key(int *i, gds_inline_rbtree_fast_node_t *n)
 {
 	test_rbtree_fast_node_t *trfn;
@@ -101,20 +111,16 @@ void t_gds_inline_rbtree_fast_add(void)
 {
 	gds_inline_rbtree_fast_node_t *root = NULL;
 	test_rbtree_fast_node_t *trfn;
-	int data[] = {0, 1, 2};
 
-	gds_inline_rbtree_fast_add(&root, &data[1],
-		(gds_getkey_cb) test_rbtree_fast_node_get_key,
-		(gds_rbtf_cmp_key_cb) test_rbtree_fast_node_cmp_key, NULL,
-		(gds_rbtf_create_node_cb) test_rbtree_fast_node_create_node, NULL);
-	gds_inline_rbtree_fast_add(&root, &data[0],
-		(gds_getkey_cb) test_rbtree_fast_node_get_key,
-		(gds_rbtf_cmp_key_cb) test_rbtree_fast_node_cmp_key, NULL,
-		(gds_rbtf_create_node_cb) test_rbtree_fast_node_create_node, NULL);
-	gds_inline_rbtree_fast_add(&root, &data[2],
-		(gds_getkey_cb) test_rbtree_fast_node_get_key,
-		(gds_rbtf_cmp_key_cb) test_rbtree_fast_node_cmp_key, NULL,
-		(gds_rbtf_create_node_cb) test_rbtree_fast_node_create_node, NULL);
+	trfn = test_rbtree_fast_node_new(1);
+	gds_inline_rbtree_fast_add(&root, &(trfn->inline_node),
+		(gds_rbtf_cmp_cb) test_rbtree_fast_node_cmp, NULL);
+	trfn = test_rbtree_fast_node_new(0);
+	gds_inline_rbtree_fast_add(&root, &(trfn->inline_node),
+		(gds_rbtf_cmp_cb) test_rbtree_fast_node_cmp, NULL);
+	trfn = test_rbtree_fast_node_new(2);
+	gds_inline_rbtree_fast_add(&root, &(trfn->inline_node),
+		(gds_rbtf_cmp_cb) test_rbtree_fast_node_cmp, NULL);
 
 	CU_ASSERT_PTR_NOT_NULL(root);
 	trfn = test_rbtree_fast_node_get_container(root);
@@ -132,27 +138,25 @@ void t_gds_inline_rbtree_fast_add(void)
 
 void t_gds_inline_rbtree_fast_del(void)
 {
-	gds_inline_rbtree_fast_node_t *root = NULL;
+	gds_inline_rbtree_fast_node_t *root = NULL, *inode;
 	test_rbtree_fast_node_t *trfn;
-	int data[] = {0, 1, 2};
 
-	gds_inline_rbtree_fast_add(&root, &data[1],
-		(gds_getkey_cb) test_rbtree_fast_node_get_key,
-		(gds_rbtf_cmp_key_cb) test_rbtree_fast_node_cmp_key, NULL,
-		(gds_rbtf_create_node_cb) test_rbtree_fast_node_create_node, NULL);
-	gds_inline_rbtree_fast_add(&root, &data[0],
-		(gds_getkey_cb) test_rbtree_fast_node_get_key,
-		(gds_rbtf_cmp_key_cb) test_rbtree_fast_node_cmp_key, NULL,
-		(gds_rbtf_create_node_cb) test_rbtree_fast_node_create_node, NULL);
-	gds_inline_rbtree_fast_add(&root, &data[2],
-		(gds_getkey_cb) test_rbtree_fast_node_get_key,
-		(gds_rbtf_cmp_key_cb) test_rbtree_fast_node_cmp_key, NULL,
-		(gds_rbtf_create_node_cb) test_rbtree_fast_node_create_node, NULL);
+	trfn = test_rbtree_fast_node_new(1);
+	gds_inline_rbtree_fast_add(&root, &(trfn->inline_node),
+		(gds_rbtf_cmp_cb) test_rbtree_fast_node_cmp, NULL);
+	trfn = test_rbtree_fast_node_new(0);
+	gds_inline_rbtree_fast_add(&root, &(trfn->inline_node),
+		(gds_rbtf_cmp_cb) test_rbtree_fast_node_cmp, NULL);
+	trfn = test_rbtree_fast_node_new(2);
+	gds_inline_rbtree_fast_add(&root, &(trfn->inline_node),
+		(gds_rbtf_cmp_cb) test_rbtree_fast_node_cmp, NULL);
 
 	int i = 1;
-	gds_inline_rbtree_fast_del(&root, &i,
-		(gds_rbtf_cmp_key_cb) test_rbtree_fast_node_cmp_key, NULL,
-		(gds_rbtf_replace_cb) test_rbtree_fast_node_replace, NULL);
+	inode = gds_inline_rbtree_fast_del(&root, &i,
+		(gds_rbtf_cmp_key_cb) test_rbtree_fast_node_cmp_key, NULL);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(inode);
+	trfn = test_rbtree_fast_node_get_container(inode);
+	CU_ASSERT_EQUAL(trfn->data, 1);
 	
 	trfn = test_rbtree_fast_node_get_container(root);
 	if (trfn->data == 0) {
@@ -162,7 +166,7 @@ void t_gds_inline_rbtree_fast_del(void)
 		CU_ASSERT_EQUAL(trfn->data, 2);
 	} else {
 		CU_ASSERT_PTR_NULL(root->right);
-		CU_ASSERT_PTR_NOT_NULL(root->left);
+		CU_ASSERT_PTR_NOT_NULL_FATAL(root->left);
 		trfn = test_rbtree_fast_node_get_container(root->left);
 		CU_ASSERT_EQUAL(trfn->data, 0);
 	}
@@ -174,20 +178,16 @@ void t_gds_inline_rbtree_fast_get_node(void)
 {
 	gds_inline_rbtree_fast_node_t *root = NULL, *node_inline;
 	test_rbtree_fast_node_t *trfn;
-	int data[] = {0, 1, 2};
 
-	gds_inline_rbtree_fast_add(&root, &data[1],
-		(gds_getkey_cb) test_rbtree_fast_node_get_key,
-		(gds_rbtf_cmp_key_cb) test_rbtree_fast_node_cmp_key, NULL,
-		(gds_rbtf_create_node_cb) test_rbtree_fast_node_create_node, NULL);
-	gds_inline_rbtree_fast_add(&root, &data[0],
-		(gds_getkey_cb) test_rbtree_fast_node_get_key,
-		(gds_rbtf_cmp_key_cb) test_rbtree_fast_node_cmp_key, NULL,
-		(gds_rbtf_create_node_cb) test_rbtree_fast_node_create_node, NULL);
-	gds_inline_rbtree_fast_add(&root, &data[2],
-		(gds_getkey_cb) test_rbtree_fast_node_get_key,
-		(gds_rbtf_cmp_key_cb) test_rbtree_fast_node_cmp_key, NULL,
-		(gds_rbtf_create_node_cb) test_rbtree_fast_node_create_node, NULL);
+	trfn = test_rbtree_fast_node_new(1);
+	gds_inline_rbtree_fast_add(&root, &(trfn->inline_node),
+		(gds_rbtf_cmp_cb) test_rbtree_fast_node_cmp, NULL);
+	trfn = test_rbtree_fast_node_new(0);
+	gds_inline_rbtree_fast_add(&root, &(trfn->inline_node),
+		(gds_rbtf_cmp_cb) test_rbtree_fast_node_cmp, NULL);
+	trfn = test_rbtree_fast_node_new(2);
+	gds_inline_rbtree_fast_add(&root, &(trfn->inline_node),
+		(gds_rbtf_cmp_cb) test_rbtree_fast_node_cmp, NULL);
 
 	int i = 0;
 	node_inline = gds_inline_rbtree_fast_get_node(root, &i,
@@ -216,20 +216,16 @@ void t_gds_inline_rbtree_fast_iterator(void)
 	gds_inline_rbtree_fast_node_t *root = NULL, *node_inline;
 	test_rbtree_fast_node_t *trfn;
 	gds_iterator_t *it;
-	int data[] = {0, 1, 2};
 
-	gds_inline_rbtree_fast_add(&root, &data[1],
-		(gds_getkey_cb) test_rbtree_fast_node_get_key,
-		(gds_rbtf_cmp_key_cb) test_rbtree_fast_node_cmp_key, NULL,
-		(gds_rbtf_create_node_cb) test_rbtree_fast_node_create_node, NULL);
-	gds_inline_rbtree_fast_add(&root, &data[0],
-		(gds_getkey_cb) test_rbtree_fast_node_get_key,
-		(gds_rbtf_cmp_key_cb) test_rbtree_fast_node_cmp_key, NULL,
-		(gds_rbtf_create_node_cb) test_rbtree_fast_node_create_node, NULL);
-	gds_inline_rbtree_fast_add(&root, &data[2],
-		(gds_getkey_cb) test_rbtree_fast_node_get_key,
-		(gds_rbtf_cmp_key_cb) test_rbtree_fast_node_cmp_key, NULL,
-		(gds_rbtf_create_node_cb) test_rbtree_fast_node_create_node, NULL);
+	trfn = test_rbtree_fast_node_new(1);
+	gds_inline_rbtree_fast_add(&root, &(trfn->inline_node),
+		(gds_rbtf_cmp_cb) test_rbtree_fast_node_cmp, NULL);
+	trfn = test_rbtree_fast_node_new(0);
+	gds_inline_rbtree_fast_add(&root, &(trfn->inline_node),
+		(gds_rbtf_cmp_cb) test_rbtree_fast_node_cmp, NULL);
+	trfn = test_rbtree_fast_node_new(2);
+	gds_inline_rbtree_fast_add(&root, &(trfn->inline_node),
+		(gds_rbtf_cmp_cb) test_rbtree_fast_node_cmp, NULL);
 
 	it = gds_inline_rbtree_fast_iterator_new(root);
 
