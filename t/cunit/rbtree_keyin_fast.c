@@ -37,7 +37,8 @@ void gds_rbtree_keyin_fast_print(gds_rbtree_keyin_fast_node_t *root, uint8_t dep
 		} else {
 			printf("%s", key);
 		}
-		printf(": %d\n", test_getvalue(root->data));
+		printf(": %d", test_getvalue(root->data));
+		printf(" (%p)\n", root);
 		node = containerof(root->rbtree.left);
 		gds_rbtree_keyin_fast_print(node, depth+1);
 	}
