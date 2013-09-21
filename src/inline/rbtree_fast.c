@@ -241,7 +241,7 @@ int8_t gds_inline_rbtree_fast_add(gds_inline_rbtree_fast_node_t **root,
 	return (node != NULL) ? 0 : 1;
 }
 
-void gds_inline_rbtree_fast_swap_nodes( gds_inline_rbtree_fast_node_t *node1,
+void gds_inline_rbtree_fast_swap_nodes(gds_inline_rbtree_fast_node_t *node1,
 	gds_inline_rbtree_fast_node_t *node2)
 {
 	gds_inline_rbtree_fast_node_t *node1_p, *node1_l, *node1_r;
@@ -274,7 +274,7 @@ void gds_inline_rbtree_fast_swap_nodes( gds_inline_rbtree_fast_node_t *node1,
 	if (node2->left == node2) node2->left = node1;
 	if (node2->right == node2) node2->right = node1;
 
-	if (node1->parent != NULL) {
+	if (node1->parent != NULL && node1->parent != node2) {
 		if (node1->parent->left == node2)
 			node1->parent->left = node1;
 		else
@@ -283,7 +283,7 @@ void gds_inline_rbtree_fast_swap_nodes( gds_inline_rbtree_fast_node_t *node1,
 	if (node1->left != NULL) node1->left->parent = node1;
 	if (node1->right != NULL) node1->right->parent = node1;
 
-	if (node2->parent != NULL) {
+	if (node2->parent != NULL && node2->parent != node1) {
 		if (node2->parent->left == node1)
 			node2->parent->left = node2;
 		else
@@ -320,6 +320,7 @@ gds_inline_rbtree_fast_node_t * gds_inline_rbtree_fast_replace_or_insert_bottom(
 
 	if (tmp != NULL) {
 		gds_inline_rbtree_fast_swap_nodes(tmp, node);
+		if (node->parent == NULL) *root = node;
 		removed_node = tmp;
 	} else {
 		node->left = node->right = NULL;
