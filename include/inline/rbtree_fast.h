@@ -23,7 +23,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "callbacks.h"
-#include "iterator.h"
+#include "../iterator.h"
 
 struct gds_inline_rbtree_fast_node_s {
 	_Bool red;
