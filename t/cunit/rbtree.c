@@ -356,7 +356,7 @@ void t_rbtree_del(void)
 
 void t_rbtree_iterator(void)
 {
-	gds_rbtree_node_t *root;
+	gds_rbtree_node_t *root = NULL;
 	gds_iterator_t *it;
 	test_t *t;
 	char buf[512];

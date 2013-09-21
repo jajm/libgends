@@ -63,6 +63,9 @@ void t_hash_map_iterator(void)
 	CU_ASSERT_STRING_EQUAL(value, "three");
 
 	CU_ASSERT(0 < gds_iterator_step(it));
+
+	gds_iterator_free(it);
+	gds_hash_map_free(hash, NULL, NULL);
 }
 
 int main()

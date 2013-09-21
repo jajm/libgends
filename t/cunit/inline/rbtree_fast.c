@@ -157,6 +157,7 @@ void t_gds_inline_rbtree_fast_del(void)
 	CU_ASSERT_PTR_NOT_NULL_FATAL(inode);
 	trfn = test_rbtree_fast_node_get_container(inode);
 	CU_ASSERT_EQUAL(trfn->data, 1);
+	test_rbtree_fast_node_free(trfn);
 	
 	trfn = test_rbtree_fast_node_get_container(root);
 	if (trfn->data == 0) {
@@ -256,6 +257,7 @@ void t_gds_inline_rbtree_fast_iterator(void)
 int main()
 {
 	CU_pSuite pSuite = NULL;
+	int fails = 0;
 
 	/* initialize the CUnit test registry */
 	if (CUE_SUCCESS != CU_initialize_registry())
@@ -283,6 +285,9 @@ int main()
 	/* Run all tests using the CUnit Basic interface */
 	CU_basic_set_mode(CU_BRM_VERBOSE);
 	CU_basic_run_tests();
+
+	fails = CU_get_number_of_failures();
 	CU_cleanup_registry();
-	return CU_get_error();
+
+	return fails ? EXIT_FAILURE : EXIT_SUCCESS;
 }

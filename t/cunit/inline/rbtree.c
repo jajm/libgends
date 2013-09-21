@@ -220,6 +220,7 @@ void t_gds_inline_rbtree_iterator(void)
 int main()
 {
 	CU_pSuite pSuite = NULL;
+	int tests_failed = 0;
 
 	/* initialize the CUnit test registry */
 	if (CUE_SUCCESS != CU_initialize_registry())
@@ -247,6 +248,9 @@ int main()
 	/* Run all tests using the CUnit Basic interface */
 	CU_basic_set_mode(CU_BRM_VERBOSE);
 	CU_basic_run_tests();
+
+	tests_failed = CU_get_number_of_failures();
 	CU_cleanup_registry();
-	return CU_get_error();
+
+	return tests_failed ? EXIT_FAILURE : EXIT_SUCCESS;
 }
