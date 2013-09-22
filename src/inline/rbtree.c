@@ -173,21 +173,43 @@ gds_inline_rbtree_node_t * gds_inline_rbtree_get_node(
 	return node;
 }
 
-int8_t gds_inline_rbtree_del(gds_inline_rbtree_node_t **root,
-	const void *key, gds_rbt_cmp_with_key_cb rbt_cmp_with_key_cb,
-	void *rbt_cmp_data, gds_rbt_replace_cb rbt_replace_cb,
-	void *rbt_replace_data)
+void gds_inline_rbtree_swap_nodes(gds_inline_rbtree_node_t *node1,
+	gds_inline_rbtree_node_t *parent1, gds_inline_rbtree_node_t *node2,
+	gds_inline_rbtree_node_t *parent2)
+{
+	gds_inline_rbtree_node_t tmp;
+
+	if (parent1->son[0] == node1) parent1->son[0] = node2;
+	else parent1->son[1] = node2;
+
+	if (parent2->son[0] == node2) parent2->son[0] = node1;
+	else parent2->son[1] = node1;
+
+	tmp.red = node1->red;
+	tmp.son[0] = node1->son[0];
+	tmp.son[1] = node1->son[1];
+
+	node1->red = node2->red;
+	node1->son[0] = node2->son[0];
+	node1->son[1] = node2->son[1];
+
+	node2->red = tmp.red;
+	node2->son[0] = tmp.son[0];
+	node2->son[1] = tmp.son[1];
+}
+
+gds_inline_rbtree_node_t * gds_inline_rbtree_del(
+	gds_inline_rbtree_node_t **root, const void *key,
+	gds_rbt_cmp_with_key_cb rbt_cmp_with_key_cb, void *rbt_cmp_data)
 {
 	gds_inline_rbtree_node_t head;       /* False tree root */
 	gds_inline_rbtree_node_t *q, *p, *g; /* Helpers */
-	gds_inline_rbtree_node_t *f = NULL;  /* Found item */
+	gds_inline_rbtree_node_t *f = NULL, *fp = NULL;  /* Found item and its parent */
 	uint8_t dir = 1;
-	int8_t deleted = 0;
 
 	GDS_CHECK_ARG_NOT_NULL(root);
 	GDS_CHECK_ARG_NOT_NULL(*root);
 	GDS_CHECK_ARG_NOT_NULL(rbt_cmp_with_key_cb);
-	GDS_CHECK_ARG_NOT_NULL(rbt_replace_cb);
 
 	/* Set up helpers */
 	q = &head;
@@ -207,8 +229,10 @@ int8_t gds_inline_rbtree_del(gds_inline_rbtree_node_t **root,
 		dir = (cmp > 0) ? 1 : 0;
 
 		/* Save found node */
-		if (cmp == 0)
+		if (cmp == 0) {
 			f = q;
+			fp = p;
+		}
 
 		if (gds_inline_rbtree_node_is_red(q)
 		|| gds_inline_rbtree_node_is_red(q->son[dir]))
@@ -217,6 +241,7 @@ int8_t gds_inline_rbtree_del(gds_inline_rbtree_node_t **root,
 		/* Push the red node down */
 		if (gds_inline_rbtree_node_is_red(q->son[!dir])) {
 			p = p->son[last] = gds_inline_rbtree_rotate(q, dir);
+			if (q == f) fp = p;
 		}
 		else if (!gds_inline_rbtree_node_is_red(q->son[!dir])) {
 			gds_inline_rbtree_node_t *s = p->son[!last];
@@ -233,10 +258,13 @@ int8_t gds_inline_rbtree_del(gds_inline_rbtree_node_t **root,
 			} else {
 				uint8_t dir2 = (g->son[1] == p) ? 1 : 0;
 
-				if ( gds_inline_rbtree_node_is_red ( s->son[last] ) )
+				if (gds_inline_rbtree_node_is_red(s->son[last])) {
 					g->son[dir2] = gds_inline_rbtree_rotate_twice(p, last);
-				else if (gds_inline_rbtree_node_is_red(s->son[!last]))
+					if (f == p) fp = g->son[dir2];
+				} else if (gds_inline_rbtree_node_is_red(s->son[!last])) {
 					g->son[dir2] = gds_inline_rbtree_rotate(p, last);
+					if (f == p) fp = g->son[dir2];
+				}
 
 				/* Ensure correct coloring */
 				q->red = g->son[dir2]->red = true;
@@ -250,13 +278,12 @@ int8_t gds_inline_rbtree_del(gds_inline_rbtree_node_t **root,
 	if (f != NULL) {
 		uint8_t dir1, dir2;
 
-		dir1 = (p->son[1] == q) ? 1 : 0;
-		dir2 = (q->son[0] == NULL) ? 1 : 0;
-		p->son[dir1] = q->son[dir2];
+		gds_inline_rbtree_swap_nodes(f, fp, q, p);
 
-		rbt_replace_cb(f, q, rbt_replace_data);
-
-		deleted = 1;
+		if (f == p) p = q;
+		dir1 = (p->son[1] == f) ? 1 : 0;
+		dir2 = (f->son[0] == NULL) ? 1 : 0;
+		p->son[dir1] = f->son[dir2];
 	}
 
 	/* Update root and make it black */
@@ -264,7 +291,7 @@ int8_t gds_inline_rbtree_del(gds_inline_rbtree_node_t **root,
 	if (*root != NULL)
 		(*root)->red = false;
 
-	return deleted;
+	return f;
 }
 
 typedef struct {

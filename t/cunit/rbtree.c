@@ -341,7 +341,13 @@ void t_rbtree_del(void)
 		sprintf(buf, "key %d", i);
 		gds_rbtree_add(&root, key_alloc(buf), test_new(buf, i), cmpkey_cb);
 	}
-	for (int i=0; i<100; i++) {
+	for (int i=50; i<100; i++) {
+		sprintf(buf, "key %d", i);
+		CU_ASSERT(0 == gds_rbtree_del(&root, buf,
+			cmpkey_cb, key_free_cb, free_cb));
+		CU_ASSERT(gds_rbtree_is_valid(root, cmpkey_cb));
+	}
+	for (int i=49; i>=0; i--) {
 		sprintf(buf, "key %d", i);
 		CU_ASSERT(0 == gds_rbtree_del(&root, buf,
 			cmpkey_cb, key_free_cb, free_cb));

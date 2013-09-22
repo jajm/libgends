@@ -34,8 +34,6 @@ typedef int32_t (*gds_rbt_cmp_cb)(gds_inline_rbtree_node_t *,
 	gds_inline_rbtree_node_t *, const void *);
 typedef int32_t (*gds_rbt_cmp_with_key_cb)(gds_inline_rbtree_node_t *,
 	const void *, const void *);
-typedef void (*gds_rbt_replace_cb)(gds_inline_rbtree_node_t *,
-	gds_inline_rbtree_node_t *, void *);
 
 void
 gds_inline_rbtree_node_init(
@@ -58,14 +56,12 @@ gds_inline_rbtree_get_node(
 	void *rbt_cmp_data
 );
 
-int8_t
+gds_inline_rbtree_node_t *
 gds_inline_rbtree_del(
 	gds_inline_rbtree_node_t **root,
 	const void *key,
 	gds_rbt_cmp_with_key_cb rbt_cmp_with_key_cb,
-	void *rbt_cmp_data,
-	gds_rbt_replace_cb rbt_replace_cb,
-	void *rbt_free_data
+	void *rbt_cmp_data
 );
 
 gds_iterator_t *

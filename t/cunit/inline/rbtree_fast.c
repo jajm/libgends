@@ -95,18 +95,6 @@ int32_t test_rbtree_fast_node_cmp_key(int *i, gds_inline_rbtree_fast_node_t *n)
 	return (*i) - trfn->data;
 }
 
-void test_rbtree_fast_node_replace(gds_inline_rbtree_fast_node_t *n1,
-	gds_inline_rbtree_fast_node_t *n2)
-{
-	test_rbtree_fast_node_t *trfn1, *trfn2;
-
-	trfn1 = test_rbtree_fast_node_get_container(n1);
-	trfn2 = test_rbtree_fast_node_get_container(n2);
-
-	trfn1->data = trfn2->data;
-	free(trfn2);
-}
-
 void t_gds_inline_rbtree_fast_add(void)
 {
 	gds_inline_rbtree_fast_node_t *root = NULL;

@@ -67,26 +67,6 @@ typedef struct {
 	gds_free_cb free_cb;
 } gds_rbtree_callbacks_t;
 
-void gds_rbtree_node_replace(
-	gds_inline_rbtree_node_t *inode1,
-	gds_inline_rbtree_node_t *inode2,
-	gds_rbtree_callbacks_t *callbacks)
-{
-	gds_rbtree_node_t *node1, *node2;
-
-	node1 = rbt_containerof(inode1);
-	node2 = rbt_containerof(inode2);
-	if (callbacks->key_free_cb) {
-		callbacks->key_free_cb(node1->key);
-	}
-	if (callbacks->free_cb) {
-		callbacks->free_cb(node1->data);
-	}
-	node1->key = node2->key;
-	node1->data = node2->data;
-	free(node2);
-}
-
 int8_t gds_rbtree_add(gds_rbtree_node_t **root, void *key, void *data,
 	gds_cmpkey_cb cmpkey_cb)
 {
@@ -178,8 +158,8 @@ int8_t gds_rbtree_set(gds_rbtree_node_t **root, void *key, void *data,
 int8_t gds_rbtree_del(gds_rbtree_node_t **root, const void *key,
 	gds_cmpkey_cb cmpkey_cb, gds_free_cb key_free_cb, gds_free_cb free_cb)
 {
-	gds_inline_rbtree_node_t *inode;
-	gds_rbtree_callbacks_t callbacks;
+	gds_inline_rbtree_node_t *iroot, *inode;
+	gds_rbtree_node_t *node;
 	int8_t deleted = 0;
 
 	GDS_CHECK_ARG_NOT_NULL(root);
@@ -190,15 +170,16 @@ int8_t gds_rbtree_del(gds_rbtree_node_t **root, const void *key,
 		return 1;
 	}
 
-	callbacks.key_free_cb = key_free_cb;
-	callbacks.free_cb = free_cb;
-
-	inode = &((*root)->rbtree);
-	deleted = gds_inline_rbtree_del(&inode, key,
+	iroot = &((*root)->rbtree);
+	inode = gds_inline_rbtree_del(&iroot, key,
 		(gds_rbt_cmp_with_key_cb) gds_rbtree_node_cmp_with_key,
-		cmpkey_cb,
-		(gds_rbt_replace_cb) gds_rbtree_node_replace, &callbacks);
-	*root = rbt_containerof(inode);
+		cmpkey_cb);
+	if (inode != NULL) {
+		node = rbt_containerof(inode);
+		gds_rbtree_node_free(node, key_free_cb, free_cb);
+		deleted = 1;
+	}
+	*root = rbt_containerof(iroot);
 
 	return deleted ? 0 : 1;
 }

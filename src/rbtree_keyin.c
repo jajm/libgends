@@ -68,20 +68,6 @@ int32_t gds_rbtree_keyin_node_cmp(gds_inline_rbtree_node_t *inode1,
 	return cmp;
 }
 
-void gds_rbtree_keyin_node_replace(gds_inline_rbtree_node_t *inode1,
-	gds_inline_rbtree_node_t *inode2, gds_free_cb free_cb)
-{
-	gds_rbtree_keyin_node_t *node1, *node2;
-
-	node1 = rbt_containerof(inode1);
-	node2 = rbt_containerof(inode2);
-	if (free_cb) {
-		free_cb(node1->data);
-	}
-	node1->data = node2->data;
-	free(node2);
-}
-
 int8_t gds_rbtree_keyin_add(gds_rbtree_keyin_node_t **root, void *data,
 	gds_getkey_cb getkey_cb, gds_cmpkey_cb cmpkey_cb)
 {
@@ -188,7 +174,8 @@ int8_t gds_rbtree_keyin_set(gds_rbtree_keyin_node_t **root, void *data,
 int8_t gds_rbtree_keyin_del(gds_rbtree_keyin_node_t **root, const void *key,
 	gds_getkey_cb getkey_cb, gds_cmpkey_cb cmpkey_cb, gds_free_cb free_cb)
 {
-	gds_inline_rbtree_node_t *inode;
+	gds_inline_rbtree_node_t *iroot, *inode;
+	gds_rbtree_keyin_node_t *node;
 	gds_rbtree_keyin_callbacks_t callbacks;
 	int8_t deleted = 0;
 
@@ -204,12 +191,16 @@ int8_t gds_rbtree_keyin_del(gds_rbtree_keyin_node_t **root, const void *key,
 	callbacks.getkey_cb = getkey_cb;
 	callbacks.cmpkey_cb = cmpkey_cb;
 
-	inode = &((*root)->rbtree);
-	deleted = gds_inline_rbtree_del(&inode, key,
+	iroot = &((*root)->rbtree);
+	inode = gds_inline_rbtree_del(&iroot, key,
 		(gds_rbt_cmp_with_key_cb)gds_rbtree_keyin_node_cmp_with_key,
-		&callbacks, (gds_rbt_replace_cb)gds_rbtree_keyin_node_replace,
-		free_cb);
-	*root = rbt_containerof(inode);
+		&callbacks);
+	if (inode != NULL) {
+		node = rbt_containerof(inode);
+		gds_rbtree_keyin_node_free(node, free_cb);
+		deleted = 1;
+	}
+	*root = rbt_containerof(iroot);
 
 	return deleted ? 0 : 1;
 }

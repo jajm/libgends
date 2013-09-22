@@ -73,18 +73,6 @@ int32_t test_rbtree_node_compare_with_key(gds_inline_rbtree_node_t *n, int *i)
 	return (*i) - trn->data;
 }
 
-void test_rbtree_node_replace(gds_inline_rbtree_node_t *n1,
-	gds_inline_rbtree_node_t *n2)
-{
-	test_rbtree_node_t *trn1, *trn2;
-
-	trn1 = test_rbtree_node_get_container(n1);
-	trn2 = test_rbtree_node_get_container(n2);
-
-	trn1->data = trn2->data;
-	free(trn2);
-}
-
 void t_gds_inline_rbtree_add(void)
 {
 	test_rbtree_node_t *root, *trn;
@@ -112,7 +100,7 @@ void t_gds_inline_rbtree_add(void)
 void t_gds_inline_rbtree_del(void)
 {
 	test_rbtree_node_t *root, *trn;
-	gds_inline_rbtree_node_t *root_inline;
+	gds_inline_rbtree_node_t *root_inline, *inode;
 	int i;
 
 	root = test_rbtree_node_new(0);
@@ -122,10 +110,13 @@ void t_gds_inline_rbtree_del(void)
 	trn = test_rbtree_node_new(1);
 	gds_inline_rbtree_add(&root_inline, &(trn->inline_node), (gds_rbt_cmp_cb)test_rbtree_node_compare, NULL);
 
-	i = 0;
-	gds_inline_rbtree_del(&root_inline, &i,
+	i = 1;
+	inode = gds_inline_rbtree_del(&root_inline, &i,
 		(gds_rbt_cmp_with_key_cb) test_rbtree_node_compare_with_key,
-		NULL, (gds_rbt_replace_cb) test_rbtree_node_replace, NULL);
+		NULL);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(inode);
+	trn = test_rbtree_node_get_container(inode);
+	test_rbtree_node_free(trn);
 	
 	root = test_rbtree_node_get_container(root_inline);
 	if (root->data == -1) {
