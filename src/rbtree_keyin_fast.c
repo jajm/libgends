@@ -51,9 +51,8 @@ int32_t gds_rbtree_keyin_fast_node_cmp(gds_inline_rbtree_fast_node_t *inode1,
 	return cmpkey_cb(getkey_cb(node1->data), getkey_cb(node2->data));
 }
 
-int32_t gds_rbtree_keyin_fast_node_cmp_key(void *key,
-	gds_inline_rbtree_fast_node_t *inode,
-	void *params[2])
+int32_t gds_rbtree_keyin_fast_node_cmp_with_key(
+	gds_inline_rbtree_fast_node_t *inode, void *key, void *params[2])
 {
 	gds_rbtree_keyin_fast_node_t *node;
 	gds_getkey_cb getkey_cb;
@@ -86,7 +85,7 @@ int gds_rbtree_keyin_fast_add(gds_rbtree_keyin_fast_node_t **root,
 	} else {
 		iroot = &((*root)->rbtree);
 		inode = gds_inline_rbtree_fast_get_node(iroot, getkey_cb(data),
-			(gds_rbtf_cmp_key_cb) gds_rbtree_keyin_fast_node_cmp_key,
+			(gds_rbtf_cmp_with_key_cb) gds_rbtree_keyin_fast_node_cmp_with_key,
 			cmp_params);
 		if (inode == NULL) {
 			node = gds_rbtree_keyin_fast_node_new(data);
@@ -138,10 +137,10 @@ gds_rbtree_keyin_fast_node_t * gds_rbtree_keyin_fast_get_node(
 	gds_rbtree_keyin_fast_node_t *root, void *key, gds_getkey_cb getkey_cb,
 	gds_cmpkey_cb cmpkey_cb)
 {
-	void *cmp_key_params[] = {getkey_cb, cmpkey_cb};
+	void *cmp_with_key_params[] = {getkey_cb, cmpkey_cb};
 	gds_inline_rbtree_fast_node_t *inode = NULL;
-	gds_rbtf_cmp_key_cb cmp_key_cb =
-		(gds_rbtf_cmp_key_cb) gds_rbtree_keyin_fast_node_cmp_key;
+	gds_rbtf_cmp_with_key_cb cmp_with_key_cb =
+		(gds_rbtf_cmp_with_key_cb) gds_rbtree_keyin_fast_node_cmp_with_key;
 
 	GDS_CHECK_ARG_NOT_NULL(getkey_cb);
 	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb);
@@ -151,7 +150,7 @@ gds_rbtree_keyin_fast_node_t * gds_rbtree_keyin_fast_get_node(
 	}
 
 	inode = gds_inline_rbtree_fast_get_node(&(root->rbtree), key,
-		cmp_key_cb, &cmp_key_params);
+		cmp_with_key_cb, &cmp_with_key_params);
 
 	return rbt_containerof(inode);
 }
@@ -173,8 +172,8 @@ int gds_rbtree_keyin_fast_del(gds_rbtree_keyin_fast_node_t **root, void *key,
 {
 	gds_inline_rbtree_fast_node_t *iroot, *inode;
 	gds_rbtree_keyin_fast_node_t *node;
-	gds_rbtf_cmp_key_cb cmp_key_cb =
-		(gds_rbtf_cmp_key_cb) gds_rbtree_keyin_fast_node_cmp_key;
+	gds_rbtf_cmp_with_key_cb cmp_with_key_cb =
+		(gds_rbtf_cmp_with_key_cb) gds_rbtree_keyin_fast_node_cmp_with_key;
 	int not_in_tree = 1;
 
 	GDS_CHECK_ARG_NOT_NULL(root);
@@ -182,11 +181,11 @@ int gds_rbtree_keyin_fast_del(gds_rbtree_keyin_fast_node_t **root, void *key,
 	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb);
 
 	if (*root != NULL) {
-		void *cmp_key_params[] = {getkey_cb, cmpkey_cb};
+		void *cmp_with_key_params[] = {getkey_cb, cmpkey_cb};
 		iroot = &((*root)->rbtree);
 
 		inode = gds_inline_rbtree_fast_del(&iroot, key,
-			cmp_key_cb, &cmp_key_params);
+			cmp_with_key_cb, &cmp_with_key_params);
 		if (inode != NULL) {
 			node = rbt_containerof(inode);
 			gds_rbtree_keyin_fast_node_free(node, free_cb);

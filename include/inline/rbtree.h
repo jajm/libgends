@@ -28,19 +28,60 @@ struct gds_inline_rbtree_node_s {
 	_Bool red;
 	struct gds_inline_rbtree_node_s *son[2];
 };
+
 typedef struct gds_inline_rbtree_node_s gds_inline_rbtree_node_t;
 
-typedef int32_t (*gds_rbt_cmp_cb)(gds_inline_rbtree_node_t *,
-	gds_inline_rbtree_node_t *, const void *);
-typedef int32_t (*gds_rbt_cmp_with_key_cb)(gds_inline_rbtree_node_t *,
-	const void *, const void *);
+/* Compare two red-black tree nodes.
+ *
+ * Should returns:
+ *   a negative value if node1 should be at left of node2
+ *   0 if node1 is equal to node2
+ *   a positive value if node1 should be at right of node2
+ */
+typedef int (*gds_rbt_cmp_cb)(
+	gds_inline_rbtree_node_t *node1,
+	gds_inline_rbtree_node_t *node2,
+	const void *userdata
+);
 
+/* Compare a key and a red-black tree node
+ *
+ * Used during search (for retrieving and deleting data) to determine where to
+ * search for data.
+ *
+ * Should returns:
+ *   a negative value if search should continue in left sub-tree of node,
+ *   zero if key corresponds to the node,
+ *   a positive value if search should continue in right sub-tree of node.
+ */
+typedef int (*gds_rbt_cmp_with_key_cb)(
+	gds_inline_rbtree_node_t *node,
+	const void *key,
+	const void *userdata
+);
+
+/* Initialize red-black tree inline node with default values */
 void
 gds_inline_rbtree_node_init(
 	gds_inline_rbtree_node_t *node
 );
 
-int8_t
+/* Insert a node in red-black tree.
+ *
+ * Parameters:
+ *   root         : root node of tree
+ *   node         : node to insert
+ *   rbt_cmp_cb   : see above documentation about gds_rbt_cmp_cb
+ *   rbt_cmp_data : user data passed to rbt_cmp_cb
+ *
+ * Returns:
+ *   0 if data was successfully inserted
+ *   1 if data was already in tree
+ *
+ * NOTE: root will be modified so it will always point to the root of tree after
+ * the function call. You should consider this when using this function.
+ */
+int
 gds_inline_rbtree_add(
 	gds_inline_rbtree_node_t **root,
 	gds_inline_rbtree_node_t *node,
@@ -48,6 +89,17 @@ gds_inline_rbtree_add(
 	void *rbt_cmp_data
 );
 
+/* Search a node by key.
+ *
+ * Parameters:
+ *   root                  : root node of tree
+ *   key                   : key to search
+ *   rbt_cmp_with_key_cb   : see above documentation about gds_rbt_cmp_with_key_cb
+ *   rbt_cmp_with_key_data : user data passed to rbt_cmp_with_key_cb
+ *
+ * Returns:
+ *   Pointer to found node, or NULL if key was not found.
+ */
 gds_inline_rbtree_node_t *
 gds_inline_rbtree_get_node(
 	gds_inline_rbtree_node_t *root,
@@ -56,6 +108,20 @@ gds_inline_rbtree_get_node(
 	void *rbt_cmp_data
 );
 
+/* Remove a node from red-black tree by its key.
+ *
+ * Parameters:
+ *   root                   : root node of tree
+ *   key                    : key of data to remove
+ *   rbt_cmp_with_key_cb    : see above documentation about gds_rbt_cmp_with_key_cb
+ *   rbt_cmp_with_key_data  : user data passed to rbt_cmp_with_key_cb
+ *
+ * Returns:
+ *   Pointer to the removed node, or NULL if node was not found.
+ *
+ * NOTE: root will be modified so it will always point to the root of tree after
+ * the function call. You should consider this when using this function.
+ */
 gds_inline_rbtree_node_t *
 gds_inline_rbtree_del(
 	gds_inline_rbtree_node_t **root,
@@ -64,6 +130,14 @@ gds_inline_rbtree_del(
 	void *rbt_cmp_data
 );
 
+/* Create an iterator on red-black tree.
+ *
+ * Parameters:
+ *   root: root node of tree
+ *
+ * Returns:
+ *   Pointer to the new iterator. Free with gds_iterator_free.
+ */
 gds_iterator_t *
 gds_inline_rbtree_iterator_new(
 	gds_inline_rbtree_node_t *root

@@ -86,7 +86,7 @@ int32_t test_rbtree_fast_node_cmp(gds_inline_rbtree_fast_node_t *n1, gds_inline_
 	return trfn1->data - trfn2->data;
 }
 
-int32_t test_rbtree_fast_node_cmp_key(int *i, gds_inline_rbtree_fast_node_t *n)
+int32_t test_rbtree_fast_node_cmp_with_key(gds_inline_rbtree_fast_node_t *n, int *i)
 {
 	test_rbtree_fast_node_t *trfn;
 
@@ -141,7 +141,7 @@ void t_gds_inline_rbtree_fast_del(void)
 
 	int i = 1;
 	inode = gds_inline_rbtree_fast_del(&root, &i,
-		(gds_rbtf_cmp_key_cb) test_rbtree_fast_node_cmp_key, NULL);
+		(gds_rbtf_cmp_with_key_cb) test_rbtree_fast_node_cmp_with_key, NULL);
 	CU_ASSERT_PTR_NOT_NULL_FATAL(inode);
 	trfn = test_rbtree_fast_node_get_container(inode);
 	CU_ASSERT_EQUAL(trfn->data, 1);
@@ -180,19 +180,19 @@ void t_gds_inline_rbtree_fast_get_node(void)
 
 	int i = 0;
 	node_inline = gds_inline_rbtree_fast_get_node(root, &i,
-		(gds_rbtf_cmp_key_cb) test_rbtree_fast_node_cmp_key, NULL);
+		(gds_rbtf_cmp_with_key_cb) test_rbtree_fast_node_cmp_with_key, NULL);
 	CU_ASSERT_PTR_NOT_NULL_FATAL(node_inline)
 	trfn = test_rbtree_fast_node_get_container(node_inline);
 	CU_ASSERT_EQUAL(trfn->data, i);
 	i = 1;
 	node_inline = gds_inline_rbtree_fast_get_node(root, &i,
-		(gds_rbtf_cmp_key_cb) test_rbtree_fast_node_cmp_key, NULL);
+		(gds_rbtf_cmp_with_key_cb) test_rbtree_fast_node_cmp_with_key, NULL);
 	CU_ASSERT_PTR_NOT_NULL_FATAL(node_inline)
 	trfn = test_rbtree_fast_node_get_container(node_inline);
 	CU_ASSERT_EQUAL(trfn->data, i);
 	i = 2;
 	node_inline = gds_inline_rbtree_fast_get_node(root, &i,
-		(gds_rbtf_cmp_key_cb) test_rbtree_fast_node_cmp_key, NULL);
+		(gds_rbtf_cmp_with_key_cb) test_rbtree_fast_node_cmp_with_key, NULL);
 	CU_ASSERT_PTR_NOT_NULL_FATAL(node_inline)
 	trfn = test_rbtree_fast_node_get_container(node_inline);
 	CU_ASSERT_EQUAL(trfn->data, i);

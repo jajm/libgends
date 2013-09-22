@@ -22,7 +22,6 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "callbacks.h"
 #include "../iterator.h"
 
 struct gds_inline_rbtree_fast_node_s {
@@ -37,26 +36,30 @@ typedef struct gds_inline_rbtree_fast_node_s gds_inline_rbtree_fast_node_t;
 /* Compare two red-black tree nodes.
  *
  * Should returns:
- *   -1 if node1 should be at left of node2
+ *   a negative value if node1 should be at left of node2
  *   0 if node1 is equal to node2
- *   1 if node1 should be at right of node2
+ *   a positive value if node1 should be at right of node2
  */
 typedef int (*gds_rbtf_cmp_cb)(
-	gds_inline_rbtree_fast_node_t *,    // node1
-	gds_inline_rbtree_fast_node_t *,    // node2
-	void *     // user data
+	gds_inline_rbtree_fast_node_t *node1,
+	gds_inline_rbtree_fast_node_t *node2,
+	void *userdata
 );
 
-/* Compare a key and a red-black tree node */
-/* Used during search (for retrieving and deleting data) to determine where to
- * search for data. */
-/* Must return a negative value if search should continue in left sub-tree of
- * node, zero if key corresponds to the node, and a positive value if search
- * should continue in right sub-tree of node. */
-typedef int32_t (*gds_rbtf_cmp_key_cb)(
-	void *,                             // key
-	gds_inline_rbtree_fast_node_t *,    // red-black tree node
-	void *                              // user data
+/* Compare a key and a red-black tree node
+ *
+ * Used during search (for retrieving and deleting data) to determine where to
+ * search for data.
+ *
+ * Should returns:
+ *   a negative value if search should continue in left sub-tree of node,
+ *   zero if key corresponds to the node,
+ *   a positive value if search should continue in right sub-tree of node.
+ */
+typedef int (*gds_rbtf_cmp_with_key_cb)(
+	gds_inline_rbtree_fast_node_t *node,
+	void *key,
+	void *userdata
 );
 
 /* Initialize red-black tree inline node with default values */
@@ -65,16 +68,25 @@ gds_inline_rbtree_fast_node_init(
 	gds_inline_rbtree_fast_node_t *node
 );
 
-/* Insert data */
-/* root                  : root node of tree
- * node                  : node to insert
- * rbtf_cmp_cb           : see above documentation about gds_rbtf_cmp_cb
- * rbtf_cmp_data         : user data passed to rbtf_cmp_cb */
-/* Return: 0 if data was successfully inserted
- *         1 if data was already in tree */
-/* NOTE: root will be modified so it will always point to the root of tree after
- * the function call. You should consider this when using this function. */
-int8_t
+/* Insert a node in red-black tree.
+ *
+ * The node is not inserted if an equivalent node is already in the tree
+ * (ie. rbtf_cmp_cb returns 0 at some point).
+ *
+ * Parameters:
+ *   root          : root node of tree
+ *   node          : node to insert
+ *   rbtf_cmp_cb   : see above documentation about gds_rbtf_cmp_cb
+ *   rbtf_cmp_data : user data passed to rbtf_cmp_cb
+ *
+ * Returns:
+ *   0 if data was successfully inserted
+ *   1 if data was already in tree
+ *
+ * NOTE: root will be modified so it will always point to the root of tree after
+ * the function call. You should consider this when using this function.
+ */
+int
 gds_inline_rbtree_fast_add(
 	gds_inline_rbtree_fast_node_t **root,
 	gds_inline_rbtree_fast_node_t *node,
@@ -82,13 +94,25 @@ gds_inline_rbtree_fast_add(
 	void *rbtf_cmp_data
 );
 
-/* Insert data or change it if it is already in the tree */
-/* root                  : root node of tree
- * node                  : node to insert
- * rbtf_cmp_cb           : see above documentation about gds_rbtf_cmp_cb
- * rbtf_cmp_data         : user data passed to rbtf_cmp_cb */
-/* NOTE: root will be modified so it will always point to the root of tree after
- * the function call. You should consider this when using this function. */
+/* Insert a node in red-black tree.
+ *
+ * Unlike gds_inline_rbtree_fast_add, this function forces insertion even if
+ * an equivalent node is already in the tree. The latter node is then removed
+ * from tree.
+ *
+ * Parameters:
+ *   root          : root node of tree
+ *   node          : node to insert
+ *   rbtf_cmp_cb   : see above documentation about gds_rbtf_cmp_cb
+ *   rbtf_cmp_data : user data passed to rbtf_cmp_cb
+ *
+ * Returns:
+ *   Pointer to the removed node, if any.
+ *   NULL otherwise.
+ *
+ * NOTE: root will be modified so it will always point to the root of tree after
+ * the function call. You should consider this when using this function.
+ */
 gds_inline_rbtree_fast_node_t *
 gds_inline_rbtree_fast_set(
 	gds_inline_rbtree_fast_node_t **root,
@@ -97,37 +121,48 @@ gds_inline_rbtree_fast_set(
 	void *rbtf_cmp_data
 );
 
-/* Search a node by key */
-/* root              : root node of tree
- * key               : key to search
- * rbtf_cmp_key_cb   : see above documentation about gds_rbtf_cmp_key_cb
- * rbtf_cmp_key_data : user data passed to rbtf_cmp_key_cb */
-/* Return pointer to found node, or NULL if key was not found. */
+/* Search a node by key.
+ *
+ * Parameters:
+ *   root                   : root node of tree
+ *   key                    : key to search
+ *   rbtf_cmp_with_key_cb   : see above documentation about gds_rbtf_cmp_with_key_cb
+ *   rbtf_cmp_with_key_data : user data passed to rbtf_cmp_with_key_cb
+ *
+ * Returns:
+ *   Pointer to found node, or NULL if key was not found.
+ */
 gds_inline_rbtree_fast_node_t *
 gds_inline_rbtree_fast_get_node(
 	gds_inline_rbtree_fast_node_t *root,
 	void *key,
-	gds_rbtf_cmp_key_cb rbtf_cmp_key_cb,
-	void *rbtf_cmp_key_data
+	gds_rbtf_cmp_with_key_cb rbtf_cmp_with_key_cb,
+	void *rbtf_cmp_with_key_data
 );
 
-/* Remove data by its key */
-/* root              : root node of tree
- * key               : key of data to remove
- * rbtf_cmp_key_cb   : see above documentation about gds_rbtf_cmp_key_cb
- * rbtf_cmp_key_data : user data passed to rbtf_cmp_key_cb */
-/* Return: pointer to the removed node, or NULL if node was not found. */
-/* NOTE: root will be modified so it will always point to the root of tree after
- * the function call. You should consider this when using this function. */
+/* Remove a node from red-black tree by its key.
+ *
+ * Parameters:
+ *   root                   : root node of tree
+ *   key                    : key of data to remove
+ *   rbtf_cmp_with_key_cb   : see above documentation about gds_rbtf_cmp_with_key_cb
+ *   rbtf_cmp_with_key_data : user data passed to rbtf_cmp_with_key_cb
+ *
+ * Returns:
+ *   Pointer to the removed node, or NULL if node was not found.
+ *
+ * NOTE: root will be modified so it will always point to the root of tree after
+ * the function call. You should consider this when using this function.
+ */
 gds_inline_rbtree_fast_node_t *
 gds_inline_rbtree_fast_del(
 	gds_inline_rbtree_fast_node_t **root,
 	void *key,
-	gds_rbtf_cmp_key_cb rbtf_cmp_key_cb,
-	void *rbtf_cmp_key_data
+	gds_rbtf_cmp_with_key_cb rbtf_cmp_with_key_cb,
+	void *rbtf_cmp_with_key_data
 );
 
-/* Create an iterator on tree
+/* Create an iterator on red-black tree.
  *
  * Parameters:
  *   root: root node of tree

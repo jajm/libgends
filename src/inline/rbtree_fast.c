@@ -358,13 +358,14 @@ gds_inline_rbtree_fast_node_t * gds_inline_rbtree_fast_set(
 
 gds_inline_rbtree_fast_node_t * gds_inline_rbtree_fast_get_node(
 	gds_inline_rbtree_fast_node_t *root, void *key,
-	gds_rbtf_cmp_key_cb rbtf_cmp_key_cb, void *rbtf_cmp_key_data)
+	gds_rbtf_cmp_with_key_cb rbtf_cmp_with_key_cb,
+	void *rbtf_cmp_with_key_data)
 {
 	gds_inline_rbtree_fast_node_t *node = root;
 	int32_t cmp;
 
 	while (node != NULL) {
-		cmp = rbtf_cmp_key_cb(key, node, rbtf_cmp_key_data);
+		cmp = rbtf_cmp_with_key_cb(node, key, rbtf_cmp_with_key_data);
 		if (cmp < 0) {
 			node = node->left;
 		} else if(cmp > 0) {
@@ -503,16 +504,16 @@ void gds_inline_rbtree_fast_replace_with_child(
 
 gds_inline_rbtree_fast_node_t * gds_inline_rbtree_fast_del(
 	gds_inline_rbtree_fast_node_t **root,
-	void *key, gds_rbtf_cmp_key_cb rbtf_cmp_key_cb,
-	void *rbtf_cmp_key_data)
+	void *key, gds_rbtf_cmp_with_key_cb rbtf_cmp_with_key_cb,
+	void *rbtf_cmp_with_key_data)
 {
 	gds_inline_rbtree_fast_node_t *node, *child;
 
 	GDS_CHECK_ARG_NOT_NULL(root);
-	GDS_CHECK_ARG_NOT_NULL(rbtf_cmp_key_cb);
+	GDS_CHECK_ARG_NOT_NULL(rbtf_cmp_with_key_cb);
 
-	node = gds_inline_rbtree_fast_get_node(*root, key, rbtf_cmp_key_cb,
-		rbtf_cmp_key_data);
+	node = gds_inline_rbtree_fast_get_node(*root, key, rbtf_cmp_with_key_cb,
+		rbtf_cmp_with_key_data);
 	if(node == NULL) {
 		GDS_LOG_WARNING("key doesn't exist in tree");
 		return NULL;

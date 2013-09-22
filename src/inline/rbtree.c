@@ -78,7 +78,7 @@ void gds_inline_rbtree_node_init(gds_inline_rbtree_node_t *node)
 	node->son[0] = node->son[1] = NULL;
 }
 
-int8_t gds_inline_rbtree_add(gds_inline_rbtree_node_t **root,
+int gds_inline_rbtree_add(gds_inline_rbtree_node_t **root,
 	gds_inline_rbtree_node_t *node, gds_rbt_cmp_cb rbt_cmp_cb,
 	void *rbt_cmp_data)
 {
