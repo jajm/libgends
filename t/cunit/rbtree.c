@@ -5,7 +5,6 @@
 #include <time.h>
 #include <CUnit/Basic.h>
 #include "test_macros.h"
-#include "rbtree_node.h"
 #include "rbtree.h"
 #include "iterator.h"
 #include "slist.h"

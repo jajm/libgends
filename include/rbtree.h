@@ -21,9 +21,15 @@
 #define gds_rbtree_h_included
 
 #include <stdint.h>
-#include "rbtree_node.h"
+#include "inline/rbtree.h"
 #include "callbacks.h"
 #include "slist.h"
+
+typedef struct {
+	void *key;
+	void *data;
+	gds_inline_rbtree_node_t rbtree;
+} gds_rbtree_node_t;
 
 int
 gds_rbtree_add(

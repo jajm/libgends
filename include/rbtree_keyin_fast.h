@@ -22,7 +22,12 @@
 
 #include <stdint.h>
 #include "callbacks.h"
-#include "rbtree_keyin_fast_node.h"
+#include "inline/rbtree_fast.h"
+
+typedef struct {
+	void *data;
+	gds_inline_rbtree_fast_node_t rbtree;
+} gds_rbtree_keyin_fast_node_t;
 
 /* Insert data into the tree */
 /*      root : pointer to pointer to the root node
