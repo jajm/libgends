@@ -90,9 +90,13 @@ int gds_inline_rbtree_add(gds_inline_rbtree_node_t **root,
 	int8_t added = 0;
 
 	GDS_CHECK_ARG_NOT_NULL(root);
-	GDS_CHECK_ARG_NOT_NULL(*root);
 	GDS_CHECK_ARG_NOT_NULL(node);
 	GDS_CHECK_ARG_NOT_NULL(rbt_cmp_cb);
+
+	if (*root == NULL) {
+		*root = node;
+		return 0;
+	}
 
 	/* Root node should be black */
 	(*root)->red = false;
