@@ -226,7 +226,7 @@ void gds_inline_rbtree_fast_rebalance_after_insert(
 	}
 }
 
-int8_t gds_inline_rbtree_fast_add(gds_inline_rbtree_fast_node_t **root,
+int gds_inline_rbtree_fast_add(gds_inline_rbtree_fast_node_t **root,
 	gds_inline_rbtree_fast_node_t *node, gds_rbtf_cmp_cb rbtf_cmp_cb,
 	void *rbtf_cmp_data)
 {
