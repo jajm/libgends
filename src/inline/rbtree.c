@@ -152,7 +152,7 @@ int gds_inline_rbtree_add(gds_inline_rbtree_node_t **root,
 	*root = head.son[1];
 	(*root)->red = false;
 
-	return added;
+	return added ? 0 : 1;
 }
 
 gds_inline_rbtree_node_t * gds_inline_rbtree_get_node(

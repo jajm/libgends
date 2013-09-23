@@ -25,7 +25,7 @@
 #include "callbacks.h"
 #include "slist.h"
 
-int8_t
+int
 gds_rbtree_add(
 	gds_rbtree_node_t **root,
 	void *key,
@@ -33,7 +33,7 @@ gds_rbtree_add(
 	gds_cmpkey_cb cmpkey_cb
 );
 
-int8_t
+int
 gds_rbtree_set(
 	gds_rbtree_node_t **root,
 	void *key,
@@ -49,7 +49,7 @@ gds_rbtree_get(
 	gds_cmpkey_cb cmpkey_cb
 );
 
-int8_t
+int
 gds_rbtree_del(
 	gds_rbtree_node_t **root,
 	const void *key,
