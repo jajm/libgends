@@ -5,7 +5,7 @@ AM_LDFLAGS = -lcunit `pkg-config --libs libexception lll`
 
 SUBDIRS = inline
 
-noinst_PROGRAMS = rbtree_keyin rbtree rbtree_keyin_fast \
+noinst_PROGRAMS = rbtree_keyin rbtree rbtree_fast rbtree_keyin_fast \
 	slist dlist hash_map
 
 rbtree_keyin_SOURCES = rbtree_keyin.c ../test.c
@@ -13,6 +13,9 @@ rbtree_keyin_LDADD = ../../src/libgends.la
 
 rbtree_SOURCES = rbtree.c ../test.c
 rbtree_LDADD = ../../src/libgends.la
+
+rbtree_fast_SOURCES = rbtree_fast.c ../test.c
+rbtree_fast_LDADD = ../../src/libgends.la
 
 rbtree_keyin_fast_SOURCES = rbtree_keyin_fast.c ../test.c
 rbtree_keyin_fast_LDADD = ../../src/libgends.la
