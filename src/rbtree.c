@@ -208,7 +208,7 @@ int gds_rbtree_set(gds_rbtree_node_t **root, void *key, void *data,
 	node = gds_rbtree_get_node(*root, key, cmpkey_cb);
 	if (node != NULL) {
 		/* Node found: the key already exists in the tree */
-		if (free_cb != NULL) {
+		if (free_cb != NULL && node->data != data) {
 			free_cb(node->data);
 		}
 		node->data = data;
