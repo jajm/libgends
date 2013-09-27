@@ -1,0 +1,7 @@
+libgends is a C library designed to help manipulating generic data structures.
+
+Actually it supports the following data structures:
+  - singly linked list
+  - doubly linked list
+  - red-black tree
+  - hash map
