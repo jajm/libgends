@@ -30,13 +30,6 @@ AC_TYPE_SIZE_T
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_CHECK_FUNCS([memmove])
-AC_ARG_ENABLE([cunit],
-	AC_HELP_STRING([--enable-cunit], [build CUnit tests]),
-	[want_cunit=$enableval],
-	[want_cunit=no]
-)
-AC_CHECK_HEADERS([CUnit/Basic.h],[have_cunit=yes],[have_cunit=no])
-AM_CONDITIONAL([CUNIT_TESTS], [test x$want_cunit$have_cunit = xyesyes])
 
 AC_CONFIG_FILES([
 	Makefile
@@ -44,8 +37,7 @@ AC_CONFIG_FILES([
 	src/Makefile
 	include/Makefile
 	t/Makefile
-	t/cunit/Makefile
-	t/cunit/inline/Makefile
+	t/inline/Makefile
 	benchs/Makefile
 ])
 

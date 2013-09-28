@@ -3,10 +3,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <time.h>
-#include <CUnit/Basic.h>
 #include "test_macros.h"
 #include "rbtree_keyin_fast.h"
 #include "test.h"
+#include "tap.h"
 
 int init_suite(void)
 {
@@ -123,22 +123,22 @@ void t_rbtree_keyin_fast_add(void)
 	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_add(&root, t, getkey_cb, NULL));
 
 	/* Tree is unchanged */
-	CU_ASSERT(NULL == root);
-	CU_ASSERT(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb));
+	ok(NULL == root, NULL);
+	ok(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb), NULL);
 
 	/* Add NULL as data, first call should success, others must return a
 	 * positive value, meaning that data is already in the tree */
-	CU_ASSERT(0 == gds_rbtree_keyin_fast_add(&root, NULL, getkey_cb, cmpkey_cb));
-	CU_ASSERT(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb));
-	CU_ASSERT(0 < gds_rbtree_keyin_fast_add(&root, NULL, getkey_cb, cmpkey_cb));
-	CU_ASSERT(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb));
+	ok(0 == gds_rbtree_keyin_fast_add(&root, NULL, getkey_cb, cmpkey_cb), NULL);
+	ok(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb), NULL);
+	ok(0 < gds_rbtree_keyin_fast_add(&root, NULL, getkey_cb, cmpkey_cb), NULL);
+	ok(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb), NULL);
 
 	/* Add t as data, first call should success, others must return a
 	 * positive value, meaning that data is already in the tree */
-	CU_ASSERT(0 == gds_rbtree_keyin_fast_add(&root, t, getkey_cb, cmpkey_cb));
-	CU_ASSERT(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb));
-	CU_ASSERT(0 < gds_rbtree_keyin_fast_add(&root, t, getkey_cb, cmpkey_cb));
-	CU_ASSERT(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb));
+	ok(0 == gds_rbtree_keyin_fast_add(&root, t, getkey_cb, cmpkey_cb), NULL);
+	ok(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb), NULL);
+	ok(0 < gds_rbtree_keyin_fast_add(&root, t, getkey_cb, cmpkey_cb), NULL);
+	ok(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb), NULL);
 
 	gds_rbtree_keyin_fast_free(root, NULL);
 	test_free(t);
@@ -146,9 +146,9 @@ void t_rbtree_keyin_fast_add(void)
 
 	for (int i=0; i<100; i++) {
 		sprintf(buf, "key %d", i);
-		CU_ASSERT(0 == gds_rbtree_keyin_fast_add(&root, test_new(buf, i),
-			getkey_cb, cmpkey_cb));
-		CU_ASSERT(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb));
+		ok(0 == gds_rbtree_keyin_fast_add(&root, test_new(buf, i),
+			getkey_cb, cmpkey_cb), NULL);
+		ok(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb), NULL);
 	}
 
 	gds_rbtree_keyin_fast_free(root, free_cb);
@@ -156,9 +156,9 @@ void t_rbtree_keyin_fast_add(void)
 
 	for (int i=100; i>0; i--) {
 		sprintf(buf, "key %d", i);
-		CU_ASSERT(0 == gds_rbtree_keyin_fast_add(&root, test_new(buf, i),
-			getkey_cb, cmpkey_cb));
-		CU_ASSERT(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb));
+		ok(0 == gds_rbtree_keyin_fast_add(&root, test_new(buf, i),
+			getkey_cb, cmpkey_cb), NULL);
+		ok(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb), NULL);
 	}
 
 	gds_rbtree_keyin_fast_free(root, free_cb);
@@ -168,9 +168,9 @@ void t_rbtree_keyin_fast_add(void)
 	for (int i=0; i<100; i++) {
 		int j = rand();
 		sprintf(buf, "key %d", j);
-		CU_ASSERT(0 <= gds_rbtree_keyin_fast_add(&root, test_new(buf, j),
-			getkey_cb, cmpkey_cb));
-		CU_ASSERT(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb));
+		ok(0 <= gds_rbtree_keyin_fast_add(&root, test_new(buf, j),
+			getkey_cb, cmpkey_cb), NULL);
+		ok(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb), NULL);
 	}
 
 	gds_rbtree_keyin_fast_free(root, free_cb);
@@ -215,31 +215,31 @@ void t_rbtree_keyin_fast_set(void)
 	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_set(&root, t   , getkey_cb, NULL     , free_cb));
 
 	/* Tree is unchanged */
-	CU_ASSERT(NULL == root);
-	CU_ASSERT(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb));
+	ok(NULL == root, NULL);
+	ok(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb), NULL);
 
 	gds_rbtree_keyin_fast_set(&root, NULL, getkey_cb, cmpkey_cb, NULL);
-	CU_ASSERT(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb));
-	CU_ASSERT(NULL == gds_rbtree_keyin_fast_get(root, NULL, getkey_cb, cmpkey_cb));
+	ok(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb), NULL);
+	ok(NULL == gds_rbtree_keyin_fast_get(root, NULL, getkey_cb, cmpkey_cb), NULL);
 	gds_rbtree_keyin_fast_set(&root, NULL, getkey_cb, cmpkey_cb, NULL);
-	CU_ASSERT(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb));
-	CU_ASSERT(NULL == gds_rbtree_keyin_fast_get(root, NULL, getkey_cb, cmpkey_cb));
+	ok(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb), NULL);
+	ok(NULL == gds_rbtree_keyin_fast_get(root, NULL, getkey_cb, cmpkey_cb), NULL);
 
 	gds_rbtree_keyin_fast_set(&root, t, getkey_cb, cmpkey_cb, NULL);
-	CU_ASSERT(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb));
-	CU_ASSERT(t == gds_rbtree_keyin_fast_get(root, getkey_cb(t), getkey_cb, cmpkey_cb));
+	ok(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb), NULL);
+	ok(t == gds_rbtree_keyin_fast_get(root, getkey_cb(t), getkey_cb, cmpkey_cb), NULL);
 	gds_rbtree_keyin_fast_set(&root, t, getkey_cb, cmpkey_cb, NULL);
-	CU_ASSERT(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb));
-	CU_ASSERT(t == gds_rbtree_keyin_fast_get(root, getkey_cb(t), getkey_cb, cmpkey_cb));
+	ok(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb), NULL);
+	ok(t == gds_rbtree_keyin_fast_get(root, getkey_cb(t), getkey_cb, cmpkey_cb), NULL);
 	gds_rbtree_keyin_fast_set(&root, test_alloc(t), getkey_cb, cmpkey_cb, NULL);
-	CU_ASSERT(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb));
-	CU_ASSERT(t != gds_rbtree_keyin_fast_get(root, getkey_cb(t), getkey_cb, cmpkey_cb));
+	ok(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb), NULL);
+	ok(t != gds_rbtree_keyin_fast_get(root, getkey_cb(t), getkey_cb, cmpkey_cb), NULL);
 	gds_rbtree_keyin_fast_set(&root, test_alloc(t), getkey_cb, cmpkey_cb, free_cb);
-	CU_ASSERT(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb));
-	CU_ASSERT(t != gds_rbtree_keyin_fast_get(root, getkey_cb(t), getkey_cb, cmpkey_cb));
+	ok(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb), NULL);
+	ok(t != gds_rbtree_keyin_fast_get(root, getkey_cb(t), getkey_cb, cmpkey_cb), NULL);
 	gds_rbtree_keyin_fast_set(&root, t, getkey_cb, cmpkey_cb, free_cb);
-	CU_ASSERT(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb));
-	CU_ASSERT(t == gds_rbtree_keyin_fast_get(root, getkey_cb(t), getkey_cb, cmpkey_cb));
+	ok(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb), NULL);
+	ok(t == gds_rbtree_keyin_fast_get(root, getkey_cb(t), getkey_cb, cmpkey_cb), NULL);
 
 	gds_rbtree_keyin_fast_free(root, free_cb);
 	root = NULL;
@@ -248,7 +248,7 @@ void t_rbtree_keyin_fast_set(void)
 		sprintf(buf, "key %02d", i);
 		gds_rbtree_keyin_fast_set(&root, test_new(buf, i), getkey_cb,
 			cmpkey_cb, NULL);
-		CU_ASSERT(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb));
+		ok(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb), NULL);
 	}
 
 	gds_rbtree_keyin_fast_free(root, free_cb);
@@ -258,7 +258,7 @@ void t_rbtree_keyin_fast_set(void)
 		sprintf(buf, "key %02d", i);
 		gds_rbtree_keyin_fast_set(&root, test_new(buf, i), getkey_cb,
 			cmpkey_cb, NULL);
-		CU_ASSERT(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb));
+		ok(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb), NULL);
 	}
 
 	gds_rbtree_keyin_fast_free(root, free_cb);
@@ -270,7 +270,7 @@ void t_rbtree_keyin_fast_set(void)
 		sprintf(buf, "key %02d", j);
 		gds_rbtree_keyin_fast_set(&root, test_new(buf, j), getkey_cb,
 			cmpkey_cb, NULL);
-		CU_ASSERT(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb));
+		ok(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb), NULL);
 	}
 
 	gds_rbtree_keyin_fast_free(root, free_cb);
@@ -317,8 +317,8 @@ void t_rbtree_keyin_fast_get(void)
 	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_get(root, "key", NULL, cmpkey_cb));
 	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_get(root, "key", getkey_cb, NULL));
 	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_get(root, "key", getkey_cb, NULL));
-	CU_ASSERT(NULL != gds_rbtree_keyin_fast_get(root, "key", getkey_cb, cmpkey_cb));
-	CU_ASSERT(NULL != (data = gds_rbtree_keyin_fast_get(root, "key", getkey_cb, cmpkey_cb)));
+	ok(NULL != gds_rbtree_keyin_fast_get(root, "key", getkey_cb, cmpkey_cb), NULL);
+	ok(NULL != (data = gds_rbtree_keyin_fast_get(root, "key", getkey_cb, cmpkey_cb)), NULL);
 
 	gds_rbtree_keyin_fast_free(root, free_cb);
 	root = NULL;
@@ -330,9 +330,9 @@ void t_rbtree_keyin_fast_get(void)
 	for (int i=0; i<100; i++) {
 		sprintf(buf, "key %d", i);
 		data = gds_rbtree_keyin_fast_get(root, buf, getkey_cb, cmpkey_cb);
-		CU_ASSERT(NULL != data);
-		CU_ASSERT(i == test_getvalue(data));
-		CU_ASSERT(0 == test_cmpkey(buf, test_getkey(data)));
+		ok(NULL != data, NULL);
+		ok(i == test_getvalue(data), NULL);
+		ok(0 == test_cmpkey(buf, test_getkey(data)), NULL);
 	}
 	gds_rbtree_keyin_fast_free(root, free_cb);
 }
@@ -370,16 +370,16 @@ void t_rbtree_keyin_fast_del(void)
 	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_del(&root, NULL, NULL, cmpkey_cb, free_cb));
 	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_del(&root, NULL, getkey_cb, NULL, NULL));
 	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_del(&root, NULL, getkey_cb, NULL, free_cb));
-	CU_ASSERT(0 < gds_rbtree_keyin_fast_del(&root, NULL, getkey_cb, cmpkey_cb, NULL));
-	CU_ASSERT(0 < gds_rbtree_keyin_fast_del(&root, NULL, getkey_cb, cmpkey_cb, free_cb));
+	ok(0 < gds_rbtree_keyin_fast_del(&root, NULL, getkey_cb, cmpkey_cb, NULL), NULL);
+	ok(0 < gds_rbtree_keyin_fast_del(&root, NULL, getkey_cb, cmpkey_cb, free_cb), NULL);
 	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_del(&root, "key", NULL, NULL, NULL));
 	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_del(&root, "key", NULL, NULL, free_cb));
 	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_del(&root, "key", NULL, cmpkey_cb, NULL));
 	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_del(&root, "key", NULL, cmpkey_cb, free_cb));
 	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_del(&root, "key", getkey_cb, NULL, NULL));
 	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_del(&root, "key", getkey_cb, NULL, free_cb));
-	CU_ASSERT(0 == gds_rbtree_keyin_fast_del(&root, "key", getkey_cb, cmpkey_cb, NULL));
-	CU_ASSERT(0 < gds_rbtree_keyin_fast_del(&root, "key", getkey_cb, cmpkey_cb, free_cb));
+	ok(0 == gds_rbtree_keyin_fast_del(&root, "key", getkey_cb, cmpkey_cb, NULL), NULL);
+	ok(0 < gds_rbtree_keyin_fast_del(&root, "key", getkey_cb, cmpkey_cb, free_cb), NULL);
 
 	test_free(t);
 
@@ -389,61 +389,25 @@ void t_rbtree_keyin_fast_del(void)
 	}
 	for (int i=0; i<100; i++) {
 		sprintf(buf, "key %d", i);
-		CU_ASSERT(0 == gds_rbtree_keyin_fast_del(&root, buf, getkey_cb, cmpkey_cb,
-			free_cb));
-		CU_ASSERT(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb));
+		ok(0 == gds_rbtree_keyin_fast_del(&root, buf, getkey_cb, cmpkey_cb,
+			free_cb), NULL);
+		ok(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb), NULL);
 	}
 	for (int i=0; i<100; i++) {
 		sprintf(buf, "key %d", i);
-		CU_ASSERT(0 < gds_rbtree_keyin_fast_del(&root, buf, getkey_cb, cmpkey_cb,
-			free_cb));
+		ok(0 < gds_rbtree_keyin_fast_del(&root, buf, getkey_cb, cmpkey_cb,
+			free_cb), NULL);
 	}
 }
 
 int main()
 {
-	CU_pSuite pSuite = NULL;
-	int fails = 0;
+	plan(1632);
 
-	/* initialize the CUnit test registry */
-	if (CUE_SUCCESS != CU_initialize_registry())
-		return CU_get_error();
+	t_rbtree_keyin_fast_add();
+	t_rbtree_keyin_fast_set();
+	t_rbtree_keyin_fast_get();
+	t_rbtree_keyin_fast_del();
 
-	/* add a suite to the registry */
-	pSuite = CU_add_suite("Red-Black tree",
-		init_suite, clean_suite);
-	if (NULL == pSuite) {
-		CU_cleanup_registry();
-		return CU_get_error();
-	}
-
-	/* add the tests to the suite */
-	if(
-	   (NULL == CU_add_test(pSuite, "gds_rbtree_keyin_fast_add()", t_rbtree_keyin_fast_add))
-	|| (NULL == CU_add_test(pSuite, "gds_rbtree_keyin_fast_set()", t_rbtree_keyin_fast_set))
-	|| (NULL == CU_add_test(pSuite, "gds_rbtree_keyin_fast_get()", t_rbtree_keyin_fast_get))
-	|| (NULL == CU_add_test(pSuite, "gds_rbtree_keyin_fast_del()", t_rbtree_keyin_fast_del))
-	) {
-		CU_cleanup_registry();
-		return CU_get_error();
-	}
-
-	/* Run all tests using the CUnit Basic interface */
-	CU_basic_set_mode(CU_BRM_VERBOSE);
-	try {
-		CU_basic_run_tests();
-	} catch() as (e) {
-		fprintf(stderr, "\nTests returned an unexpected exception\n");
-		fprintf(stderr, "\tType: %s\n", e->type());
-		fprintf(stderr, "\tMessage: %s\n", e->message());
-		fprintf(stderr, "\tFile: %s\n", e->filename());
-		fprintf(stderr, "\tFunction: %s\n", e->function());
-		fprintf(stderr, "\tLine: %d\n", e->line());
-		return EXIT_FAILURE;
-	}
-
-	fails = CU_get_number_of_failures();
-	CU_cleanup_registry();
-
-	return fails ? EXIT_FAILURE : EXIT_SUCCESS;
+	return EXIT_SUCCESS;
 }

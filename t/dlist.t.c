@@ -1,10 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <CUnit/Basic.h>
 #include "dlist.h"
 #include "lambda.h"
-
-int g_debug = 0;
+#include "tap.h"
 
 void assert_list_equals(gds_dlist_t *list, unsigned int size, void *compare[])
 {
@@ -15,15 +13,12 @@ void assert_list_equals(gds_dlist_t *list, unsigned int size, void *compare[])
 	gds_iterator_reset(it);
 	while (!gds_iterator_step(it) && i < size) {
 		void *d = gds_iterator_get(it);
-		CU_ASSERT_PTR_EQUAL(d, compare[i]);
-		if (g_debug) {
-			printf("d=%p compare[%d]=%p\n", d, i, compare[i]);
-		}
+		is(d, compare[i], NULL);
 		i++;
 	}
-	CU_ASSERT_EQUAL(i, size);
-	CU_ASSERT_EQUAL(i, gds_dlist_size(list));
-	CU_ASSERT_NOT_EQUAL(gds_iterator_step(it), 0);
+	is(i, size, NULL);
+	is(i, gds_dlist_size(list), NULL);
+	isnt(gds_iterator_step(it), 0, NULL);
 
 	gds_iterator_free(it);
 }
@@ -34,7 +29,7 @@ void t_gds_dlist_unshift(void)
 	int a[] = {1, 2, 3};
 
 	list = gds_dlist();
-	CU_ASSERT_PTR_NOT_NULL_FATAL(list);
+	isntnull(list, NULL);
 
 	assert_list_equals(list, 0, (void *[]){});
 
@@ -56,7 +51,7 @@ void t_gds_dlist_push(void)
 	int a[] = {1, 2, 3};
 
 	list = gds_dlist();
-	CU_ASSERT_PTR_NOT_NULL_FATAL(list);
+	isntnull(list, NULL);
 
 	assert_list_equals(list, 0, (void *[]){});
 
@@ -79,24 +74,24 @@ void t_gds_dlist_shift(void)
 	int *b;
 
 	list = gds_dlist(&a[0], &a[1], &a[2]);
-	CU_ASSERT_PTR_NOT_NULL_FATAL(list);
+	isntnull(list, NULL);
 	assert_list_equals(list, 3, (void *[]){&a[0], &a[1], &a[2]});
 
 	b = gds_dlist_shift(list);
 	assert_list_equals(list, 2, (void *[]){&a[1], &a[2]});
-	CU_ASSERT_PTR_EQUAL(b, &a[0]);
+	is(b, &a[0], NULL);
 
 	b = gds_dlist_shift(list);
 	assert_list_equals(list, 1, (void *[]){&a[2]});
-	CU_ASSERT_PTR_EQUAL(b, &a[1]);
+	is(b, &a[1], NULL);
 
 	b = gds_dlist_shift(list);
 	assert_list_equals(list, 0, (void *[]){});
-	CU_ASSERT_PTR_EQUAL(b, &a[2]);
+	is(b, &a[2], NULL);
 
 	b = gds_dlist_shift(list);
 	assert_list_equals(list, 0, (void *[]){});
-	CU_ASSERT_PTR_EQUAL(b, UNDEFINED);
+	is(b, UNDEFINED, NULL);
 
 	gds_dlist_free(list, NULL, NULL);
 }
@@ -108,24 +103,24 @@ void t_gds_dlist_pop(void)
 	int *b;
 
 	list = gds_dlist(&a[0], &a[1], &a[2]);
-	CU_ASSERT_PTR_NOT_NULL_FATAL(list);
+	isntnull(list, NULL);
 	assert_list_equals(list, 3, (void *[]){&a[0], &a[1], &a[2]});
 
 	b = gds_dlist_pop(list);
 	assert_list_equals(list, 2, (void *[]){&a[0], &a[1]});
-	CU_ASSERT_PTR_EQUAL(b, &a[2]);
+	is(b, &a[2], NULL);
 
 	b = gds_dlist_pop(list);
 	assert_list_equals(list, 1, (void *[]){&a[0]});
-	CU_ASSERT_PTR_EQUAL(b, &a[1]);
+	is(b, &a[1], NULL);
 
 	b = gds_dlist_pop(list);
 	assert_list_equals(list, 0, (void *[]){});
-	CU_ASSERT_PTR_EQUAL(b, &a[0]);
+	is(b, &a[0], NULL);
 
 	b = gds_dlist_pop(list);
 	assert_list_equals(list, 0, (void *[]){});
-	CU_ASSERT_PTR_EQUAL(b, UNDEFINED);
+	is(b, UNDEFINED, NULL);
 
 	gds_dlist_free(list, NULL, NULL);
 }
@@ -138,9 +133,9 @@ void t_gds_dlist_get(void)
 
 	list = gds_dlist(&a[0], &a[1], &a[2]);
 	for (i = 0; i < 3; i++) {
-		CU_ASSERT_PTR_EQUAL(gds_dlist_get(list, i), &a[i]);
+		is(gds_dlist_get(list, i), &a[i], NULL);
 	}
-	CU_ASSERT_PTR_EQUAL(gds_dlist_get(list, i), UNDEFINED);
+	is(gds_dlist_get(list, i), UNDEFINED, NULL);
 	gds_dlist_free(list, NULL, NULL);
 }
 
@@ -151,7 +146,7 @@ void t_gds_dlist_splice(void)
 	int i;
 
 	list = gds_dlist();
-	CU_ASSERT_PTR_NOT_NULL_FATAL(list);
+	isntnull(list, NULL);
 	for (i=0; i<10; i++) {
 		a[i] = malloc(sizeof(int));
 		*(a[i]) = i;
@@ -247,7 +242,7 @@ void t_gds_dlist_slice(void)
 	int i;
 
 	list = gds_dlist();
-	CU_ASSERT_PTR_NOT_NULL_FATAL(list);
+	isntnull(list, NULL);
 	for (i=0; i<10; i++) {
 		a[i] = malloc(sizeof(int));
 		*(a[i]) = i;
@@ -283,11 +278,11 @@ void t_gds_dlist_slice(void)
 		{a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]});
 	i = 0;
 	gds_dlist_foreach(b, list2) {
-		CU_ASSERT_PTR_NOT_EQUAL(b, a[i+2]);
-		CU_ASSERT_EQUAL(*b, *(a[i+2]));
+		isnt(b, a[i+2], NULL);
+		is(*b, *(a[i+2]), NULL);
 		i++;
 	}
-	CU_ASSERT_EQUAL(i, 4);
+	is(i, 4, NULL);
 	gds_dlist_free(list, free, NULL);
 	gds_dlist_free(list2, free, NULL);
 }
@@ -301,9 +296,9 @@ void t_gds_dlist_map(void)
 	gds_dlist_map(list, lambda(void, (int *a) {
 		*a = *a + *a;
 	}), NULL);
-	CU_ASSERT_EQUAL(a[0], 2);
-	CU_ASSERT_EQUAL(a[1], 4);
-	CU_ASSERT_EQUAL(a[2], 6);
+	is(a[0], 2, NULL);
+	is(a[1], 4, NULL);
+	is(a[2], 6, NULL);
 
 	gds_dlist_free(list, NULL, NULL);
 }
@@ -315,7 +310,7 @@ void t_gds_dlist_filter(void)
 	int i;
 
 	list = gds_dlist();
-	CU_ASSERT_PTR_NOT_NULL_FATAL(list);
+	isntnull(list, NULL);
 	for (i=0; i<10; i++) {
 		a[i] = malloc(sizeof(int));
 		*(a[i]) = i;
@@ -365,10 +360,10 @@ void t_gds_dlist_reduce(void)
 	}
 
 	result = gds_dlist_reduce(list, string_reduce_join, NULL);
-	CU_ASSERT_STRING_EQUAL(result, "Hello,splittedworld!");
+	str_eq(result, "Hello,splittedworld!", NULL);
 	free(result);
 	result = gds_dlist_reduce(list, string_reduce_join, &sep);
-	CU_ASSERT_STRING_EQUAL(result, "Hello, splitted world!");
+	str_eq(result, "Hello, splitted world!", NULL);
 	free(result);
 
 	gds_dlist_free(list, NULL, NULL);
@@ -376,41 +371,18 @@ void t_gds_dlist_reduce(void)
 
 int main()
 {
-	CU_pSuite pSuite = NULL;
-	unsigned int tests_failed;
+	plan(431);
 
-	/* initialize the CUnit test registry */
-	if (CUE_SUCCESS != CU_initialize_registry())
-		return CU_get_error();
+	t_gds_dlist_unshift();
+	t_gds_dlist_push();
+	t_gds_dlist_shift();
+	t_gds_dlist_pop();
+	t_gds_dlist_get();
+	t_gds_dlist_splice();
+	t_gds_dlist_slice();
+	t_gds_dlist_map();
+	t_gds_dlist_filter();
+	t_gds_dlist_reduce();
 
-	/* add a suite to the registry */
-	pSuite = CU_add_suite("Double linked list", NULL, NULL);
-	if (NULL == pSuite) {
-		CU_cleanup_registry();
-		return CU_get_error();
-	}
-
-	/* add the tests to the suite */
-	if(
-	   (NULL == CU_add_test(pSuite, "gds_dlist_unshift()", t_gds_dlist_unshift))
-	   || (NULL == CU_add_test(pSuite, "gds_dlist_push()", t_gds_dlist_push))
-	   || (NULL == CU_add_test(pSuite, "gds_dlist_shift()", t_gds_dlist_shift))
-	   || (NULL == CU_add_test(pSuite, "gds_dlist_pop()", t_gds_dlist_pop))
-	   || (NULL == CU_add_test(pSuite, "gds_dlist_get()", t_gds_dlist_get))
-	   || (NULL == CU_add_test(pSuite, "gds_dlist_splice()", t_gds_dlist_splice))
-	   || (NULL == CU_add_test(pSuite, "gds_dlist_slice()", t_gds_dlist_slice))
-	   || (NULL == CU_add_test(pSuite, "gds_dlist_map()", t_gds_dlist_map))
-	   || (NULL == CU_add_test(pSuite, "gds_dlist_filter()", t_gds_dlist_filter))
-	   || (NULL == CU_add_test(pSuite, "gds_dlist_reduce()", t_gds_dlist_reduce))
-	) {
-		CU_cleanup_registry();
-		return CU_get_error();
-	}
-
-	/* Run all tests using the CUnit Basic interface */
-	CU_basic_set_mode(CU_BRM_VERBOSE);
-	CU_basic_run_tests();
-	tests_failed = CU_get_number_of_tests_failed();
-	CU_cleanup_registry();
-	return tests_failed ? EXIT_FAILURE : EXIT_SUCCESS;
+	return EXIT_SUCCESS;
 }

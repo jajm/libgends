@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <stdio.h>
-#include <CUnit/Basic.h>
 #include "inline/rbtree_fast.h"
+#include "../tap.h"
 
 typedef struct {
 	int data;
@@ -110,16 +110,16 @@ void t_gds_inline_rbtree_fast_add(void)
 	gds_inline_rbtree_fast_add(&root, &(trfn->inline_node),
 		(gds_rbtf_cmp_cb) test_rbtree_fast_node_cmp, NULL);
 
-	CU_ASSERT_PTR_NOT_NULL(root);
+	isntnull(root, NULL);
 	trfn = test_rbtree_fast_node_get_container(root);
-	CU_ASSERT_PTR_NOT_NULL(trfn);
-	CU_ASSERT_EQUAL(trfn->data, 1);
+	isntnull(trfn, NULL);
+	is(trfn->data, 1, NULL);
 	trfn = test_rbtree_fast_node_get_container(root->left);
-	CU_ASSERT_PTR_NOT_NULL(trfn);
-	CU_ASSERT_EQUAL(trfn->data, 0);
+	isntnull(trfn, NULL);
+	is(trfn->data, 0, NULL);
 	trfn = test_rbtree_fast_node_get_container(root->right);
-	CU_ASSERT_PTR_NOT_NULL(trfn);
-	CU_ASSERT_EQUAL(trfn->data, 2);
+	isntnull(trfn, NULL);
+	is(trfn->data, 2, NULL);
 
 	test_rbtree_fast_free(test_rbtree_fast_node_get_container(root));
 }
@@ -142,22 +142,22 @@ void t_gds_inline_rbtree_fast_del(void)
 	int i = 1;
 	inode = gds_inline_rbtree_fast_del(&root, &i,
 		(gds_rbtf_cmp_with_key_cb) test_rbtree_fast_node_cmp_with_key, NULL);
-	CU_ASSERT_PTR_NOT_NULL_FATAL(inode);
+	isntnull(inode, NULL);
 	trfn = test_rbtree_fast_node_get_container(inode);
-	CU_ASSERT_EQUAL(trfn->data, 1);
+	is(trfn->data, 1, NULL);
 	test_rbtree_fast_node_free(trfn);
 	
 	trfn = test_rbtree_fast_node_get_container(root);
 	if (trfn->data == 0) {
-		CU_ASSERT_PTR_NULL(root->left);
-		CU_ASSERT_PTR_NOT_NULL(root->right);
+		isnull(root->left, NULL);
+		isntnull(root->right, NULL);
 		trfn = test_rbtree_fast_node_get_container(root->right);
-		CU_ASSERT_EQUAL(trfn->data, 2);
+		is(trfn->data, 2, NULL);
 	} else {
-		CU_ASSERT_PTR_NULL(root->right);
-		CU_ASSERT_PTR_NOT_NULL_FATAL(root->left);
+		isnull(root->right, NULL);
+		isntnull(root->left, NULL);
 		trfn = test_rbtree_fast_node_get_container(root->left);
-		CU_ASSERT_EQUAL(trfn->data, 0);
+		is(trfn->data, 0, NULL);
 	}
 
 	test_rbtree_fast_free(test_rbtree_fast_node_get_container(root));
@@ -181,21 +181,21 @@ void t_gds_inline_rbtree_fast_get_node(void)
 	int i = 0;
 	node_inline = gds_inline_rbtree_fast_get_node(root, &i,
 		(gds_rbtf_cmp_with_key_cb) test_rbtree_fast_node_cmp_with_key, NULL);
-	CU_ASSERT_PTR_NOT_NULL_FATAL(node_inline)
+	isntnull(node_inline, NULL);
 	trfn = test_rbtree_fast_node_get_container(node_inline);
-	CU_ASSERT_EQUAL(trfn->data, i);
+	is(trfn->data, i, NULL);
 	i = 1;
 	node_inline = gds_inline_rbtree_fast_get_node(root, &i,
 		(gds_rbtf_cmp_with_key_cb) test_rbtree_fast_node_cmp_with_key, NULL);
-	CU_ASSERT_PTR_NOT_NULL_FATAL(node_inline)
+	isntnull(node_inline, NULL);
 	trfn = test_rbtree_fast_node_get_container(node_inline);
-	CU_ASSERT_EQUAL(trfn->data, i);
+	is(trfn->data, i, NULL);
 	i = 2;
 	node_inline = gds_inline_rbtree_fast_get_node(root, &i,
 		(gds_rbtf_cmp_with_key_cb) test_rbtree_fast_node_cmp_with_key, NULL);
-	CU_ASSERT_PTR_NOT_NULL_FATAL(node_inline)
+	isntnull(node_inline, NULL);
 	trfn = test_rbtree_fast_node_get_container(node_inline);
-	CU_ASSERT_EQUAL(trfn->data, i);
+	is(trfn->data, i, NULL);
 
 	test_rbtree_fast_free(test_rbtree_fast_node_get_container(root));
 }
@@ -218,25 +218,25 @@ void t_gds_inline_rbtree_fast_iterator(void)
 
 	it = gds_inline_rbtree_fast_iterator_new(root);
 
-	CU_ASSERT(0 == gds_iterator_step(it));
+	ok(0 == gds_iterator_step(it), NULL);
 	node_inline = gds_iterator_get(it);
 	trfn = test_rbtree_fast_node_get_container(node_inline);
-	CU_ASSERT_PTR_NOT_NULL_FATAL(trfn);
-	CU_ASSERT_EQUAL(trfn->data, 0);
+	isntnull(trfn, NULL);
+	is(trfn->data, 0, NULL);
 
-	CU_ASSERT(0 == gds_iterator_step(it));
+	ok(0 == gds_iterator_step(it), NULL);
 	node_inline = gds_iterator_get(it);
 	trfn = test_rbtree_fast_node_get_container(node_inline);
-	CU_ASSERT_PTR_NOT_NULL_FATAL(trfn);
-	CU_ASSERT_EQUAL(trfn->data, 1);
+	isntnull(trfn, NULL);
+	is(trfn->data, 1, NULL);
 
-	CU_ASSERT(0 == gds_iterator_step(it));
+	ok(0 == gds_iterator_step(it), NULL);
 	node_inline = gds_iterator_get(it);
 	trfn = test_rbtree_fast_node_get_container(node_inline);
-	CU_ASSERT_PTR_NOT_NULL_FATAL(trfn);
-	CU_ASSERT_EQUAL(trfn->data, 2);
+	isntnull(trfn, NULL);
+	is(trfn->data, 2, NULL);
 
-	CU_ASSERT(0 < gds_iterator_step(it));
+	ok(0 < gds_iterator_step(it), NULL);
 
 	gds_iterator_free(it);
 	test_rbtree_fast_free(test_rbtree_fast_node_get_container(root));
@@ -244,38 +244,12 @@ void t_gds_inline_rbtree_fast_iterator(void)
 
 int main()
 {
-	CU_pSuite pSuite = NULL;
-	int fails = 0;
+	plan(28);
 
-	/* initialize the CUnit test registry */
-	if (CUE_SUCCESS != CU_initialize_registry())
-		return CU_get_error();
+	t_gds_inline_rbtree_fast_add();
+	t_gds_inline_rbtree_fast_del();
+	t_gds_inline_rbtree_fast_get_node();
+	t_gds_inline_rbtree_fast_iterator();
 
-	/* add a suite to the registry */
-	pSuite = CU_add_suite("Inline structure for red-black trees",
-		NULL, NULL);
-	if (NULL == pSuite) {
-		CU_cleanup_registry();
-		return CU_get_error();
-	}
-
-	/* add the tests to the suite */
-	if(
-	   (NULL == CU_add_test(pSuite, "gds_inline_rbtree_fast_add()", t_gds_inline_rbtree_fast_add))
-	   || (NULL == CU_add_test(pSuite, "gds_inline_rbtree_fast_del()", t_gds_inline_rbtree_fast_del))
-	   || (NULL == CU_add_test(pSuite, "gds_inline_rbtree_fast_get_node()", t_gds_inline_rbtree_fast_get_node))
-	   || (NULL == CU_add_test(pSuite, "gds_inline_rbtree_fast_iterator", t_gds_inline_rbtree_fast_iterator))
-	) {
-		CU_cleanup_registry();
-		return CU_get_error();
-	}
-
-	/* Run all tests using the CUnit Basic interface */
-	CU_basic_set_mode(CU_BRM_VERBOSE);
-	CU_basic_run_tests();
-
-	fails = CU_get_number_of_failures();
-	CU_cleanup_registry();
-
-	return fails ? EXIT_FAILURE : EXIT_SUCCESS;
+	return EXIT_SUCCESS;
 }
