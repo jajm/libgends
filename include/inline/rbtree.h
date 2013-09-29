@@ -89,6 +89,33 @@ gds_inline_rbtree_add(
 	void *rbt_cmp_data
 );
 
+/* Insert a node in red-black tree.
+ *
+ * Unlike gds_inline_rbtree_add, this function forces insertion even if
+ * an equivalent node is already in the tree. The latter node is then removed
+ * from tree.
+ *
+ * Parameters:
+ *   root         : root node of tree
+ *   node         : node to insert
+ *   rbt_cmp_cb   : see above documentation about gds_rbt_cmp_cb
+ *   rbt_cmp_data : user data passed to rbt_cmp_cb
+ *
+ * Returns:
+ *   Pointer to the removed node, if any.
+ *   NULL otherwise.
+ *
+ * NOTE: root will be modified so it will always point to the root of tree after
+ * the function call. You should consider this when using this function.
+ */
+gds_inline_rbtree_node_t *
+gds_inline_rbtree_set(
+	gds_inline_rbtree_node_t **root,
+	gds_inline_rbtree_node_t *node,
+	gds_rbt_cmp_cb rbt_cmp_cb,
+	void *rbt_cmp_data
+);
+
 /* Search a node by key.
  *
  * Parameters:

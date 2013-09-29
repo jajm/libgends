@@ -78,9 +78,38 @@ void gds_inline_rbtree_node_init(gds_inline_rbtree_node_t *node)
 	node->son[0] = node->son[1] = NULL;
 }
 
-int gds_inline_rbtree_add(gds_inline_rbtree_node_t **root,
+void gds_inline_rbtree_swap_nodes(gds_inline_rbtree_node_t *node1,
+	gds_inline_rbtree_node_t *parent1, gds_inline_rbtree_node_t *node2,
+	gds_inline_rbtree_node_t *parent2)
+{
+	gds_inline_rbtree_node_t tmp;
+
+	if (parent1 != NULL) {
+		if (parent1->son[0] == node1) parent1->son[0] = node2;
+		else parent1->son[1] = node2;
+	}
+
+	if (parent2 != NULL) {
+		if (parent2->son[0] == node2) parent2->son[0] = node1;
+		else parent2->son[1] = node1;
+	}
+
+	tmp.red = node1->red;
+	tmp.son[0] = node1->son[0];
+	tmp.son[1] = node1->son[1];
+
+	node1->red = node2->red;
+	node1->son[0] = node2->son[0];
+	node1->son[1] = node2->son[1];
+
+	node2->red = tmp.red;
+	node2->son[0] = tmp.son[0];
+	node2->son[1] = tmp.son[1];
+}
+
+int gds_inline_rbtree_insert(gds_inline_rbtree_node_t **root,
 	gds_inline_rbtree_node_t *node, gds_rbt_cmp_cb rbt_cmp_cb,
-	void *rbt_cmp_data)
+	void *rbt_cmp_data, _Bool replace, gds_inline_rbtree_node_t **removed)
 {
 	gds_inline_rbtree_node_t head;      /* False tree root */
 	gds_inline_rbtree_node_t *g, *t;    /* Grandparent & parent */
@@ -102,8 +131,9 @@ int gds_inline_rbtree_add(gds_inline_rbtree_node_t **root,
 	(*root)->red = false;
 
 	/* Set up helpers */
-	t = &head;
-	g = p = NULL;
+	head.red = false; head.son[0] = NULL;
+	t = p = &head;
+	g = NULL;
 	q = t->son[1] = *root;
 
 	/* Search down the tree */
@@ -135,8 +165,13 @@ int gds_inline_rbtree_add(gds_inline_rbtree_node_t **root,
 
 		/* Stop if found */
 		cmp = rbt_cmp_cb(node, q, rbt_cmp_data);
-		if (cmp == 0)
+		if (cmp == 0) {
+			if (replace && node != q) {
+				gds_inline_rbtree_swap_nodes(node, NULL, q, p);
+				if (removed != NULL) *removed = q;
+			}
 			break;
+		}
 
 		last = dir;
 		dir = (cmp > 0) ? 1 : 0;
@@ -153,6 +188,26 @@ int gds_inline_rbtree_add(gds_inline_rbtree_node_t **root,
 	(*root)->red = false;
 
 	return added ? 0 : 1;
+}
+
+int gds_inline_rbtree_add(gds_inline_rbtree_node_t **root,
+	gds_inline_rbtree_node_t *node, gds_rbt_cmp_cb rbt_cmp_cb,
+	void *rbt_cmp_data)
+{
+	return gds_inline_rbtree_insert(root, node, rbt_cmp_cb, rbt_cmp_data,
+		false, NULL);
+}
+
+gds_inline_rbtree_node_t * gds_inline_rbtree_set(
+	gds_inline_rbtree_node_t **root, gds_inline_rbtree_node_t *node,
+	gds_rbt_cmp_cb rbt_cmp_cb, void *rbt_cmp_data)
+{
+	gds_inline_rbtree_node_t *removed = NULL;
+
+	gds_inline_rbtree_insert(root, node, rbt_cmp_cb, rbt_cmp_data,
+		true, &removed);
+
+	return removed;
 }
 
 gds_inline_rbtree_node_t * gds_inline_rbtree_get_node(
@@ -175,31 +230,6 @@ gds_inline_rbtree_node_t * gds_inline_rbtree_get_node(
 	}
 
 	return node;
-}
-
-void gds_inline_rbtree_swap_nodes(gds_inline_rbtree_node_t *node1,
-	gds_inline_rbtree_node_t *parent1, gds_inline_rbtree_node_t *node2,
-	gds_inline_rbtree_node_t *parent2)
-{
-	gds_inline_rbtree_node_t tmp;
-
-	if (parent1->son[0] == node1) parent1->son[0] = node2;
-	else parent1->son[1] = node2;
-
-	if (parent2->son[0] == node2) parent2->son[0] = node1;
-	else parent2->son[1] = node1;
-
-	tmp.red = node1->red;
-	tmp.son[0] = node1->son[0];
-	tmp.son[1] = node1->son[1];
-
-	node1->red = node2->red;
-	node1->son[0] = node2->son[0];
-	node1->son[1] = node2->son[1];
-
-	node2->red = tmp.red;
-	node2->son[0] = tmp.son[0];
-	node2->son[1] = tmp.son[1];
 }
 
 gds_inline_rbtree_node_t * gds_inline_rbtree_del(
