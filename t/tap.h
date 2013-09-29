@@ -17,6 +17,7 @@ static unsigned int current = 0;
 		if (test) printf("ok %d ", current); \
 		else printf("not ok %d ", current); \
 		if (_msg != NULL) printf(_msg, ##__VA_ARGS__); \
+		printf(" (line %d)", __LINE__); \
 		printf("\n"); \
 	} while(0)
 
