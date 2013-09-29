@@ -66,6 +66,7 @@ gds_hash_map_set(
 	gds_hash_map_t *h,
 	void *key,
 	void *data,
+	gds_free_cb key_free_cb,
 	gds_free_cb free_cb
 );
 

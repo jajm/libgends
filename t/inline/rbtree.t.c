@@ -118,15 +118,20 @@ void t_gds_inline_rbtree_set(void)
 {
 	test_rbtree_node_t *root, *trn;
 	gds_inline_rbtree_node_t *root_inline;
-	gds_inline_rbtree_node_t *removed;
+	gds_inline_rbtree_node_t *removed = NULL;
+	int rc;
 
 	root = test_rbtree_node_new(0);
 	root_inline = &(root->inline_node);
 	trn = test_rbtree_node_new(-1);
-	removed = gds_inline_rbtree_set(&root_inline, &(trn->inline_node), (gds_rbt_cmp_cb)test_rbtree_node_compare, NULL);
+	rc = gds_inline_rbtree_set(&root_inline, &(trn->inline_node),
+		(gds_rbt_cmp_cb)test_rbtree_node_compare, NULL, &removed);
+	is(rc, 0, NULL);
 	isnull(removed, NULL);
 	trn = test_rbtree_node_new(1);
-	removed = gds_inline_rbtree_set(&root_inline, &(trn->inline_node), (gds_rbt_cmp_cb)test_rbtree_node_compare, NULL);
+	rc = gds_inline_rbtree_set(&root_inline, &(trn->inline_node),
+		(gds_rbt_cmp_cb)test_rbtree_node_compare, NULL, &removed);
+	is(rc, 0, NULL);
 	isnull(removed, NULL);
 
 	root = test_rbtree_node_get_container(root_inline);
@@ -139,7 +144,9 @@ void t_gds_inline_rbtree_set(void)
 	isntnull(trn, NULL);
 	is(trn->data, 1, NULL);
 
-	removed = gds_inline_rbtree_set(&root_inline, &(trn->inline_node), (gds_rbt_cmp_cb)test_rbtree_node_compare, NULL);
+	rc = gds_inline_rbtree_set(&root_inline, &(trn->inline_node),
+		(gds_rbt_cmp_cb)test_rbtree_node_compare, NULL, &removed);
+	is(rc, 1, NULL);
 	isnull(removed, NULL);
 
 	root = test_rbtree_node_get_container(root_inline);
@@ -153,13 +160,17 @@ void t_gds_inline_rbtree_set(void)
 	is(trn->data, 1, NULL);
 
 	trn = test_rbtree_node_new(1);
-	removed = gds_inline_rbtree_set(&root_inline, &(trn->inline_node), (gds_rbt_cmp_cb)test_rbtree_node_compare, NULL);
+	rc = gds_inline_rbtree_set(&root_inline, &(trn->inline_node),
+		(gds_rbt_cmp_cb)test_rbtree_node_compare, NULL, &removed);
+	is(rc, 0, NULL);
 	isntnull(removed, NULL);
 	trn = test_rbtree_node_get_container(removed);
 	test_rbtree_node_free(trn);
 
 	trn = test_rbtree_node_new(0);
-	removed = gds_inline_rbtree_set(&root_inline, &(trn->inline_node), (gds_rbt_cmp_cb)test_rbtree_node_compare, NULL);
+	rc = gds_inline_rbtree_set(&root_inline, &(trn->inline_node),
+		(gds_rbt_cmp_cb)test_rbtree_node_compare, NULL, &removed);
+	is(rc, 0, NULL);
 	isntnull(removed, NULL);
 	trn = test_rbtree_node_get_container(removed);
 	test_rbtree_node_free(trn);
@@ -290,7 +301,7 @@ void t_gds_inline_rbtree_iterator(void)
 
 int main()
 {
-	plan(58);
+	plan(63);
 
 	t_gds_inline_rbtree_add();
 	t_gds_inline_rbtree_set();

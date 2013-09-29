@@ -35,18 +35,23 @@ void t_hash_map_iterator(void)
 	char * keys[] = {"1", "2", "3"};
 	char * values[] = {"one", "two", "three"};
 	char *key, *value;
+	int rc;
 
 	hash = gds_hash_map_new(32, (gds_hash_cb) test_hash,
 		(gds_cmpkey_cb) test_cmpkey);
 	for (int i = 0; i < 3; i++) {
-		gds_hash_map_set(hash, keys[i], values[i], NULL);
+		rc = gds_hash_map_set(hash, keys[i], values[i], NULL, NULL);
+		is(rc, 0, NULL);
 	}
 
 	it = gds_hash_map_iterator_new(hash);
+	isntnull(it, NULL);
 
 	gds_iterator_step(it);
 	key = gds_iterator_getkey(it);
 	value = gds_iterator_get(it);
+	isntnull(key, NULL);
+	isntnull(value, NULL);
 	str_eq(key, "1", NULL);
 	str_eq(value, "one", NULL);
 
@@ -70,7 +75,7 @@ void t_hash_map_iterator(void)
 
 int main()
 {
-	plan(7);
+	plan(13);
 
 	t_hash_map_iterator();
 

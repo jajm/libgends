@@ -116,7 +116,7 @@ int gds_inline_rbtree_insert(gds_inline_rbtree_node_t **root,
 	gds_inline_rbtree_node_t *p, *q;    /* Iterator & parent */
 	uint8_t dir = 0, last = 0;
 	int32_t cmp;
-	int8_t added = 0;
+	int8_t inserted = 0;
 
 	GDS_CHECK_ARG_NOT_NULL(root);
 	GDS_CHECK_ARG_NOT_NULL(node);
@@ -141,7 +141,7 @@ int gds_inline_rbtree_insert(gds_inline_rbtree_node_t **root,
 		if (q == NULL) {
 			/* Insert new node at the bottom */
 			p->son[dir] = q = node;
-			added = 1;
+			inserted = 1;
 		}
 		else if (gds_inline_rbtree_node_is_red(q->son[0])
 		&& gds_inline_rbtree_node_is_red(q->son[1])) {
@@ -169,6 +169,7 @@ int gds_inline_rbtree_insert(gds_inline_rbtree_node_t **root,
 			if (replace && node != q) {
 				gds_inline_rbtree_swap_nodes(node, NULL, q, p);
 				if (removed != NULL) *removed = q;
+				inserted = 1;
 			}
 			break;
 		}
@@ -187,7 +188,7 @@ int gds_inline_rbtree_insert(gds_inline_rbtree_node_t **root,
 	*root = head.son[1];
 	(*root)->red = false;
 
-	return added ? 0 : 1;
+	return inserted ? 0 : 1;
 }
 
 int gds_inline_rbtree_add(gds_inline_rbtree_node_t **root,
@@ -198,16 +199,12 @@ int gds_inline_rbtree_add(gds_inline_rbtree_node_t **root,
 		false, NULL);
 }
 
-gds_inline_rbtree_node_t * gds_inline_rbtree_set(
-	gds_inline_rbtree_node_t **root, gds_inline_rbtree_node_t *node,
-	gds_rbt_cmp_cb rbt_cmp_cb, void *rbt_cmp_data)
+int gds_inline_rbtree_set(gds_inline_rbtree_node_t **root,
+	gds_inline_rbtree_node_t *node, gds_rbt_cmp_cb rbt_cmp_cb,
+	void *rbt_cmp_data, gds_inline_rbtree_node_t **removed)
 {
-	gds_inline_rbtree_node_t *removed = NULL;
-
-	gds_inline_rbtree_insert(root, node, rbt_cmp_cb, rbt_cmp_data,
-		true, &removed);
-
-	return removed;
+	return gds_inline_rbtree_insert(root, node, rbt_cmp_cb, rbt_cmp_data,
+		true, removed);
 }
 
 gds_inline_rbtree_node_t * gds_inline_rbtree_get_node(

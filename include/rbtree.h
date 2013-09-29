@@ -45,6 +45,7 @@ gds_rbtree_set(
 	void *key,
 	void *data,
 	gds_cmpkey_cb cmpkey_cb,
+	gds_free_cb key_free_cb,
 	gds_free_cb free_cb
 );
 

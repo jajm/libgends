@@ -100,20 +100,23 @@ gds_inline_rbtree_add(
  *   node         : node to insert
  *   rbt_cmp_cb   : see above documentation about gds_rbt_cmp_cb
  *   rbt_cmp_data : user data passed to rbt_cmp_cb
+ *   removed      : if not NULL, *removed will contain the address of removed
+ *                  node, if any.
  *
  * Returns:
- *   Pointer to the removed node, if any.
- *   NULL otherwise.
+ *   0 if node was inserted in the tree
+ *   1 otherwise
  *
  * NOTE: root will be modified so it will always point to the root of tree after
  * the function call. You should consider this when using this function.
  */
-gds_inline_rbtree_node_t *
+int
 gds_inline_rbtree_set(
 	gds_inline_rbtree_node_t **root,
 	gds_inline_rbtree_node_t *node,
 	gds_rbt_cmp_cb rbt_cmp_cb,
-	void *rbt_cmp_data
+	void *rbt_cmp_data,
+	gds_inline_rbtree_node_t **removed
 );
 
 /* Search a node by key.
