@@ -58,7 +58,7 @@ typedef int (*gds_rbtf_cmp_cb)(
  */
 typedef int (*gds_rbtf_cmp_with_key_cb)(
 	gds_inline_rbtree_fast_node_t *node,
-	void *key,
+	const void *key,
 	void *userdata
 );
 
@@ -135,7 +135,7 @@ gds_inline_rbtree_fast_set(
 gds_inline_rbtree_fast_node_t *
 gds_inline_rbtree_fast_get_node(
 	gds_inline_rbtree_fast_node_t *root,
-	void *key,
+	const void *key,
 	gds_rbtf_cmp_with_key_cb rbtf_cmp_with_key_cb,
 	void *rbtf_cmp_with_key_data
 );
@@ -157,7 +157,7 @@ gds_inline_rbtree_fast_get_node(
 gds_inline_rbtree_fast_node_t *
 gds_inline_rbtree_fast_del(
 	gds_inline_rbtree_fast_node_t **root,
-	void *key,
+	const void *key,
 	gds_rbtf_cmp_with_key_cb rbtf_cmp_with_key_cb,
 	void *rbtf_cmp_with_key_data
 );

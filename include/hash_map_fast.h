@@ -27,11 +27,11 @@
 
 #include <stdint.h>
 #include "callbacks.h"
-#include "rbtree.h"
+#include "rbtree_fast.h"
 
 struct gds_hash_map_fast_s {
 	uint32_t size;
-	gds_rbtree_node_t **map;
+	gds_rbtree_fast_node_t **map;
 	gds_hash_cb hash_cb;
 	gds_cmpkey_cb cmpkey_cb;
 };
@@ -106,31 +106,6 @@ gds_hash_map_fast_iterator_new(
 	while (!gds_iterator_step(gds_hash_map_fast_it) \
 		&& ((key = gds_iterator_getkey(gds_hash_map_fast_it)) || !key) \
 		&& ((val = gds_iterator_get(gds_hash_map_fast_it)) || !val))
-
-/* Return keys contained in the hash map as a list */
-/* h : pointer to the hash map */
-/* Return: pointer to the list */
-gds_slist_t *
-gds_hash_map_fast_keys(
-	gds_hash_map_fast_t *h
-);
-
-/* Return values contained in the hash map as a list */
-/* h : pointer to the hash map */
-/* Return: pointer to the list */
-gds_slist_t *
-gds_hash_map_fast_values(
-	gds_hash_map_fast_t *h
-);
-
-/* Change the number of buckets of hash map */
-/*        h : pointer to the hash map
- * new_size : New size (number of buckets) */
-void
-gds_hash_map_fast_change_size(
-	gds_hash_map_fast_t *h,
-	uint32_t new_size
-);
 
 /* Free hash map */
 /*           h : pointer to the hash map

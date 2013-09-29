@@ -122,7 +122,7 @@ int gds_rbtree_fast_add(gds_rbtree_fast_node_t **root, void *key, void *data,
 }
 
 gds_rbtree_fast_node_t * gds_rbtree_fast_get_node(gds_rbtree_fast_node_t *root,
-	void *key, gds_cmpkey_cb cmpkey_cb)
+	const void *key, gds_cmpkey_cb cmpkey_cb)
 {
 	gds_inline_rbtree_fast_node_t *inode = NULL;
 	gds_rbtf_cmp_with_key_cb cmp_with_key_cb =
@@ -161,7 +161,7 @@ void gds_rbtree_fast_set(gds_rbtree_fast_node_t **root, void *key,
 	}
 }
 
-void * gds_rbtree_fast_get(gds_rbtree_fast_node_t *root, void *key,
+void * gds_rbtree_fast_get(gds_rbtree_fast_node_t *root, const void *key,
 	gds_cmpkey_cb cmpkey_cb)
 {
 	gds_rbtree_fast_node_t *n;
@@ -175,7 +175,7 @@ void * gds_rbtree_fast_get(gds_rbtree_fast_node_t *root, void *key,
 	}
 }
 
-int gds_rbtree_fast_del(gds_rbtree_fast_node_t **root, void *key,
+int gds_rbtree_fast_del(gds_rbtree_fast_node_t **root, const void *key,
 	gds_cmpkey_cb cmpkey_cb, gds_free_cb key_free_cb, gds_free_cb free_cb)
 {
 	gds_inline_rbtree_fast_node_t *iroot, *inode;

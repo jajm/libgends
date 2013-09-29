@@ -85,7 +85,7 @@ gds_rbtree_fast_set(
 void *
 gds_rbtree_fast_get(
 	gds_rbtree_fast_node_t *root,
-	void *key,
+	const void *key,
 	gds_cmpkey_cb cmpkey_cb
 );
 
@@ -105,7 +105,7 @@ gds_rbtree_fast_get(
 int
 gds_rbtree_fast_del(
 	gds_rbtree_fast_node_t **root,
-	void *key,
+	const void *key,
 	gds_cmpkey_cb cmpkey_cb,
 	gds_free_cb key_free_cb,
 	gds_free_cb free_cb
