@@ -122,6 +122,51 @@ void t_hash_map_set(void)
 	gds_hash_map_free(hash, NULL, NULL);
 }
 
+void t_hash_map_get(void)
+{
+	gds_hash_map_t *hash;
+	char *keys[] = {"one", "two", "three"};
+	char *data[] = {"1", "2", "3"};
+	char *s;
+
+	hash = gds_hash_map_new(32, (gds_hash_cb) test_hash, (gds_cmpkey_cb) test_cmpkey);
+
+	GDS_ASSERT_THROW(BadArgumentException, gds_hash_map_get(NULL, NULL));
+	GDS_ASSERT_THROW(BadArgumentException, gds_hash_map_get(NULL, keys[0]));
+
+	s = gds_hash_map_get(hash, NULL);
+	isnull(s, NULL);
+	s = gds_hash_map_get(hash, keys[0]);
+	isnull(s, NULL);
+	s = gds_hash_map_get(hash, keys[1]);
+	isnull(s, NULL);
+	s = gds_hash_map_get(hash, keys[2]);
+	isnull(s, NULL);
+
+	gds_hash_map_set(hash, keys[0], data[0], NULL, NULL);
+	s = gds_hash_map_get(hash, keys[0]);
+	isntnull(s, NULL);
+	str_eq(s, data[0], NULL);
+	s = gds_hash_map_get(hash, keys[1]);
+	isnull(s, NULL);
+	s = gds_hash_map_get(hash, keys[2]);
+	isnull(s, NULL);
+
+	gds_hash_map_set(hash, keys[1], data[1], NULL, NULL);
+	gds_hash_map_set(hash, keys[2], data[2], NULL, NULL);
+	s = gds_hash_map_get(hash, keys[0]);
+	isntnull(s, NULL);
+	str_eq(s, data[0], NULL);
+	s = gds_hash_map_get(hash, keys[1]);
+	isntnull(s, NULL);
+	str_eq(s, data[1], NULL);
+	s = gds_hash_map_get(hash, keys[2]);
+	isntnull(s, NULL);
+	str_eq(s, data[2], NULL);
+
+	gds_hash_map_free(hash, NULL, NULL);
+}
+
 void t_hash_map_iterator(void)
 {
 	gds_hash_map_t *hash;
@@ -169,10 +214,11 @@ void t_hash_map_iterator(void)
 
 int main()
 {
-	plan(46);
+	plan(62);
 
 	t_hash_map_new();
 	t_hash_map_set();
+	t_hash_map_get();
 	t_hash_map_iterator();
 
 	return EXIT_SUCCESS;
