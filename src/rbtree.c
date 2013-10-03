@@ -137,28 +137,20 @@ int gds_rbtree_add(gds_rbtree_node_t **root, void *key, void *data,
 	gds_cmpkey_cb cmpkey_cb)
 {
 	gds_rbtree_node_t *node;
-	gds_inline_rbtree_node_t *inode;
+	gds_inline_rbtree_node_t *iroot;
 	int rc = 0;
 
 	GDS_CHECK_ARG_NOT_NULL(root);
 	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb);
 
-	if (*root == NULL) {
-		*root = gds_rbtree_node_new(key, data);
-		(*root)->rbtree.red = false;
-	} else {
-		inode = gds_inline_rbtree_get_node(&((*root)->rbtree),
-			key, (gds_rbt_cmp_with_key_cb)
-			gds_rbtree_node_cmp_with_key, cmpkey_cb);
-		if (inode == NULL) {
-			node = gds_rbtree_node_new(key, data);
-			inode = &((*root)->rbtree);
-			rc = gds_inline_rbtree_add(&inode, &(node->rbtree),
-				(gds_rbt_cmp_cb)gds_rbtree_node_cmp, cmpkey_cb);
-			*root = rbt_containerof(inode);
-		} else {
-			rc = 1;
-		}
+	node = gds_rbtree_node_new(key, data);
+	iroot = (*root != NULL) ? &((*root)->rbtree) : NULL;
+	rc = gds_inline_rbtree_add(&iroot, &(node->rbtree),
+		(gds_rbt_cmp_cb)gds_rbtree_node_cmp, cmpkey_cb);
+	*root = rbt_containerof(iroot);
+
+	if (rc > 0) {
+		gds_rbtree_node_free(node, NULL, NULL);
 	}
 
 	return rc;
@@ -201,27 +193,26 @@ int gds_rbtree_set(gds_rbtree_node_t **root, void *key, void *data,
 {
 	gds_rbtree_node_t *node, *removed;
 	gds_inline_rbtree_node_t *iroot, *iremoved = NULL;
-	int ret;
+	int rc;
 
 	GDS_CHECK_ARG_NOT_NULL(root);
 	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb);
 
 	node = gds_rbtree_node_new(key, data);
 	iroot = (*root != NULL) ? &((*root)->rbtree) : NULL;
-	ret = gds_inline_rbtree_set(&iroot, &(node->rbtree),
+	rc = gds_inline_rbtree_set(&iroot, &(node->rbtree),
 		(gds_rbt_cmp_cb) gds_rbtree_node_cmp, cmpkey_cb, &iremoved);
 	*root = rbt_containerof(iroot);
 
-	if (ret > 0) {
-		gds_rbtree_node_free(node, NULL, NULL);
-	} else if (iremoved != NULL) {
+	if (rc == 2 && iremoved != NULL) {
+		rc = 1;
 		removed = rbt_containerof(iremoved);
 		key_free_cb = (removed->key != key) ? key_free_cb : NULL;
 		free_cb = (removed->data != data) ? free_cb : NULL;
 		gds_rbtree_node_free(removed, key_free_cb, free_cb);
 	}
 
-	return ret;
+	return rc;
 }
 
 int gds_rbtree_del(gds_rbtree_node_t **root, const void *key,

@@ -75,8 +75,8 @@ gds_inline_rbtree_node_init(
  *   rbt_cmp_data : user data passed to rbt_cmp_cb
  *
  * Returns:
- *   0 if data was successfully inserted
- *   1 if data was already in tree
+ *   0 if node was successfully inserted
+ *   1 if an equivalent node was already in tree (ie. rbt_cmp_cb returned 0)
  *
  * NOTE: root will be modified so it will always point to the root of tree after
  * the function call. You should consider this when using this function.
@@ -105,7 +105,8 @@ gds_inline_rbtree_add(
  *
  * Returns:
  *   0 if node was inserted in the tree
- *   1 otherwise
+ *   1 if the node is already in the tree (no replacement done)
+ *   2 if node has replaced another node in the tree (*removed will be set)
  *
  * NOTE: root will be modified so it will always point to the root of tree after
  * the function call. You should consider this when using this function.
@@ -135,7 +136,7 @@ gds_inline_rbtree_get_node(
 	gds_inline_rbtree_node_t *root,
 	const void *key,
 	gds_rbt_cmp_with_key_cb rbt_cmp_with_key_cb,
-	void *rbt_cmp_data
+	void *rbt_cmp_with_key_data
 );
 
 /* Remove a node from red-black tree by its key.
@@ -157,7 +158,7 @@ gds_inline_rbtree_del(
 	gds_inline_rbtree_node_t **root,
 	const void *key,
 	gds_rbt_cmp_with_key_cb rbt_cmp_with_key_cb,
-	void *rbt_cmp_data
+	void *rbt_cmp_with_key_data
 );
 
 /* Create an iterator on red-black tree.

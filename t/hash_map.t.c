@@ -100,9 +100,9 @@ void t_hash_map_set(void)
 	rc = gds_hash_map_set(hash, keys[0], data[0], NULL, NULL);
 	is(rc, 0, NULL);
 	rc = gds_hash_map_set(hash, keys[0], data[0], free, free);
-	is(rc, 0, NULL);
+	is(rc, 1, NULL);
 	rc = gds_hash_map_set(hash, keys[0], data[0], free, free);
-	is(rc, 0, NULL);
+	is(rc, 1, NULL);
 
 	s = gds_hash_map_get(hash, keys[0]);
 	isntnull(s, NULL);
