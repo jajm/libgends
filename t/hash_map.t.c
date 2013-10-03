@@ -167,6 +167,59 @@ void t_hash_map_get(void)
 	gds_hash_map_free(hash, NULL, NULL);
 }
 
+void t_hash_map_unset(void)
+{
+	gds_hash_map_t *hash;
+	char * keys[] = {"1", "2", "3"};
+	char * data[] = {"one", "two", "three"};
+	int rc;
+
+	hash = gds_hash_map_new(32, (gds_hash_cb) test_hash,
+		(gds_cmpkey_cb) test_cmpkey);
+
+	GDS_ASSERT_THROW(BadArgumentException, gds_hash_map_unset(NULL, NULL, NULL, NULL));
+	GDS_ASSERT_THROW(BadArgumentException, gds_hash_map_unset(NULL, NULL, NULL, free));
+	GDS_ASSERT_THROW(BadArgumentException, gds_hash_map_unset(NULL, NULL, free, NULL));
+	GDS_ASSERT_THROW(BadArgumentException, gds_hash_map_unset(NULL, NULL, free, free));
+	GDS_ASSERT_THROW(BadArgumentException, gds_hash_map_unset(NULL, keys[0], NULL, NULL));
+	GDS_ASSERT_THROW(BadArgumentException, gds_hash_map_unset(NULL, keys[0], NULL, free));
+	GDS_ASSERT_THROW(BadArgumentException, gds_hash_map_unset(NULL, keys[0], free, NULL));
+	GDS_ASSERT_THROW(BadArgumentException, gds_hash_map_unset(NULL, keys[0], free, free));
+
+	rc = gds_hash_map_unset(hash, NULL, NULL, NULL);
+	is(rc, 1, NULL);
+	rc = gds_hash_map_unset(hash, keys[0], NULL, NULL);
+	is(rc, 1, NULL);
+	rc = gds_hash_map_unset(hash, keys[1], NULL, NULL);
+	is(rc, 1, NULL);
+	rc = gds_hash_map_unset(hash, keys[2], NULL, NULL);
+	is(rc, 1, NULL);
+
+	gds_hash_map_set(hash, keys[0], data[0], NULL, NULL);
+	gds_hash_map_set(hash, keys[1], data[1], NULL, NULL);
+	gds_hash_map_set(hash, keys[2], data[2], NULL, NULL);
+
+	rc = gds_hash_map_unset(hash, NULL, NULL, NULL);
+	is(rc, 1, NULL);
+	rc = gds_hash_map_unset(hash, keys[0], NULL, NULL);
+	is(rc, 0, NULL);
+	rc = gds_hash_map_unset(hash, keys[1], NULL, NULL);
+	is(rc, 0, NULL);
+	rc = gds_hash_map_unset(hash, keys[2], NULL, NULL);
+	is(rc, 0, NULL);
+
+	rc = gds_hash_map_unset(hash, NULL, NULL, NULL);
+	is(rc, 1, NULL);
+	rc = gds_hash_map_unset(hash, keys[0], NULL, NULL);
+	is(rc, 1, NULL);
+	rc = gds_hash_map_unset(hash, keys[1], NULL, NULL);
+	is(rc, 1, NULL);
+	rc = gds_hash_map_unset(hash, keys[2], NULL, NULL);
+	is(rc, 1, NULL);
+
+	gds_hash_map_free(hash, NULL, NULL);
+}
+
 void t_hash_map_iterator(void)
 {
 	gds_hash_map_t *hash;
@@ -214,11 +267,12 @@ void t_hash_map_iterator(void)
 
 int main()
 {
-	plan(62);
+	plan(82);
 
 	t_hash_map_new();
 	t_hash_map_set();
 	t_hash_map_get();
+	t_hash_map_unset();
 	t_hash_map_iterator();
 
 	return EXIT_SUCCESS;
