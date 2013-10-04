@@ -5,6 +5,7 @@
 #include <time.h>
 #include <libexception/exception.h>
 #include "hash_map.h"
+#include "slist.h"
 #include "tap.h"
 #include "test_macros.h"
 
@@ -265,15 +266,38 @@ void t_hash_map_iterator(void)
 	gds_hash_map_free(hash, NULL, NULL);
 }
 
+void t_hash_map_keys(void)
+{
+	gds_hash_map_t *hash;
+	char * keys[] = {"1", "2", "3"};
+	char * values[] = {"one", "two", "three"};
+
+	hash = gds_hash_map_new(32, (gds_hash_cb) test_hash,
+		(gds_cmpkey_cb) test_cmpkey);
+	for (int i = 0; i < 3; i++) {
+		gds_hash_map_set(hash, keys[i], values[i], NULL, NULL);
+	}
+
+	gds_slist_t *k = gds_hash_map_keys(hash);
+	is(gds_slist_size(k), 3, NULL);
+	is(gds_slist_get(k, 0), keys[0], NULL);
+	is(gds_slist_get(k, 1), keys[1], NULL);
+	is(gds_slist_get(k, 2), keys[2], NULL);
+	gds_slist_free(k, NULL, NULL);
+
+	gds_hash_map_free(hash, NULL, NULL);
+}
+
 int main()
 {
-	plan(82);
+	plan(86);
 
 	t_hash_map_new();
 	t_hash_map_set();
 	t_hash_map_get();
 	t_hash_map_unset();
 	t_hash_map_iterator();
+	t_hash_map_keys();
 
 	return EXIT_SUCCESS;
 }
