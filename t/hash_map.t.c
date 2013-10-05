@@ -288,9 +288,31 @@ void t_hash_map_keys(void)
 	gds_hash_map_free(hash, NULL, NULL);
 }
 
+void t_hash_map_values(void)
+{
+	gds_hash_map_t *hash;
+	char * keys[] = {"1", "2", "3"};
+	char * values[] = {"one", "two", "three"};
+
+	hash = gds_hash_map_new(32, (gds_hash_cb) test_hash,
+		(gds_cmpkey_cb) test_cmpkey);
+	for (int i = 0; i < 3; i++) {
+		gds_hash_map_set(hash, keys[i], values[i], NULL, NULL);
+	}
+
+	gds_slist_t *v = gds_hash_map_values(hash);
+	is(gds_slist_size(v), 3, NULL);
+	is(gds_slist_get(v, 0), values[0], NULL);
+	is(gds_slist_get(v, 1), values[1], NULL);
+	is(gds_slist_get(v, 2), values[2], NULL);
+	gds_slist_free(v, NULL, NULL);
+
+	gds_hash_map_free(hash, NULL, NULL);
+}
+
 int main()
 {
-	plan(86);
+	plan(90);
 
 	t_hash_map_new();
 	t_hash_map_set();
@@ -298,6 +320,7 @@ int main()
 	t_hash_map_unset();
 	t_hash_map_iterator();
 	t_hash_map_keys();
+	t_hash_map_values();
 
 	return EXIT_SUCCESS;
 }
