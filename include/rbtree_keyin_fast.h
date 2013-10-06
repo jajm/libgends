@@ -29,22 +29,23 @@ typedef struct {
 	gds_inline_rbtree_fast_node_t rbtree;
 } gds_rbtree_keyin_fast_node_t;
 
-/* Insert data into the tree */
-/*      root : pointer to pointer to the root node
- *      data : pointer to the data
- * copy_data : true => copy the data using alloc_cb
- *             false => don't copy the data, only the pointer
- *  alloc_cb : function that takes a pointer and return another pointer to a
- *             copy of data
- * getkey_cb : function that takes a pointer and return a key for the pointed
- *             data. Key will be used to determine where the new node will be
- *             inserted
- * cmpkey_cb : function that takes two keys and compare them. Should return 0 if
- *             keys are the same, a negative number if first key is lesser than
- *             second key, and a positive number otherwise. */
-/* Return: 0: success
- *         a negative value: failure
- *         a positive value: key of data is already in the tree: nothing done */
+/* Insert data into the tree.
+ *
+ * Parameters
+ *   root      : pointer to pointer to the root node
+ *   data      : pointer to the data
+ *   getkey_cb : function that takes a pointer and return a key for the pointed
+ *               data. Key will be used to determine where the new node will be
+ *               inserted
+ *   cmpkey_cb : function that takes two keys and compare them. Should return 0
+ *               if keys are the same, a negative number if first key is lesser
+ *               than second key, and a positive number otherwise.
+ *
+ * Returns
+ *   0 on success
+ *   a negative value on failure
+ *   a positive value if key of data is already in the tree: nothing done
+ */
 int
 gds_rbtree_keyin_fast_add(
 	gds_rbtree_keyin_fast_node_t **root,
@@ -53,6 +54,19 @@ gds_rbtree_keyin_fast_add(
 	gds_cmpkey_cb cmpkey_cb
 );
 
+/* Set data of a node in red-black tree.
+ *
+ * If key is not in the tree, a new node is added. Otherwise the existing node
+ * is replaced and memory is free using the callbacks key_free_cb and free_cb.
+ *
+ * Parameters
+ *   root      : Pointer to pointer to root node. Will be updated to point to
+ *               the root node, if the root changes.
+ *   data      : Node's data
+ *   getkey_cb : Callback function to get key from data.
+ *   cmpkey_cb : Callback function to compare two keys.
+ *   free_cb   : Callback function to free memory used by data.
+ */
 void
 gds_rbtree_keyin_fast_set(
 	gds_rbtree_keyin_fast_node_t **root,
@@ -62,6 +76,18 @@ gds_rbtree_keyin_fast_set(
 	gds_free_cb free_cb
 );
 
+/* Get data of a node in red-black tree.
+ *
+ * Parameters
+ *   root      : Pointer to root node.
+ *   key       : Key of node to retrieve.
+ *   getkey_cb : Callback function to get key from data.
+ *   cmpkey_cb : Callback function to compare two keys.
+ *
+ * Returns
+ *   Pointer to data.
+ *   NULL if key is not in tree.
+ */
 void *
 gds_rbtree_keyin_fast_get(
 	gds_rbtree_keyin_fast_node_t *root,
@@ -70,6 +96,20 @@ gds_rbtree_keyin_fast_get(
 	gds_cmpkey_cb cmpkey_cb
 );
 
+/* Remove a node from a red-black tree.
+ *
+ * Parameters
+ *   root      : Pointer to pointer to root node. Will be updated to point to
+ *               root node, if root changes.
+ *   key       : Key of node to remove
+ *   getkey_cb : Callback function to get key from data.
+ *   cmpkey_cb : Callback function to compare two keys.
+ *   free_cb   : Callback function to free memory used by data.
+ *
+ * Returns
+ *   0 if node was successfully deleted.
+ *   1 if key was not in tree.
+ */
 int
 gds_rbtree_keyin_fast_del(
 	gds_rbtree_keyin_fast_node_t **root,
@@ -79,6 +119,12 @@ gds_rbtree_keyin_fast_del(
 	gds_free_cb free_cb
 );
 
+/* Destroy a red-black-tree.
+ *
+ * Parameters
+ *   root    : Pointer to root node.
+ *   free_cb : Callback function to free memory used by data.
+ */
 void
 gds_rbtree_keyin_fast_free(
 	gds_rbtree_keyin_fast_node_t *root,
