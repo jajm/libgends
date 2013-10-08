@@ -9,16 +9,6 @@
 #include "tap.h"
 #include "test_macros.h"
 
-int init_suite(void)
-{
-	return 0;
-}
-
-int clean_suite(void)
-{
-	return 0;
-}
-
 int test_hash(const char *key)
 {
 	if (key) return key[0];

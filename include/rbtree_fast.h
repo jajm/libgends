@@ -61,8 +61,12 @@ gds_rbtree_fast_add(
  *   data      : pointer to data
  *   cmpkey_cb : callback that should takes two keys and compare them.
  *   free_cb   : callback that should free data.
+ *
+ * Returns
+ *   0 if key was already in the hash map
+ *   1 if key was just added
  */
-void
+int
 gds_rbtree_fast_set(
 	gds_rbtree_fast_node_t **root,
 	void *key,

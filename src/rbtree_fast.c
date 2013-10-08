@@ -140,10 +140,11 @@ gds_rbtree_fast_node_t * gds_rbtree_fast_get_node(gds_rbtree_fast_node_t *root,
 	return rbt_containerof(inode);
 }
 
-void gds_rbtree_fast_set(gds_rbtree_fast_node_t **root, void *key,
+int gds_rbtree_fast_set(gds_rbtree_fast_node_t **root, void *key,
 	void *data, gds_cmpkey_cb cmpkey_cb, gds_free_cb free_cb)
 {
 	gds_rbtree_fast_node_t *node;
+	int rc;
 
 	GDS_CHECK_ARG_NOT_NULL(root);
 	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb);
@@ -155,10 +156,14 @@ void gds_rbtree_fast_set(gds_rbtree_fast_node_t **root, void *key,
 			free_cb(node->data);
 		}
 		node->data = data;
+		rc = 0;
 	} else {
 		/* Node not found: add a new node */
 		gds_rbtree_fast_add(root, key, data, cmpkey_cb);
+		rc = 1;
 	}
+
+	return rc;
 }
 
 void * gds_rbtree_fast_get(gds_rbtree_fast_node_t *root, const void *key,

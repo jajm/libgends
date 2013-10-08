@@ -62,13 +62,14 @@ int gds_hash_map_fast_set(gds_hash_map_fast_t *h, void *key, void *data,
 	gds_free_cb free_cb)
 {
 	uint32_t hash;
+	int rc;
 
 	GDS_CHECK_ARG_NOT_NULL(h);
 
 	hash = gds_hash_map_fast_hash(h, key);
-	gds_rbtree_fast_set(&(h->map[hash]), key, data, h->cmpkey_cb, free_cb);
+	rc = gds_rbtree_fast_set(&(h->map[hash]), key, data, h->cmpkey_cb, free_cb);
 
-	return 0;
+	return rc;
 }
 
 void * gds_hash_map_fast_get(gds_hash_map_fast_t *h, const void *key)
