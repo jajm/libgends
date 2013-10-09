@@ -66,8 +66,12 @@ gds_rbtree_keyin_fast_add(
  *   getkey_cb : Callback function to get key from data.
  *   cmpkey_cb : Callback function to compare two keys.
  *   free_cb   : Callback function to free memory used by data.
+ *
+ * Returns
+ *   0 if key was not in the tree (node added)
+ *   1 if key was already in the tree (node replaced)
  */
-void
+int
 gds_rbtree_keyin_fast_set(
 	gds_rbtree_keyin_fast_node_t **root,
 	void *data,

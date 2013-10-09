@@ -184,6 +184,7 @@ void t_rbtree_keyin_fast_set(void)
 	gds_cmpkey_cb cmpkey_cb = (gds_cmpkey_cb) test_cmpkey;
 	gds_getkey_cb getkey_cb = (gds_getkey_cb) test_getkey;
 	gds_free_cb free_cb = (gds_free_cb) test_free;
+	int rc;
 
 	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_set(NULL , NULL, NULL     , NULL     , NULL   ));
 	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_set(NULL , NULL, NULL     , NULL     , free_cb));
@@ -218,26 +219,33 @@ void t_rbtree_keyin_fast_set(void)
 	ok(NULL == root, NULL);
 	ok(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb), NULL);
 
-	gds_rbtree_keyin_fast_set(&root, NULL, getkey_cb, cmpkey_cb, NULL);
+	rc = gds_rbtree_keyin_fast_set(&root, NULL, getkey_cb, cmpkey_cb, NULL);
+	is(rc, 0, NULL);
 	ok(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb), NULL);
 	ok(NULL == gds_rbtree_keyin_fast_get(root, NULL, getkey_cb, cmpkey_cb), NULL);
-	gds_rbtree_keyin_fast_set(&root, NULL, getkey_cb, cmpkey_cb, NULL);
+	rc = gds_rbtree_keyin_fast_set(&root, NULL, getkey_cb, cmpkey_cb, NULL);
+	is(rc, 1, NULL);
 	ok(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb), NULL);
 	ok(NULL == gds_rbtree_keyin_fast_get(root, NULL, getkey_cb, cmpkey_cb), NULL);
 
-	gds_rbtree_keyin_fast_set(&root, t, getkey_cb, cmpkey_cb, NULL);
+	rc = gds_rbtree_keyin_fast_set(&root, t, getkey_cb, cmpkey_cb, NULL);
+	is(rc, 0, NULL);
 	ok(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb), NULL);
 	ok(t == gds_rbtree_keyin_fast_get(root, getkey_cb(t), getkey_cb, cmpkey_cb), NULL);
-	gds_rbtree_keyin_fast_set(&root, t, getkey_cb, cmpkey_cb, NULL);
+	rc = gds_rbtree_keyin_fast_set(&root, t, getkey_cb, cmpkey_cb, NULL);
+	is(rc, 1, NULL);
 	ok(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb), NULL);
 	ok(t == gds_rbtree_keyin_fast_get(root, getkey_cb(t), getkey_cb, cmpkey_cb), NULL);
-	gds_rbtree_keyin_fast_set(&root, test_alloc(t), getkey_cb, cmpkey_cb, NULL);
+	rc = gds_rbtree_keyin_fast_set(&root, test_alloc(t), getkey_cb, cmpkey_cb, NULL);
+	is(rc, 1, NULL);
 	ok(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb), NULL);
 	ok(t != gds_rbtree_keyin_fast_get(root, getkey_cb(t), getkey_cb, cmpkey_cb), NULL);
-	gds_rbtree_keyin_fast_set(&root, test_alloc(t), getkey_cb, cmpkey_cb, free_cb);
+	rc = gds_rbtree_keyin_fast_set(&root, test_alloc(t), getkey_cb, cmpkey_cb, free_cb);
+	is(rc, 1, NULL);
 	ok(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb), NULL);
 	ok(t != gds_rbtree_keyin_fast_get(root, getkey_cb(t), getkey_cb, cmpkey_cb), NULL);
-	gds_rbtree_keyin_fast_set(&root, t, getkey_cb, cmpkey_cb, free_cb);
+	rc = gds_rbtree_keyin_fast_set(&root, t, getkey_cb, cmpkey_cb, free_cb);
+	is(rc, 1, NULL);
 	ok(gds_rbtree_keyin_fast_is_valid(root, getkey_cb, cmpkey_cb), NULL);
 	ok(t == gds_rbtree_keyin_fast_get(root, getkey_cb(t), getkey_cb, cmpkey_cb), NULL);
 
@@ -402,7 +410,7 @@ void t_rbtree_keyin_fast_del(void)
 
 int main()
 {
-	plan(1632);
+	plan(1639);
 
 	t_rbtree_keyin_fast_add();
 	t_rbtree_keyin_fast_set();

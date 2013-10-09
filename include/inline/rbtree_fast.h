@@ -105,20 +105,24 @@ gds_inline_rbtree_fast_add(
  *   node          : node to insert
  *   rbtf_cmp_cb   : see above documentation about gds_rbtf_cmp_cb
  *   rbtf_cmp_data : user data passed to rbtf_cmp_cb
+ *   removed       : if not NULL, *removed will contain the address of removed
+ *                   node, if any.
  *
  * Returns:
- *   Pointer to the removed node, if any.
- *   NULL otherwise.
+ *   0 if node was inserted in the tree
+ *   1 if the node is already in the tree (no replacement done)
+ *   2 if node has replaced another node in the tree (*removed will be set)
  *
  * NOTE: root will be modified so it will always point to the root of tree after
  * the function call. You should consider this when using this function.
  */
-gds_inline_rbtree_fast_node_t *
+int
 gds_inline_rbtree_fast_set(
 	gds_inline_rbtree_fast_node_t **root,
 	gds_inline_rbtree_fast_node_t *node,
 	gds_rbtf_cmp_cb rbtf_cmp_cb,
-	void *rbtf_cmp_data
+	void *rbtf_cmp_data,
+	gds_inline_rbtree_fast_node_t **removed
 );
 
 /* Search a node by key.

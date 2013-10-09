@@ -293,14 +293,15 @@ void gds_inline_rbtree_fast_swap_nodes(gds_inline_rbtree_fast_node_t *node1,
 	if (node2->right != NULL) node2->right->parent = node2;
 }
 
-gds_inline_rbtree_fast_node_t * gds_inline_rbtree_fast_replace_or_insert_bottom(
+int gds_inline_rbtree_fast_replace_or_insert_bottom(
 	gds_inline_rbtree_fast_node_t **root,
 	gds_inline_rbtree_fast_node_t *node,
-	gds_rbtf_cmp_cb rbtf_cmp_cb, void *rbtf_cmp_data)
+	gds_rbtf_cmp_cb rbtf_cmp_cb, void *rbtf_cmp_data,
+	gds_inline_rbtree_fast_node_t **removed)
 {
 	gds_inline_rbtree_fast_node_t *tmp, *parent = NULL;
-	gds_inline_rbtree_fast_node_t *removed_node = NULL;
 	int32_t cmp;
+	int rc = 0;
 
 	GDS_CHECK_ARG_NOT_NULL(root);
 	GDS_CHECK_ARG_NOT_NULL(rbtf_cmp_cb);
@@ -319,9 +320,14 @@ gds_inline_rbtree_fast_node_t * gds_inline_rbtree_fast_replace_or_insert_bottom(
 	}
 
 	if (tmp != NULL) {
-		gds_inline_rbtree_fast_swap_nodes(tmp, node);
-		if (node->parent == NULL) *root = node;
-		removed_node = tmp;
+		if (tmp != node) {
+			gds_inline_rbtree_fast_swap_nodes(tmp, node);
+			if (node->parent == NULL) *root = node;
+			if (removed != NULL) *removed = tmp;
+			rc = 2;
+		} else {
+			rc = 1;
+		}
 	} else {
 		node->left = node->right = NULL;
 		node->parent = parent;
@@ -336,24 +342,23 @@ gds_inline_rbtree_fast_node_t * gds_inline_rbtree_fast_replace_or_insert_bottom(
 		}
 	}
 
-	return removed_node;
+	return rc;
 }
 
-gds_inline_rbtree_fast_node_t * gds_inline_rbtree_fast_set(
-	gds_inline_rbtree_fast_node_t **root,
-	gds_inline_rbtree_fast_node_t *node,
-	gds_rbtf_cmp_cb rbtf_cmp_cb, void *rbtf_cmp_data)
+int gds_inline_rbtree_fast_set( gds_inline_rbtree_fast_node_t **root,
+	gds_inline_rbtree_fast_node_t *node, gds_rbtf_cmp_cb rbtf_cmp_cb,
+	void *rbtf_cmp_data, gds_inline_rbtree_fast_node_t **removed)
 {
-	gds_inline_rbtree_fast_node_t *removed_node;
+	int rc;
 
 	GDS_CHECK_ARG_NOT_NULL(root);
 	GDS_CHECK_ARG_NOT_NULL(node);
 
-	removed_node = gds_inline_rbtree_fast_replace_or_insert_bottom(root,
-		node, rbtf_cmp_cb, rbtf_cmp_data);
+	rc = gds_inline_rbtree_fast_replace_or_insert_bottom(root,
+		node, rbtf_cmp_cb, rbtf_cmp_data, removed);
 	gds_inline_rbtree_fast_rebalance_after_insert(root, node);
 
-	return removed_node;
+	return rc;
 }
 
 gds_inline_rbtree_fast_node_t * gds_inline_rbtree_fast_get_node(
