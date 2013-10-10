@@ -345,7 +345,7 @@ int gds_inline_rbtree_fast_replace_or_insert_bottom(
 	return rc;
 }
 
-int gds_inline_rbtree_fast_set( gds_inline_rbtree_fast_node_t **root,
+int gds_inline_rbtree_fast_set(gds_inline_rbtree_fast_node_t **root,
 	gds_inline_rbtree_fast_node_t *node, gds_rbtf_cmp_cb rbtf_cmp_cb,
 	void *rbtf_cmp_data, gds_inline_rbtree_fast_node_t **removed)
 {
@@ -356,7 +356,12 @@ int gds_inline_rbtree_fast_set( gds_inline_rbtree_fast_node_t **root,
 
 	rc = gds_inline_rbtree_fast_replace_or_insert_bottom(root,
 		node, rbtf_cmp_cb, rbtf_cmp_data, removed);
-	gds_inline_rbtree_fast_rebalance_after_insert(root, node);
+
+	/* Rebalance tree only if node was inserted as a new node
+	 * (not a replacement) */
+	if (rc == 0) {
+		gds_inline_rbtree_fast_rebalance_after_insert(root, node);
+	}
 
 	return rc;
 }
