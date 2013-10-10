@@ -238,7 +238,7 @@ int gds_inline_rbtree_fast_add(gds_inline_rbtree_fast_node_t **root,
 		gds_inline_rbtree_fast_rebalance_after_insert(root, node);
 	}
 
-	return (node != NULL) ? 0 : 1;
+	return rc;
 }
 
 void gds_inline_rbtree_fast_swap_nodes(gds_inline_rbtree_fast_node_t *node1,
