@@ -163,26 +163,18 @@ int gds_rbtree_keyin_fast_set(gds_rbtree_keyin_fast_node_t **root,
 	GDS_CHECK_ARG_NOT_NULL(getkey_cb);
 	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb);
 
-	if (*root == NULL) {
-		*root = gds_rbtree_keyin_fast_node_new(data);
-		(*root)->rbtree.red = false;
-	} else {
-		iroot = &((*root)->rbtree);
-		node = gds_rbtree_keyin_fast_node_new(data);
-		inode = &(node->rbtree);
-		rc = gds_inline_rbtree_fast_set(&iroot, inode,
-			cmp_cb, &cmp_params, &removed_inode);
+	iroot = (*root != NULL) ? &((*root)->rbtree) : NULL;
+	node = gds_rbtree_keyin_fast_node_new(data);
+	inode = &(node->rbtree);
+	rc = gds_inline_rbtree_fast_set(&iroot, inode, cmp_cb, &cmp_params,
+		&removed_inode);
+	*root = rbt_containerof(iroot);
 
-		if (rc == 2 && removed_inode != NULL) {
-			removed_node = rbt_containerof(removed_inode);
-			free_cb = (removed_node->data != data) ? free_cb : NULL;
-			gds_rbtree_keyin_fast_node_free(removed_node, free_cb);
-			rc = 1;
-		} else if (rc == 1) {
-			gds_rbtree_keyin_fast_node_free(node, NULL);
-		}
-
-		*root = rbt_containerof(iroot);
+	if (rc == 2 && removed_inode != NULL) {
+		removed_node = rbt_containerof(removed_inode);
+		free_cb = (removed_node->data != data) ? free_cb : NULL;
+		gds_rbtree_keyin_fast_node_free(removed_node, free_cb);
+		rc = 1;
 	}
 
 	return rc;
