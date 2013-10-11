@@ -191,30 +191,31 @@ void * gds_rbtree_keyin_get(gds_rbtree_keyin_node_t *root, const void *key,
 int gds_rbtree_keyin_set(gds_rbtree_keyin_node_t **root, void *data,
 	gds_getkey_cb getkey_cb, gds_cmpkey_cb cmpkey_cb, gds_free_cb free_cb)
 {
-	void *key;
-	gds_rbtree_keyin_node_t *node;
-	int ret;
+	gds_rbtree_keyin_node_t *node, *removed;
+	gds_inline_rbtree_node_t *iroot, *iremoved;
+	gds_rbt_cmp_cb cmp_cb = (gds_rbt_cmp_cb) gds_rbtree_keyin_node_cmp;
+	gds_rbtree_keyin_callbacks_t callbacks
+		= { .getkey_cb = getkey_cb, .cmpkey_cb = cmpkey_cb };
+	int rc;
 
 	GDS_CHECK_ARG_NOT_NULL(root);
 	GDS_CHECK_ARG_NOT_NULL(getkey_cb);
 	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb);
 
-	key = getkey_cb(data);
-	node = gds_rbtree_keyin_get_node(*root, key, getkey_cb, cmpkey_cb);
-	if (node != NULL) {
-		/* Node found: the key already exists in the tree */
-		if (free_cb != NULL) {
-			free_cb(node->data);
-		}
-		node->data = data;
-		ret = 0;
-	} else {
-		/* Node not found: add a new node */
-		gds_rbtree_keyin_add(root, data, getkey_cb, cmpkey_cb);
-		ret = 1;
+	node = gds_rbtree_keyin_node_new(data);
+	iroot = (*root != NULL) ? &((*root)->rbtree) : NULL;
+	rc = gds_inline_rbtree_set(&iroot, &(node->rbtree), cmp_cb, &callbacks,
+		&iremoved);
+	*root = rbt_containerof(iroot);
+
+	if (rc == 2 && iremoved != NULL) {
+		rc = 1;
+		removed = rbt_containerof(iremoved);
+		free_cb = (removed->data != data) ? free_cb : NULL;
+		gds_rbtree_keyin_node_free(removed, free_cb);
 	}
 
-	return ret;
+	return rc;
 }
 
 int gds_rbtree_keyin_del(gds_rbtree_keyin_node_t **root, const void *key,
