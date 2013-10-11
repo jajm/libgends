@@ -53,19 +53,27 @@ gds_hash_map_fast_new(
 	gds_cmpkey_cb cmpkey_cb
 );
 
-/* Set a key/value pair in the hash map */
-/* If key already exists, old value is replaced by the new one */
-/*            h : pointer to the hash map
- *          key : key to insert
- *         data : data to insert
- *      free_cb : free callback for data */
-/* Return: 0: key was already in the hash map
- *         1: key was just added */
+/* Set a key/value pair in the hash map
+ *
+ * If key already exists, old value is replaced by the new one
+ *
+ * Parameters
+ *   h           : pointer to the hash map
+ *   key         : key to insert
+ *   data        : data to insert
+ *   key_free_cb : free callback for key
+ *   free_cb     : free callback for data
+ *
+ * Returns
+ *   0: key was just added
+ *   1: key was already in the hash map
+ */
 int
 gds_hash_map_fast_set(
 	gds_hash_map_fast_t *h,
 	void *key,
 	void *data,
+	gds_free_cb key_free_cb,
 	gds_free_cb free_cb
 );
 

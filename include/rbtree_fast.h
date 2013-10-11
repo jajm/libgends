@@ -56,11 +56,12 @@ gds_rbtree_fast_add(
 /* Insert or replace data into the tree.
  *
  * Parameters
- *   root      : pointer to the root node pointer
- *   key       : pointer to key
- *   data      : pointer to data
- *   cmpkey_cb : callback that should takes two keys and compare them.
- *   free_cb   : callback that should free data.
+ *   root        : pointer to the root node pointer
+ *   key         : pointer to key
+ *   data        : pointer to data
+ *   cmpkey_cb   : callback that should takes two keys and compare them.
+ *   key_free_cb : callback that should free key.
+ *   free_cb     : callback that should free data.
  *
  * Returns
  *   0 if key was already in the hash map
@@ -72,6 +73,7 @@ gds_rbtree_fast_set(
 	void *key,
 	void *data,
 	gds_cmpkey_cb cmpkey_cb,
+	gds_free_cb key_free_cb,
 	gds_free_cb free_cb
 );
 

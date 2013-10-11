@@ -54,35 +54,51 @@ void t_hash_map_fast_set(void)
 	hash = gds_hash_map_fast_new(32, (gds_hash_cb) test_hash, (gds_cmpkey_cb) test_cmpkey);
 
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_fast_set(NULL, NULL, NULL, NULL));
+		gds_hash_map_fast_set(NULL, NULL, NULL, NULL, NULL));
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_fast_set(NULL, NULL, NULL, free));
+		gds_hash_map_fast_set(NULL, NULL, NULL, NULL, free));
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_fast_set(NULL, NULL, data[0], NULL));
+		gds_hash_map_fast_set(NULL, NULL, NULL, free, NULL));
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_fast_set(NULL, NULL, data[0], free));
+		gds_hash_map_fast_set(NULL, NULL, NULL, free, free));
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_fast_set(NULL, keys[0], NULL, NULL));
+		gds_hash_map_fast_set(NULL, NULL, data[0], NULL, NULL));
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_fast_set(NULL, keys[0], NULL, free));
+		gds_hash_map_fast_set(NULL, NULL, data[0], NULL, free));
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_fast_set(NULL, keys[0], data[0], NULL));
+		gds_hash_map_fast_set(NULL, NULL, data[0], free, NULL));
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_fast_set(NULL, keys[0], data[0], free));
+		gds_hash_map_fast_set(NULL, NULL, data[0], free, free));
+	GDS_ASSERT_THROW(BadArgumentException,
+		gds_hash_map_fast_set(NULL, keys[0], NULL, NULL, NULL));
+	GDS_ASSERT_THROW(BadArgumentException,
+		gds_hash_map_fast_set(NULL, keys[0], NULL, NULL, free));
+	GDS_ASSERT_THROW(BadArgumentException,
+		gds_hash_map_fast_set(NULL, keys[0], NULL, free, NULL));
+	GDS_ASSERT_THROW(BadArgumentException,
+		gds_hash_map_fast_set(NULL, keys[0], NULL, free, free));
+	GDS_ASSERT_THROW(BadArgumentException,
+		gds_hash_map_fast_set(NULL, keys[0], data[0], NULL, NULL));
+	GDS_ASSERT_THROW(BadArgumentException,
+		gds_hash_map_fast_set(NULL, keys[0], data[0], NULL, free));
+	GDS_ASSERT_THROW(BadArgumentException,
+		gds_hash_map_fast_set(NULL, keys[0], data[0], free, NULL));
+	GDS_ASSERT_THROW(BadArgumentException,
+		gds_hash_map_fast_set(NULL, keys[0], data[0], free, free));
 
-	rc = gds_hash_map_fast_set(hash, keys[0], data[0], NULL);
+	rc = gds_hash_map_fast_set(hash, keys[0], data[0], NULL, NULL);
+	is(rc, 0, NULL);
+	rc = gds_hash_map_fast_set(hash, keys[0], data[0], NULL, free);
 	is(rc, 1, NULL);
-	rc = gds_hash_map_fast_set(hash, keys[0], data[0], free);
-	is(rc, 0, NULL);
-	rc = gds_hash_map_fast_set(hash, keys[0], data[0], free);
-	is(rc, 0, NULL);
+	rc = gds_hash_map_fast_set(hash, keys[0], data[0], free, free);
+	is(rc, 1, NULL);
 
 	s = gds_hash_map_fast_get(hash, keys[0]);
 	isntnull(s, NULL);
 	str_eq(s, data[0], NULL);
 
-	gds_hash_map_fast_set(hash, keys[1], data[1], NULL);
-	gds_hash_map_fast_set(hash, keys[2], data[2], NULL);
+	gds_hash_map_fast_set(hash, keys[1], data[1], NULL, NULL);
+	gds_hash_map_fast_set(hash, keys[2], data[2], NULL, NULL);
 
 	s = gds_hash_map_fast_get(hash, keys[1]);
 	isntnull(s, NULL);
@@ -116,7 +132,7 @@ void t_hash_map_fast_get(void)
 	s = gds_hash_map_fast_get(hash, keys[2]);
 	isnull(s, NULL);
 
-	gds_hash_map_fast_set(hash, keys[0], data[0], NULL);
+	gds_hash_map_fast_set(hash, keys[0], data[0], NULL, NULL);
 	s = gds_hash_map_fast_get(hash, keys[0]);
 	isntnull(s, NULL);
 	str_eq(s, data[0], NULL);
@@ -125,8 +141,8 @@ void t_hash_map_fast_get(void)
 	s = gds_hash_map_fast_get(hash, keys[2]);
 	isnull(s, NULL);
 
-	gds_hash_map_fast_set(hash, keys[1], data[1], NULL);
-	gds_hash_map_fast_set(hash, keys[2], data[2], NULL);
+	gds_hash_map_fast_set(hash, keys[1], data[1], NULL, NULL);
+	gds_hash_map_fast_set(hash, keys[2], data[2], NULL, NULL);
 	s = gds_hash_map_fast_get(hash, keys[0]);
 	isntnull(s, NULL);
 	str_eq(s, data[0], NULL);
@@ -168,9 +184,9 @@ void t_hash_map_fast_unset(void)
 	rc = gds_hash_map_fast_unset(hash, keys[2], NULL, NULL);
 	is(rc, 1, NULL);
 
-	gds_hash_map_fast_set(hash, keys[0], data[0], NULL);
-	gds_hash_map_fast_set(hash, keys[1], data[1], NULL);
-	gds_hash_map_fast_set(hash, keys[2], data[2], NULL);
+	gds_hash_map_fast_set(hash, keys[0], data[0], NULL, NULL);
+	gds_hash_map_fast_set(hash, keys[1], data[1], NULL, NULL);
+	gds_hash_map_fast_set(hash, keys[2], data[2], NULL, NULL);
 
 	rc = gds_hash_map_fast_unset(hash, NULL, NULL, NULL);
 	is(rc, 1, NULL);
@@ -204,7 +220,7 @@ void t_hash_map_fast_iterator(void)
 	hash = gds_hash_map_fast_new(32, (gds_hash_cb) test_hash,
 		(gds_cmpkey_cb) test_cmpkey);
 	for (int i = 0; i < 3; i++) {
-		gds_hash_map_fast_set(hash, keys[i], values[i], NULL);
+		gds_hash_map_fast_set(hash, keys[i], values[i], NULL, NULL);
 	}
 
 	it = gds_hash_map_fast_iterator_new(hash);
@@ -235,7 +251,7 @@ void t_hash_map_fast_iterator(void)
 
 int main()
 {
-	plan(68);
+	plan(76);
 
 	t_hash_map_fast_new();
 	t_hash_map_fast_set();
