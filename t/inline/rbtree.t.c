@@ -53,7 +53,7 @@ void test_rbtree_free(test_rbtree_node_t *root)
 	}
 }
 
-int32_t test_rbtree_node_compare(gds_inline_rbtree_node_t *n1,
+int test_rbtree_node_compare(gds_inline_rbtree_node_t *n1,
 	gds_inline_rbtree_node_t *n2)
 {
 	test_rbtree_node_t *trn1, *trn2;
@@ -64,7 +64,7 @@ int32_t test_rbtree_node_compare(gds_inline_rbtree_node_t *n1,
 	return trn1->data - trn2->data;
 }
 
-int32_t test_rbtree_node_compare_with_key(gds_inline_rbtree_node_t *n, int *i)
+int test_rbtree_node_compare_with_key(gds_inline_rbtree_node_t *n, int *i)
 {
 	test_rbtree_node_t *trn;
 

@@ -102,23 +102,23 @@ void gds_rbtree_node_free(gds_rbtree_node_t *node,
 	? (gds_rbtree_node_t *)((char *)ptr - offsetof(gds_rbtree_node_t, rbtree)) \
 	: NULL
 
-int8_t gds_rbtree_node_cmp_with_key(
+int gds_rbtree_node_cmp_with_key(
 	gds_inline_rbtree_node_t *inode, void *key,
 	gds_cmpkey_cb cmpkey_cb)
 {
 	gds_rbtree_node_t *node;
-	int8_t cmp;
+	int cmp;
 
 	node = rbt_containerof(inode);
 	cmp = cmpkey_cb(key, node->key);
 	return cmp;
 }
 
-int8_t gds_rbtree_node_cmp(gds_inline_rbtree_node_t *inode1,
+int gds_rbtree_node_cmp(gds_inline_rbtree_node_t *inode1,
 	gds_inline_rbtree_node_t *inode2, gds_cmpkey_cb cmpkey_cb)
 {
 	gds_rbtree_node_t *node1, *node2;
-	int8_t cmp;
+	int cmp;
 
 	node1 = rbt_containerof(inode1);
 	node2 = rbt_containerof(inode2);
@@ -220,7 +220,7 @@ int gds_rbtree_del(gds_rbtree_node_t **root, const void *key,
 {
 	gds_inline_rbtree_node_t *iroot, *inode;
 	gds_rbtree_node_t *node;
-	int8_t deleted = 0;
+	int deleted = 0;
 
 	GDS_CHECK_ARG_NOT_NULL(root);
 	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb);

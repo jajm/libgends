@@ -22,14 +22,14 @@ int clean_suite(void)
 	((ptr) != NULL) ? (gds_rbtree_keyin_fast_node_t *)((char *)ptr \
 		- offsetof(gds_rbtree_keyin_fast_node_t, rbtree)) : NULL
 
-void gds_rbtree_keyin_fast_print(gds_rbtree_keyin_fast_node_t *root, uint8_t depth)
+void gds_rbtree_keyin_fast_print(gds_rbtree_keyin_fast_node_t *root, int depth)
 {
 	char *key;
 	gds_rbtree_keyin_fast_node_t *node;
 	if(root != NULL) {
 		node = containerof(root->rbtree.right);
 		gds_rbtree_keyin_fast_print(node, depth+1);
-		for (uint8_t i=0; i<depth; i++)
+		for (int i=0; i<depth; i++)
 			printf("- ");
 		key = test_getkey(root->data);
 		if (key == NULL) {
@@ -44,7 +44,7 @@ void gds_rbtree_keyin_fast_print(gds_rbtree_keyin_fast_node_t *root, uint8_t dep
 	}
 }
 
-int8_t gds_rbtree_keyin_fast_is_valid(gds_rbtree_keyin_fast_node_t *root, gds_getkey_cb getkey_cb,
+int gds_rbtree_keyin_fast_is_valid(gds_rbtree_keyin_fast_node_t *root, gds_getkey_cb getkey_cb,
 	gds_cmpkey_cb cmpkey_cb)
 {
 	int lh, rh;

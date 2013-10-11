@@ -28,8 +28,8 @@
  *  - define a struct, or whatever you need to store iterator informations
  *  - define 4 functions (described below) which will deal with these
  *  informations:
- *    . int8_t reset(void *data)
- *    . int8_t step(void *data)
+ *    . int reset(void *data)
+ *    . int step(void *data)
  *    . void * get(void *data)
  *    . void free(void *data)
  *  - and provide a way to get an initialized iterator for your container
@@ -43,8 +43,8 @@
 #include <stdbool.h>
 #include "callbacks.h"
 
-typedef int8_t (*gds_iterator_reset_cb)(void *);
-typedef int8_t (*gds_iterator_step_cb)(void *);
+typedef int (*gds_iterator_reset_cb)(void *);
+typedef int (*gds_iterator_step_cb)(void *);
 typedef void * (*gds_iterator_get_cb)(void *);
 typedef void * (*gds_iterator_getkey_cb)(void *);
 
@@ -99,13 +99,13 @@ gds_iterator_new(
 );
 
 /* Alias for it->reset_cb(it->data) */
-int8_t
+int
 gds_iterator_reset(
 	gds_iterator_t *it
 );
 
 /* Alias for it->step_cb(it->data) */
-int8_t
+int
 gds_iterator_step(
 	gds_iterator_t *it
 );

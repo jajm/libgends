@@ -69,7 +69,7 @@ gds_dlist_node_t *gds_dlist_node_new(void *data)
 }
 
 
-int8_t gds_dlist_node_set_data(gds_dlist_node_t *node, void *data,
+int gds_dlist_node_set_data(gds_dlist_node_t *node, void *data,
 	void *callback, void *callback_data)
 {
 	void (*cb)(void *, void *) = callback;
@@ -459,7 +459,7 @@ typedef struct {
 	int i;
 } gds_dlist_iterator_data_t;
 
-int8_t gds_dlist_iterator_reset(gds_dlist_iterator_data_t *it_data)
+int gds_dlist_iterator_reset(gds_dlist_iterator_data_t *it_data)
 {
 	GDS_CHECK_ARG_NOT_NULL(it_data);
 
@@ -469,7 +469,7 @@ int8_t gds_dlist_iterator_reset(gds_dlist_iterator_data_t *it_data)
 	return 0;
 }
 
-int8_t gds_dlist_iterator_step(gds_dlist_iterator_data_t *it_data)
+int gds_dlist_iterator_step(gds_dlist_iterator_data_t *it_data)
 {
 	gds_inline_dlist_node_t *next = NULL;
 

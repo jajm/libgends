@@ -128,7 +128,7 @@ int gds_inline_rbtree_fast_insert_bottom(gds_inline_rbtree_fast_node_t **root,
 	void *rbtf_cmp_data)
 {
 	gds_inline_rbtree_fast_node_t *tmp, *parent = NULL;
-	int32_t cmp;
+	int cmp;
 
 	GDS_CHECK_ARG_NOT_NULL(root);
 	GDS_CHECK_ARG_NOT_NULL(rbtf_cmp_cb);
@@ -300,7 +300,7 @@ int gds_inline_rbtree_fast_replace_or_insert_bottom(
 	gds_inline_rbtree_fast_node_t **removed)
 {
 	gds_inline_rbtree_fast_node_t *tmp, *parent = NULL;
-	int32_t cmp;
+	int cmp;
 	int rc = 0;
 
 	GDS_CHECK_ARG_NOT_NULL(root);
@@ -372,7 +372,7 @@ gds_inline_rbtree_fast_node_t * gds_inline_rbtree_fast_get_node(
 	void *rbtf_cmp_with_key_data)
 {
 	gds_inline_rbtree_fast_node_t *node = root;
-	int32_t cmp;
+	int cmp;
 
 	while (node != NULL) {
 		cmp = rbtf_cmp_with_key_cb(node, key, rbtf_cmp_with_key_data);

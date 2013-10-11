@@ -65,7 +65,7 @@ gds_hash_map_new(
  *   0: key was just added
  *   1: key was already in the hash
  */
-int8_t
+int
 gds_hash_map_set(
 	gds_hash_map_t *h,
 	void *key,
@@ -91,7 +91,7 @@ gds_hash_map_get(
  *     free_cb : free callback for data */
 /* Return: 0: key was correctly unset
  *         1: key was not in the hash map */
-int8_t
+int
 gds_hash_map_unset(
 	gds_hash_map_t *h,
 	const void *key,

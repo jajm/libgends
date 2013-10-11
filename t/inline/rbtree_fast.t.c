@@ -76,7 +76,7 @@ void test_rbtree_fast_node_set_data(gds_inline_rbtree_fast_node_t *inode,
 	node->data = *i;
 }
 
-int32_t test_rbtree_fast_node_cmp(gds_inline_rbtree_fast_node_t *n1, gds_inline_rbtree_fast_node_t *n2)
+int test_rbtree_fast_node_cmp(gds_inline_rbtree_fast_node_t *n1, gds_inline_rbtree_fast_node_t *n2)
 {
 	test_rbtree_fast_node_t *trfn1, *trfn2;
 
@@ -86,7 +86,7 @@ int32_t test_rbtree_fast_node_cmp(gds_inline_rbtree_fast_node_t *n1, gds_inline_
 	return trfn1->data - trfn2->data;
 }
 
-int32_t test_rbtree_fast_node_cmp_with_key(gds_inline_rbtree_fast_node_t *n, int *i)
+int test_rbtree_fast_node_cmp_with_key(gds_inline_rbtree_fast_node_t *n, int *i)
 {
 	test_rbtree_fast_node_t *trfn;
 

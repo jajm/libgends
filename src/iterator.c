@@ -28,8 +28,8 @@
  *  - define a struct, or whatever you need to store iterator informations
  *  - define 5 functions (described below) which will deal with these
  *  informations:
- *    . int8_t reset(void *data)
- *    . int8_t step(void *data)
+ *    . int reset(void *data)
+ *    . int step(void *data)
  *    . void * get(void *data)
  *    . void * getkey(void *data)
  *    . void free(void *data)
@@ -76,14 +76,14 @@ gds_iterator_t *gds_iterator_new(void *data, gds_iterator_reset_cb reset_cb,
 	return it;
 }
 
-int8_t gds_iterator_reset(gds_iterator_t *it)
+int gds_iterator_reset(gds_iterator_t *it)
 {
 	GDS_CHECK_ARG_NOT_NULL(it);
 
 	return it->reset_cb(it->data);
 }
 
-int8_t gds_iterator_step(gds_iterator_t *it)
+int gds_iterator_step(gds_iterator_t *it)
 {
 	GDS_CHECK_ARG_NOT_NULL(it);
 

@@ -4,7 +4,7 @@
 #include <string.h>
 #include "test.h"
 
-test_t * test_new(const char *key, int32_t value)
+test_t * test_new(const char *key, int value)
 {
 	test_t *t;
 	size_t len;
@@ -42,7 +42,7 @@ char * test_getkey(test_t *t)
 	return (t != NULL) ? t->key : NULL;
 }
 
-int8_t test_setkey(test_t *t, const char *key)
+int test_setkey(test_t *t, const char *key)
 {
 	size_t len;
 	char *s = NULL;
@@ -65,9 +65,9 @@ int8_t test_setkey(test_t *t, const char *key)
 	return 0;
 }
 
-int32_t test_cmpkey(const char *key1, const char *key2)
+int test_cmpkey(const char *key1, const char *key2)
 {
-	int32_t cmp;
+	int cmp;
 
 	if (key1 == NULL && key2 == NULL)
 		cmp = 0;
@@ -81,12 +81,12 @@ int32_t test_cmpkey(const char *key1, const char *key2)
 	return cmp;
 }
 
-int32_t test_getvalue(test_t *t)
+int test_getvalue(test_t *t)
 {
 	return (t != NULL) ? t->value : 0;
 }
 
-int8_t test_setvalue(test_t *t, int32_t value)
+int test_setvalue(test_t *t, int value)
 {
 	if (t == NULL) {
 		return -1;

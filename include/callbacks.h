@@ -42,7 +42,7 @@ typedef void * (*gds_getkey_cb)(const void *);
  *  - if key1 < key2: a negative value
  *  - if key1 = key2: 0 (zero)
  *  - if key1 > key2: a positive value */
-typedef int32_t (*gds_cmpkey_cb)(const void *, const void *);
+typedef int (*gds_cmpkey_cb)(const void *, const void *);
 
 /* Callback: gds_cmp_cb */
 /* Purpose: Compare two objects */
@@ -52,7 +52,7 @@ typedef int32_t (*gds_cmpkey_cb)(const void *, const void *);
  *  - if object1 < object2: a negative value
  *  - if object1 = object2: 0 (zero)
  *  - if object1 > object2: a positive value */
-typedef int32_t (*gds_cmp_cb)(const void *, const void *);
+typedef int (*gds_cmp_cb)(const void *, const void *);
 
 /* Callback: gds_hash_cb */
 /* Purpose: Compute the hash of an object */
