@@ -1,0 +1,36 @@
+include ../config.mk
+
+CFLAGS := -Wall -Wextra -Werror -g -std=c99 $(CFLAGS)
+CPPFLAGS := -I../include $(shell pkg-config --cflags lll libexception) $(CPPFLAGS)
+LDFLAGS := $(shell pkg-config --libs lll libexception) $(LDFLAGS)
+LIBTOOL_CURRENT := @LIBTOOL_CURRENT@
+LIBTOOL_REVISION := @LIBTOOL_REVISION@
+LIBTOOL_AGE := @LIBTOOL_AGE@
+LIBTOOL_VERSION := $(LIBTOOL_CURRENT):$(LIBTOOL_REVISION):$(LIBTOOL_AGE)
+
+SOURCES := $(wildcard *.c) $(wildcard inline/*.c)
+OBJS := $(SOURCES:.c=.lo)
+
+all: $(LIBRARY_NAME)
+
+$(LIBRARY_NAME): $(OBJS)
+	$(LIBTOOL) --mode=link $(CC) $(LDFLAGS) -rpath $(LIBDIR) -version-info $(LIBTOOL_VERSION) -o $@ $^
+
+.deps/%.d: %.c
+	@set -e; rm -f $@; \
+	mkdir -p $(dir $@); \
+	$(CC) -MM -MG $(CPPFLAGS) $< > $@.$$$$; \
+	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$
+
+-include $(patsubst %.c,.deps/%.d,$(SOURCES))
+
+%.lo: %.c
+	$(LIBTOOL) --mode=compile $(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
+
+install: $(LIBRARY_NAME)
+	$(LIBTOOL) --mode=install $(INSTALL) $< $(LIBDIR)
+
+clean:
+	rm -rf *.o *.lo $(LIBRARY_NAME)
+	rm -rf .deps .libs

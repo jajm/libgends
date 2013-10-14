@@ -1,0 +1,33 @@
+include config.mk
+
+PKGCONFIG_FILES := $(wildcard *.pc)
+
+.PHONY: lib test benchs install clean
+
+all: lib test benchs
+
+lib:
+	$(MAKE) -C src
+
+test:
+	$(MAKE) -C t
+
+benchs:
+	$(MAKE) -C benchs
+
+install:
+	$(MAKE) -C src install
+	$(MAKE) -C include install
+	@ if [ -n "$(PKGCONFIG_FILES)" ]; then \
+		CMD="$(INSTALL) -d $(PKGCONFIGDIR)"; \
+		echo "$${CMD}"; \
+		$${CMD}; \
+		CMD="$(INSTALL) --mode=0644 $(PKGCONFIG_FILES) $(PKGCONFIGDIR)"; \
+		echo "$${CMD}"; \
+		$${CMD}; \
+	fi
+
+clean:
+	$(MAKE) -C src clean
+	$(MAKE) -C t clean
+	$(MAKE) -C benchs clean
