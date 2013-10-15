@@ -29,6 +29,7 @@ $(LIBRARY_NAME): $(OBJS)
 	$(LIBTOOL) --mode=compile $(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
 
 install: $(LIBRARY_NAME)
+	mkdir -p $(LIBDIR)
 	$(LIBTOOL) --mode=install $(INSTALL) $< $(LIBDIR)
 
 clean:
