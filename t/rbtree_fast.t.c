@@ -592,15 +592,83 @@ void t_rbtree_fast_iterator(void)
 	gds_rbtree_fast_free(root, key_free_cb, free_cb);
 }
 
+void t_rbtree_fast_keys()
+{
+	char *keys[] = { "01", "02", "03" };
+	char *data[] = { "foo", "bar", "baz" };
+	char *s;
+	gds_rbtree_fast_node_t *root = NULL;
+	gds_cmpkey_cb cmpkey_cb = (gds_cmpkey_cb) test_cmpkey;
+	gds_slist_t *list;
+	gds_iterator_t *it;
+	int i;
+
+	for (i=0; i<3; i++) {
+		gds_rbtree_fast_add(&root, keys[i], data[i], cmpkey_cb);
+	}
+
+	list = gds_rbtree_fast_keys(root);
+	it = gds_slist_iterator_new(list);
+	gds_iterator_step(it);
+	s = gds_iterator_get(it);
+	str_eq(s, "01", NULL);
+	gds_iterator_step(it);
+	s = gds_iterator_get(it);
+	str_eq(s, "02", NULL);
+	gds_iterator_step(it);
+	s = gds_iterator_get(it);
+	str_eq(s, "03", NULL);
+	ok(0 < gds_iterator_step(it), NULL);
+
+	gds_iterator_free(it);
+	gds_slist_free(list, NULL, NULL);
+	gds_rbtree_fast_free(root, NULL, NULL);
+}
+
+void t_rbtree_fast_values()
+{
+	char *keys[] = { "01", "02", "03" };
+	char *data[] = { "foo", "bar", "baz" };
+	char *s;
+	gds_rbtree_fast_node_t *root = NULL;
+	gds_cmpkey_cb cmpkey_cb = (gds_cmpkey_cb) test_cmpkey;
+	gds_slist_t *list;
+	gds_iterator_t *it;
+	int i;
+
+	for (i=0; i<3; i++) {
+		gds_rbtree_fast_add(&root, keys[i], data[i], cmpkey_cb);
+	}
+
+	list = gds_rbtree_fast_values(root);
+	it = gds_slist_iterator_new(list);
+	gds_iterator_step(it);
+	s = gds_iterator_get(it);
+	str_eq(s, "foo", NULL);
+	gds_iterator_step(it);
+	s = gds_iterator_get(it);
+	str_eq(s, "bar", NULL);
+	gds_iterator_step(it);
+	s = gds_iterator_get(it);
+	str_eq(s, "baz", NULL);
+	ok(0 < gds_iterator_step(it), NULL);
+
+	gds_iterator_free(it);
+	gds_slist_free(list, NULL, NULL);
+	gds_rbtree_fast_free(root, NULL, NULL);
+}
+
 int main()
 {
-	plan(1849);
+	plan(1857);
 
 	t_rbtree_fast_add();
 	t_rbtree_fast_set();
 	t_rbtree_fast_get();
 	t_rbtree_fast_del();
 	t_rbtree_fast_iterator();
+	t_rbtree_fast_keys();
+	t_rbtree_fast_values();
 
 	return EXIT_SUCCESS;
 }

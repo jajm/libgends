@@ -24,6 +24,7 @@
 #include "exception.h"
 #include "check_arg.h"
 #include "log.h"
+#include "slist.h"
 #include "inline/rbtree_fast.h"
 #include "rbtree_fast.h"
 #include "callbacks.h"
@@ -287,4 +288,46 @@ gds_iterator_t * gds_rbtree_fast_iterator_new(gds_rbtree_fast_node_t *root)
 		(gds_free_cb) gds_rbtree_fast_iterator_data_free);
 
 	return it;
+}
+
+void gds_rbtree_fast_build_keys_list(gds_rbtree_fast_node_t *root,
+	gds_slist_t *list)
+{
+	if (root != NULL) {
+		gds_rbtree_fast_build_keys_list(rbt_containerof(
+			root->rbtree.right), list);
+		gds_slist_unshift(list, root->key);
+		gds_rbtree_fast_build_keys_list(rbt_containerof(
+			root->rbtree.left), list);
+	}
+}
+
+gds_slist_t * gds_rbtree_fast_keys(gds_rbtree_fast_node_t *root)
+{
+	gds_slist_t *list = gds_slist_new();
+
+	gds_rbtree_fast_build_keys_list(root, list);
+
+	return list;
+}
+
+void gds_rbtree_fast_build_values_list(gds_rbtree_fast_node_t *root,
+	gds_slist_t *list)
+{
+	if (root != NULL) {
+		gds_rbtree_fast_build_values_list(
+			rbt_containerof(root->rbtree.right), list);
+		gds_slist_unshift(list, root->data);
+		gds_rbtree_fast_build_values_list(
+			rbt_containerof(root->rbtree.left), list);
+	}
+}
+
+gds_slist_t * gds_rbtree_fast_values(gds_rbtree_fast_node_t *root)
+{
+	gds_slist_t *list = gds_slist_new();
+
+	gds_rbtree_fast_build_values_list(root, list);
+
+	return list;
 }
