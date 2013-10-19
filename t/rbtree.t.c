@@ -592,6 +592,39 @@ void t_rbtree_iterator(void)
 	gds_rbtree_free(root, key_free_cb, free_cb);
 }
 
+void t_rbtree_keys()
+{
+	char *keys[] = { "01", "02", "03" };
+	char *data[] = { "foo", "bar", "baz" };
+	char *s;
+	gds_rbtree_node_t *root = NULL;
+	gds_cmpkey_cb cmpkey_cb = (gds_cmpkey_cb) test_cmpkey;
+	gds_slist_t *list;
+	gds_iterator_t *it;
+	int i;
+
+	for (i=0; i<3; i++) {
+		gds_rbtree_add(&root, keys[i], data[i], cmpkey_cb);
+	}
+
+	list = gds_rbtree_keys(root);
+	it = gds_slist_iterator_new(list);
+	gds_iterator_step(it);
+	s = gds_iterator_get(it);
+	str_eq(s, "01", NULL);
+	gds_iterator_step(it);
+	s = gds_iterator_get(it);
+	str_eq(s, "02", NULL);
+	gds_iterator_step(it);
+	s = gds_iterator_get(it);
+	str_eq(s, "03", NULL);
+	ok(0 < gds_iterator_step(it), NULL);
+
+	gds_iterator_free(it);
+	gds_slist_free(list, NULL, NULL);
+	gds_rbtree_free(root, NULL, NULL);
+}
+
 void t_rbtree_values(void)
 {
 	gds_rbtree_node_t *root = NULL;
@@ -628,13 +661,14 @@ void t_rbtree_values(void)
 
 int main()
 {
-	plan(2050);
+	plan(2054);
 
 	t_rbtree_add();
 	t_rbtree_set();
 	t_rbtree_get();
 	t_rbtree_del();
 	t_rbtree_iterator();
+	t_rbtree_keys();
 	t_rbtree_values();
 
 	return EXIT_SUCCESS;
