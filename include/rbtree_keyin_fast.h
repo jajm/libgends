@@ -23,6 +23,8 @@
 #include <stdint.h>
 #include "callbacks.h"
 #include "inline/rbtree_fast.h"
+#include "slist.h"
+#include "iterator.h"
 
 typedef struct {
 	void *data;
@@ -133,6 +135,33 @@ void
 gds_rbtree_keyin_fast_free(
 	gds_rbtree_keyin_fast_node_t *root,
 	gds_free_cb free_cb
+);
+
+/* Create an iterator on a red-black tree.
+ *
+ * Parameters
+ *   root : Pointer to root node.
+ *
+ * Returns
+ *   Pointer to iterator.
+ */
+gds_iterator_t *
+gds_rbtree_keyin_fast_iterator_new(
+	gds_rbtree_keyin_fast_node_t *root,
+	gds_getkey_cb getkey_cb
+);
+
+/* Return list of values contained in tree.
+ *
+ * Parameters
+ *   root : Pointer to root node.
+ *
+ * Returns
+ *   List of values
+ */
+gds_slist_t *
+gds_rbtree_keyin_fast_values(
+	gds_rbtree_keyin_fast_node_t *root
 );
 
 #endif /* Not rbtree_keyin_fast_h_included */

@@ -261,3 +261,109 @@ void gds_rbtree_keyin_fast_free(gds_rbtree_keyin_fast_node_t *root,
 		gds_rbtree_keyin_fast_node_free(root, free_cb);
 	}
 }
+
+typedef struct {
+	gds_rbtree_keyin_fast_node_t *root;
+	gds_iterator_t *inline_rbtree_fast_it;
+	gds_getkey_cb getkey_cb;
+} gds_rbtree_keyin_fast_iterator_data_t;
+
+int gds_rbtree_keyin_fast_iterator_reset(gds_rbtree_keyin_fast_iterator_data_t *data)
+{
+	gds_iterator_free(data->inline_rbtree_fast_it);
+	data->inline_rbtree_fast_it =
+		gds_inline_rbtree_fast_iterator_new(&(data->root->rbtree));
+
+	return 0;
+}
+
+int gds_rbtree_keyin_fast_iterator_step(gds_rbtree_keyin_fast_iterator_data_t *data)
+{
+	return gds_iterator_step(data->inline_rbtree_fast_it);
+}
+
+void * gds_rbtree_keyin_fast_iterator_get(
+	gds_rbtree_keyin_fast_iterator_data_t *data)
+{
+	gds_inline_rbtree_fast_node_t *inline_node;
+	gds_rbtree_keyin_fast_node_t *node;
+
+	inline_node = gds_iterator_get(data->inline_rbtree_fast_it);
+	node = rbt_containerof(inline_node);
+
+	return (node != NULL) ? node->data : NULL;
+}
+
+const void * gds_rbtree_keyin_fast_iterator_getkey(
+	gds_rbtree_keyin_fast_iterator_data_t *data)
+{
+	gds_inline_rbtree_fast_node_t *inline_node;
+	gds_rbtree_keyin_fast_node_t *node;
+	gds_getkey_cb getkey_cb;
+	const void *key = NULL;
+
+	inline_node = gds_iterator_get(data->inline_rbtree_fast_it);
+	node = rbt_containerof(inline_node);
+
+	getkey_cb = data->getkey_cb;
+	if (node != NULL && getkey_cb != NULL) {
+		key = getkey_cb(node->data);
+	}
+
+	return key;
+}
+
+void gds_rbtree_keyin_fast_iterator_data_free(
+	gds_rbtree_keyin_fast_iterator_data_t *data)
+{
+	gds_iterator_free(data->inline_rbtree_fast_it);
+	free(data);
+}
+
+gds_iterator_t * gds_rbtree_keyin_fast_iterator_new(
+	gds_rbtree_keyin_fast_node_t *root, gds_getkey_cb getkey_cb)
+{
+	gds_rbtree_keyin_fast_iterator_data_t *data;
+	gds_iterator_t *it;
+
+	GDS_CHECK_ARG_NOT_NULL(root);
+
+	data = malloc(sizeof(gds_rbtree_keyin_fast_iterator_data_t));
+	if (data == NULL) {
+		GDS_THROW_ALLOC_ERROR(sizeof(gds_rbtree_keyin_fast_iterator_data_t));
+	}
+
+	data->root = root;
+	data->inline_rbtree_fast_it = NULL;
+	data->getkey_cb = getkey_cb;
+
+	it = gds_iterator_new(data,
+		(gds_iterator_reset_cb) gds_rbtree_keyin_fast_iterator_reset,
+		(gds_iterator_step_cb) gds_rbtree_keyin_fast_iterator_step,
+		(gds_iterator_get_cb) gds_rbtree_keyin_fast_iterator_get,
+		(gds_iterator_getkey_cb) gds_rbtree_keyin_fast_iterator_getkey,
+		(gds_free_cb) gds_rbtree_keyin_fast_iterator_data_free);
+
+	return it;
+}
+
+void gds_rbtree_keyin_fast_build_values_list(gds_rbtree_keyin_fast_node_t *root,
+	gds_slist_t *list)
+{
+	if (root != NULL) {
+		gds_rbtree_keyin_fast_build_values_list(
+			rbt_containerof(root->rbtree.right), list);
+		gds_slist_unshift(list, root->data);
+		gds_rbtree_keyin_fast_build_values_list(
+			rbt_containerof(root->rbtree.left), list);
+	}
+}
+
+gds_slist_t * gds_rbtree_keyin_fast_values(gds_rbtree_keyin_fast_node_t *root)
+{
+	gds_slist_t *list = gds_slist_new();
+
+	gds_rbtree_keyin_fast_build_values_list(root, list);
+
+	return list;
+}
