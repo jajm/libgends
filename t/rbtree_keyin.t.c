@@ -482,6 +482,71 @@ void t_rbtree_keyin_del(void)
 	}
 }
 
+void t_rbtree_keyin_iterator(void)
+{
+	gds_rbtree_keyin_node_t *root = NULL;
+	gds_iterator_t *it;
+	test_t *t;
+	char buf[512];
+	int i;
+	const char *key;
+	gds_cmpkey_cb cmpkey_cb = (gds_cmpkey_cb)test_cmpkey;
+	gds_getkey_cb getkey_cb = (gds_getkey_cb)test_getkey;
+	gds_free_cb free_cb = (gds_free_cb)test_free;
+
+	for(i=0; i<5; i++) {
+		sprintf(buf, "key %02d", i);
+		t = test_new(buf, i);
+		gds_rbtree_keyin_add(&root, t, getkey_cb, cmpkey_cb);
+	}
+
+	it = gds_rbtree_keyin_iterator_new(root, getkey_cb);
+	isntnull(it, NULL);
+
+	isnull(gds_iterator_get(it), NULL);
+	isnull(gds_iterator_getkey(it), NULL);
+
+	ok(0 == gds_iterator_step(it), NULL);
+	t = gds_iterator_get(it);
+	key = gds_iterator_getkey(it);
+	isntnull(t, NULL);
+	isntnull(key, NULL);
+	str_eq(key, "key 00", NULL);
+
+	ok(0 == gds_iterator_step(it), NULL);
+	t = gds_iterator_get(it);
+	key = gds_iterator_getkey(it);
+	isntnull(t, NULL);
+	isntnull(key, NULL);
+	str_eq(key, "key 01", NULL);
+
+	ok(0 == gds_iterator_step(it), NULL);
+	t = gds_iterator_get(it);
+	key = gds_iterator_getkey(it);
+	isntnull(t, NULL);
+	isntnull(key, NULL);
+	str_eq(key, "key 02", NULL);
+
+	ok(0 == gds_iterator_step(it), NULL);
+	t = gds_iterator_get(it);
+	key = gds_iterator_getkey(it);
+	isntnull(t, NULL);
+	isntnull(key, NULL);
+	str_eq(key, "key 03", NULL);
+
+	ok(0 == gds_iterator_step(it), NULL);
+	t = gds_iterator_get(it);
+	key = gds_iterator_getkey(it);
+	isntnull(t, NULL);
+	isntnull(key, NULL);
+	str_eq(key, "key 04", NULL);
+
+	ok(0 < gds_iterator_step(it), NULL);
+
+	gds_iterator_free(it);
+	gds_rbtree_keyin_free(root, free_cb);
+}
+
 void t_rbtree_keyin_values(void)
 {
 	gds_rbtree_keyin_node_t *root = NULL;
@@ -520,12 +585,13 @@ void t_rbtree_keyin_values(void)
 
 int main()
 {
-	plan(2207);
+	plan(2231);
 
 	t_rbtree_keyin_add();
 	t_rbtree_keyin_set();
 	t_rbtree_keyin_get();
 	t_rbtree_keyin_del();
+	t_rbtree_keyin_iterator();
 	t_rbtree_keyin_values();
 
 	return EXIT_SUCCESS;

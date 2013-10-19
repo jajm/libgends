@@ -24,6 +24,7 @@
 #include "callbacks.h"
 #include "slist.h"
 #include "inline/rbtree.h"
+#include "iterator.h"
 
 typedef struct {
 	void *data;
@@ -133,6 +134,20 @@ void
 gds_rbtree_keyin_free(
 	gds_rbtree_keyin_node_t *root,
 	gds_free_cb free_cb
+);
+
+/* Create an iterator on a red-black tree.
+ *
+ * Parameters
+ *   root : Pointer to root node.
+ *
+ * Returns
+ *   Pointer to iterator.
+ */
+gds_iterator_t *
+gds_rbtree_keyin_iterator_new(
+	gds_rbtree_keyin_node_t *root,
+	gds_getkey_cb getkey_cb
 );
 
 /* Return list of values contained in tree.
