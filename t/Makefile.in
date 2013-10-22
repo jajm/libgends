@@ -16,6 +16,7 @@ rbtree_keyin_fast.t: test.o
 rbtree_keyin.t: test.o
 rbtree.t: test.o
 hash_map_keyin.t: test.o
+hash_map_keyin_fast.t: test.o
 
 %.o: %.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<

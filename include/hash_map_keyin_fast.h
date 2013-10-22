@@ -92,6 +92,27 @@ gds_hash_map_keyin_fast_unset(
 	gds_free_cb free_cb
 );
 
+/* Create a new iterator.
+ *
+ * Parameters
+ *   h : Pointer to hash
+ *
+ * Returns
+ *   Pointer to the newly created iterator.
+ */
+gds_iterator_t *
+gds_hash_map_keyin_fast_iterator_new(
+	gds_hash_map_keyin_fast_t *h
+);
+
+#define gds_hash_map_keyin_fast_foreach(key, val, hash) \
+	for (gds_iterator_t *gds_hash_map_keyin_fast_it = gds_hash_map_keyin_fast_iterator_new(hash) \
+		; gds_hash_map_keyin_fast_it != NULL \
+		; gds_iterator_free(gds_hash_map_keyin_fast_it), gds_hash_map_keyin_fast_it = NULL) \
+	while (!gds_iterator_step(gds_hash_map_keyin_fast_it) \
+		&& ((key = gds_iterator_getkey(gds_hash_map_keyin_fast_it)) || !key) \
+		&& ((val = gds_iterator_get(gds_hash_map_keyin_fast_it)) || !val))
+
 /* Return values contained in the hash map as a list */
 /*         h : pointer to the hash map */
 /* Return: pointer to the list */
