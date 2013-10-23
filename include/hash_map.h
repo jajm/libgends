@@ -41,11 +41,16 @@ typedef struct gds_hash_map_s gds_hash_map_t;
 extern "C" {
 #endif
 
-/* Create a new hash map */
-/* size: the number of buckets
- *   hash_cb : hash callback
- * cmpkey_cb : cmpkey callback */
-/* Return: a pointer to the new hash map */
+/* Create a new hash map
+ *
+ * Parameters
+ *   size      : the number of buckets
+ *   hash_cb   : hash callback
+ *   cmpkey_cb : cmpkey callback
+ *
+ * Returns
+ *   a pointer to the new hash map
+ */
 gds_hash_map_t *
 gds_hash_map_new(
 	uint32_t size,
@@ -61,6 +66,7 @@ gds_hash_map_new(
  *   key     : key to insert
  *   data    : data to insert
  *   free_cb : free callback for data
+ *
  * Returns
  *   0: key was just added
  *   1: key was already in the hash
@@ -74,23 +80,33 @@ gds_hash_map_set(
 	gds_free_cb free_cb
 );
 
-/* Get a value given its key */
-/*         h : pointer to the hash map
- *       key : key to unset */
-/* Return: pointer to the data, or NULL if key doesn't exist */
+/* Get a value given its key
+ *
+ * Parameters
+ *   h   : pointer to the hash map
+ *   key : key to unset
+ *
+ * Returns
+ *   pointer to the data, or NULL if key doesn't exist
+ */
 void *
 gds_hash_map_get(
 	gds_hash_map_t *h,
 	const void *key
 );
 
-/* Unset a key/value pair in the hash map */
-/*           h : pointer to the hash map
- *         key : key to unset
- * key_free_cb : free callback for key
- *     free_cb : free callback for data */
-/* Return: 0: key was correctly unset
- *         1: key was not in the hash map */
+/* Unset a key/value pair in the hash map
+ *
+ * Parameters
+ *   h           : pointer to the hash map
+ *   key         : key to unset
+ *   key_free_cb : free callback for key
+ *   free_cb     : free callback for data
+ *
+ * Returns
+ *   0: key was correctly unset
+ *   1: key was not in the hash map
+ */
 int
 gds_hash_map_unset(
 	gds_hash_map_t *h,
@@ -99,6 +115,11 @@ gds_hash_map_unset(
 	gds_free_cb free_cb
 );
 
+/* Create a new iterator.
+ *
+ * Parameters
+ *   h : pointer to hash map
+ */
 gds_iterator_t *
 gds_hash_map_iterator_new(
 	gds_hash_map_t *h
@@ -112,35 +133,51 @@ gds_hash_map_iterator_new(
 		&& ((key = gds_iterator_getkey(gds_hash_map_it)) || !key) \
 		&& ((val = gds_iterator_get(gds_hash_map_it)) || !val))
 
-/* Return keys contained in the hash map as a list */
-/* h : pointer to the hash map */
-/* Return: pointer to the list */
+/* Return keys contained in the hash map as a list.
+ *
+ * Parameters
+ *   h : pointer to the hash map
+ *
+ * Returns
+ *   pointer to the list
+ */
 gds_slist_t *
 gds_hash_map_keys(
 	gds_hash_map_t *h
 );
 
-/* Return values contained in the hash map as a list */
-/* h : pointer to the hash map */
-/* Return: pointer to the list */
+/* Return values contained in the hash map as a list
+ *
+ * Parameters
+ *   h : pointer to the hash map
+ *
+ * Returns
+ *   pointer to the list
+ */
 gds_slist_t *
 gds_hash_map_values(
 	gds_hash_map_t *h
 );
 
-/* Change the number of buckets of hash map */
-/*        h : pointer to the hash map
- * new_size : New size (number of buckets) */
+/* Change the number of buckets of hash map
+ *
+ * Parameters
+ *   h        : pointer to the hash map
+ *   new_size : New size (number of buckets)
+ */
 void
 gds_hash_map_change_size(
 	gds_hash_map_t *h,
 	uint32_t new_size
 );
 
-/* Free hash map */
-/*           h : pointer to the hash map
- * key_free_cb : free callback for key
- *     free_cb : free callback for data */
+/* Free hash map
+ *
+ * Parameters
+ *   h           : pointer to the hash map
+ *   key_free_cb : free callback for key
+ *   free_cb     : free callback for data
+ */
 void
 gds_hash_map_free(
 	gds_hash_map_t *h,
