@@ -115,6 +115,44 @@ gds_hash_map_fast_iterator_new(
 		&& ((key = gds_iterator_getkey(gds_hash_map_fast_it)) || !key) \
 		&& ((val = gds_iterator_get(gds_hash_map_fast_it)) || !val))
 
+/* Return keys contained in the hash map as a list.
+ *
+ * Parameters
+ *   h : pointer to the hash map
+ *
+ * Returns
+ *   pointer to the list
+ */
+gds_slist_t *
+gds_hash_map_fast_keys(
+	gds_hash_map_fast_t *h
+);
+
+/* Return values contained in the hash map as a list
+ *
+ * Parameters
+ *   h : pointer to the hash map
+ *
+ * Returns
+ *   pointer to the list
+ */
+gds_slist_t *
+gds_hash_map_fast_values(
+	gds_hash_map_fast_t *h
+);
+
+/* Change the number of buckets of hash map
+ *
+ * Parameters
+ *   h        : pointer to the hash map
+ *   new_size : New size (number of buckets)
+ */
+void
+gds_hash_map_fast_change_size(
+	gds_hash_map_fast_t *h,
+	uint32_t new_size
+);
+
 /* Free hash map */
 /*           h : pointer to the hash map
  * key_free_cb : free callback for key

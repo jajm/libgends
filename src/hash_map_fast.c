@@ -190,6 +190,84 @@ gds_iterator_t * gds_hash_map_fast_iterator_new(gds_hash_map_fast_t *h)
 	return it;
 }
 
+gds_slist_t * gds_hash_map_fast_keys(gds_hash_map_fast_t *h)
+{
+	gds_slist_t *l = gds_slist_new();
+	gds_slist_t *list;
+	uint32_t i;
+
+	GDS_CHECK_ARG_NOT_NULL(h);
+
+	for (i = h->size; i > 0; i--) {
+		list = gds_rbtree_fast_keys(h->map[i-1]);
+		if (list != NULL) {
+			gds_slist_splice(l, 0, 0, NULL, NULL, list);
+			gds_slist_free(list, NULL, NULL);
+		}
+	}
+
+	return l;
+}
+
+gds_slist_t * gds_hash_map_fast_values(gds_hash_map_fast_t *h)
+{
+	gds_slist_t *l = gds_slist_new();
+	gds_slist_t *list;
+	uint32_t i;
+
+	GDS_CHECK_ARG_NOT_NULL(h);
+
+	for (i = h->size; i > 0; i--) {
+		list = gds_rbtree_fast_values(h->map[i-1]);
+		if (list != NULL) {
+			gds_slist_splice(l, 0, 0, NULL, NULL, list);
+			gds_slist_free(list, NULL, NULL);
+		}
+	}
+
+	return l;
+}
+
+gds_rbtree_fast_node_t ** gds_hash_map_fast_build_map(gds_hash_map_fast_t *h, uint32_t size)
+{
+	gds_rbtree_fast_node_t **map;
+	gds_iterator_t *it;
+	uint32_t hash;
+	void *k, *v;
+
+	map = calloc(size, sizeof(gds_rbtree_fast_node_t *));
+	if (map == NULL) {
+		GDS_THROW_ALLOC_ERROR(sizeof(gds_rbtree_fast_node_t *));
+	}
+	it = gds_hash_map_fast_iterator_new(h);
+	gds_iterator_reset(it);
+	while (!gds_iterator_step(it)) {
+		v = gds_iterator_get(it);
+		k = gds_iterator_getkey(it);
+		hash = h->hash_cb(k, size) % size;
+		gds_rbtree_fast_add(&(map[hash]), k, v, h->cmpkey_cb);
+	}
+	gds_iterator_free(it);
+
+	return map;
+}
+
+void gds_hash_map_fast_change_size(gds_hash_map_fast_t *h, uint32_t new_size)
+{
+	gds_rbtree_fast_node_t **map;
+
+	GDS_CHECK_ARG_NOT_NULL(h);
+	GDS_CHECK_ARG_NOT_ZERO(new_size);
+
+	map = gds_hash_map_fast_build_map(h, new_size);
+	for (uint32_t i = 0; i < h->size; i++) {
+		gds_rbtree_fast_free(h->map[i], NULL, NULL);
+	}
+	free(h->map);
+	h->map = map;
+	h->size = new_size;
+}
+
 void gds_hash_map_fast_free(gds_hash_map_fast_t *h, gds_free_cb key_free_cb,
 	gds_free_cb free_cb)
 {
