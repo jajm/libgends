@@ -1,9 +1,8 @@
 include ../config.mk
 
-HEADERS := $(wildcard *.h)
+HEADERS := $(wildcard *.h) $(wildcard inline/*.h)
 
 all:
 
 install:
-	$(INSTALL) -d $(INCLUDEDIR)
-	$(INSTALL) --mode=0644 $(HEADERS) $(INCLUDEDIR)
+	$(foreach header, $(HEADERS), $(INSTALL) -D --mode=0644 $(header) $(INCLUDEDIR)/$(header);)
