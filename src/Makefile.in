@@ -33,5 +33,5 @@ install: $(LIBRARY_NAME)
 	$(LIBTOOL) --mode=install $(INSTALL) $< $(LIBDIR)
 
 clean:
-	rm -rf *.o *.lo $(LIBRARY_NAME)
-	rm -rf .deps .libs
+	rm -rf *.o *.lo inline/*.o inline/*.lo $(LIBRARY_NAME)
+	rm -rf .deps .libs inline/.deps inline/.libs
