@@ -37,18 +37,14 @@
  * See slist.h or dlist.h for examples of implementation
  */
 
-#include <stdbool.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include "exception.h"
 #include "check_arg.h"
 #include "log.h"
 #include "iterator.h"
-#include "callbacks.h"
 
-gds_iterator_t *gds_iterator_new(void *data, gds_iterator_reset_cb reset_cb,
-	gds_iterator_step_cb step_cb, gds_iterator_get_cb get_cb,
-	gds_iterator_getkey_cb getkey_cb, gds_free_cb free_cb)
+gds_iterator_t *gds_iterator_new(void *data, void *reset_cb, void *step_cb,
+	void *get_cb, void *getkey_cb, void *free_cb)
 {
 	gds_iterator_t *it;
 

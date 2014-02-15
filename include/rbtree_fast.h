@@ -21,7 +21,6 @@
 #define rbtree_fast_h_included
 
 #include <stdint.h>
-#include "callbacks.h"
 #include "slist.h"
 #include "inline/rbtree_fast.h"
 
@@ -37,10 +36,13 @@ typedef struct {
  *   root      : pointer to the root node pointer
  *   key       : pointer to key
  *   data      : pointer to the data
- *   cmpkey_cb : function that takes two keys and compare them.
- *               Should return 0 if keys are the same, a negative number if
- *               first key is lesser than second key, and a positive number
- *               otherwise.
+ *   cmpkey_cb : cmpkey callback
+ *               Prototype: int cmpkey_cb(const void *key1, const void *key2)
+ *               It should compare key1 to key2 and returns:
+ *               - a negative value if key1 < key2
+ *               - 0 if key1 == key2
+ *               - a positive value if key1 > key2
+ *
  * Returns
  *   0 on success
  *   a negative value on failure
@@ -51,7 +53,7 @@ gds_rbtree_fast_add(
 	gds_rbtree_fast_node_t **root,
 	void *key,
 	void *data,
-	gds_cmpkey_cb cmpkey_cb
+	void *cmpkey_cb
 );
 
 /* Insert or replace data into the tree.
@@ -60,9 +62,18 @@ gds_rbtree_fast_add(
  *   root        : pointer to the root node pointer
  *   key         : pointer to key
  *   data        : pointer to data
- *   cmpkey_cb   : callback that should takes two keys and compare them.
- *   key_free_cb : callback that should free key.
- *   free_cb     : callback that should free data.
+ *   cmpkey_cb   : cmpkey callback
+ *                 Prototype: int cmpkey_cb(const void *key1, const void *key2)
+ *                 It should compare key1 to key2 and returns:
+ *                 - a negative value if key1 < key2
+ *                 - 0 if key1 == key2
+ *                 - a positive value if key1 > key2
+ *   key_free_cb : key_free callback
+ *                 Prototype: void key_free_cb(void *key)
+ *                 It should free memory used by object referenced by key
+ *   free_cb     : free callback
+ *                 Prototype: void free_cb(void *ptr)
+ *                 It should free memory used by object referenced by ptr
  *
  * Returns
  *   0 if key was already in the hash map
@@ -73,9 +84,9 @@ gds_rbtree_fast_set(
 	gds_rbtree_fast_node_t **root,
 	void *key,
 	void *data,
-	gds_cmpkey_cb cmpkey_cb,
-	gds_free_cb key_free_cb,
-	gds_free_cb free_cb
+	void *cmpkey_cb,
+	void *key_free_cb,
+	void *free_cb
 );
 
 /* Retrieve data from the tree.
@@ -83,7 +94,12 @@ gds_rbtree_fast_set(
  * Parameters
  *   root      : pointer to the root node
  *   key       : pointer to key
- *   cmpkey_cb : callback that should takes two keys and compare them
+ *   cmpkey_cb : cmpkey callback
+ *               Prototype: int cmpkey_cb(const void *key1, const void *key2)
+ *               It should compare key1 to key2 and returns:
+ *               - a negative value if key1 < key2
+ *               - 0 if key1 == key2
+ *               - a positive value if key1 > key2
  *
  * Returns
  *   pointer to the data
@@ -93,7 +109,7 @@ void *
 gds_rbtree_fast_get(
 	gds_rbtree_fast_node_t *root,
 	const void *key,
-	gds_cmpkey_cb cmpkey_cb
+	void *cmpkey_cb
 );
 
 /* Remove a node from the tree.
@@ -101,9 +117,18 @@ gds_rbtree_fast_get(
  * Parameters
  *   root        : pointer to the root node pointer
  *   key         : pointer to key
- *   cmpkey_cp   : callback that should takes two keys and compare them
- *   key_free_cb : callback that should free key
- *   free_cb     : callback that should free data
+ *   cmpkey_cb   : cmpkey callback
+ *                 Prototype: int cmpkey_cb(const void *key1, const void *key2)
+ *                 It should compare key1 to key2 and returns:
+ *                 - a negative value if key1 < key2
+ *                 - 0 if key1 == key2
+ *                 - a positive value if key1 > key2
+ *   key_free_cb : key_free callback
+ *                 Prototype: void key_free_cb(void *key)
+ *                 It should free memory used by object referenced by key
+ *   free_cb     : free callback
+ *                 Prototype: void free_cb(void *ptr)
+ *                 It should free memory used by object referenced by ptr
  *
  * Returns
  *   0 if node was successfully deleted.
@@ -113,23 +138,27 @@ int
 gds_rbtree_fast_del(
 	gds_rbtree_fast_node_t **root,
 	const void *key,
-	gds_cmpkey_cb cmpkey_cb,
-	gds_free_cb key_free_cb,
-	gds_free_cb free_cb
+	void *cmpkey_cb,
+	void *key_free_cb,
+	void *free_cb
 );
 
 /* Destroy the entire tree.
  *
  * Parameters
  *   root        : pointer to the root node
- *   key_free_cb : callback that should free key
- *   free_cb     : callback that should free data
+ *   key_free_cb : key_free callback
+ *                 Prototype: void key_free_cb(void *key)
+ *                 It should free memory used by object referenced by key
+ *   free_cb     : free callback
+ *                 Prototype: void free_cb(void *ptr)
+ *                 It should free memory used by object referenced by ptr
  */
 void
 gds_rbtree_fast_free(
 	gds_rbtree_fast_node_t *root,
-	gds_free_cb key_free_cb,
-	gds_free_cb free_cb
+	void *key_free_cb,
+	void *free_cb
 );
 
 /* Create a new iterator.

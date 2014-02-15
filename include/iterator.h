@@ -39,15 +39,6 @@
 #ifndef iterator_h_included
 #define iterator_h_included
 
-#include <stdint.h>
-#include <stdbool.h>
-#include "callbacks.h"
-
-typedef int (*gds_iterator_reset_cb)(void *);
-typedef int (*gds_iterator_step_cb)(void *);
-typedef void * (*gds_iterator_get_cb)(void *);
-typedef void * (*gds_iterator_getkey_cb)(void *);
-
 typedef struct {
 	/* Used to store iterator-specific information
 	 * It will be passed to the four following functions */
@@ -56,28 +47,28 @@ typedef struct {
 	/* This function must reset the iterator to beginning
 	 * It must take one argument (data) and return 0 on success,
 	 * a negative value otherwise */
-	gds_iterator_reset_cb reset_cb;
+	int (*reset_cb)(void *data);
 
 	/* This function must move iterator to the next element
 	 * It must take one argument (data) and return 0 on success,
 	 * a positive value if iterator has reached the end, and a negative
 	 * value otherwise */
-	gds_iterator_step_cb step_cb;
+	int (*step_cb)(void *data);
 
 	/* This fuction must return data of element pointed by iterator
 	 * It must take one argument (data) and return a valid pointer on
 	 * success, or NULL otherwise */
-	gds_iterator_get_cb get_cb;
+	void * (*get_cb)(void *data);
 
 	/* This function must return key of element pointed by iterator, if any.
 	 * It must take one argument (data) and return a valid pointer on
 	 * success, or NULL otherwise. */
-	gds_iterator_getkey_cb getkey_cb;
+	void * (*getkey_cb)(void *data);
 
 	/* This function must free data referenced by 'data' member.
 	 * It must take one argument (data).
 	 * It can be NULL, in this case data won't be freed. */
-	gds_free_cb free_cb;
+	void (*free_cb)(void *data);
 } gds_iterator_t;
 
 #ifdef __cplusplus
@@ -91,11 +82,11 @@ extern "C" {
 gds_iterator_t *
 gds_iterator_new(
 	void *data,
-	gds_iterator_reset_cb reset_cb,
-	gds_iterator_step_cb step_cb,
-	gds_iterator_get_cb get_cb,
-	gds_iterator_getkey_cb getkey_cb,
-	gds_free_cb free_cb
+	void *reset_cb,
+	void *step_cb,
+	void *get_cb,
+	void *getkey_cb,
+	void *free_cb
 );
 
 /* Alias for it->reset_cb(it->data) */

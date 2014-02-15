@@ -21,7 +21,6 @@
 #define rbtree_keyin_h_included
 
 #include <stdint.h>
-#include "callbacks.h"
 #include "slist.h"
 #include "inline/rbtree.h"
 #include "iterator.h"
@@ -36,12 +35,15 @@ typedef struct {
  * Parameters
  *   root      : pointer to pointer to the root node
  *   data      : pointer to the data
- *   getkey_cb : function that takes a pointer and return a key for the pointed
- *               data. Key will be used to determine where the new node will be
- *               inserted
- *   cmpkey_cb : function that takes two keys and compare them. Should return 0
- *               if keys are the same, a negative number if first key is lesser
- *               than second key, and a positive number otherwise.
+ *   getkey_cb : getkey callback
+ *               Prototype: void * getkey_cb(const void *ptr)
+ *               It should return the key of object referenced by ptr.
+ *   cmpkey_cb : cmpkey callback
+ *               Prototype: int cmpkey_cb(const void *key1, const void *key2)
+ *               It should compare key1 to key2 and returns:
+ *               - a negative value if key1 < key2
+ *               - 0 if key1 == key2
+ *               - a positive value if key1 > key2
  *
  * Returns
  *   0 on success
@@ -51,8 +53,8 @@ int
 gds_rbtree_keyin_add(
 	gds_rbtree_keyin_node_t **root,
 	void *data,
-	gds_getkey_cb getkey_cb,
-	gds_cmpkey_cb cmpkey_cb
+	void *getkey_cb,
+	void *cmpkey_cb
 );
 
 /* Set data of a node in red-black tree.
@@ -64,9 +66,18 @@ gds_rbtree_keyin_add(
  *   root      : Pointer to pointer to root node. Will be updated to point to
  *               the root node, if the root changes.
  *   data      : Node's data
- *   getkey_cb : Callback function to get key from data.
- *   cmpkey_cb : Callback function to compare two keys.
- *   free_cb   : Callback function to free memory used by data.
+ *   getkey_cb : getkey callback
+ *               Prototype: void * getkey_cb(const void *ptr)
+ *               It should return the key of object referenced by ptr.
+ *   cmpkey_cb : cmpkey callback
+ *               Prototype: int cmpkey_cb(const void *key1, const void *key2)
+ *               It should compare key1 to key2 and returns:
+ *               - a negative value if key1 < key2
+ *               - 0 if key1 == key2
+ *               - a positive value if key1 > key2
+ *   free_cb   : free callback
+ *               Prototype: void free_cb(void *ptr)
+ *               It should free memory used by object referenced by ptr
  *
  * Returns
  *   0 if key was not in the tree (node added)
@@ -76,9 +87,9 @@ int
 gds_rbtree_keyin_set(
 	gds_rbtree_keyin_node_t **root,
 	void *data,
-	gds_getkey_cb getkey_cb,
-	gds_cmpkey_cb cmpkey_cb,
-	gds_free_cb free_cb
+	void *getkey_cb,
+	void *cmpkey_cb,
+	void *free_cb
 );
 
 /* Get data of a node in red-black tree.
@@ -86,8 +97,15 @@ gds_rbtree_keyin_set(
  * Parameters
  *   root      : Pointer to root node.
  *   key       : Key of node to retrieve.
- *   getkey_cb : Callback function to get key from data.
- *   cmpkey_cb : Callback function to compare two keys.
+ *   getkey_cb : getkey callback
+ *               Prototype: void * getkey_cb(const void *ptr)
+ *               It should return the key of object referenced by ptr.
+ *   cmpkey_cb : cmpkey callback
+ *               Prototype: int cmpkey_cb(const void *key1, const void *key2)
+ *               It should compare key1 to key2 and returns:
+ *               - a negative value if key1 < key2
+ *               - 0 if key1 == key2
+ *               - a positive value if key1 > key2
  *
  * Returns
  *   Pointer to data.
@@ -97,8 +115,8 @@ void *
 gds_rbtree_keyin_get(
 	gds_rbtree_keyin_node_t *root,
 	const void *key,
-	gds_getkey_cb getkey_cb,
-	gds_cmpkey_cb cmpkey_cb
+	void *getkey_cb,
+	void *cmpkey_cb
 );
 
 /* Remove a node from a red-black tree.
@@ -107,9 +125,18 @@ gds_rbtree_keyin_get(
  *   root      : Pointer to pointer to root node. Will be updated to point to
  *               root node, if root changes.
  *   key       : Key of node to remove
- *   getkey_cb : Callback function to get key from data.
- *   cmpkey_cb : Callback function to compare two keys.
- *   free_cb   : Callback function to free memory used by data.
+ *   getkey_cb : getkey callback
+ *               Prototype: void * getkey_cb(const void *ptr)
+ *               It should return the key of object referenced by ptr.
+ *   cmpkey_cb : cmpkey callback
+ *               Prototype: int cmpkey_cb(const void *key1, const void *key2)
+ *               It should compare key1 to key2 and returns:
+ *               - a negative value if key1 < key2
+ *               - 0 if key1 == key2
+ *               - a positive value if key1 > key2
+ *   free_cb   : free callback
+ *               Prototype: void free_cb(void *ptr)
+ *               It should free memory used by object referenced by ptr
  *
  * Returns
  *   0 if node was successfully deleted.
@@ -119,27 +146,32 @@ int
 gds_rbtree_keyin_del(
 	gds_rbtree_keyin_node_t **root,
 	const void *key,
-	gds_getkey_cb getkey_cb,
-	gds_cmpkey_cb cmpkey_cb,
-	gds_free_cb free_cb
+	void *getkey_cb,
+	void *cmpkey_cb,
+	void *free_cb
 );
 
 /* Destroy a red-black-tree.
  *
  * Parameters
  *   root    : Pointer to root node.
- *   free_cb : Callback function to free memory used by data.
+ *   free_cb : free callback
+ *             Prototype: void free_cb(void *ptr)
+ *             It should free memory used by object referenced by ptr
  */
 void
 gds_rbtree_keyin_free(
 	gds_rbtree_keyin_node_t *root,
-	gds_free_cb free_cb
+	void *free_cb
 );
 
 /* Create an iterator on a red-black tree.
  *
  * Parameters
  *   root : Pointer to root node.
+ *   getkey_cb : getkey callback
+ *               Prototype: void * getkey_cb(const void *ptr)
+ *               It should return the key of object referenced by ptr.
  *
  * Returns
  *   Pointer to iterator.
@@ -147,7 +179,7 @@ gds_rbtree_keyin_free(
 gds_iterator_t *
 gds_rbtree_keyin_iterator_new(
 	gds_rbtree_keyin_node_t *root,
-	gds_getkey_cb getkey_cb
+	void *getkey_cb
 );
 
 /* Return list of values contained in tree.

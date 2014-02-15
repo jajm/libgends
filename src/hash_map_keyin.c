@@ -199,12 +199,11 @@ gds_iterator_t * gds_hash_map_keyin_iterator_new(gds_hash_map_keyin_t *h)
 	data->hash = h;
 	data->rbtree_keyin_it = NULL;
 
-	it = gds_iterator_new(data,
-		(gds_iterator_reset_cb) gds_hash_map_keyin_iterator_reset,
-		(gds_iterator_step_cb) gds_hash_map_keyin_iterator_step,
-		(gds_iterator_get_cb) gds_hash_map_keyin_iterator_get,
-		(gds_iterator_getkey_cb) gds_hash_map_keyin_iterator_getkey,
-		(gds_free_cb) gds_hash_map_keyin_iterator_data_free);
+	it = gds_iterator_new(data, gds_hash_map_keyin_iterator_reset,
+		gds_hash_map_keyin_iterator_step,
+		gds_hash_map_keyin_iterator_get,
+		gds_hash_map_keyin_iterator_getkey,
+		gds_hash_map_keyin_iterator_data_free);
 
 	return it;
 }

@@ -19,76 +19,73 @@ int test_hash(const char *key)
 void t_hash_map_keyin_new(void)
 {
 	gds_hash_map_keyin_t *hash;
-	gds_cmpkey_cb cmpkey_cb = (gds_cmpkey_cb) test_cmpkey;
-	gds_getkey_cb getkey_cb = (gds_getkey_cb) test_getkey;
-	gds_hash_cb hash_cb = (gds_hash_cb) test_hash;
 
 	GDS_ASSERT_THROW(BadArgumentException,
 		gds_hash_map_keyin_new(0, NULL, NULL, NULL, NULL));
 	GDS_ASSERT_THROW(BadArgumentException,
 		gds_hash_map_keyin_new(0, NULL, NULL, NULL, free));
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(0, NULL, NULL, cmpkey_cb, NULL));
+		gds_hash_map_keyin_new(0, NULL, NULL, test_cmpkey, NULL));
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(0, NULL, NULL, cmpkey_cb, free));
+		gds_hash_map_keyin_new(0, NULL, NULL, test_cmpkey, free));
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(0, NULL, getkey_cb, NULL, NULL));
+		gds_hash_map_keyin_new(0, NULL, test_getkey, NULL, NULL));
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(0, NULL, getkey_cb, NULL, free));
+		gds_hash_map_keyin_new(0, NULL, test_getkey, NULL, free));
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(0, NULL, getkey_cb, cmpkey_cb, NULL));
+		gds_hash_map_keyin_new(0, NULL, test_getkey, test_cmpkey, NULL));
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(0, NULL, getkey_cb, cmpkey_cb, free));
+		gds_hash_map_keyin_new(0, NULL, test_getkey, test_cmpkey, free));
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(0, hash_cb, NULL, NULL, NULL));
+		gds_hash_map_keyin_new(0, test_hash, NULL, NULL, NULL));
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(0, hash_cb, NULL, NULL, free));
+		gds_hash_map_keyin_new(0, test_hash, NULL, NULL, free));
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(0, hash_cb, NULL, cmpkey_cb, NULL));
+		gds_hash_map_keyin_new(0, test_hash, NULL, test_cmpkey, NULL));
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(0, hash_cb, NULL, cmpkey_cb, free));
+		gds_hash_map_keyin_new(0, test_hash, NULL, test_cmpkey, free));
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(0, hash_cb, getkey_cb, NULL, NULL));
+		gds_hash_map_keyin_new(0, test_hash, test_getkey, NULL, NULL));
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(0, hash_cb, getkey_cb, NULL, free));
+		gds_hash_map_keyin_new(0, test_hash, test_getkey, NULL, free));
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(0, hash_cb, getkey_cb, cmpkey_cb, NULL));
+		gds_hash_map_keyin_new(0, test_hash, test_getkey, test_cmpkey, NULL));
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(0, hash_cb, getkey_cb, cmpkey_cb, free));
+		gds_hash_map_keyin_new(0, test_hash, test_getkey, test_cmpkey, free));
 	GDS_ASSERT_THROW(BadArgumentException,
 		gds_hash_map_keyin_new(32, NULL, NULL, NULL, NULL));
 	GDS_ASSERT_THROW(BadArgumentException,
 		gds_hash_map_keyin_new(32, NULL, NULL, NULL, free));
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(32, NULL, NULL, cmpkey_cb, NULL));
+		gds_hash_map_keyin_new(32, NULL, NULL, test_cmpkey, NULL));
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(32, NULL, NULL, cmpkey_cb, free));
+		gds_hash_map_keyin_new(32, NULL, NULL, test_cmpkey, free));
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(32, NULL, getkey_cb, NULL, NULL));
+		gds_hash_map_keyin_new(32, NULL, test_getkey, NULL, NULL));
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(32, NULL, getkey_cb, NULL, free));
+		gds_hash_map_keyin_new(32, NULL, test_getkey, NULL, free));
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(32, NULL, getkey_cb, cmpkey_cb, NULL));
+		gds_hash_map_keyin_new(32, NULL, test_getkey, test_cmpkey, NULL));
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(32, NULL, getkey_cb, cmpkey_cb, free));
+		gds_hash_map_keyin_new(32, NULL, test_getkey, test_cmpkey, free));
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(32, hash_cb, NULL, NULL, NULL));
+		gds_hash_map_keyin_new(32, test_hash, NULL, NULL, NULL));
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(32, hash_cb, NULL, NULL, free));
+		gds_hash_map_keyin_new(32, test_hash, NULL, NULL, free));
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(32, hash_cb, NULL, cmpkey_cb, NULL));
+		gds_hash_map_keyin_new(32, test_hash, NULL, test_cmpkey, NULL));
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(32, hash_cb, NULL, cmpkey_cb, free));
+		gds_hash_map_keyin_new(32, test_hash, NULL, test_cmpkey, free));
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(32, hash_cb, getkey_cb, NULL, NULL));
+		gds_hash_map_keyin_new(32, test_hash, test_getkey, NULL, NULL));
 	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(32, hash_cb, getkey_cb, NULL, free));
+		gds_hash_map_keyin_new(32, test_hash, test_getkey, NULL, free));
 
-	hash = gds_hash_map_keyin_new(32, hash_cb, getkey_cb, cmpkey_cb, NULL);
+	hash = gds_hash_map_keyin_new(32, test_hash, test_getkey, test_cmpkey, NULL);
 	isntnull(hash, "hash creation succeeded");
 	gds_hash_map_keyin_free(hash);
 
-	hash = gds_hash_map_keyin_new(32, hash_cb, getkey_cb, cmpkey_cb, free);
+	hash = gds_hash_map_keyin_new(32, test_hash, test_getkey, test_cmpkey, free);
 	isntnull(hash, "hash creation succeeded");
 	gds_hash_map_keyin_free(hash);
 }

@@ -21,7 +21,6 @@
 #include <stdlib.h>
 #include "exception.h"
 #include "check_arg.h"
-#include "callbacks.h"
 #include "log.h"
 #include "inline/dlist.h"
 #include "dlist.h"
@@ -522,12 +521,9 @@ gds_iterator_t * gds_dlist_iterator_new(gds_dlist_t *list)
 	it_data->list = list;
 	it_data->cur = NULL;
 
-	it = gds_iterator_new(it_data,
-		(gds_iterator_reset_cb) &gds_dlist_iterator_reset,
-		(gds_iterator_step_cb) &gds_dlist_iterator_step,
-		(gds_iterator_get_cb) &gds_dlist_iterator_get,
-		(gds_iterator_getkey_cb) &gds_dlist_iterator_getkey,
-		(gds_free_cb) &free);
+	it = gds_iterator_new(it_data, gds_dlist_iterator_reset,
+		gds_dlist_iterator_step, gds_dlist_iterator_get,
+		gds_dlist_iterator_getkey, free);
 
 	return it;
 }

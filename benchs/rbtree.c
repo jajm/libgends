@@ -168,7 +168,7 @@ int main()
 	gds_inline_rbtree_node_t *root = NULL;
 	for(i=0; i<max; i++) {
 		trn = trn_new(i);
-		gds_inline_rbtree_add(&root, &(trn->rbtree), (gds_rbt_cmp_cb) trn_cmp, NULL);
+		gds_inline_rbtree_add(&root, &(trn->rbtree), trn_cmp, NULL);
 	}
 	gettimeofday(&end, NULL);
 	timeval_diff(&start, &end, &diff);
@@ -176,7 +176,7 @@ int main()
 	printf("\tGetting %ld nodes...\n", max);
 	gettimeofday(&start, NULL);
 	for(i=0; i<max; i++) {
-		gds_inline_rbtree_get_node(root, &i, (gds_rbt_cmp_with_key_cb) trn_cmp_with_key, NULL);
+		gds_inline_rbtree_get_node(root, &i, trn_cmp_with_key, NULL);
 	}
 	gettimeofday(&end, NULL);
 	timeval_diff(&start, &end, &diff);
@@ -184,7 +184,7 @@ int main()
 	printf("\tDeleting %ld nodes...\n", max);
 	gettimeofday(&start, NULL);
 	for(i=0; i<max; i++) {
-		irn = gds_inline_rbtree_del(&root, &i, (gds_rbt_cmp_with_key_cb) trn_cmp_with_key, NULL);
+		irn = gds_inline_rbtree_del(&root, &i, trn_cmp_with_key, NULL);
 		trn = trn_container_of(irn);
 		trn_free(trn);
 	}
@@ -203,7 +203,7 @@ int main()
 	gds_inline_rbtree_fast_node_t *froot = NULL;
 	for(i=0; i<max; i++) {
 		trfn = trfn_new(i);
-		gds_inline_rbtree_fast_add(&froot, &(trfn->rbtree), (gds_rbtf_cmp_cb) trfn_cmp, NULL);
+		gds_inline_rbtree_fast_add(&froot, &(trfn->rbtree), trfn_cmp, NULL);
 	}
 	gettimeofday(&end, NULL);
 	timeval_diff(&start, &end, &diff);
@@ -211,7 +211,7 @@ int main()
 	printf("\tGetting %ld nodes...\n", max);
 	gettimeofday(&start, NULL);
 	for(i=0; i<max; i++) {
-		gds_inline_rbtree_fast_get_node(froot, &i, (gds_rbtf_cmp_with_key_cb) trfn_cmp_with_key, NULL);
+		gds_inline_rbtree_fast_get_node(froot, &i, trfn_cmp_with_key, NULL);
 	}
 	gettimeofday(&end, NULL);
 	timeval_diff(&start, &end, &diff);
@@ -219,7 +219,7 @@ int main()
 	printf("\tDeleting %ld nodes...\n", max);
 	gettimeofday(&start, NULL);
 	for(i=0; i<max; i++) {
-		irfn = gds_inline_rbtree_fast_del(&froot, &i, (gds_rbtf_cmp_with_key_cb) trfn_cmp_with_key, NULL);
+		irfn = gds_inline_rbtree_fast_del(&froot, &i, trfn_cmp_with_key, NULL);
 		trfn = trfn_container_of(irfn);
 		trfn_free(trfn);
 	}

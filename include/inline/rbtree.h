@@ -31,35 +31,6 @@ struct gds_inline_rbtree_node_s {
 
 typedef struct gds_inline_rbtree_node_s gds_inline_rbtree_node_t;
 
-/* Compare two red-black tree nodes.
- *
- * Should returns:
- *   a negative value if node1 should be at left of node2
- *   0 if node1 is equal to node2
- *   a positive value if node1 should be at right of node2
- */
-typedef int (*gds_rbt_cmp_cb)(
-	gds_inline_rbtree_node_t *node1,
-	gds_inline_rbtree_node_t *node2,
-	const void *userdata
-);
-
-/* Compare a key and a red-black tree node
- *
- * Used during search (for retrieving and deleting data) to determine where to
- * search for data.
- *
- * Should returns:
- *   a negative value if search should continue in left sub-tree of node,
- *   zero if key corresponds to the node,
- *   a positive value if search should continue in right sub-tree of node.
- */
-typedef int (*gds_rbt_cmp_with_key_cb)(
-	gds_inline_rbtree_node_t *node,
-	const void *key,
-	const void *userdata
-);
-
 /* Initialize red-black tree inline node with default values */
 void
 gds_inline_rbtree_node_init(
@@ -69,10 +40,15 @@ gds_inline_rbtree_node_init(
 /* Insert a node in red-black tree.
  *
  * Parameters:
- *   root         : root node of tree
- *   node         : node to insert
- *   rbt_cmp_cb   : see above documentation about gds_rbt_cmp_cb
- *   rbt_cmp_data : user data passed to rbt_cmp_cb
+ *   root     : root node of tree
+ *   node     : node to insert
+ *   cmp_cb   : cmp callback
+ *              Prototype: int cmp_cb(gds_inline_rbtree_node_t *node1, gds_inline_rbtree_node_t *node2, void *userdata)
+ *              It should compare two nodes and return:
+ *              - a negative value if node1 should be at left of node2
+ *              - 0 if node1 is equal to node2
+ *              - a positive value if node1 should be at right of node2
+ *   cmp_data : user data passed to cmp_cb
  *
  * Returns:
  *   0 if node was successfully inserted
@@ -85,8 +61,8 @@ int
 gds_inline_rbtree_add(
 	gds_inline_rbtree_node_t **root,
 	gds_inline_rbtree_node_t *node,
-	gds_rbt_cmp_cb rbt_cmp_cb,
-	void *rbt_cmp_data
+	void *cmp_cb,
+	void *cmp_data
 );
 
 /* Insert a node in red-black tree.
@@ -96,12 +72,17 @@ gds_inline_rbtree_add(
  * from tree.
  *
  * Parameters:
- *   root         : root node of tree
- *   node         : node to insert
- *   rbt_cmp_cb   : see above documentation about gds_rbt_cmp_cb
- *   rbt_cmp_data : user data passed to rbt_cmp_cb
- *   removed      : if not NULL, *removed will contain the address of removed
- *                  node, if any.
+ *   root     : root node of tree
+ *   node     : node to insert
+ *   cmp_cb   : cmp callback
+ *              Prototype: int cmp_cb(gds_inline_rbtree_node_t *node1, gds_inline_rbtree_node_t *node2, void *userdata)
+ *              It should compare two nodes and return:
+ *              - a negative value if node1 should be at left of node2
+ *              - 0 if node1 is equal to node2
+ *              - a positive value if node1 should be at right of node2
+ *   cmp_data : user data passed to cmp_cb
+ *   removed  : if not NULL, *removed will contain the address of removed
+ *              node, if any.
  *
  * Returns:
  *   0 if node was inserted in the tree
@@ -115,7 +96,7 @@ int
 gds_inline_rbtree_set(
 	gds_inline_rbtree_node_t **root,
 	gds_inline_rbtree_node_t *node,
-	gds_rbt_cmp_cb rbt_cmp_cb,
+	void *rbt_cmp_cb,
 	void *rbt_cmp_data,
 	gds_inline_rbtree_node_t **removed
 );
@@ -123,10 +104,17 @@ gds_inline_rbtree_set(
 /* Search a node by key.
  *
  * Parameters:
- *   root                  : root node of tree
- *   key                   : key to search
- *   rbt_cmp_with_key_cb   : see above documentation about gds_rbt_cmp_with_key_cb
- *   rbt_cmp_with_key_data : user data passed to rbt_cmp_with_key_cb
+ *   root              : root node of tree
+ *   key               : key to search
+ *   cmp_with_key_cb   : cmp_with_key callback
+ *                       Prototype: int cmp_with_key_cb(gds_inline_rbtree_node_t *node, void *key, void *userdata)
+ *                       It should compare node against key and return:
+ *                       - a negative value if search should continue in left
+ *                         sub-tree of node,
+ *                       - zero if key corresponds to the node,
+ *                       - a positive value if search should continue in right
+ *                         sub-tree of node.
+ *   cmp_with_key_data : user data passed to cmp_with_key_cb
  *
  * Returns:
  *   Pointer to found node, or NULL if key was not found.
@@ -135,17 +123,24 @@ gds_inline_rbtree_node_t *
 gds_inline_rbtree_get_node(
 	gds_inline_rbtree_node_t *root,
 	const void *key,
-	gds_rbt_cmp_with_key_cb rbt_cmp_with_key_cb,
-	void *rbt_cmp_with_key_data
+	void *cmp_with_key_cb,
+	void *cmp_with_key_data
 );
 
 /* Remove a node from red-black tree by its key.
  *
  * Parameters:
- *   root                   : root node of tree
- *   key                    : key of data to remove
- *   rbt_cmp_with_key_cb    : see above documentation about gds_rbt_cmp_with_key_cb
- *   rbt_cmp_with_key_data  : user data passed to rbt_cmp_with_key_cb
+ *   root              : root node of tree
+ *   key               : key of data to remove
+ *   cmp_with_key_cb   : cmp_with_key callback
+ *                       Prototype: int cmp_with_key_cb(gds_inline_rbtree_node_t *node, void *key, void *userdata)
+ *                       It should compare node against key and return:
+ *                       - a negative value if search should continue in left
+ *                         sub-tree of node,
+ *                       - zero if key corresponds to the node,
+ *                       - a positive value if search should continue in right
+ *                         sub-tree of node.
+ *   cmp_with_key_data : user data passed to cmp_with_key_cb
  *
  * Returns:
  *   Pointer to the removed node, or NULL if node was not found.
@@ -157,8 +152,8 @@ gds_inline_rbtree_node_t *
 gds_inline_rbtree_del(
 	gds_inline_rbtree_node_t **root,
 	const void *key,
-	gds_rbt_cmp_with_key_cb rbt_cmp_with_key_cb,
-	void *rbt_cmp_with_key_data
+	void *cmp_with_key_cb,
+	void *cmp_with_key_data
 );
 
 /* Create an iterator on red-black tree.
