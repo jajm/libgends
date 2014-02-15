@@ -26,15 +26,15 @@
 #define gds_hash_map_keyin_h_included
 
 #include <stdint.h>
-#include "callbacks.h"
 #include "rbtree_keyin.h"
 
 struct gds_hash_map_keyin_s {
 	uint32_t size;
 	gds_rbtree_keyin_node_t **map;
-	gds_hash_cb hash_cb;
-	gds_getkey_cb getkey_cb;
-	gds_cmpkey_cb cmpkey_cb;
+	uint32_t (*hash_cb)(const void *ptr, uint32_t size);
+	void * (*getkey_cb)(const void *ptr);
+	int (*cmpkey_cb)(const void *key1, const void *key2);
+	void (*free_cb)(void *ptr);
 };
 typedef struct gds_hash_map_keyin_s gds_hash_map_keyin_t;
 
@@ -42,31 +42,56 @@ typedef struct gds_hash_map_keyin_s gds_hash_map_keyin_t;
 extern "C" {
 #endif
 
-/* Create a new hash map */
-/* size: the number of buckets
- *   hash_cb : hash callback
- * getkey_cb : getkey callback
- * cmpkey_cb : cmpkey callback */
-/* Return: a pointer to the new hash map */
+/* Create a new hash map
+ *
+ * Parameters
+ *   size      : the number of buckets
+ *   hash_cb   : hash callback
+ *               Prototype: uint32_t hash_cb(const void *ptr, uint32_t size)
+ *               It should return the hash of object referenced by ptr.
+ *               size is the number of buckets of hash map.
+ *   getkey_cb : getkey callback
+ *               Prototype: void * getkey_cb(const void *ptr)
+ *               It should return the key of object referenced by ptr.
+ *   cmpkey_cb : cmpkey callback
+ *               Prototype: int cmpkey_cb(const void *key1, const void *key2)
+ *               It should compare key1 to key2 and returns:
+ *               - a negative value if key1 < key2
+ *               - 0 if key1 == key2
+ *               - a positive value if key1 > key2
+ *   free_cb   : free callback
+ *               Prototype: void free_cb(void *ptr)
+ *               It should free memory used by object referenced by ptr
+ *
+ * Returns
+ *   a pointer to the new hash map
+ */
 gds_hash_map_keyin_t *
 gds_hash_map_keyin_new(
 	uint32_t size,
-	gds_hash_cb hash_cb,
-	gds_getkey_cb getkey_cb,
-	gds_cmpkey_cb cmpkey_cb
+	void *hash_cb,
+	void *getkey_cb,
+	void *cmpkey_cb,
+	void *free_cb
 );
 
-/* Set a key/value pair in the hash map */
-/* If key already exists, old value is replaced by the new one */
-/*         h : pointer to the hash map
- *      data : data to insert */
-/* Return: 0: key was already in the hash map
- *         1: key was just added */
+/* Set a key/value pair in the hash map
+ *
+ * If key already exists, old value is replaced by the new one.
+ * Calls free_cb if key was already in the hash map.
+ *
+ * Parameters
+ *   h    : pointer to the hash map
+ *   data : data to insert
+ *
+ * Returns
+ *   0: key was already in the hash
+ *   1: key was just added
+ */
 int
 gds_hash_map_keyin_set(
 	gds_hash_map_keyin_t *h,
-	void *data,
-	gds_free_cb free_cb
+	void *data
 );
 
 /* Get a value given its key */
@@ -79,17 +104,22 @@ gds_hash_map_keyin_get(
 	const void *key
 );
 
-/* Unset a key/value pair in the hash map */
-/*         h : pointer to the hash map
- *       key : key to unset
- *   free_cb : free callback */
-/* Return: 0: key was correctly unset
- *         1: key was not in the hash map */
+/* Unset a key/value pair in the hash map
+ *
+ * Calls free_cb.
+ *
+ * Parameters
+ *   h           : pointer to the hash map
+ *   key         : key to unset
+ *
+ * Returns
+ *   0: key was correctly unset
+ *   1: key was not in the hash map
+ */
 int
 gds_hash_map_keyin_unset(
 	gds_hash_map_keyin_t *h,
-	const void *key,
-	gds_free_cb free_cb
+	const void *key
 );
 
 /* Create a new iterator.
@@ -130,13 +160,16 @@ gds_hash_map_keyin_change_size(
 	uint32_t new_size
 );
 
-/* Free hash map */
-/*       h : pointer to the hash map
- * free_cb : free callback */
+/* Free hash map
+ *
+ * Calls free_cb.
+ *
+ * Parameters
+ *   h : pointer to the hash map
+ */
 void
 gds_hash_map_keyin_free(
-	gds_hash_map_keyin_t *h,
-	gds_free_cb free_cb
+	gds_hash_map_keyin_t *h
 );
 
 #ifdef __cplusplus

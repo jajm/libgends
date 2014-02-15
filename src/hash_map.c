@@ -27,8 +27,8 @@
 #include "rbtree.h"
 #include "hash_map.h"
 
-gds_hash_map_t * gds_hash_map_new(uint32_t size, gds_hash_cb hash_cb,
-	gds_cmpkey_cb cmpkey_cb)
+gds_hash_map_t * gds_hash_map_new(uint32_t size, void *hash_cb, void *cmpkey_cb,
+	void *key_free_cb, void *free_cb)
 {
 	gds_hash_map_t *h;
 
@@ -49,6 +49,8 @@ gds_hash_map_t * gds_hash_map_new(uint32_t size, gds_hash_cb hash_cb,
 	h->size = size;
 	h->hash_cb = hash_cb;
 	h->cmpkey_cb = cmpkey_cb;
+	h->key_free_cb = key_free_cb;
+	h->free_cb = free_cb;
 
 	return h;
 }
@@ -58,8 +60,7 @@ uint32_t gds_hash_map_hash(gds_hash_map_t *h, const void *key)
 	return h->hash_cb(key, h->size) % h->size;
 }
 
-int gds_hash_map_set(gds_hash_map_t *h, void *key, void *data,
-	gds_free_cb key_free_cb, gds_free_cb free_cb)
+int gds_hash_map_set(gds_hash_map_t *h, void *key, void *data)
 {
 	uint32_t hash;
 	int rc;
@@ -68,7 +69,7 @@ int gds_hash_map_set(gds_hash_map_t *h, void *key, void *data,
 
 	hash = gds_hash_map_hash(h, key);
 	rc = gds_rbtree_set(&(h->map[hash]), key, data, h->cmpkey_cb,
-		key_free_cb, free_cb);
+		h->key_free_cb, h->free_cb);
 
 	return rc;
 }
@@ -85,8 +86,7 @@ void * gds_hash_map_get(gds_hash_map_t *h, const void *key)
 	return data;
 }
 
-int gds_hash_map_unset(gds_hash_map_t *h, const void *key,
-	gds_free_cb key_free_cb, gds_free_cb free_cb)
+int gds_hash_map_unset(gds_hash_map_t *h, const void *key)
 {
 	uint32_t hash;
 	int rv;
@@ -95,7 +95,7 @@ int gds_hash_map_unset(gds_hash_map_t *h, const void *key,
 
 	hash = gds_hash_map_hash(h, key);
 	rv = gds_rbtree_del(&(h->map[hash]), key, h->cmpkey_cb,
-		key_free_cb, free_cb);
+		h->key_free_cb, h->free_cb);
 	
 	return rv;
 }
@@ -280,14 +280,12 @@ void gds_hash_map_change_size(gds_hash_map_t *h, uint32_t new_size)
 	h->size = new_size;
 }
 
-void gds_hash_map_free(gds_hash_map_t *h, gds_free_cb key_free_cb,
-	gds_free_cb free_cb)
+void gds_hash_map_free(gds_hash_map_t *h)
 {
 	uint32_t i;
 	if (h != NULL) {
 		for (i=0; i<h->size; i++) {
-			gds_rbtree_free(h->map[i], key_free_cb,
-				free_cb);
+			gds_rbtree_free(h->map[i], h->key_free_cb, h->free_cb);
 		}
 		free(h->map);
 		free(h);
