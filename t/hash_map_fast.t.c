@@ -188,12 +188,6 @@ void t_hash_map_fast_unset(void)
 	hash = gds_hash_map_fast_new(32, gds_hash_sdbm, test_cmpkey, NULL, NULL);
 
 	GDS_ASSERT_THROW(BadArgumentException, gds_hash_map_fast_unset(NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_hash_map_fast_unset(NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_hash_map_fast_unset(NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_hash_map_fast_unset(NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_hash_map_fast_unset(NULL, keys[0]));
-	GDS_ASSERT_THROW(BadArgumentException, gds_hash_map_fast_unset(NULL, keys[0]));
-	GDS_ASSERT_THROW(BadArgumentException, gds_hash_map_fast_unset(NULL, keys[0]));
 	GDS_ASSERT_THROW(BadArgumentException, gds_hash_map_fast_unset(NULL, keys[0]));
 
 	rc = gds_hash_map_fast_unset(hash, NULL);
@@ -375,7 +369,7 @@ void t_hash_map_fast_values(void)
 
 int main()
 {
-	plan(110);
+	plan(104);
 
 	t_hash_map_fast_new();
 	t_hash_map_fast_set();
