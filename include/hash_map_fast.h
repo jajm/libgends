@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Julian Maurice
+ * Copyright 2013-2014 Julian Maurice
  *
  * This file is part of libgends
  *
