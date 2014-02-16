@@ -21,7 +21,6 @@
 #define gds_inline_rbtree_h_included
 
 #include <stdbool.h>
-#include <stdint.h>
 #include "../iterator.h"
 
 struct gds_inline_rbtree_node_s {

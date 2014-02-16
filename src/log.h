@@ -25,7 +25,6 @@
 #ifndef gds_log_h_included
 #define gds_log_h_included
 
-#include <stdint.h>
 #include <stdlib.h>
 #include <lll/lll.h>
 

@@ -23,7 +23,6 @@
  */
 
 #include <stdio.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include "slist.h"
 #include "exception.h"
@@ -32,7 +31,7 @@
 #include "rbtree_keyin.h"
 #include "hash_map_keyin.h"
 
-gds_hash_map_keyin_t * gds_hash_map_keyin_new(uint32_t size, void *hash_cb,
+gds_hash_map_keyin_t * gds_hash_map_keyin_new(unsigned long size, void *hash_cb,
 	void *getkey_cb, void *cmpkey_cb, void *free_cb)
 {
 	gds_hash_map_keyin_t *h;
@@ -61,14 +60,14 @@ gds_hash_map_keyin_t * gds_hash_map_keyin_new(uint32_t size, void *hash_cb,
 	return h;
 }
 
-uint32_t gds_hash_map_keyin_hash(gds_hash_map_keyin_t *h, const void *key)
+unsigned long gds_hash_map_keyin_hash(gds_hash_map_keyin_t *h, const void *key)
 {
 	return h->hash_cb(key, h->size) % h->size;
 }
 
 int gds_hash_map_keyin_set(gds_hash_map_keyin_t *h, void *data)
 {
-	uint32_t hash;
+	unsigned long hash;
 
 	GDS_CHECK_ARG_NOT_NULL(h);
 
@@ -79,7 +78,7 @@ int gds_hash_map_keyin_set(gds_hash_map_keyin_t *h, void *data)
 
 void * gds_hash_map_keyin_get(gds_hash_map_keyin_t *h, const void *key)
 {
-	uint32_t hash;
+	unsigned long hash;
 	void *data;
 
 	GDS_CHECK_ARG_NOT_NULL(h);
@@ -94,7 +93,7 @@ void * gds_hash_map_keyin_get(gds_hash_map_keyin_t *h, const void *key)
 
 int gds_hash_map_keyin_unset(gds_hash_map_keyin_t *h, const void *key)
 {
-	uint32_t hash;
+	unsigned long hash;
 	int rv;
 
 	GDS_CHECK_ARG_NOT_NULL(h);
@@ -108,14 +107,14 @@ int gds_hash_map_keyin_unset(gds_hash_map_keyin_t *h, const void *key)
 
 typedef struct {
 	gds_hash_map_keyin_t *hash;
-	uint32_t i;
+	unsigned long i;
 	gds_iterator_t *rbtree_keyin_it;
 } gds_hash_map_keyin_iterator_data_t;
 
 void gds_hash_map_keyin_iterator_find_next_rbtree_keyin(gds_hash_map_keyin_iterator_data_t *data)
 {
 	gds_hash_map_keyin_t *hash = data->hash;
-	uint32_t i = data->i;
+	unsigned long i = data->i;
 
 	while (i < hash->size && hash->map[i] == NULL)
 		i++;
@@ -212,7 +211,7 @@ gds_slist_t * gds_hash_map_keyin_values(gds_hash_map_keyin_t *h)
 {
 	gds_slist_t *l = gds_slist_new();
 	gds_slist_t *list;
-	uint32_t i;
+	unsigned long i;
 
 	GDS_CHECK_ARG_NOT_NULL(h);
 
@@ -228,13 +227,13 @@ gds_slist_t * gds_hash_map_keyin_values(gds_hash_map_keyin_t *h)
 }
 
 gds_rbtree_keyin_node_t ** gds_hash_map_keyin_build_map(gds_hash_map_keyin_t *h,
-	uint32_t size)
+	unsigned long size)
 {
 	gds_rbtree_keyin_node_t **map;
 	gds_slist_t *l;
 	gds_iterator_t *it;
 	void *data;
-	uint32_t hash;
+	unsigned long hash;
 
 	map = calloc(size, sizeof(gds_rbtree_keyin_node_t *));
 	if (map == NULL) {
@@ -254,7 +253,7 @@ gds_rbtree_keyin_node_t ** gds_hash_map_keyin_build_map(gds_hash_map_keyin_t *h,
 	return map;
 }
 
-void gds_hash_map_keyin_change_size(gds_hash_map_keyin_t *h, uint32_t new_size)
+void gds_hash_map_keyin_change_size(gds_hash_map_keyin_t *h, unsigned long new_size)
 {
 	gds_rbtree_keyin_node_t **map;
 
@@ -262,7 +261,7 @@ void gds_hash_map_keyin_change_size(gds_hash_map_keyin_t *h, uint32_t new_size)
 	GDS_CHECK_ARG_NOT_ZERO(new_size);
 
 	map = gds_hash_map_keyin_build_map(h, new_size);
-	for (uint32_t i = 0; i < h->size; i++) {
+	for (unsigned long i = 0; i < h->size; i++) {
 		gds_rbtree_keyin_free(h->map[i], NULL);
 	}
 	free(h->map);
@@ -272,7 +271,7 @@ void gds_hash_map_keyin_change_size(gds_hash_map_keyin_t *h, uint32_t new_size)
 
 void gds_hash_map_keyin_free(gds_hash_map_keyin_t *h)
 {
-	uint32_t i;
+	unsigned long i;
 	if (h != NULL) {
 		for (i=0; i<h->size; i++) {
 			gds_rbtree_keyin_free(h->map[i], h->free_cb);

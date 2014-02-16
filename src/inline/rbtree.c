@@ -18,7 +18,6 @@
  */
 
 #include <stdbool.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include "iterator.h"
 #include "slist.h"

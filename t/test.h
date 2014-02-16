@@ -1,8 +1,6 @@
 #ifndef test_h_included
 #define test_h_included
 
-#include <stdint.h>
-
 typedef struct {
 	char *key;
 	int value;

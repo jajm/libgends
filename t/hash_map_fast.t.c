@@ -1,7 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
-#include <stdbool.h>
 #include <libexception/exception.h>
 #include "hash_map_fast.h"
 #include "hash_functions.h"

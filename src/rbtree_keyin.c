@@ -18,8 +18,6 @@
  */
 
 #include <stdlib.h>
-#include <stdint.h>
-#include <stdbool.h>
 #include <stdio.h>
 #include "exception.h"
 #include "check_arg.h"

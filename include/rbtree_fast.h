@@ -20,7 +20,6 @@
 #ifndef rbtree_fast_h_included
 #define rbtree_fast_h_included
 
-#include <stdint.h>
 #include "slist.h"
 #include "inline/rbtree_fast.h"
 

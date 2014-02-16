@@ -20,7 +20,6 @@
 #ifndef gds_rbtree_h_included
 #define gds_rbtree_h_included
 
-#include <stdint.h>
 #include "inline/rbtree.h"
 #include "slist.h"
 

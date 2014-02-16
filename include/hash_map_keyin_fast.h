@@ -25,13 +25,12 @@
 #ifndef gds_hash_map_keyin_fast_h_included
 #define gds_hash_map_keyin_fast_h_included
 
-#include <stdint.h>
 #include "rbtree_keyin_fast.h"
 
 struct gds_hash_map_keyin_fast_s {
-	uint32_t size;
+	unsigned long size;
 	gds_rbtree_keyin_fast_node_t **map;
-	uint32_t (*hash_cb)(const void *ptr, uint32_t size);
+	unsigned long (*hash_cb)(const void *ptr, unsigned long size);
 	void * (*getkey_cb)(const void *ptr);
 	int (*cmpkey_cb)(const void *key1, const void *key2);
 	void (*free_cb)(void *ptr);
@@ -47,7 +46,7 @@ extern "C" {
  * Parameters
  *   size      : the number of buckets
  *   hash_cb   : hash callback
- *               Prototype: uint32_t hash_cb(const void *ptr, uint32_t size)
+ *               Prototype: unsigned long hash_cb(const void *ptr, unsigned long size)
  *               It should return the hash of object referenced by ptr.
  *               size is the number of buckets of hash map.
  *   getkey_cb : getkey callback
@@ -68,7 +67,7 @@ extern "C" {
  */
 gds_hash_map_keyin_fast_t *
 gds_hash_map_keyin_fast_new(
-	uint32_t size,
+	unsigned long size,
 	void *hash_cb,
 	void *getkey_cb,
 	void *cmpkey_cb,
@@ -157,7 +156,7 @@ gds_hash_map_keyin_fast_values(
 void
 gds_hash_map_keyin_fast_change_size(
 	gds_hash_map_keyin_fast_t *h,
-	uint32_t new_size
+	unsigned long new_size
 );
 
 /* Free hash map

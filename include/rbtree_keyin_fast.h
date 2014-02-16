@@ -20,7 +20,6 @@
 #ifndef rbtree_keyin_fast_h_included
 #define rbtree_keyin_fast_h_included
 
-#include <stdint.h>
 #include "inline/rbtree_fast.h"
 #include "slist.h"
 #include "iterator.h"

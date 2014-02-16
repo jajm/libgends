@@ -20,7 +20,6 @@
 #ifndef rbtree_keyin_h_included
 #define rbtree_keyin_h_included
 
-#include <stdint.h>
 #include "slist.h"
 #include "inline/rbtree.h"
 #include "iterator.h"

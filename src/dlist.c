@@ -17,7 +17,6 @@
  * along with libgends.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdint.h>
 #include <stdlib.h>
 #include "exception.h"
 #include "check_arg.h"

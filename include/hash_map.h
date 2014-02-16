@@ -25,13 +25,12 @@
 #ifndef gds_hash_map_h_included
 #define gds_hash_map_h_included
 
-#include <stdint.h>
 #include "rbtree.h"
 
 struct gds_hash_map_s {
-	uint32_t size;
+	unsigned long size;
 	gds_rbtree_node_t **map;
-	uint32_t (*hash_cb)(const void *ptr, uint32_t size);
+	unsigned long (*hash_cb)(const void *ptr, unsigned long size);
 	int (*cmpkey_cb)(const void *key1, const void *key2);
 	void (*key_free_cb)(void *key);
 	void (*free_cb)(void *ptr);
@@ -47,7 +46,7 @@ extern "C" {
  * Parameters
  *   size        : the number of buckets
  *   hash_cb     : hash callback
- *                 Prototype: uint32_t hash_cb(const void *ptr, uint32_t size)
+ *                 Prototype: unsigned long hash_cb(const void *ptr, unsigned long size)
  *                 It should return the hash of object referenced by ptr.
  *                 size is the number of buckets of hash map.
  *   cmpkey_cb   : cmpkey callback
@@ -68,7 +67,7 @@ extern "C" {
  */
 gds_hash_map_t *
 gds_hash_map_new(
-	uint32_t size,
+	unsigned long size,
 	void *hash_cb,
 	void *cmpkey_cb,
 	void *key_free_cb,
@@ -182,7 +181,7 @@ gds_hash_map_values(
 void
 gds_hash_map_change_size(
 	gds_hash_map_t *h,
-	uint32_t new_size
+	unsigned long new_size
 );
 
 /* Free hash map
