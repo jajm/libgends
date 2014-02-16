@@ -27,14 +27,6 @@
 
 #include "rbtree_keyin.h"
 
-struct gds_hash_map_keyin_s {
-	unsigned long size;
-	gds_rbtree_keyin_node_t **map;
-	unsigned long (*hash_cb)(const void *ptr, unsigned long size);
-	void * (*getkey_cb)(const void *ptr);
-	int (*cmpkey_cb)(const void *key1, const void *key2);
-	void (*free_cb)(void *ptr);
-};
 typedef struct gds_hash_map_keyin_s gds_hash_map_keyin_t;
 
 #ifdef __cplusplus

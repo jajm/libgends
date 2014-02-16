@@ -27,14 +27,6 @@
 
 #include "rbtree.h"
 
-struct gds_hash_map_s {
-	unsigned long size;
-	gds_rbtree_node_t **map;
-	unsigned long (*hash_cb)(const void *ptr, unsigned long size);
-	int (*cmpkey_cb)(const void *key1, const void *key2);
-	void (*key_free_cb)(void *key);
-	void (*free_cb)(void *ptr);
-};
 typedef struct gds_hash_map_s gds_hash_map_t;
 
 #ifdef __cplusplus

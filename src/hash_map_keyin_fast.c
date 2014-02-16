@@ -31,6 +31,15 @@
 #include "rbtree_keyin_fast.h"
 #include "hash_map_keyin_fast.h"
 
+struct gds_hash_map_keyin_fast_s {
+	unsigned long size;
+	gds_rbtree_keyin_fast_node_t **map;
+	unsigned long (*hash_cb)(const void *ptr, unsigned long size);
+	void * (*getkey_cb)(const void *ptr);
+	int (*cmpkey_cb)(const void *key1, const void *key2);
+	void (*free_cb)(void *ptr);
+};
+
 gds_hash_map_keyin_fast_t * gds_hash_map_keyin_fast_new(unsigned long size,
 	void *hash_cb, void *getkey_cb, void *cmpkey_cb, void *free_cb)
 {
