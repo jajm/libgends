@@ -238,6 +238,34 @@ int gds_rbtree_del(gds_rbtree_node_t **root, const void *key,
 	return deleted ? 0 : 1;
 }
 
+void * gds_rbtree_pop(gds_rbtree_node_t **root, const void *key,
+	void *cmpkey_cb, void *key_free_cb)
+{
+	gds_inline_rbtree_node_t *iroot, *inode;
+	gds_rbtree_node_t *node;
+	void *data = NULL;
+
+	GDS_CHECK_ARG_NOT_NULL(root);
+	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb);
+
+	if(*root == NULL) {
+		GDS_LOG_WARNING("Tree is empty");
+		return NULL;
+	}
+
+	iroot = &((*root)->rbtree);
+	inode = gds_inline_rbtree_del(&iroot, key,
+		gds_rbtree_node_cmp_with_key, cmpkey_cb);
+	if (inode != NULL) {
+		node = rbt_containerof(inode);
+		data = node->data;
+		gds_rbtree_node_free(node, key_free_cb, NULL);
+	}
+	*root = rbt_containerof(iroot);
+
+	return data;
+}
+
 void gds_rbtree_free(gds_rbtree_node_t *root, void *key_free_cb, void *free_cb)
 {
 	gds_rbtree_node_t *node;

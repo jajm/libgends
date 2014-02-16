@@ -513,6 +513,66 @@ void t_rbtree_del(void)
 	}
 }
 
+void t_rbtree_pop(void)
+{
+	gds_rbtree_node_t *root = NULL;
+	test_t *t = test_new("key", 1);
+	char buf[512];
+	test_t *t2;
+
+	gds_rbtree_add(&root, "key", t, test_cmpkey);
+
+	GDS_ASSERT_THROW(BadArgumentException,
+		gds_rbtree_pop(NULL , NULL , NULL       , NULL));
+	GDS_ASSERT_THROW(BadArgumentException,
+		gds_rbtree_pop(NULL , NULL , NULL       , free));
+	GDS_ASSERT_THROW(BadArgumentException,
+		gds_rbtree_pop(NULL , NULL , test_cmpkey, NULL));
+	GDS_ASSERT_THROW(BadArgumentException,
+		gds_rbtree_pop(NULL , NULL , test_cmpkey, free));
+	GDS_ASSERT_THROW(BadArgumentException,
+		gds_rbtree_pop(NULL , "key", NULL       , NULL));
+	GDS_ASSERT_THROW(BadArgumentException,
+		gds_rbtree_pop(NULL , "key", NULL       , free));
+	GDS_ASSERT_THROW(BadArgumentException,
+		gds_rbtree_pop(NULL , "key", test_cmpkey, NULL));
+	GDS_ASSERT_THROW(BadArgumentException,
+		gds_rbtree_pop(NULL , "key", test_cmpkey, free));
+	GDS_ASSERT_THROW(BadArgumentException,
+		gds_rbtree_pop(&root, NULL , NULL       , NULL));
+	GDS_ASSERT_THROW(BadArgumentException,
+		gds_rbtree_pop(&root, NULL , NULL       , free));
+	GDS_ASSERT_THROW(BadArgumentException,
+		gds_rbtree_pop(&root, "key", NULL       , NULL));
+	GDS_ASSERT_THROW(BadArgumentException,
+		gds_rbtree_pop(&root, "key", NULL       , free));
+
+	isnull(gds_rbtree_pop(&root, NULL , test_cmpkey, NULL), NULL);
+	isnull(gds_rbtree_pop(&root, NULL , test_cmpkey, free), NULL);
+	t2 = gds_rbtree_pop(&root, "key", test_cmpkey, NULL);
+	isntnull(t2, NULL);
+	is(t2, t, NULL);
+	test_free(t2);
+	isnull(gds_rbtree_pop(&root, "key", test_cmpkey, free), NULL);
+
+	for (int i=0; i<100; i++) {
+		sprintf(buf, "key %d", i);
+		gds_rbtree_add(&root, key_alloc(buf), test_new(buf, i), test_cmpkey);
+	}
+	for (int i=0; i<100; i++) {
+		sprintf(buf, "key %d", i);
+		t2 = gds_rbtree_pop(&root, buf, test_cmpkey, free);
+		str_eq(t2->key, buf, NULL);
+		test_free(t2);
+		ok(gds_rbtree_is_valid(root, test_cmpkey), NULL);
+	}
+	for (int i=0; i<100; i++) {
+		sprintf(buf, "key %d", i);
+		ok(0 < gds_rbtree_del(&root, buf,
+			test_cmpkey, free, test_free), NULL);
+	}
+}
+
 void t_rbtree_iterator(void)
 {
 	gds_rbtree_node_t *root = NULL;
@@ -640,12 +700,13 @@ void t_rbtree_values(void)
 
 int main()
 {
-	plan(2054);
+	plan(2371);
 
 	t_rbtree_add();
 	t_rbtree_set();
 	t_rbtree_get();
 	t_rbtree_del();
+	t_rbtree_pop();
 	t_rbtree_iterator();
 	t_rbtree_keys();
 	t_rbtree_values();

@@ -238,6 +238,33 @@ int gds_rbtree_keyin_fast_del(gds_rbtree_keyin_fast_node_t **root,
 	return not_in_tree;
 }
 
+void * gds_rbtree_keyin_fast_pop(gds_rbtree_keyin_fast_node_t **root, const void *key,
+	void *getkey_cb, void *cmpkey_cb)
+{
+	gds_inline_rbtree_fast_node_t *iroot, *inode;
+	gds_rbtree_keyin_fast_node_t *node;
+	void *data = NULL;
+
+	GDS_CHECK_ARG_NOT_NULL(root);
+	GDS_CHECK_ARG_NOT_NULL(getkey_cb);
+	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb);
+
+	if (*root != NULL) {
+		void *cmp_with_key_params[] = {getkey_cb, cmpkey_cb};
+		iroot = &((*root)->rbtree);
+		inode = gds_inline_rbtree_fast_del(&iroot, key,
+			gds_rbtree_keyin_fast_node_cmp_with_key, &cmp_with_key_params);
+		if (inode != NULL) {
+			node = rbt_containerof(inode);
+			data = node->data;
+			gds_rbtree_keyin_fast_node_free(node, NULL);
+		}
+		*root = rbt_containerof(iroot);
+	}
+
+	return data;
+}
+
 void gds_rbtree_keyin_fast_free(gds_rbtree_keyin_fast_node_t *root,
 	void *free_cb)
 {

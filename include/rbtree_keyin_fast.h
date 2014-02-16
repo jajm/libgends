@@ -151,6 +151,33 @@ gds_rbtree_keyin_fast_del(
 	void *free_cb
 );
 
+/* Remove a node from a red-black tree and return its data.
+ *
+ * Parameters
+ *   root      : Pointer to pointer to root node. Will be updated to point to
+ *               root node, if root changes.
+ *   key       : Key of node to remove
+ *   getkey_cb : getkey callback
+ *               Prototype: void * getkey_cb(const void *ptr)
+ *               It should return the key of object referenced by ptr.
+ *   cmpkey_cb : cmpkey callback
+ *               Prototype: int cmpkey_cb(const void *key1, const void *key2)
+ *               It should compare key1 to key2 and returns:
+ *               - a negative value if key1 < key2
+ *               - 0 if key1 == key2
+ *               - a positive value if key1 > key2
+ *
+ * Returns
+ *   pointer to the data
+ */
+void *
+gds_rbtree_keyin_fast_pop(
+	gds_rbtree_keyin_fast_node_t **root,
+	const void *key,
+	void *getkey_cb,
+	void *cmpkey_cb
+);
+
 /* Destroy a red-black-tree.
  *
  * Parameters

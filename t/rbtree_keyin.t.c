@@ -470,6 +470,72 @@ void t_rbtree_keyin_del(void)
 	}
 }
 
+void t_rbtree_keyin_pop(void)
+{
+	gds_rbtree_keyin_node_t *root = NULL;
+	test_t *t = test_new("key", 1);
+	char buf[512];
+	test_t *t2;
+
+	gds_rbtree_keyin_add(&root, t, test_getkey, test_cmpkey);
+
+	GDS_ASSERT_THROW(BadArgumentException,
+		gds_rbtree_keyin_pop(NULL, NULL, NULL, NULL));
+	GDS_ASSERT_THROW(BadArgumentException,
+		gds_rbtree_keyin_pop(NULL, NULL, NULL, test_cmpkey));
+	GDS_ASSERT_THROW(BadArgumentException,
+		gds_rbtree_keyin_pop(NULL, NULL, test_getkey, NULL));
+	GDS_ASSERT_THROW(BadArgumentException,
+		gds_rbtree_keyin_pop(NULL, NULL, test_getkey, test_cmpkey));
+	GDS_ASSERT_THROW(BadArgumentException,
+		gds_rbtree_keyin_pop(NULL, "key", NULL, NULL));
+	GDS_ASSERT_THROW(BadArgumentException,
+		gds_rbtree_keyin_pop(NULL, "key", NULL, test_cmpkey));
+	GDS_ASSERT_THROW(BadArgumentException,
+		gds_rbtree_keyin_pop(NULL, "key", test_getkey, NULL));
+	GDS_ASSERT_THROW(BadArgumentException,
+		gds_rbtree_keyin_pop(NULL, "key", test_getkey, test_cmpkey));
+	GDS_ASSERT_THROW(BadArgumentException,
+		gds_rbtree_keyin_pop(&root, NULL, NULL, NULL));
+	GDS_ASSERT_THROW(BadArgumentException,
+		gds_rbtree_keyin_pop(&root, NULL, NULL, test_cmpkey));
+	GDS_ASSERT_THROW(BadArgumentException,
+		gds_rbtree_keyin_pop(&root, NULL, test_getkey, NULL));
+	GDS_ASSERT_THROW(BadArgumentException,
+		gds_rbtree_keyin_pop(&root, "key", NULL, NULL));
+	GDS_ASSERT_THROW(BadArgumentException,
+		gds_rbtree_keyin_pop(&root, "key", NULL, test_cmpkey));
+	GDS_ASSERT_THROW(BadArgumentException,
+		gds_rbtree_keyin_pop(&root, "key", test_getkey, NULL));
+
+	isnull(gds_rbtree_keyin_pop(&root, NULL, test_getkey, test_cmpkey), NULL);
+	t2 = gds_rbtree_keyin_pop(&root, "key", test_getkey, test_cmpkey);
+	isntnull(t2, NULL);
+	is(t2, t, NULL);
+	test_free(t2);
+	isnull(gds_rbtree_keyin_pop(&root, "key", test_getkey, test_cmpkey), NULL);
+
+	for (int i=0; i<100; i++) {
+		sprintf(buf, "key %d", i);
+		gds_rbtree_keyin_add(&root, test_new(buf, i), test_getkey,
+			test_cmpkey);
+	}
+	for (int i=0; i<100; i++) {
+		sprintf(buf, "key %d", i);
+		t2 = gds_rbtree_keyin_pop(&root, buf, test_getkey,
+			test_cmpkey);
+		str_eq(t2->key, buf, NULL);
+		test_free(t2);
+		ok(gds_rbtree_keyin_is_valid(root, test_getkey,
+			test_cmpkey), NULL);
+	}
+	for (int i=0; i<100; i++) {
+		sprintf(buf, "key %d", i);
+		isnull(gds_rbtree_keyin_pop(&root, buf, test_getkey,
+			test_cmpkey), NULL);
+	}
+}
+
 void t_rbtree_keyin_iterator(void)
 {
 	gds_rbtree_keyin_node_t *root = NULL;
@@ -567,12 +633,13 @@ void t_rbtree_keyin_values(void)
 
 int main()
 {
-	plan(2231);
+	plan(2549);
 
 	t_rbtree_keyin_add();
 	t_rbtree_keyin_set();
 	t_rbtree_keyin_get();
 	t_rbtree_keyin_del();
+	t_rbtree_keyin_pop();
 	t_rbtree_keyin_iterator();
 	t_rbtree_keyin_values();
 
