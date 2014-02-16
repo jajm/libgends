@@ -114,6 +114,20 @@ int gds_hash_map_keyin_unset(gds_hash_map_keyin_t *h, const void *key)
 	return rv;
 }
 
+void * gds_hash_map_keyin_pop(gds_hash_map_keyin_t *h, const void *key)
+{
+	unsigned long hash;
+	void *data;
+
+	GDS_CHECK_ARG_NOT_NULL(h);
+
+	hash = gds_hash_map_keyin_hash(h, key);
+	data = gds_rbtree_keyin_pop(&(h->map[hash]), key, h->getkey_cb,
+		h->cmpkey_cb);
+
+	return data;
+}
+
 typedef struct {
 	gds_hash_map_keyin_t *hash;
 	unsigned long i;

@@ -120,6 +120,20 @@ gds_hash_map_unset(
 	const void *key
 );
 
+/* Pop a value from the hash map and return it
+ *
+ * Calls key_free_cb.
+ *
+ * Parameters
+ *   h   : pointer to the hash map
+ *   key : key of value to remove
+ */
+void *
+gds_hash_map_pop(
+	gds_hash_map_t *h,
+	const void *key
+);
+
 /* Create a new iterator.
  *
  * Parameters

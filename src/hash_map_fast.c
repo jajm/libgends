@@ -108,6 +108,20 @@ int gds_hash_map_fast_unset(gds_hash_map_fast_t *h, const void *key)
 	return rv;
 }
 
+void * gds_hash_map_fast_pop(gds_hash_map_fast_t *h, const void *key)
+{
+	unsigned long hash;
+	void *data;
+
+	GDS_CHECK_ARG_NOT_NULL(h);
+
+	hash = gds_hash_map_fast_hash(h, key);
+	data = gds_rbtree_fast_pop(&(h->map[hash]), key, h->cmpkey_cb,
+		h->key_free_cb);
+
+	return data;
+}
+
 typedef struct {
 	gds_hash_map_fast_t *hash;
 	unsigned long i;
