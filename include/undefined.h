@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Julian Maurice
+ * Copyright 2013-2014 Julian Maurice
  *
  * This file is part of libgends
  *
@@ -20,7 +20,13 @@
 #ifndef gds_undefined_h_included
 #define gds_undefined_h_included
 
-#define UNDEFINED ((void *)-1)
-#define NULL_OR_UNDEFINED(ptr) ( ((ptr) == NULL) || ((ptr) == UNDEFINED) )
+#define UNDEFINED ((void *) -1)
+
+#define isdef(ptr) ((ptr) != UNDEFINED)
+
+#define isset(ptr) ({ \
+	void *gds_ptr = (ptr); \
+	((gds_ptr != NULL) && (gds_ptr != UNDEFINED)); \
+})
 
 #endif /* ! gds_undefined_h_included */

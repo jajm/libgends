@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Julian Maurice
+ * Copyright 2013-2014 Julian Maurice
  *
  * This file is part of libgends
  *
@@ -186,8 +186,8 @@ gds_inline_dlist_node_t * gds_inline_dlist_node_prev(
 {
 	gds_inline_dlist_node_t *_prev = UNDEFINED;
 
-	if (!NULL_OR_UNDEFINED(node)) {
-		if (prev != UNDEFINED) {
+	if (isset(node)) {
+		if (isdef(prev)) {
 			node->prev = prev;
 		}
 		_prev = node->prev;
@@ -201,8 +201,8 @@ gds_inline_dlist_node_t * gds_inline_dlist_node_next(
 {
 	gds_inline_dlist_node_t *_next = UNDEFINED;
 
-	if (!NULL_OR_UNDEFINED(node)) {
-		if (next != UNDEFINED) {
+	if (isset(node)) {
+		if (isdef(next)) {
 			node->next = next;
 		}
 		_next = node->next;
