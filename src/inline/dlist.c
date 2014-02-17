@@ -222,7 +222,7 @@ int gds_inline_dlist_node_prepend(gds_inline_dlist_node_t *node,
 	if (list != NULL) {
 		added = _gds_inline_dlist_head_tail(list, node, &head, &tail);
 		if (added < 0) {
-			GDS_LOG_ERROR("<node> and <list> are in the same list. "
+			gds_log_error("<node> and <list> are in the same list. "
 				"Refusing to continue.");
 			return -1;
 		}
@@ -249,7 +249,7 @@ int gds_inline_dlist_node_append(gds_inline_dlist_node_t *node,
 	if (list != NULL) {
 		added = _gds_inline_dlist_head_tail(list, node, &head, &tail);
 		if (added < 0) {
-			GDS_LOG_ERROR("node and list are in the same list. "
+			gds_log_error("node and list are in the same list. "
 				"Refusing to continue.");
 			return -1;
 		}

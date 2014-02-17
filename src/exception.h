@@ -25,7 +25,7 @@
 
 #define GDS_THROW(exception, message, ...) \
 	{ \
-		GDS_LOG_ERROR(message, ##__VA_ARGS__); \
+		gds_log_error(message, ##__VA_ARGS__); \
 		throw(exception, message, ##__VA_ARGS__); \
 	}
 

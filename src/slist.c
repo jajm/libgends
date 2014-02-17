@@ -168,7 +168,7 @@ int gds_slist_unshift(gds_slist_t *list, void *data)
 
 	added = gds_inline_slist_insert(head, 0, i, &head, &tail);
 	if (added != 1) {
-		GDS_LOG_ERROR("Insertion failed");
+		gds_log_error("Insertion failed");
 		return -1;
 	}
 
@@ -194,7 +194,7 @@ int gds_slist_push(gds_slist_t *list, void *data)
 
 	added = gds_inline_slist_insert(tail, 1, i, &head, &tail);
 	if (added != 1) {
-		GDS_LOG_ERROR("Insertion failed");
+		gds_log_error("Insertion failed");
 		return -1;
 	}
 
@@ -237,7 +237,7 @@ void * gds_slist_shift(gds_slist_t *list)
 		removed = gds_inline_slist_remove(head, 0, 1,
 			gds_slist_node_remove_callback, NULL, &head, &tail);
 		if (removed != 1) {
-			GDS_LOG_ERROR("Removal failed");
+			gds_log_error("Removal failed");
 			return UNDEFINED;
 		}
 

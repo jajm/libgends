@@ -217,7 +217,7 @@ int gds_rbtree_del(gds_rbtree_node_t **root, const void *key,
 	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb);
 
 	if(*root == NULL) {
-		GDS_LOG_WARNING("Tree is empty");
+		gds_log_warning("Tree is empty");
 		return 1;
 	}
 
@@ -245,7 +245,7 @@ void * gds_rbtree_pop(gds_rbtree_node_t **root, const void *key,
 	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb);
 
 	if(*root == NULL) {
-		GDS_LOG_WARNING("Tree is empty");
+		gds_log_warning("Tree is empty");
 		return NULL;
 	}
 

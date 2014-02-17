@@ -157,7 +157,7 @@ int gds_inline_slist_node_append(gds_inline_slist_node_t *node,
 			added++;
 		}
 		if (tmp->next == node) {
-			GDS_LOG_ERROR("<node> and <next> are in the same list. Refusing to continue.");
+			gds_log_error("<node> and <next> are in the same list. Refusing to continue.");
 			return -1;
 		}
 		tmp->next = node->next;

@@ -149,7 +149,7 @@ int gds_inline_rbtree_fast_insert_bottom(gds_inline_rbtree_fast_node_t **root,
 	}
 
 	if (tmp != NULL) {
-		GDS_LOG_WARNING("Node key already exists in tree");
+		gds_log_warning("Node key already exists in tree");
 		return 1;
 	}
 
@@ -531,7 +531,7 @@ gds_inline_rbtree_fast_node_t * gds_inline_rbtree_fast_del(
 	node = gds_inline_rbtree_fast_get_node(*root, key, cmp_with_key_cb,
 		cmp_with_key_data);
 	if(node == NULL) {
-		GDS_LOG_WARNING("key doesn't exist in tree");
+		gds_log_warning("key doesn't exist in tree");
 		return NULL;
 	}
 

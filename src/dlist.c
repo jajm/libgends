@@ -165,7 +165,7 @@ int gds_dlist_unshift(gds_dlist_t *list, void *data)
 
 	added = gds_inline_dlist_insert(head, 0, i, &head, &tail);
 	if (added != 1) {
-		GDS_LOG_ERROR("Insertion failed");
+		gds_log_error("Insertion failed");
 		return -1;
 	}
 
@@ -192,7 +192,7 @@ int gds_dlist_push(gds_dlist_t *list, void *data)
 
 	added = gds_inline_dlist_insert(tail, 1, i, &head, &tail);
 	if (added != 1) {
-		GDS_LOG_ERROR("Insertion failed");
+		gds_log_error("Insertion failed");
 		return -1;
 	}
 

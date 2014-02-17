@@ -38,19 +38,19 @@
 	} \
 } while(0)
 
-#define GDS_LOG_FATAL(...) \
+#define gds_log_fatal(...) \
 	gds_log(1, "fatal", __VA_ARGS__)
 
-#define GDS_LOG_ERROR(...) \
+#define gds_log_error(...) \
 	gds_log(2, "error", __VA_ARGS__)
 
-#define GDS_LOG_WARNING(...) \
+#define gds_log_warning(...) \
 	gds_log(3, "warning", __VA_ARGS__)
 
-#define GDS_LOG_INFO(...) \
+#define gds_log_info(...) \
 	gds_log(4, "info", __VA_ARGS__)
 
-#define GDS_LOG_DEBUG(...) \
+#define gds_log_debug(...) \
 	gds_log(5, "debug", __VA_ARGS__)
 
 #endif /* gds_log_h_included */
