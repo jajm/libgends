@@ -19,7 +19,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "exception.h"
+#include "malloc.h"
 #include "check_arg.h"
 #include "log.h"
 #include "inline/rbtree.h"
@@ -30,11 +30,7 @@ gds_rbtree_node_t * gds_rbtree_node_new(void *key, void *data)
 {
 	gds_rbtree_node_t *node;
 	
-	node = malloc(sizeof(gds_rbtree_node_t));
-
-	if(node == NULL) {
-		GDS_THROW_ALLOC_ERROR(sizeof(gds_rbtree_node_t));
-	}
+	node = gds_malloc(sizeof(gds_rbtree_node_t));
 
 	node->key = key;
 	node->data = data;
@@ -335,10 +331,7 @@ gds_iterator_t * gds_rbtree_iterator_new(gds_rbtree_node_t *root)
 
 	GDS_CHECK_ARG_NOT_NULL(root);
 
-	data = malloc(sizeof(gds_rbtree_iterator_data_t));
-	if (data == NULL) {
-		GDS_THROW_ALLOC_ERROR(sizeof(gds_rbtree_iterator_data_t));
-	}
+	data = gds_malloc(sizeof(gds_rbtree_iterator_data_t));
 
 	data->root = root;
 	data->inline_rbtree_it = NULL;

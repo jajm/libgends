@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "slist.h"
-#include "exception.h"
+#include "malloc.h"
 #include "check_arg.h"
 #include "log.h"
 #include "rbtree.h"
@@ -44,15 +44,8 @@ gds_hash_map_t * gds_hash_map_new(unsigned long size, void *hash_cb,
 	GDS_CHECK_ARG_NOT_NULL(hash_cb)
 	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb)
 
-	h = malloc(sizeof(gds_hash_map_t));
-	if (h == NULL) {
-		GDS_THROW_ALLOC_ERROR(sizeof(gds_hash_map_t));
-	}
-
-	h->map = calloc(size, sizeof(gds_rbtree_node_t *));
-	if (h->map == NULL) {
-		GDS_THROW_ALLOC_ERROR(sizeof(gds_rbtree_node_t *));
-	}
+	h = gds_malloc(sizeof(gds_hash_map_t));
+	h->map = gds_calloc(size, sizeof(gds_rbtree_node_t *));
 
 	h->size = size;
 	h->hash_cb = hash_cb;
@@ -206,10 +199,7 @@ gds_iterator_t * gds_hash_map_iterator_new(gds_hash_map_t *h)
 	gds_hash_map_iterator_data_t *data;
 	gds_iterator_t *it;
 
-	data = malloc(sizeof(gds_hash_map_iterator_data_t));
-	if (data == NULL) {
-		GDS_THROW_ALLOC_ERROR(sizeof(gds_hash_map_iterator_data_t));
-	}
+	data = gds_malloc(sizeof(gds_hash_map_iterator_data_t));
 
 	data->hash = h;
 	data->rbtree_it = NULL;
@@ -267,10 +257,7 @@ gds_rbtree_node_t ** gds_hash_map_build_map(gds_hash_map_t *h,
 	unsigned long hash;
 	void *k, *v;
 
-	map = calloc(size, sizeof(gds_rbtree_node_t *));
-	if (map == NULL) {
-		GDS_THROW_ALLOC_ERROR(sizeof(gds_rbtree_node_t *));
-	}
+	map = gds_calloc(size, sizeof(gds_rbtree_node_t *));
 	it = gds_hash_map_iterator_new(h);
 	gds_iterator_reset(it);
 	while (!gds_iterator_step(it)) {

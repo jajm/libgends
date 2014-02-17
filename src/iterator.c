@@ -38,7 +38,7 @@
  */
 
 #include <stdlib.h>
-#include "exception.h"
+#include "malloc.h"
 #include "check_arg.h"
 #include "log.h"
 #include "iterator.h"
@@ -54,11 +54,7 @@ gds_iterator_t *gds_iterator_new(void *data, void *reset_cb, void *step_cb,
 	GDS_CHECK_ARG_NOT_NULL(get_cb);
 	GDS_CHECK_ARG_NOT_NULL(getkey_cb);
 
-	it = malloc(sizeof(gds_iterator_t));
-	if (it == NULL) {
-		GDS_THROW(NotEnoughMemoryException, "failed to allocate %d "
-			"bytes", sizeof(gds_iterator_t));
-	}
+	it = gds_malloc(sizeof(gds_iterator_t));
 
 	it->data = data;
 	it->reset_cb = reset_cb;

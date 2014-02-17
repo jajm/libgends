@@ -18,7 +18,7 @@
  */
 
 #include <stdlib.h>
-#include "exception.h"
+#include "malloc.h"
 #include "check_arg.h"
 #include "log.h"
 #include "inline/slist.h"
@@ -55,11 +55,7 @@ gds_slist_node_t *gds_slist_node_new(void *data)
 
 	GDS_CHECK_ARG_NOT_NULL(data);
 
-	node = malloc(sizeof(gds_slist_node_t));
-	if (node == NULL) {
-		GDS_THROW(NotEnoughMemoryException, "failed to allocate %d "
-			"bytes", sizeof(gds_slist_node_t));
-	}
+	node = gds_malloc(sizeof(gds_slist_node_t));
 	node->data = data;
 	gds_inline_slist_node_init(&(node->slist_node_inline));
 
@@ -137,12 +133,10 @@ struct gds_slist_s {
 
 gds_slist_t * gds_slist_new(void)
 {
-	gds_slist_t *list = malloc(sizeof(gds_slist_t));
+	gds_slist_t *list = gds_malloc(sizeof(gds_slist_t));
 
-	if (list) {
-		list->head = list->tail = NULL;
-		list->size = 0;
-	}
+	list->head = list->tail = NULL;
+	list->size = 0;
 
 	return list;
 }
@@ -523,11 +517,7 @@ gds_iterator_t * gds_slist_iterator_new(gds_slist_t *list)
 	gds_slist_iterator_data_t *it_data;
 	gds_iterator_t *it;
 
-	it_data = malloc(sizeof(gds_slist_iterator_data_t));
-	if (it_data == NULL) {
-		GDS_THROW(NotEnoughMemoryException, "failed to allocate %d "
-			"bytes", sizeof(gds_slist_iterator_data_t));
-	}
+	it_data = gds_malloc(sizeof(gds_slist_iterator_data_t));
 
 	it_data->list = list;
 	it_data->cur = NULL;
