@@ -19,7 +19,7 @@
 
 #include <stdlib.h>
 #include "malloc.h"
-#include "check_arg.h"
+#include "assert.h"
 #include "log.h"
 #include "inline/dlist.h"
 #include "dlist.h"
@@ -66,7 +66,7 @@ int gds_dlist_node_set_data(gds_dlist_node_t *node, void *data,
 {
 	void (*cb)(void *, void *) = callback;
 
-	GDS_CHECK_ARG_NOT_NULL(node);
+	gds_assert(node != NULL, -1);
 
 	if (cb != NULL) {
 		cb(node->data, callback_data);
@@ -79,7 +79,7 @@ int gds_dlist_node_set_data(gds_dlist_node_t *node, void *data,
 
 void * gds_dlist_node_get_data(gds_dlist_node_t *node)
 {
-	GDS_CHECK_ARG_NOT_NULL(node);
+	gds_assert(node != NULL, NULL);
 
 	return node->data;
 }
@@ -89,7 +89,7 @@ gds_dlist_node_t * gds_dlist_node_copy(gds_dlist_node_t *node)
 	gds_dlist_node_t *head, *tmp, *tmp2, *n;
 	gds_inline_dlist_node_t *i, *ti, *t2i;
 
-	GDS_CHECK_ARG_NOT_NULL(node);
+	gds_assert(node != NULL, NULL);
 
 	head = gds_dlist_node_new(node->data);
 	tmp = head;
@@ -154,7 +154,7 @@ int gds_dlist_unshift(gds_dlist_t *list, void *data)
 	gds_inline_dlist_node_t *i, *head, *tail;
 	int added;
 
-	GDS_CHECK_ARG_NOT_NULL(list);
+	gds_assert(list != NULL, -1);
 
 	n = gds_dlist_node_new(data);
 
@@ -181,7 +181,7 @@ int gds_dlist_push(gds_dlist_t *list, void *data)
 	gds_inline_dlist_node_t *i, *head, *tail;
 	int added;
 
-	GDS_CHECK_ARG_NOT_NULL(list);
+	gds_assert(list != NULL, -1);
 
 	n = gds_dlist_node_new(data);
 
@@ -223,7 +223,7 @@ void * gds_dlist_shift(gds_dlist_t *list)
 	void *callback = _gds_dlist_remove_callback;
 	void *d = NULL;
 
-	GDS_CHECK_ARG_NOT_NULL(list);
+	gds_assert(list != NULL, NULL);
 
 	if (list->head != NULL) {
 		head = gds_dlist_node_get_inline(list->head);
@@ -245,7 +245,7 @@ void * gds_dlist_pop(gds_dlist_t *list)
 	void *callback = _gds_dlist_remove_callback;
 	void *d = NULL;
 
-	GDS_CHECK_ARG_NOT_NULL(list);
+	gds_assert(list != NULL, NULL);
 
 	if (list->tail != NULL) {
 		head = gds_dlist_node_get_inline(list->head);
@@ -266,7 +266,8 @@ void * gds_dlist_get(gds_dlist_t *list, unsigned int offset)
 	void *d = NULL;
 	gds_dlist_node_t *n;
 	gds_inline_dlist_node_t *i;
-	GDS_CHECK_ARG_NOT_NULL(list);
+
+	gds_assert(list != NULL, NULL);
 
 	if (list->head != NULL) {
 		i = gds_dlist_node_get_inline(list->head);
@@ -280,7 +281,7 @@ void * gds_dlist_get(gds_dlist_t *list, unsigned int offset)
 	return d;
 }
 
-void gds_dlist_splice(gds_dlist_t *list, unsigned int offset,
+int gds_dlist_splice(gds_dlist_t *list, unsigned int offset,
 	unsigned int length, void *callback, void *callback_data,
 	gds_dlist_t *replacement)
 {
@@ -288,7 +289,7 @@ void gds_dlist_splice(gds_dlist_t *list, unsigned int offset,
 	void *cb = _gds_dlist_remove_callback;
 	gds_dlist_node_t *copy;
 
-	GDS_CHECK_ARG_NOT_NULL(list);
+	gds_assert(list != NULL, -1);
 
 	head = gds_dlist_node_get_inline(list->head);
 	tail = gds_dlist_node_get_inline(list->tail);
@@ -302,6 +303,8 @@ void gds_dlist_splice(gds_dlist_t *list, unsigned int offset,
 		&head, &tail);
 	list->head = gds_dlist_node_get_container_of(head);
 	list->tail = gds_dlist_node_get_container_of(tail);
+
+	return 0;
 }
 
 gds_dlist_t * gds_dlist_slice(gds_dlist_t *list, unsigned int offset,
@@ -314,7 +317,7 @@ gds_dlist_t * gds_dlist_slice(gds_dlist_t *list, unsigned int offset,
 	void *data;
 	unsigned int cnt = 0;
 
-	GDS_CHECK_ARG_NOT_NULL(list);
+	gds_assert(list != NULL, NULL);
 
 	slice = gds_dlist_new();
 
@@ -347,18 +350,20 @@ void _gds_dlist_map_callback(gds_inline_dlist_node_t *current, unsigned int pos,
 	callback(data, pos, callback_data);
 }
 
-void gds_dlist_map(gds_dlist_t *list, void *callback, void *callback_data)
+int gds_dlist_map(gds_dlist_t *list, void *callback, void *callback_data)
 {
 	gds_inline_dlist_node_t *i;
 
-	GDS_CHECK_ARG_NOT_NULL(list);
-	GDS_CHECK_ARG_NOT_NULL(callback);
+	gds_assert(list != NULL, -1);
+	gds_assert(callback != NULL, -1);
 
 	if (list->head != NULL) {
 		i = gds_dlist_node_get_inline(list->head);
 		gds_inline_dlist_map(i, _gds_dlist_map_callback,
 			(void *[]) {callback, callback_data});
 	}
+
+	return 0;
 }
 
 gds_dlist_t * gds_dlist_filter(gds_dlist_t *list, void *callback,
@@ -370,8 +375,8 @@ gds_dlist_t * gds_dlist_filter(gds_dlist_t *list, void *callback,
 	gds_inline_dlist_node_t *i;
 	int (*cb)(void *, void *) = callback;
 
-	GDS_CHECK_ARG_NOT_NULL(list);
-	GDS_CHECK_ARG_NOT_NULL(callback);
+	gds_assert(list != NULL, NULL);
+	gds_assert(callback != NULL, NULL);
 
 	l = gds_dlist_new();
 
@@ -407,8 +412,8 @@ void * gds_dlist_reduce(gds_dlist_t *list, void *callback, void *callback_data)
 	gds_inline_dlist_node_t *i;
 	void *result = NULL;
 
-	GDS_CHECK_ARG_NOT_NULL(list);
-	GDS_CHECK_ARG_NOT_NULL(callback);
+	gds_assert(list != NULL, NULL);
+	gds_assert(callback != NULL, NULL);
 
 	if (list->head != NULL) {
 		i = gds_dlist_node_get_inline(list->head);
@@ -421,7 +426,7 @@ void * gds_dlist_reduce(gds_dlist_t *list, void *callback, void *callback_data)
 
 unsigned int gds_dlist_size(gds_dlist_t *list)
 {
-	GDS_CHECK_ARG_NOT_NULL(list);
+	gds_assert(list != NULL, 0);
 
 	return list->size;
 }
@@ -451,7 +456,7 @@ typedef struct {
 
 int gds_dlist_iterator_reset(gds_dlist_iterator_data_t *it_data)
 {
-	GDS_CHECK_ARG_NOT_NULL(it_data);
+	gds_assert(it_data != NULL, -1);
 
 	it_data->cur = NULL;
 	it_data->i = -1;
@@ -463,7 +468,7 @@ int gds_dlist_iterator_step(gds_dlist_iterator_data_t *it_data)
 {
 	gds_inline_dlist_node_t *next = NULL;
 
-	GDS_CHECK_ARG_NOT_NULL(it_data);
+	gds_assert(it_data != NULL, -1);
 
 	if (it_data->cur != NULL) {
 		next = gds_inline_dlist_node_get_next(it_data->cur);
@@ -485,7 +490,7 @@ void * gds_dlist_iterator_get(gds_dlist_iterator_data_t *it_data)
 {
 	gds_dlist_node_t *node;
 
-	GDS_CHECK_ARG_NOT_NULL(it_data);
+	gds_assert(it_data != NULL, NULL);
 
 	node = gds_dlist_node_get_container_of(it_data->cur);
 	return gds_dlist_node_get_data(node);
@@ -493,7 +498,7 @@ void * gds_dlist_iterator_get(gds_dlist_iterator_data_t *it_data)
 
 const void * gds_dlist_iterator_getkey(gds_dlist_iterator_data_t *it_data)
 {
-	GDS_CHECK_ARG_NOT_NULL(it_data);
+	gds_assert(it_data != NULL, NULL);
 
 	return &(it_data->i);
 }

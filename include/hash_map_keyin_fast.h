@@ -78,6 +78,7 @@ gds_hash_map_keyin_fast_new(
  * Returns
  *   0: key was already in the hash
  *   1: key was just added
+ *   a negative value on failure
  */
 int
 gds_hash_map_keyin_fast_set(
@@ -106,6 +107,7 @@ gds_hash_map_keyin_fast_get(
  * Returns
  *   0: key was correctly unset
  *   1: key was not in the hash map
+ *   a negative value on failure
  */
 int
 gds_hash_map_keyin_fast_unset(
@@ -156,10 +158,17 @@ gds_hash_map_keyin_fast_values(
 	gds_hash_map_keyin_fast_t *h
 );
 
-/* Change the number of buckets of hash map */
-/*         h : pointer to the hash map
- *  new_size : New size (number of buckets) */
-void
+/* Change the number of buckets of hash map
+ *
+ * Parameters
+ *   h        : pointer to the hash map
+ *   new_size : New size (number of buckets)
+ *
+ * Returns
+ *   0 on success
+ *   a negative value on failure
+ */
+int
 gds_hash_map_keyin_fast_change_size(
 	gds_hash_map_keyin_fast_t *h,
 	unsigned long new_size

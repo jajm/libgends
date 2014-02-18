@@ -20,7 +20,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "malloc.h"
-#include "check_arg.h"
+#include "assert.h"
+#include "container_of.h"
 #include "log.h"
 #include "slist.h"
 #include "inline/rbtree_fast.h"
@@ -58,10 +59,7 @@ void gds_rbtree_fast_node_free(gds_rbtree_fast_node_t *node,
 }
 
 #define rbt_containerof(ptr) \
-	((ptr) != NULL) \
-	? (gds_rbtree_fast_node_t *) \
-		((char *)ptr - offsetof(gds_rbtree_fast_node_t, rbtree)) \
-	: NULL
+	((ptr) ? container_of(ptr, gds_rbtree_fast_node_t, rbtree) : NULL)
 
 int gds_rbtree_fast_node_cmp(gds_inline_rbtree_fast_node_t *inode1,
 	gds_inline_rbtree_fast_node_t *inode2, int (*cmpkey_cb)(void *, void *))
@@ -91,8 +89,8 @@ int gds_rbtree_fast_add(gds_rbtree_fast_node_t **root, void *key, void *data,
 	gds_rbtree_fast_node_t *node;
 	int rc;
 
-	GDS_CHECK_ARG_NOT_NULL(root);
-	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb);
+	gds_assert(root != NULL, -1);
+	gds_assert(cmpkey_cb != NULL, -1);
 
 	iroot = (*root != NULL) ? &((*root)->rbtree) : NULL;
 	node = gds_rbtree_fast_node_new(key, data);
@@ -113,7 +111,7 @@ gds_rbtree_fast_node_t * gds_rbtree_fast_get_node(gds_rbtree_fast_node_t *root,
 {
 	gds_inline_rbtree_fast_node_t *inode = NULL;
 
-	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb);
+	gds_assert(cmpkey_cb != NULL, NULL);
 
 	if (root == NULL) {
 		return NULL;
@@ -132,8 +130,8 @@ int gds_rbtree_fast_set(gds_rbtree_fast_node_t **root, void *key, void *data,
 	gds_inline_rbtree_fast_node_t *iroot, *iremoved = NULL;
 	int rc;
 
-	GDS_CHECK_ARG_NOT_NULL(root);
-	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb);
+	gds_assert(root != NULL, -1);
+	gds_assert(cmpkey_cb != NULL, -1);
 
 	node = gds_rbtree_fast_node_new(key, data);
 	iroot = (*root != NULL) ? &((*root)->rbtree) : NULL;
@@ -173,8 +171,8 @@ int gds_rbtree_fast_del(gds_rbtree_fast_node_t **root, const void *key,
 	gds_rbtree_fast_node_t *node;
 	int not_in_tree = 1;
 
-	GDS_CHECK_ARG_NOT_NULL(root);
-	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb);
+	gds_assert(root != NULL, -1)
+	gds_assert(cmpkey_cb != NULL, -1);
 
 	if (*root != NULL) {
 		iroot = &((*root)->rbtree);
@@ -200,8 +198,8 @@ void * gds_rbtree_fast_pop(gds_rbtree_fast_node_t **root, const void *key,
 	gds_rbtree_fast_node_t *node;
 	void *data = NULL;
 
-	GDS_CHECK_ARG_NOT_NULL(root);
-	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb);
+	gds_assert(root != NULL, NULL);
+	gds_assert(cmpkey_cb != NULL, NULL);
 
 	if(*root == NULL) {
 		gds_log_warning("Tree is empty");
@@ -289,7 +287,7 @@ gds_iterator_t * gds_rbtree_fast_iterator_new(gds_rbtree_fast_node_t *root)
 	gds_rbtree_fast_iterator_data_t *data;
 	gds_iterator_t *it;
 
-	GDS_CHECK_ARG_NOT_NULL(root);
+	gds_assert(root != NULL, NULL);
 
 	data = gds_malloc(sizeof(gds_rbtree_fast_iterator_data_t));
 

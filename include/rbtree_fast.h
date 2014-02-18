@@ -77,6 +77,7 @@ gds_rbtree_fast_add(
  * Returns
  *   0 if key was already in the hash map
  *   1 if key was just added
+ *   a negative value on failure
  */
 int
 gds_rbtree_fast_set(
@@ -132,6 +133,7 @@ gds_rbtree_fast_get(
  * Returns
  *   0 if node was successfully deleted.
  *   1 if node was not found.
+ *   a negative value on failure.
  */
 int
 gds_rbtree_fast_del(
@@ -194,6 +196,7 @@ gds_rbtree_fast_free(
  *
  * Returns
  *   Pointer to the new iterator.
+ *   NULL on failure.
  */
 gds_iterator_t *
 gds_rbtree_fast_iterator_new(

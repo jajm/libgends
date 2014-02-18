@@ -52,6 +52,7 @@ gds_inline_rbtree_node_init(
  * Returns:
  *   0 if node was successfully inserted
  *   1 if an equivalent node was already in tree (ie. rbt_cmp_cb returned 0)
+ *   a negative value on failure
  *
  * NOTE: root will be modified so it will always point to the root of tree after
  * the function call. You should consider this when using this function.
@@ -87,6 +88,7 @@ gds_inline_rbtree_add(
  *   0 if node was inserted in the tree
  *   1 if the node is already in the tree (no replacement done)
  *   2 if node has replaced another node in the tree (*removed will be set)
+ *   a negative value on failure
  *
  * NOTE: root will be modified so it will always point to the root of tree after
  * the function call. You should consider this when using this function.
@@ -162,6 +164,7 @@ gds_inline_rbtree_del(
  *
  * Returns:
  *   Pointer to the new iterator. Free with gds_iterator_free.
+ *   NULL on failure
  */
 gds_iterator_t *
 gds_inline_rbtree_iterator_new(

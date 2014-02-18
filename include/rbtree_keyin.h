@@ -47,6 +47,7 @@ typedef struct {
  * Returns
  *   0 on success
  *   a positive value if key of data is already in the tree: nothing done
+ *   a negative value on failure
  */
 int
 gds_rbtree_keyin_add(
@@ -81,6 +82,7 @@ gds_rbtree_keyin_add(
  * Returns
  *   0 if key was not in the tree (node added)
  *   1 if key was already in the tree (node replaced)
+ *   a negative value on failure
  */
 int
 gds_rbtree_keyin_set(
@@ -140,6 +142,7 @@ gds_rbtree_keyin_get(
  * Returns
  *   0 if node was successfully deleted.
  *   1 if key was not in tree.
+ *   a negative value on failure.
  */
 int
 gds_rbtree_keyin_del(
@@ -168,6 +171,7 @@ gds_rbtree_keyin_del(
  *
  * Returns
  *   pointer to the data
+ *   NULL on failure
  */
 void *
 gds_rbtree_keyin_pop(
@@ -201,6 +205,7 @@ gds_rbtree_keyin_free(
  *
  * Returns
  *   Pointer to iterator.
+ *   NULL on failure.
  */
 gds_iterator_t *
 gds_rbtree_keyin_iterator_new(

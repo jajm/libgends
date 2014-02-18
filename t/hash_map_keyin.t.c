@@ -6,73 +6,42 @@
 #include "hash_map_keyin.h"
 #include "hash_functions.h"
 #include "slist.h"
-#include "test_macros.h"
 #include "test.h"
 
 void t_hash_map_keyin_new(void)
 {
 	gds_hash_map_keyin_t *hash;
 
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(0, NULL, NULL, NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(0, NULL, NULL, NULL, free));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(0, NULL, NULL, test_cmpkey, NULL));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(0, NULL, NULL, test_cmpkey, free));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(0, NULL, test_getkey, NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(0, NULL, test_getkey, NULL, free));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(0, NULL, test_getkey, test_cmpkey, NULL));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(0, NULL, test_getkey, test_cmpkey, free));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(0, gds_hash_djb2, NULL, NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(0, gds_hash_djb2, NULL, NULL, free));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(0, gds_hash_djb2, NULL, test_cmpkey, NULL));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(0, gds_hash_djb2, NULL, test_cmpkey, free));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(0, gds_hash_djb2, test_getkey, NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(0, gds_hash_djb2, test_getkey, NULL, free));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(0, gds_hash_djb2, test_getkey, test_cmpkey, NULL));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(0, gds_hash_djb2, test_getkey, test_cmpkey, free));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(32, NULL, NULL, NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(32, NULL, NULL, NULL, free));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(32, NULL, NULL, test_cmpkey, NULL));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(32, NULL, NULL, test_cmpkey, free));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(32, NULL, test_getkey, NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(32, NULL, test_getkey, NULL, free));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(32, NULL, test_getkey, test_cmpkey, NULL));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(32, NULL, test_getkey, test_cmpkey, free));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(32, gds_hash_djb2, NULL, NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(32, gds_hash_djb2, NULL, NULL, free));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(32, gds_hash_djb2, NULL, test_cmpkey, NULL));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(32, gds_hash_djb2, NULL, test_cmpkey, free));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(32, gds_hash_djb2, test_getkey, NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_new(32, gds_hash_djb2, test_getkey, NULL, free));
+	ok(NULL == gds_hash_map_keyin_new(0, NULL, NULL, NULL, NULL));
+	ok(NULL == gds_hash_map_keyin_new(0, NULL, NULL, NULL, free));
+	ok(NULL == gds_hash_map_keyin_new(0, NULL, NULL, test_cmpkey, NULL));
+	ok(NULL == gds_hash_map_keyin_new(0, NULL, NULL, test_cmpkey, free));
+	ok(NULL == gds_hash_map_keyin_new(0, NULL, test_getkey, NULL, NULL));
+	ok(NULL == gds_hash_map_keyin_new(0, NULL, test_getkey, NULL, free));
+	ok(NULL == gds_hash_map_keyin_new(0, NULL, test_getkey, test_cmpkey, NULL));
+	ok(NULL == gds_hash_map_keyin_new(0, NULL, test_getkey, test_cmpkey, free));
+	ok(NULL == gds_hash_map_keyin_new(0, gds_hash_djb2, NULL, NULL, NULL));
+	ok(NULL == gds_hash_map_keyin_new(0, gds_hash_djb2, NULL, NULL, free));
+	ok(NULL == gds_hash_map_keyin_new(0, gds_hash_djb2, NULL, test_cmpkey, NULL));
+	ok(NULL == gds_hash_map_keyin_new(0, gds_hash_djb2, NULL, test_cmpkey, free));
+	ok(NULL == gds_hash_map_keyin_new(0, gds_hash_djb2, test_getkey, NULL, NULL));
+	ok(NULL == gds_hash_map_keyin_new(0, gds_hash_djb2, test_getkey, NULL, free));
+	ok(NULL == gds_hash_map_keyin_new(0, gds_hash_djb2, test_getkey, test_cmpkey, NULL));
+	ok(NULL == gds_hash_map_keyin_new(0, gds_hash_djb2, test_getkey, test_cmpkey, free));
+	ok(NULL == gds_hash_map_keyin_new(32, NULL, NULL, NULL, NULL));
+	ok(NULL == gds_hash_map_keyin_new(32, NULL, NULL, NULL, free));
+	ok(NULL == gds_hash_map_keyin_new(32, NULL, NULL, test_cmpkey, NULL));
+	ok(NULL == gds_hash_map_keyin_new(32, NULL, NULL, test_cmpkey, free));
+	ok(NULL == gds_hash_map_keyin_new(32, NULL, test_getkey, NULL, NULL));
+	ok(NULL == gds_hash_map_keyin_new(32, NULL, test_getkey, NULL, free));
+	ok(NULL == gds_hash_map_keyin_new(32, NULL, test_getkey, test_cmpkey, NULL));
+	ok(NULL == gds_hash_map_keyin_new(32, NULL, test_getkey, test_cmpkey, free));
+	ok(NULL == gds_hash_map_keyin_new(32, gds_hash_djb2, NULL, NULL, NULL));
+	ok(NULL == gds_hash_map_keyin_new(32, gds_hash_djb2, NULL, NULL, free));
+	ok(NULL == gds_hash_map_keyin_new(32, gds_hash_djb2, NULL, test_cmpkey, NULL));
+	ok(NULL == gds_hash_map_keyin_new(32, gds_hash_djb2, NULL, test_cmpkey, free));
+	ok(NULL == gds_hash_map_keyin_new(32, gds_hash_djb2, test_getkey, NULL, NULL));
+	ok(NULL == gds_hash_map_keyin_new(32, gds_hash_djb2, test_getkey, NULL, free));
 
 	hash = gds_hash_map_keyin_new(32, gds_hash_djb2, test_getkey, test_cmpkey, NULL);
 	isnt(hash, NULL, "hash creation succeeded");
@@ -96,10 +65,8 @@ void t_hash_map_keyin_set(void)
 
 	hash = gds_hash_map_keyin_new(32, gds_hash_djb2, test_getkey, test_cmpkey, NULL);
 
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_set(NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_hash_map_keyin_set(NULL, &data[0]));
+	ok(0 > gds_hash_map_keyin_set(NULL, NULL));
+	ok(0 > gds_hash_map_keyin_set(NULL, &data[0]));
 
 	rc = gds_hash_map_keyin_set(hash, &data[0]);
 	is(rc, 0);
@@ -138,8 +105,8 @@ void t_hash_map_keyin_get(void)
 
 	hash = gds_hash_map_keyin_new(32, gds_hash_djb2, test_getkey, test_cmpkey, NULL);
 
-	GDS_ASSERT_THROW(BadArgumentException, gds_hash_map_keyin_get(NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_hash_map_keyin_get(NULL, data[0].key));
+	ok(NULL == gds_hash_map_keyin_get(NULL, NULL));
+	ok(NULL == gds_hash_map_keyin_get(NULL, data[0].key));
 
 	t = gds_hash_map_keyin_get(hash, NULL);
 	is(t, NULL);
@@ -186,8 +153,8 @@ void t_hash_map_keyin_unset(void)
 
 	hash = gds_hash_map_keyin_new(32, gds_hash_djb2, test_getkey, test_cmpkey, NULL);
 
-	GDS_ASSERT_THROW(BadArgumentException, gds_hash_map_keyin_unset(NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_hash_map_keyin_unset(NULL, data[0].key));
+	ok(0 > gds_hash_map_keyin_unset(NULL, NULL));
+	ok(0 > gds_hash_map_keyin_unset(NULL, data[0].key));
 
 	rc = gds_hash_map_keyin_unset(hash, NULL);
 	is(rc, 1);
@@ -235,8 +202,8 @@ void t_hash_map_keyin_pop(void)
 
 	hash = gds_hash_map_keyin_new(32, gds_hash_djb2, test_getkey, test_cmpkey, NULL);
 
-	GDS_ASSERT_THROW(BadArgumentException, gds_hash_map_keyin_pop(NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_hash_map_keyin_pop(NULL, data[0].key));
+	ok(NULL == gds_hash_map_keyin_pop(NULL, NULL));
+	ok(NULL == gds_hash_map_keyin_pop(NULL, data[0].key));
 
 	d = gds_hash_map_keyin_pop(hash, NULL);
 	is(d, NULL);

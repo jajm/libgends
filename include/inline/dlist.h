@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Julian Maurice
+ * Copyright 2013-2014 Julian Maurice
  *
  * This file is part of libgends
  *
@@ -25,10 +25,16 @@ typedef struct gds_inline_dlist_node_s {
 	struct gds_inline_dlist_node_s *next;
 } gds_inline_dlist_node_t;
 
-/**
- * Initialize structure
+/* Initialize structure
+ *
+ * Parameters
+ *   node : Node to initialize.
+ *
+ * Returns
+ *   0 on success
+ *   a negative value on failure
  */
-void
+int
 gds_inline_dlist_node_init(
 	gds_inline_dlist_node_t *node
 );
@@ -68,7 +74,7 @@ gds_inline_dlist_node_get_prev(
  *   node: The node to modify
  *   next: Node to set as the next node
  *
- * Returns:
+ * Returns
  *   0 on success
  *   a negative value on failure
  */
@@ -78,13 +84,12 @@ gds_inline_dlist_node_set_next(
 	gds_inline_dlist_node_t *next
 );
 
-/*
- * Get the next node
+/* Get the next node
  *
  * Parameters
  *   node: Pointer to node
  *
- * Returns:
+ * Returns
  *   pointer to the next node
  */
 gds_inline_dlist_node_t *
@@ -92,16 +97,15 @@ gds_inline_dlist_node_get_next(
 	gds_inline_dlist_node_t *node
 );
 
-/*
- * Insert <list> immediately before <node>.
+/* Insert <list> immediately before <node>.
  *
- * Parameters:
- *   node: reference node
- *   list: a node in the list to insert
- *   newhead: if not NULL, and if <node> was the head of the list, *newhead will
- *            contain the address of the new head of the list
+ * Parameters
+ *   node    : reference node
+ *   list    : a node in the list to insert
+ *   newhead : if not NULL, and if <node> was the head of the list, *newhead
+ *             will contain the address of the new head of the list
  *
- * Example:
+ * Example
  *   If we have 2 lists:
  *     N <-> N1 <-> N2
  *     P <-> P1 <-> P2
@@ -111,27 +115,26 @@ gds_inline_dlist_node_get_next(
  * Note: <list> should not be already in the same list than <node>, otherwise
  * you may experience problems.
  *
- * Returns:
+ * Returns
  *   number of added nodes, ie. size of inserted list
- *   or a negative value in case of failure.
+ *   0 on failure
  */
-int
+unsigned int
 gds_inline_dlist_node_prepend(
 	gds_inline_dlist_node_t *node,
 	gds_inline_dlist_node_t *list,
 	gds_inline_dlist_node_t **newhead
 );
 
-/*
- * Insert <list> immediately after <node>.
+/* Insert <list> immediately after <node>.
  *
- * Parameters:
- *   node: reference node
- *   list: a node in the list to insert
- *   newtail: if not NULL, and if <node> was the tail of the list, *newtail will
- *            contain the address of the new tail of the list
+ * Parameters
+ *   node    : reference node
+ *   list    : a node in the list to insert
+ *   newtail : if not NULL, and if <node> was the tail of the list, *newtail
+ *             will contain the address of the new tail of the list
  *
- * Example:
+ * Example
  *   If we have 2 lists:
  *     N <-> N1 <-> N2
  *     P <-> P1 <-> P2
@@ -141,34 +144,33 @@ gds_inline_dlist_node_prepend(
  * Note: <list> should not be already in the same list than <node>, otherwise
  * you may experience problems.
  *
- * Returns:
+ * Returns
  *   number of added nodes, ie. size of inserted list
- *   or a negative value in case of failure.
+ *   0 on failure
  */
-int
+unsigned int
 gds_inline_dlist_node_append(
 	gds_inline_dlist_node_t *node,
 	gds_inline_dlist_node_t *list,
 	gds_inline_dlist_node_t **newtail
 );
 
-/*
- * Insert nodes in list.
+/* Insert nodes in list.
  *
- * Parameters:
- *   node: A node in the list.
- *   offset: Where to insert the nodes in the list. Can be negative.
- *   list: A node in the list to insert.
- *   newhead: if not NULL, and if head of list was just changed, address of new
- *            head is affected to *newhead
- *   newtail: if not NULL, and if tail of list was just changed, address of new
- *            tail is affected to *newtail
+ * Parameters
+ *   node    : A node in the list.
+ *   offset  : Where to insert the nodes in the list. Can be negative.
+ *   list    : A node in the list to insert.
+ *   newhead : if not NULL, and if head of list was just changed, address of new
+ *             head is affected to *newhead
+ *   newtail : if not NULL, and if tail of list was just changed, address of new
+ *             tail is affected to *newtail
  *
  * Returns:
  *   number of added nodes, ie. size of inserted list
- *   or a negative value in case of failure.
+ *   0 on failure
  */
-int gds_inline_dlist_insert(
+unsigned int gds_inline_dlist_insert(
 	gds_inline_dlist_node_t *node,
 	int offset,
 	gds_inline_dlist_node_t *list,
@@ -176,30 +178,30 @@ int gds_inline_dlist_insert(
 	gds_inline_dlist_node_t **newtail
 );
 
-/*
- * Remove nodes from list.
+/* Remove nodes from list.
  *
- * Parameters:
- *   node: a node in the list
- *   offset: removal starting point
- *           if offset > 0, start removal <offset> nodes after <node>
- *           if offset < 0, start removal <offset> nodes before <node>
- *           if offset = 0, start removal at <node>
- *   length: number of nodes to remove
- *           if length > 0, remove in direction of tail
- *           if length < 0, remove in direction of head
- *   callback: function called on node before removal
- *             prototype is void callback(gds_inline_dlist_node_t *, void *)
- *             first parameter is the node that will be removed
- *             second parameter is <callback_data>
- *   callback_data: data passed to <callback>
- *   newhead: if not NULL, and if head of list was just removed, address of new
- *            head is affected to *newhead
- *   newtail: if not NULL, and if tail of list was just removed, address of new
- *            tail is affected to *newtail
+ * Parameters
+ *   node          : a node in the list
+ *   offset        : removal starting point
+ *                   if offset > 0, start removal <offset> nodes after <node>
+ *                   if offset < 0, start removal <offset> nodes before <node>
+ *                   if offset = 0, start removal at <node>
+ *   length        : number of nodes to remove
+ *                   if length > 0, remove in direction of tail
+ *                   if length < 0, remove in direction of head
+ *   callback      : function called on node before removal
+ *                   prototype: void callback(gds_inline_dlist_node_t *, void *)
+ *                   first parameter is the node that will be removed
+ *                   second parameter is <callback_data>
+ *   callback_data : data passed to <callback>
+ *   newhead       : if not NULL, and if head of list was just removed, address
+ *                   of new head is affected to *newhead
+ *   newtail       : if not NULL, and if tail of list was just removed, address
+ *                   of new tail is affected to *newtail
  *
- * Returns:
+ * Returns
  *   Number of removed nodes.
+ *   0 on failure
  */
 unsigned int
 gds_inline_dlist_remove(
@@ -212,28 +214,27 @@ gds_inline_dlist_remove(
 	gds_inline_dlist_node_t **newtail
 );
 
-/*
- * Remove nodes from list and insert other nodes in place.
+/* Remove nodes from list and insert other nodes in place.
  *
- * Parameters:
- *   node: a node in the list
- *   offset: removal starting point
- *           if offset > 0, start removal <offset> nodes after <node>
- *           if offset < 0, start removal <offset> nodes before <node>
- *           if offset = 0, start removal at <node>
- *   length: number of nodes to remove
- *           if length > 0, remove in direction of tail
- *           if length < 0, remove in direction of head
- *   callback: function called on node before removal
- *             prototype is void callback(gds_inline_dlist_node_t *, void *)
- *             first parameter is the node that will be removed
- *             second parameter is <callback_data>
- *   callback_data: data passed to <callback>
- *   list: A node in the list to insert in place.
- *   newhead: if not NULL, and if head of list was just removed, address of new
- *            head is affected to *newhead
- *   newtail: if not NULL, and if tail of list was just removed, address of new
- *            tail is affected to *newtail
+ * Parameters
+ *   node          : a node in the list
+ *   offset        : removal starting point
+ *                   if offset > 0, start removal <offset> nodes after <node>
+ *                   if offset < 0, start removal <offset> nodes before <node>
+ *                   if offset = 0, start removal at <node>
+ *   length        : number of nodes to remove
+ *                   if length > 0, remove in direction of tail
+ *                   if length < 0, remove in direction of head
+ *   callback      : function called on node before removal
+ *                   prototype: void callback(gds_inline_dlist_node_t *, void *)
+ *                   first parameter is the node that will be removed
+ *                   second parameter is <callback_data>
+ *   callback_data : data passed to <callback>
+ *   list          : A node in the list to insert in place.
+ *   newhead       : if not NULL, and if head of list was just removed, address
+ *                   of new head is affected to *newhead
+ *   newtail       : if not NULL, and if tail of list was just removed, address
+ *                   of new tail is affected to *newtail
  *
  * Returns:
  *   Number of added nodes.
@@ -252,12 +253,11 @@ gds_inline_dlist_splice(
 	gds_inline_dlist_node_t **newtail
 );
 
-/*
- * Get a node in list from its position.
+/* Get a node in list from its position.
  *
- * Parameters:
- *   node: A node in the list.
- *   offset: Offset from <node>. Can be negative.
+ * Parameters
+ *   node   : A node in the list.
+ *   offset : Offset from <node>. Can be negative.
  *
  * Returns:
  *   Given N the position of <node>, it returns the node at position
@@ -270,13 +270,12 @@ gds_inline_dlist_get(
 	int offset
 );
 
-/*
- * Get the first node of list.
+/* Get the first node of list.
  *
- * Parameters:
- *   node: A node in the list
+ * Parameters
+ *   node : A node in the list
  *
- * Returns:
+ * Returns
  *   The first node of the list.
  */
 gds_inline_dlist_node_t *
@@ -284,13 +283,12 @@ gds_inline_dlist_get_head(
 	gds_inline_dlist_node_t *node
 );
 
-/*
- * Get the last node of list.
+/* Get the last node of list.
  *
- * Parameters:
- *   node: A node in the list
+ * Parameters
+ *   node : A node in the list
  *
- * Returns:
+ * Returns
  *   The last node of the list.
  */
 gds_inline_dlist_node_t *
@@ -298,32 +296,34 @@ gds_inline_dlist_get_tail(
 	gds_inline_dlist_node_t *node
 );
 
-/*
- * Get the list size
+/* Get the list size
  *
- * Parameters:
- *   head: Head of list
+ * Parameters
+ *   head : Head of list
  *
- * Returns:
+ * Returns
  *   The number of elements in the list
  */
-int
+unsigned int
 gds_inline_dlist_size(
 	gds_inline_dlist_node_t *head
 );
 
-/*
- * Apply a function to each node in list.
+/* Apply a function to each node in list.
  *
  * Parameters:
- *   head: Head of the list.
- *   callback: Function called on each node. Parameters are:
- *             - (gds_inline_dlist_node_t *) current node
- *             - (unsigned int) node offset
- *             - (void *) callback_data
- *   callback_data: Data to pass to callback as 3rd parameter.
+ *   head          : Head of the list.
+ *   callback      : Function called on each node. Parameters are:
+ *                   - (gds_inline_dlist_node_t *) current node
+ *                   - (unsigned int) node offset
+ *                   - (void *) callback_data
+ *   callback_data : Data to pass to callback as 3rd parameter.
+ *
+ * Returns
+ *   0 on success
+ *   a negative value on failure
  */
-void
+int
 gds_inline_dlist_map(
 	gds_inline_dlist_node_t *head,
 	void *callback,

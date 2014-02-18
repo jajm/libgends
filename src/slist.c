@@ -19,7 +19,7 @@
 
 #include <stdlib.h>
 #include "malloc.h"
-#include "check_arg.h"
+#include "assert.h"
 #include "log.h"
 #include "inline/slist.h"
 #include "slist.h"
@@ -52,7 +52,7 @@ gds_slist_node_t *gds_slist_node_new(void *data)
 {
 	gds_slist_node_t *node;
 
-	GDS_CHECK_ARG_NOT_NULL(data);
+	gds_assert(data != NULL, NULL);
 
 	node = gds_malloc(sizeof(gds_slist_node_t));
 	node->data = data;
@@ -67,7 +67,7 @@ int gds_slist_node_set_data(gds_slist_node_t *node, void *data,
 {
 	void (*cb)(void *, void *) = callback;
 
-	GDS_CHECK_ARG_NOT_NULL(node);
+	gds_assert(node != NULL, -1);
 
 	if (cb != NULL) {
 		cb(node->data, callback_data);
@@ -78,11 +78,11 @@ int gds_slist_node_set_data(gds_slist_node_t *node, void *data,
 	return 0;
 }
 
-void *gds_slist_node_get_data(gds_slist_node_t *node)
+void * gds_slist_node_get_data(gds_slist_node_t *node)
 {
 	void *data;
 
-	GDS_CHECK_ARG_NOT_NULL(node);
+	gds_assert(node != NULL, NULL);
 
 	data = node->data;
 
@@ -94,7 +94,7 @@ gds_slist_node_t * gds_slist_node_copy(gds_slist_node_t *node)
 	gds_slist_node_t *head, *tmp, *tmp2, *n;
 	gds_inline_slist_node_t *i, *ti, *t2i;
 
-	GDS_CHECK_ARG_NOT_NULL(node);
+	gds_assert(node != NULL, NULL);
 
 	head = gds_slist_node_new(node->data);
 	tmp = head;
@@ -158,7 +158,7 @@ int gds_slist_unshift(gds_slist_t *list, void *data)
 	gds_inline_slist_node_t *i, *head, *tail;
 	int added;
 
-	GDS_CHECK_ARG_NOT_NULL(list);
+	gds_assert(list != NULL, -1);
 
 	n = gds_slist_node_new(data);
 	i = gds_slist_node_get_inline(n);
@@ -184,7 +184,7 @@ int gds_slist_push(gds_slist_t *list, void *data)
 	gds_inline_slist_node_t *i, *head, *tail;
 	int added;
 
-	GDS_CHECK_ARG_NOT_NULL(list);
+	gds_assert(list != NULL, -1);
 
 	n = gds_slist_node_new(data);
 	i = gds_slist_node_get_inline(n);
@@ -226,7 +226,7 @@ void * gds_slist_shift(gds_slist_t *list)
 	int removed;
 	void *d = NULL;
 
-	GDS_CHECK_ARG_NOT_NULL(list);
+	gds_assert(list != NULL, NULL);
 
 	if (list->head != NULL) {
 		d = gds_slist_node_get_data(list->head);
@@ -253,7 +253,7 @@ void * gds_slist_pop(gds_slist_t *list)
 	gds_inline_slist_node_t *head, *tail;
 	void *d = NULL;
 
-	GDS_CHECK_ARG_NOT_NULL(list);
+	gds_assert(list != NULL, NULL);
 
 	if (list->tail != NULL) {
 		d = gds_slist_node_get_data(list->tail);
@@ -276,7 +276,8 @@ void * gds_slist_get(gds_slist_t *list, unsigned int offset)
 	void *d = NULL;
 	gds_slist_node_t *n;
 	gds_inline_slist_node_t *i;
-	GDS_CHECK_ARG_NOT_NULL(list);
+
+	gds_assert(list != NULL, NULL);
 
 	if (list->head != NULL) {
 		i = gds_slist_node_get_inline(list->head);
@@ -291,7 +292,7 @@ void * gds_slist_get(gds_slist_t *list, unsigned int offset)
 }
 
 
-void gds_slist_splice(gds_slist_t *list, unsigned int offset,
+int gds_slist_splice(gds_slist_t *list, unsigned int offset,
 	unsigned int length, void *callback, void *callback_data,
 	gds_slist_t *replacement)
 {
@@ -299,7 +300,7 @@ void gds_slist_splice(gds_slist_t *list, unsigned int offset,
 	gds_slist_node_t *copy;
 	int added;
 
-	GDS_CHECK_ARG_NOT_NULL(list);
+	gds_assert(list != NULL, -1);
 
 	head = gds_slist_node_get_inline(list->head);
 	tail = gds_slist_node_get_inline(list->tail);
@@ -315,6 +316,8 @@ void gds_slist_splice(gds_slist_t *list, unsigned int offset,
 	list->tail = gds_slist_node_get_container_of(tail);
 
 	list->size += added;
+
+	return 0;
 }
 
 gds_slist_t * gds_slist_slice(gds_slist_t *list, unsigned int offset,
@@ -327,7 +330,7 @@ gds_slist_t * gds_slist_slice(gds_slist_t *list, unsigned int offset,
 	void *data;
 	unsigned int cnt = 0;
 
-	GDS_CHECK_ARG_NOT_NULL(list);
+	gds_assert(list != NULL, NULL);
 
 	slice = gds_slist_new();
 
@@ -360,18 +363,20 @@ void gds_slist_map_callback(gds_inline_slist_node_t *current, unsigned int pos,
 	callback(data, pos, callback_data);
 }
 
-void gds_slist_map(gds_slist_t *list, void *callback, void *callback_data)
+int gds_slist_map(gds_slist_t *list, void *callback, void *callback_data)
 {
 	gds_inline_slist_node_t *head;
 
-	GDS_CHECK_ARG_NOT_NULL(list);
-	GDS_CHECK_ARG_NOT_NULL(callback);
+	gds_assert(list != NULL, -1);
+	gds_assert(callback != NULL, -1);
 
 	if (list->head != NULL) {
 		head = gds_slist_node_get_inline(list->head);
 		gds_inline_slist_map(head, gds_slist_map_callback,
 			(void *[]) {callback, callback_data});
 	}
+
+	return 0;
 }
 
 gds_slist_t * gds_slist_filter(gds_slist_t *list, void *callback,
@@ -383,8 +388,8 @@ gds_slist_t * gds_slist_filter(gds_slist_t *list, void *callback,
 	gds_inline_slist_node_t *i;
 	int (*cb)(void *, void *) = callback;
 
-	GDS_CHECK_ARG_NOT_NULL(list);
-	GDS_CHECK_ARG_NOT_NULL(callback);
+	gds_assert(list != NULL, NULL);
+	gds_assert(callback != NULL, NULL);
 
 	l = gds_slist_new();
 
@@ -420,8 +425,8 @@ void * gds_slist_reduce(gds_slist_t *list, void *callback, void *callback_data)
 	gds_inline_slist_node_t *i;
 	void *result = NULL;
 
-	GDS_CHECK_ARG_NOT_NULL(list);
-	GDS_CHECK_ARG_NOT_NULL(callback);
+	gds_assert(list != NULL, NULL);
+	gds_assert(callback != NULL, NULL);
 
 	if (list->head != NULL) {
 		i = gds_slist_node_get_inline(list->head);
@@ -434,7 +439,7 @@ void * gds_slist_reduce(gds_slist_t *list, void *callback, void *callback_data)
 
 unsigned int gds_slist_size(gds_slist_t *list)
 {
-	GDS_CHECK_ARG_NOT_NULL(list);
+	gds_assert(list != NULL, 0);
 
 	return list->size;
 }
@@ -464,7 +469,7 @@ typedef struct {
 
 int gds_slist_iterator_reset(gds_slist_iterator_data_t *it_data)
 {
-	GDS_CHECK_ARG_NOT_NULL(it_data);
+	gds_assert(it_data != NULL, -1);
 
 	it_data->cur = NULL;
 	it_data->i = -1;
@@ -476,7 +481,7 @@ int gds_slist_iterator_step(gds_slist_iterator_data_t *it_data)
 {
 	gds_inline_slist_node_t *next = NULL;
 
-	GDS_CHECK_ARG_NOT_NULL(it_data);
+	gds_assert(it_data != NULL, -1);
 
 	if (it_data->cur != NULL) {
 		next = gds_inline_slist_node_get_next(it_data->cur);
@@ -498,7 +503,7 @@ void * gds_slist_iterator_get(gds_slist_iterator_data_t *it_data)
 {
 	gds_slist_node_t *node;
 
-	GDS_CHECK_ARG_NOT_NULL(it_data);
+	gds_assert(it_data != NULL, NULL);
 
 	node = gds_slist_node_get_container_of(it_data->cur);
 	return (node != NULL) ? gds_slist_node_get_data(node) : NULL;
@@ -506,7 +511,7 @@ void * gds_slist_iterator_get(gds_slist_iterator_data_t *it_data)
 
 const void * gds_slist_iterator_getkey(gds_slist_iterator_data_t *it_data)
 {
-	GDS_CHECK_ARG_NOT_NULL(it_data);
+	gds_assert(it_data != NULL, NULL);
 
 	return &(it_data->i);
 }

@@ -1,8 +1,8 @@
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <libtap13/tap.h>
-#include "test_macros.h"
 #include "rbtree_keyin_fast.h"
 #include "test.h"
 
@@ -104,20 +104,20 @@ void t_rbtree_keyin_fast_add(void)
 	test_t *t = test_new("key", 4);
 	char buf[512];
 
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_add(NULL, NULL, NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_add(NULL, NULL, NULL, test_cmpkey));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_add(NULL, NULL, test_getkey, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_add(NULL, NULL, test_getkey, test_cmpkey));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_add(NULL, t, NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_add(NULL, t, NULL, test_cmpkey));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_add(NULL, t, test_getkey, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_add(NULL, t, test_getkey, test_cmpkey));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_add(&root, NULL, NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_add(&root, NULL, NULL, test_cmpkey));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_add(&root, NULL, test_getkey, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_add(&root, t, NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_add(&root, t, NULL, test_cmpkey));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_add(&root, t, test_getkey, NULL));
+	ok(0 > gds_rbtree_keyin_fast_add(NULL, NULL, NULL, NULL));
+	ok(0 > gds_rbtree_keyin_fast_add(NULL, NULL, NULL, test_cmpkey));
+	ok(0 > gds_rbtree_keyin_fast_add(NULL, NULL, test_getkey, NULL));
+	ok(0 > gds_rbtree_keyin_fast_add(NULL, NULL, test_getkey, test_cmpkey));
+	ok(0 > gds_rbtree_keyin_fast_add(NULL, t, NULL, NULL));
+	ok(0 > gds_rbtree_keyin_fast_add(NULL, t, NULL, test_cmpkey));
+	ok(0 > gds_rbtree_keyin_fast_add(NULL, t, test_getkey, NULL));
+	ok(0 > gds_rbtree_keyin_fast_add(NULL, t, test_getkey, test_cmpkey));
+	ok(0 > gds_rbtree_keyin_fast_add(&root, NULL, NULL, NULL));
+	ok(0 > gds_rbtree_keyin_fast_add(&root, NULL, NULL, test_cmpkey));
+	ok(0 > gds_rbtree_keyin_fast_add(&root, NULL, test_getkey, NULL));
+	ok(0 > gds_rbtree_keyin_fast_add(&root, t, NULL, NULL));
+	ok(0 > gds_rbtree_keyin_fast_add(&root, t, NULL, test_cmpkey));
+	ok(0 > gds_rbtree_keyin_fast_add(&root, t, test_getkey, NULL));
 
 	/* Tree is unchanged */
 	ok(NULL == root);
@@ -180,34 +180,34 @@ void t_rbtree_keyin_fast_set(void)
 	char buf[512];
 	int rc;
 
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_set(NULL , NULL, NULL     , NULL     , NULL   ));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_set(NULL , NULL, NULL     , NULL     , test_free));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_set(NULL , NULL, NULL     , test_cmpkey, NULL   ));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_set(NULL , NULL, NULL     , test_cmpkey, test_free));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_set(NULL , NULL, test_getkey, NULL     , NULL   ));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_set(NULL , NULL, test_getkey, NULL     , test_free));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_set(NULL , NULL, test_getkey, test_cmpkey, NULL   ));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_set(NULL , NULL, test_getkey, test_cmpkey, test_free));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_set(NULL , t   , NULL     , NULL     , NULL   ));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_set(NULL , t   , NULL     , NULL     , test_free));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_set(NULL , t   , NULL     , test_cmpkey, NULL   ));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_set(NULL , t   , NULL     , test_cmpkey, test_free));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_set(NULL , t   , test_getkey, NULL     , NULL   ));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_set(NULL , t   , test_getkey, NULL     , test_free));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_set(NULL , t   , test_getkey, test_cmpkey, NULL   ));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_set(NULL , t   , test_getkey, test_cmpkey, test_free));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_set(&root, NULL, NULL     , NULL     , NULL   ));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_set(&root, NULL, NULL     , NULL     , test_free));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_set(&root, NULL, NULL     , test_cmpkey, NULL   ));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_set(&root, NULL, NULL     , test_cmpkey, test_free));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_set(&root, NULL, test_getkey, NULL     , NULL   ));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_set(&root, NULL, test_getkey, NULL     , test_free));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_set(&root, t   , NULL     , NULL     , NULL   ));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_set(&root, t   , NULL     , NULL     , test_free));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_set(&root, t   , NULL     , test_cmpkey, NULL   ));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_set(&root, t   , NULL     , test_cmpkey, test_free));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_set(&root, t   , test_getkey, NULL     , NULL   ));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_set(&root, t   , test_getkey, NULL     , test_free));
+	ok(0 > gds_rbtree_keyin_fast_set(NULL , NULL, NULL     , NULL     , NULL   ));
+	ok(0 > gds_rbtree_keyin_fast_set(NULL , NULL, NULL     , NULL     , test_free));
+	ok(0 > gds_rbtree_keyin_fast_set(NULL , NULL, NULL     , test_cmpkey, NULL   ));
+	ok(0 > gds_rbtree_keyin_fast_set(NULL , NULL, NULL     , test_cmpkey, test_free));
+	ok(0 > gds_rbtree_keyin_fast_set(NULL , NULL, test_getkey, NULL     , NULL   ));
+	ok(0 > gds_rbtree_keyin_fast_set(NULL , NULL, test_getkey, NULL     , test_free));
+	ok(0 > gds_rbtree_keyin_fast_set(NULL , NULL, test_getkey, test_cmpkey, NULL   ));
+	ok(0 > gds_rbtree_keyin_fast_set(NULL , NULL, test_getkey, test_cmpkey, test_free));
+	ok(0 > gds_rbtree_keyin_fast_set(NULL , t   , NULL     , NULL     , NULL   ));
+	ok(0 > gds_rbtree_keyin_fast_set(NULL , t   , NULL     , NULL     , test_free));
+	ok(0 > gds_rbtree_keyin_fast_set(NULL , t   , NULL     , test_cmpkey, NULL   ));
+	ok(0 > gds_rbtree_keyin_fast_set(NULL , t   , NULL     , test_cmpkey, test_free));
+	ok(0 > gds_rbtree_keyin_fast_set(NULL , t   , test_getkey, NULL     , NULL   ));
+	ok(0 > gds_rbtree_keyin_fast_set(NULL , t   , test_getkey, NULL     , test_free));
+	ok(0 > gds_rbtree_keyin_fast_set(NULL , t   , test_getkey, test_cmpkey, NULL   ));
+	ok(0 > gds_rbtree_keyin_fast_set(NULL , t   , test_getkey, test_cmpkey, test_free));
+	ok(0 > gds_rbtree_keyin_fast_set(&root, NULL, NULL     , NULL     , NULL   ));
+	ok(0 > gds_rbtree_keyin_fast_set(&root, NULL, NULL     , NULL     , test_free));
+	ok(0 > gds_rbtree_keyin_fast_set(&root, NULL, NULL     , test_cmpkey, NULL   ));
+	ok(0 > gds_rbtree_keyin_fast_set(&root, NULL, NULL     , test_cmpkey, test_free));
+	ok(0 > gds_rbtree_keyin_fast_set(&root, NULL, test_getkey, NULL     , NULL   ));
+	ok(0 > gds_rbtree_keyin_fast_set(&root, NULL, test_getkey, NULL     , test_free));
+	ok(0 > gds_rbtree_keyin_fast_set(&root, t   , NULL     , NULL     , NULL   ));
+	ok(0 > gds_rbtree_keyin_fast_set(&root, t   , NULL     , NULL     , test_free));
+	ok(0 > gds_rbtree_keyin_fast_set(&root, t   , NULL     , test_cmpkey, NULL   ));
+	ok(0 > gds_rbtree_keyin_fast_set(&root, t   , NULL     , test_cmpkey, test_free));
+	ok(0 > gds_rbtree_keyin_fast_set(&root, t   , test_getkey, NULL     , NULL   ));
+	ok(0 > gds_rbtree_keyin_fast_set(&root, t   , test_getkey, NULL     , test_free));
 
 	/* Tree is unchanged */
 	ok(NULL == root);
@@ -286,36 +286,36 @@ void t_rbtree_keyin_fast_get(void)
 
 	gds_rbtree_keyin_fast_add(&root, test_new("key", 1), test_getkey, test_cmpkey);
 
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_get(NULL, NULL, NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_get(NULL, NULL, NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_get(NULL, NULL, NULL, test_cmpkey));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_get(NULL, NULL, NULL, test_cmpkey));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_get(NULL, NULL, test_getkey, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_get(NULL, NULL, test_getkey, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_get(NULL, NULL, test_getkey, test_cmpkey));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_get(NULL, NULL, test_getkey, test_cmpkey));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_get(NULL, "key", NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_get(NULL, "key", NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_get(NULL, "key", NULL, test_cmpkey));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_get(NULL, "key", NULL, test_cmpkey));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_get(NULL, "key", test_getkey, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_get(NULL, "key", test_getkey, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_get(NULL, "key", test_getkey, test_cmpkey));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_get(NULL, "key", test_getkey, test_cmpkey));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_get(root, NULL, NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_get(root, NULL, NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_get(root, NULL, NULL, test_cmpkey));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_get(root, NULL, NULL, test_cmpkey));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_get(root, NULL, test_getkey, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_get(root, NULL, test_getkey, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_get(root, NULL, test_getkey, test_cmpkey));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_get(root, NULL, test_getkey, test_cmpkey));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_get(root, "key", NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_get(root, "key", NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_get(root, "key", NULL, test_cmpkey));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_get(root, "key", NULL, test_cmpkey));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_get(root, "key", test_getkey, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_get(root, "key", test_getkey, NULL));
+	ok(NULL == gds_rbtree_keyin_fast_get(NULL, NULL, NULL, NULL));
+	ok(NULL == gds_rbtree_keyin_fast_get(NULL, NULL, NULL, NULL));
+	ok(NULL == gds_rbtree_keyin_fast_get(NULL, NULL, NULL, test_cmpkey));
+	ok(NULL == gds_rbtree_keyin_fast_get(NULL, NULL, NULL, test_cmpkey));
+	ok(NULL == gds_rbtree_keyin_fast_get(NULL, NULL, test_getkey, NULL));
+	ok(NULL == gds_rbtree_keyin_fast_get(NULL, NULL, test_getkey, NULL));
+	ok(NULL == gds_rbtree_keyin_fast_get(NULL, NULL, test_getkey, test_cmpkey));
+	ok(NULL == gds_rbtree_keyin_fast_get(NULL, NULL, test_getkey, test_cmpkey));
+	ok(NULL == gds_rbtree_keyin_fast_get(NULL, "key", NULL, NULL));
+	ok(NULL == gds_rbtree_keyin_fast_get(NULL, "key", NULL, NULL));
+	ok(NULL == gds_rbtree_keyin_fast_get(NULL, "key", NULL, test_cmpkey));
+	ok(NULL == gds_rbtree_keyin_fast_get(NULL, "key", NULL, test_cmpkey));
+	ok(NULL == gds_rbtree_keyin_fast_get(NULL, "key", test_getkey, NULL));
+	ok(NULL == gds_rbtree_keyin_fast_get(NULL, "key", test_getkey, NULL));
+	ok(NULL == gds_rbtree_keyin_fast_get(NULL, "key", test_getkey, test_cmpkey));
+	ok(NULL == gds_rbtree_keyin_fast_get(NULL, "key", test_getkey, test_cmpkey));
+	ok(NULL == gds_rbtree_keyin_fast_get(root, NULL, NULL, NULL));
+	ok(NULL == gds_rbtree_keyin_fast_get(root, NULL, NULL, NULL));
+	ok(NULL == gds_rbtree_keyin_fast_get(root, NULL, NULL, test_cmpkey));
+	ok(NULL == gds_rbtree_keyin_fast_get(root, NULL, NULL, test_cmpkey));
+	ok(NULL == gds_rbtree_keyin_fast_get(root, NULL, test_getkey, NULL));
+	ok(NULL == gds_rbtree_keyin_fast_get(root, NULL, test_getkey, NULL));
+	ok(NULL == gds_rbtree_keyin_fast_get(root, NULL, test_getkey, test_cmpkey));
+	ok(NULL == gds_rbtree_keyin_fast_get(root, NULL, test_getkey, test_cmpkey));
+	ok(NULL == gds_rbtree_keyin_fast_get(root, "key", NULL, NULL));
+	ok(NULL == gds_rbtree_keyin_fast_get(root, "key", NULL, NULL));
+	ok(NULL == gds_rbtree_keyin_fast_get(root, "key", NULL, test_cmpkey));
+	ok(NULL == gds_rbtree_keyin_fast_get(root, "key", NULL, test_cmpkey));
+	ok(NULL == gds_rbtree_keyin_fast_get(root, "key", test_getkey, NULL));
+	ok(NULL == gds_rbtree_keyin_fast_get(root, "key", test_getkey, NULL));
 	ok(NULL != gds_rbtree_keyin_fast_get(root, "key", test_getkey, test_cmpkey));
 	ok(NULL != (data = gds_rbtree_keyin_fast_get(root, "key", test_getkey, test_cmpkey)));
 
@@ -344,36 +344,36 @@ void t_rbtree_keyin_fast_del(void)
 
 	gds_rbtree_keyin_fast_add(&root, t, test_getkey, test_cmpkey);
 
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_del(NULL, NULL, NULL, NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_del(NULL, NULL, NULL, NULL, test_free));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_del(NULL, NULL, NULL, test_cmpkey, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_del(NULL, NULL, NULL, test_cmpkey, test_free));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_del(NULL, NULL, test_getkey, NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_del(NULL, NULL, test_getkey, NULL, test_free));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_del(NULL, NULL, test_getkey, test_cmpkey, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_del(NULL, NULL, test_getkey, test_cmpkey, test_free));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_del(NULL, "key", NULL, NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_del(NULL, "key", NULL, NULL, test_free));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_del(NULL, "key", NULL, test_cmpkey, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_del(NULL, "key", NULL, test_cmpkey, test_free));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_del(NULL, "key", test_getkey, NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_del(NULL, "key", test_getkey, NULL, test_free));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_del(NULL, "key", test_getkey, test_cmpkey, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_del(NULL, "key", test_getkey, test_cmpkey, test_free));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_del(&root, NULL, NULL, NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_del(&root, NULL, NULL, NULL, test_free));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_del(&root, NULL, NULL, test_cmpkey, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_del(&root, NULL, NULL, test_cmpkey, test_free));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_del(&root, NULL, test_getkey, NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_del(&root, NULL, test_getkey, NULL, test_free));
+	ok(0 > gds_rbtree_keyin_fast_del(NULL, NULL, NULL, NULL, NULL));
+	ok(0 > gds_rbtree_keyin_fast_del(NULL, NULL, NULL, NULL, test_free));
+	ok(0 > gds_rbtree_keyin_fast_del(NULL, NULL, NULL, test_cmpkey, NULL));
+	ok(0 > gds_rbtree_keyin_fast_del(NULL, NULL, NULL, test_cmpkey, test_free));
+	ok(0 > gds_rbtree_keyin_fast_del(NULL, NULL, test_getkey, NULL, NULL));
+	ok(0 > gds_rbtree_keyin_fast_del(NULL, NULL, test_getkey, NULL, test_free));
+	ok(0 > gds_rbtree_keyin_fast_del(NULL, NULL, test_getkey, test_cmpkey, NULL));
+	ok(0 > gds_rbtree_keyin_fast_del(NULL, NULL, test_getkey, test_cmpkey, test_free));
+	ok(0 > gds_rbtree_keyin_fast_del(NULL, "key", NULL, NULL, NULL));
+	ok(0 > gds_rbtree_keyin_fast_del(NULL, "key", NULL, NULL, test_free));
+	ok(0 > gds_rbtree_keyin_fast_del(NULL, "key", NULL, test_cmpkey, NULL));
+	ok(0 > gds_rbtree_keyin_fast_del(NULL, "key", NULL, test_cmpkey, test_free));
+	ok(0 > gds_rbtree_keyin_fast_del(NULL, "key", test_getkey, NULL, NULL));
+	ok(0 > gds_rbtree_keyin_fast_del(NULL, "key", test_getkey, NULL, test_free));
+	ok(0 > gds_rbtree_keyin_fast_del(NULL, "key", test_getkey, test_cmpkey, NULL));
+	ok(0 > gds_rbtree_keyin_fast_del(NULL, "key", test_getkey, test_cmpkey, test_free));
+	ok(0 > gds_rbtree_keyin_fast_del(&root, NULL, NULL, NULL, NULL));
+	ok(0 > gds_rbtree_keyin_fast_del(&root, NULL, NULL, NULL, test_free));
+	ok(0 > gds_rbtree_keyin_fast_del(&root, NULL, NULL, test_cmpkey, NULL));
+	ok(0 > gds_rbtree_keyin_fast_del(&root, NULL, NULL, test_cmpkey, test_free));
+	ok(0 > gds_rbtree_keyin_fast_del(&root, NULL, test_getkey, NULL, NULL));
+	ok(0 > gds_rbtree_keyin_fast_del(&root, NULL, test_getkey, NULL, test_free));
 	ok(0 < gds_rbtree_keyin_fast_del(&root, NULL, test_getkey, test_cmpkey, NULL));
 	ok(0 < gds_rbtree_keyin_fast_del(&root, NULL, test_getkey, test_cmpkey, test_free));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_del(&root, "key", NULL, NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_del(&root, "key", NULL, NULL, test_free));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_del(&root, "key", NULL, test_cmpkey, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_del(&root, "key", NULL, test_cmpkey, test_free));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_del(&root, "key", test_getkey, NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException, gds_rbtree_keyin_fast_del(&root, "key", test_getkey, NULL, test_free));
+	ok(0 > gds_rbtree_keyin_fast_del(&root, "key", NULL, NULL, NULL));
+	ok(0 > gds_rbtree_keyin_fast_del(&root, "key", NULL, NULL, test_free));
+	ok(0 > gds_rbtree_keyin_fast_del(&root, "key", NULL, test_cmpkey, NULL));
+	ok(0 > gds_rbtree_keyin_fast_del(&root, "key", NULL, test_cmpkey, test_free));
+	ok(0 > gds_rbtree_keyin_fast_del(&root, "key", test_getkey, NULL, NULL));
+	ok(0 > gds_rbtree_keyin_fast_del(&root, "key", test_getkey, NULL, test_free));
 	ok(0 == gds_rbtree_keyin_fast_del(&root, "key", test_getkey, test_cmpkey, NULL));
 	ok(0 < gds_rbtree_keyin_fast_del(&root, "key", test_getkey, test_cmpkey, test_free));
 
@@ -405,34 +405,20 @@ void t_rbtree_keyin_fast_pop(void)
 
 	gds_rbtree_keyin_fast_add(&root, t, test_getkey, test_cmpkey);
 
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_rbtree_keyin_fast_pop(NULL, NULL, NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_rbtree_keyin_fast_pop(NULL, NULL, NULL, test_cmpkey));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_rbtree_keyin_fast_pop(NULL, NULL, test_getkey, NULL));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_rbtree_keyin_fast_pop(NULL, NULL, test_getkey, test_cmpkey));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_rbtree_keyin_fast_pop(NULL, "key", NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_rbtree_keyin_fast_pop(NULL, "key", NULL, test_cmpkey));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_rbtree_keyin_fast_pop(NULL, "key", test_getkey, NULL));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_rbtree_keyin_fast_pop(NULL, "key", test_getkey, test_cmpkey));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_rbtree_keyin_fast_pop(&root, NULL, NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_rbtree_keyin_fast_pop(&root, NULL, NULL, test_cmpkey));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_rbtree_keyin_fast_pop(&root, NULL, test_getkey, NULL));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_rbtree_keyin_fast_pop(&root, "key", NULL, NULL));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_rbtree_keyin_fast_pop(&root, "key", NULL, test_cmpkey));
-	GDS_ASSERT_THROW(BadArgumentException,
-		gds_rbtree_keyin_fast_pop(&root, "key", test_getkey, NULL));
+	ok(NULL == gds_rbtree_keyin_fast_pop(NULL, NULL, NULL, NULL));
+	ok(NULL == gds_rbtree_keyin_fast_pop(NULL, NULL, NULL, test_cmpkey));
+	ok(NULL == gds_rbtree_keyin_fast_pop(NULL, NULL, test_getkey, NULL));
+	ok(NULL == gds_rbtree_keyin_fast_pop(NULL, NULL, test_getkey, test_cmpkey));
+	ok(NULL == gds_rbtree_keyin_fast_pop(NULL, "key", NULL, NULL));
+	ok(NULL == gds_rbtree_keyin_fast_pop(NULL, "key", NULL, test_cmpkey));
+	ok(NULL == gds_rbtree_keyin_fast_pop(NULL, "key", test_getkey, NULL));
+	ok(NULL == gds_rbtree_keyin_fast_pop(NULL, "key", test_getkey, test_cmpkey));
+	ok(NULL == gds_rbtree_keyin_fast_pop(&root, NULL, NULL, NULL));
+	ok(NULL == gds_rbtree_keyin_fast_pop(&root, NULL, NULL, test_cmpkey));
+	ok(NULL == gds_rbtree_keyin_fast_pop(&root, NULL, test_getkey, NULL));
+	ok(NULL == gds_rbtree_keyin_fast_pop(&root, "key", NULL, NULL));
+	ok(NULL == gds_rbtree_keyin_fast_pop(&root, "key", NULL, test_cmpkey));
+	ok(NULL == gds_rbtree_keyin_fast_pop(&root, "key", test_getkey, NULL));
 
 	is(gds_rbtree_keyin_fast_pop(&root, NULL, test_getkey, test_cmpkey), NULL);
 	t2 = gds_rbtree_keyin_fast_pop(&root, "key", test_getkey, test_cmpkey);

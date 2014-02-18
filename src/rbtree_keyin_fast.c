@@ -20,7 +20,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "malloc.h"
-#include "check_arg.h"
+#include "assert.h"
+#include "container_of.h"
 #include "log.h"
 #include "inline/rbtree_fast.h"
 #include "rbtree_keyin_fast.h"
@@ -43,7 +44,7 @@ int gds_rbtree_keyin_fast_node_set_data(gds_rbtree_keyin_fast_node_t *node,
 {
 	void (*free_callback)(void *) = free_cb;
 
-	GDS_CHECK_ARG_NOT_NULL(node);
+	gds_assert(node != NULL, -1);
 
 	if (free_callback != NULL) {
 		free_callback(node->data);
@@ -55,7 +56,7 @@ int gds_rbtree_keyin_fast_node_set_data(gds_rbtree_keyin_fast_node_t *node,
 
 void * gds_rbtree_keyin_fast_node_get_data(gds_rbtree_keyin_fast_node_t *node)
 {
-	GDS_CHECK_ARG_NOT_NULL(node);
+	gds_assert(node != NULL, NULL);
 
 	return node->data;
 }
@@ -74,10 +75,7 @@ void gds_rbtree_keyin_fast_node_free(gds_rbtree_keyin_fast_node_t *node,
 }
 
 #define rbt_containerof(ptr) \
-	((ptr) != NULL) \
-	? (gds_rbtree_keyin_fast_node_t *) \
-		((char *)ptr - offsetof(gds_rbtree_keyin_fast_node_t, rbtree)) \
-	: NULL
+	((ptr) ? container_of(ptr, gds_rbtree_keyin_fast_node_t, rbtree) : NULL)
 
 int gds_rbtree_keyin_fast_node_cmp(gds_inline_rbtree_fast_node_t *inode1,
 	gds_inline_rbtree_fast_node_t *inode2, void *params[2])
@@ -117,9 +115,9 @@ int gds_rbtree_keyin_fast_add(gds_rbtree_keyin_fast_node_t **root,
 	int already_in_tree = 0;
 	void * (*getkey_callback)(void *) = getkey_cb;
 
-	GDS_CHECK_ARG_NOT_NULL(root);
-	GDS_CHECK_ARG_NOT_NULL(getkey_cb);
-	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb);
+	gds_assert(root != NULL, -1);
+	gds_assert(getkey_cb != NULL, -1);
+	gds_assert(cmpkey_cb != NULL, -1);
 
 	if (*root == NULL) {
 		*root = gds_rbtree_keyin_fast_node_new(data);
@@ -151,9 +149,9 @@ int gds_rbtree_keyin_fast_set(gds_rbtree_keyin_fast_node_t **root, void *data,
 	void *cmp_params[] = {getkey_cb, cmpkey_cb};
 	int rc = 0;
 
-	GDS_CHECK_ARG_NOT_NULL(root);
-	GDS_CHECK_ARG_NOT_NULL(getkey_cb);
-	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb);
+	gds_assert(root != NULL, -1);
+	gds_assert(getkey_cb != NULL, -1);
+	gds_assert(cmpkey_cb != NULL, -1);
 
 	iroot = (*root != NULL) ? &((*root)->rbtree) : NULL;
 	node = gds_rbtree_keyin_fast_node_new(data);
@@ -179,8 +177,8 @@ gds_rbtree_keyin_fast_node_t * gds_rbtree_keyin_fast_get_node(
 	void *cmp_with_key_params[] = {getkey_cb, cmpkey_cb};
 	gds_inline_rbtree_fast_node_t *inode = NULL;
 
-	GDS_CHECK_ARG_NOT_NULL(getkey_cb);
-	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb);
+	gds_assert(getkey_cb != NULL, NULL);
+	gds_assert(cmpkey_cb != NULL, NULL);
 
 	if (root == NULL) {
 		return NULL;
@@ -197,7 +195,7 @@ void * gds_rbtree_keyin_fast_get(gds_rbtree_keyin_fast_node_t *root,
 {
 	gds_rbtree_keyin_fast_node_t *n;
 
-	GDS_CHECK_ARG_NOT_NULL(root);
+	gds_assert(root != NULL, NULL);
 
 	n = gds_rbtree_keyin_fast_get_node(root, key, getkey_cb, cmpkey_cb);
 	return gds_rbtree_keyin_fast_node_get_data(n);
@@ -211,9 +209,9 @@ int gds_rbtree_keyin_fast_del(gds_rbtree_keyin_fast_node_t **root,
 	gds_rbtree_keyin_fast_node_t *node;
 	int not_in_tree = 1;
 
-	GDS_CHECK_ARG_NOT_NULL(root);
-	GDS_CHECK_ARG_NOT_NULL(getkey_cb);
-	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb);
+	gds_assert(root != NULL, -1);
+	gds_assert(getkey_cb != NULL, -1);
+	gds_assert(cmpkey_cb != NULL, -1);
 
 	if (*root != NULL) {
 		void *cmp_with_key_params[] = {getkey_cb, cmpkey_cb};
@@ -241,9 +239,9 @@ void * gds_rbtree_keyin_fast_pop(gds_rbtree_keyin_fast_node_t **root, const void
 	gds_rbtree_keyin_fast_node_t *node;
 	void *data = NULL;
 
-	GDS_CHECK_ARG_NOT_NULL(root);
-	GDS_CHECK_ARG_NOT_NULL(getkey_cb);
-	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb);
+	gds_assert(root != NULL, NULL);
+	gds_assert(getkey_cb != NULL, NULL);
+	gds_assert(cmpkey_cb != NULL, NULL);
 
 	if (*root != NULL) {
 		void *cmp_with_key_params[] = {getkey_cb, cmpkey_cb};
@@ -341,7 +339,7 @@ gds_iterator_t * gds_rbtree_keyin_fast_iterator_new(
 	gds_rbtree_keyin_fast_iterator_data_t *data;
 	gds_iterator_t *it;
 
-	GDS_CHECK_ARG_NOT_NULL(root);
+	gds_assert(root != NULL, NULL);
 
 	data = gds_malloc(sizeof(gds_rbtree_keyin_fast_iterator_data_t));
 

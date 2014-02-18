@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include "iterator.h"
 #include "slist.h"
-#include "../check_arg.h"
+#include "../assert.h"
 #include "../malloc.h"
 #include "inline/rbtree_fast.h"
 
@@ -131,8 +131,9 @@ int gds_inline_rbtree_fast_insert_bottom(gds_inline_rbtree_fast_node_t **root,
 	int cmp;
 	int (*cmp_callback)(gds_inline_rbtree_fast_node_t *, gds_inline_rbtree_fast_node_t *, void *);
 
-	GDS_CHECK_ARG_NOT_NULL(root);
-	GDS_CHECK_ARG_NOT_NULL(cmp_cb);
+	gds_assert(root != NULL, -1);
+	gds_assert(node != NULL, -1);
+	gds_assert(cmp_cb != NULL, -1);
 
 	cmp_callback = cmp_cb;
 
@@ -177,8 +178,8 @@ void gds_inline_rbtree_fast_rebalance_after_insert(
 	gds_inline_rbtree_fast_node_t *u, *g;
 	_Bool valid = 0;
 
-	GDS_CHECK_ARG_NOT_NULL(root);
-	GDS_CHECK_ARG_NOT_NULL(node);
+	gds_assert(root != NULL);
+	gds_assert(node != NULL);
 
 	while (!valid) {
 		if (node->parent == NULL) {
@@ -248,8 +249,8 @@ void gds_inline_rbtree_fast_swap_nodes(gds_inline_rbtree_fast_node_t *node1,
 	gds_inline_rbtree_fast_node_t *node1_p, *node1_l, *node1_r;
 	_Bool node1_red;
 
-	GDS_CHECK_ARG_NOT_NULL(node1);
-	GDS_CHECK_ARG_NOT_NULL(node2);
+	gds_assert(node1 != NULL);
+	gds_assert(node2 != NULL);
 
 	node1_p = node1->parent;
 	node1_l = node1->left;
@@ -305,8 +306,8 @@ int gds_inline_rbtree_fast_replace_or_insert_bottom(
 	int rc = 0;
 	int (*cmp_callback)(gds_inline_rbtree_fast_node_t *, gds_inline_rbtree_fast_node_t *, void *);
 
-	GDS_CHECK_ARG_NOT_NULL(root);
-	GDS_CHECK_ARG_NOT_NULL(cmp_cb);
+	gds_assert(root != NULL, -1);
+	gds_assert(cmp_cb != NULL, -1);
 
 	cmp_callback = cmp_cb;
 
@@ -355,8 +356,8 @@ int gds_inline_rbtree_fast_set(gds_inline_rbtree_fast_node_t **root,
 {
 	int rc;
 
-	GDS_CHECK_ARG_NOT_NULL(root);
-	GDS_CHECK_ARG_NOT_NULL(node);
+	gds_assert(root != NULL, -1);
+	gds_assert(node != NULL, -1);
 
 	rc = gds_inline_rbtree_fast_replace_or_insert_bottom(root,
 		node, cmp_cb, cmp_data, removed);
@@ -378,7 +379,7 @@ gds_inline_rbtree_fast_node_t * gds_inline_rbtree_fast_get_node(
 	int cmp;
 	int (*cmp_with_key_callback)(gds_inline_rbtree_fast_node_t *, const void *, void *);
 
-	GDS_CHECK_ARG_NOT_NULL(cmp_with_key_cb);
+	gds_assert(cmp_with_key_cb != NULL, NULL);
 	
 	cmp_with_key_callback = cmp_with_key_cb;
 
@@ -404,7 +405,7 @@ void gds_inline_rbtree_fast_rebalance_after_delete(
 	gds_inline_rbtree_fast_node_t *sibling, *tmp;
 	bool valid = false;
 
-	GDS_CHECK_ARG_NOT_NULL(root);
+	gds_assert(root != NULL);
 
 	/* If we are here, we removed a black node which had one black child
 	 * or no child at all */
@@ -526,8 +527,8 @@ gds_inline_rbtree_fast_node_t * gds_inline_rbtree_fast_del(
 {
 	gds_inline_rbtree_fast_node_t *node, *child;
 
-	GDS_CHECK_ARG_NOT_NULL(root);
-	GDS_CHECK_ARG_NOT_NULL(cmp_with_key_cb);
+	gds_assert(root != NULL, NULL);
+	gds_assert(cmp_with_key_cb != NULL, NULL);
 
 	node = gds_inline_rbtree_fast_get_node(*root, key, cmp_with_key_cb,
 		cmp_with_key_data);
@@ -631,7 +632,7 @@ gds_iterator_t * gds_inline_rbtree_fast_iterator_new(
 	gds_inline_rbtree_fast_iterator_data_t *it_data;
 	gds_iterator_t *it;
 
-	GDS_CHECK_ARG_NOT_NULL(root);
+	gds_assert(root != NULL, NULL);
 
 	it_data = gds_malloc(sizeof(gds_inline_rbtree_fast_iterator_data_t));
 	it_data->root = root;

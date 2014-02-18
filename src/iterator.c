@@ -39,7 +39,7 @@
 
 #include <stdlib.h>
 #include "malloc.h"
-#include "check_arg.h"
+#include "assert.h"
 #include "log.h"
 #include "iterator.h"
 
@@ -48,11 +48,11 @@ gds_iterator_t *gds_iterator_new(void *data, void *reset_cb, void *step_cb,
 {
 	gds_iterator_t *it;
 
-	GDS_CHECK_ARG_NOT_NULL(data);
-	GDS_CHECK_ARG_NOT_NULL(reset_cb);
-	GDS_CHECK_ARG_NOT_NULL(step_cb);
-	GDS_CHECK_ARG_NOT_NULL(get_cb);
-	GDS_CHECK_ARG_NOT_NULL(getkey_cb);
+	gds_assert(data != NULL, NULL);
+	gds_assert(reset_cb != NULL, NULL);
+	gds_assert(step_cb != NULL, NULL);
+	gds_assert(get_cb != NULL, NULL);
+	gds_assert(getkey_cb != NULL, NULL);
 
 	it = gds_malloc(sizeof(gds_iterator_t));
 
@@ -70,28 +70,28 @@ gds_iterator_t *gds_iterator_new(void *data, void *reset_cb, void *step_cb,
 
 int gds_iterator_reset(gds_iterator_t *it)
 {
-	GDS_CHECK_ARG_NOT_NULL(it);
+	gds_assert(it != NULL, -1);
 
 	return it->reset_cb(it->data);
 }
 
 int gds_iterator_step(gds_iterator_t *it)
 {
-	GDS_CHECK_ARG_NOT_NULL(it);
+	gds_assert(it != NULL, -1);
 
 	return it->step_cb(it->data);
 }
 
 void * gds_iterator_get(gds_iterator_t *it)
 {
-	GDS_CHECK_ARG_NOT_NULL(it);
+	gds_assert(it != NULL, NULL);
 
 	return it->get_cb(it->data);
 }
 
 void * gds_iterator_getkey(gds_iterator_t *it)
 {
-	GDS_CHECK_ARG_NOT_NULL(it);
+	gds_assert(it != NULL, NULL);
 
 	return it->getkey_cb(it->data);
 }

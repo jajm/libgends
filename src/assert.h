@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013 Julian Maurice
+ * Copyright 2014 Julian Maurice
  *
  * This file is part of libgends
  *
@@ -17,17 +17,15 @@
  * along with libgends.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef gds_exception_h_included
-#define gds_exception_h_included
+#ifndef gds_assert_h_included
+#define gds_assert_h_included
 
-#include <libexception/exception.h>
 #include "log.h"
 
-#define GDS_THROW(exception, message, ...) \
-	{ \
-		gds_log_error(message, ##__VA_ARGS__); \
-		throw(exception, message, ##__VA_ARGS__); \
+#define gds_assert(assertion, ...) \
+	if (!(assertion)) { \
+		gds_log_error("Assertion '%s' failed", #assertion); \
+		return __VA_ARGS__; \
 	}
 
-#endif /* Not gds_exception_h_included */
-
+#endif /* ! gds_assert_h_included */

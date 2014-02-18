@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include "slist.h"
 #include "malloc.h"
-#include "check_arg.h"
+#include "assert.h"
 #include "log.h"
 #include "rbtree.h"
 #include "hash_map.h"
@@ -40,9 +40,9 @@ gds_hash_map_t * gds_hash_map_new(unsigned long size, void *hash_cb,
 {
 	gds_hash_map_t *h;
 
-	GDS_CHECK_ARG_NOT_ZERO(size);
-	GDS_CHECK_ARG_NOT_NULL(hash_cb)
-	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb)
+	gds_assert(size > 0, NULL);
+	gds_assert(hash_cb != NULL, NULL);
+	gds_assert(cmpkey_cb != NULL, NULL);
 
 	h = gds_malloc(sizeof(gds_hash_map_t));
 	h->map = gds_calloc(size, sizeof(gds_rbtree_node_t *));
@@ -66,7 +66,7 @@ int gds_hash_map_set(gds_hash_map_t *h, void *key, void *data)
 	unsigned long hash;
 	int rc;
 
-	GDS_CHECK_ARG_NOT_NULL(h);
+	gds_assert(h != NULL, -1);
 
 	hash = gds_hash_map_hash(h, key);
 	rc = gds_rbtree_set(&(h->map[hash]), key, data, h->cmpkey_cb,
@@ -80,7 +80,7 @@ void * gds_hash_map_get(gds_hash_map_t *h, const void *key)
 	unsigned long hash;
 	void *data;
 
-	GDS_CHECK_ARG_NOT_NULL(h);
+	gds_assert(h != NULL, NULL);
 
 	hash = gds_hash_map_hash(h, key);
 	data = gds_rbtree_get(h->map[hash], key, h->cmpkey_cb);
@@ -92,7 +92,7 @@ int gds_hash_map_unset(gds_hash_map_t *h, const void *key)
 	unsigned long hash;
 	int rv;
 
-	GDS_CHECK_ARG_NOT_NULL(h);
+	gds_assert(h != NULL, -1);
 
 	hash = gds_hash_map_hash(h, key);
 	rv = gds_rbtree_del(&(h->map[hash]), key, h->cmpkey_cb,
@@ -106,7 +106,7 @@ void * gds_hash_map_pop(gds_hash_map_t *h, const void *key)
 	unsigned long hash;
 	void *data;
 
-	GDS_CHECK_ARG_NOT_NULL(h);
+	gds_assert(h != NULL, NULL);
 
 	hash = gds_hash_map_hash(h, key);
 	data = gds_rbtree_pop(&(h->map[hash]), key, h->cmpkey_cb,
@@ -217,7 +217,7 @@ gds_slist_t * gds_hash_map_keys(gds_hash_map_t *h)
 	gds_slist_t *list;
 	unsigned long i;
 
-	GDS_CHECK_ARG_NOT_NULL(h);
+	gds_assert(h != NULL, NULL);
 
 	for (i = h->size; i > 0; i--) {
 		list = gds_rbtree_keys(h->map[i-1]);
@@ -236,7 +236,7 @@ gds_slist_t * gds_hash_map_values(gds_hash_map_t *h)
 	gds_slist_t *list;
 	unsigned long i;
 
-	GDS_CHECK_ARG_NOT_NULL(h);
+	gds_assert(h != NULL, NULL);
 
 	for (i = h->size; i > 0; i--) {
 		list = gds_rbtree_values(h->map[i-1]);
@@ -271,12 +271,12 @@ gds_rbtree_node_t ** gds_hash_map_build_map(gds_hash_map_t *h,
 	return map;
 }
 
-void gds_hash_map_change_size(gds_hash_map_t *h, unsigned long new_size)
+int gds_hash_map_change_size(gds_hash_map_t *h, unsigned long new_size)
 {
 	gds_rbtree_node_t **map;
 
-	GDS_CHECK_ARG_NOT_NULL(h);
-	GDS_CHECK_ARG_NOT_ZERO(new_size);
+	gds_assert(h != NULL, -1);
+	gds_assert(new_size > 0, -1);
 
 	map = gds_hash_map_build_map(h, new_size);
 	for (unsigned long i = 0; i < h->size; i++) {
@@ -285,6 +285,8 @@ void gds_hash_map_change_size(gds_hash_map_t *h, unsigned long new_size)
 	free(h->map);
 	h->map = map;
 	h->size = new_size;
+
+	return 0;
 }
 
 void gds_hash_map_free(gds_hash_map_t *h)

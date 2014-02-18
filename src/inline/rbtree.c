@@ -22,7 +22,7 @@
 #include "iterator.h"
 #include "slist.h"
 #include "inline/rbtree.h"
-#include "../check_arg.h"
+#include "../assert.h"
 #include "../malloc.h"
 
 void gds_inline_rbtree_print_dbg_r(gds_inline_rbtree_node_t *root, unsigned int d)
@@ -120,9 +120,9 @@ int gds_inline_rbtree_insert(gds_inline_rbtree_node_t **root,
 	int rc = 0;
 	int (*cmp_callback)(gds_inline_rbtree_node_t *, gds_inline_rbtree_node_t *, void *);
 
-	GDS_CHECK_ARG_NOT_NULL(root);
-	GDS_CHECK_ARG_NOT_NULL(node);
-	GDS_CHECK_ARG_NOT_NULL(cmp_cb);
+	gds_assert(root != NULL, -1);
+	gds_assert(node != NULL, -1);
+	gds_assert(cmp_cb != NULL, -1);
 
 	if (*root == NULL) {
 		*root = node;
@@ -221,7 +221,7 @@ gds_inline_rbtree_node_t * gds_inline_rbtree_get_node(
 	int dir;
 	int (*cmp_with_key_callback)(gds_inline_rbtree_node_t *, const void *, void *);
 
-	GDS_CHECK_ARG_NOT_NULL(cmp_with_key_cb);
+	gds_assert(cmp_with_key_cb != NULL, NULL);
 
 	cmp_with_key_callback = cmp_with_key_cb;
 
@@ -247,9 +247,9 @@ gds_inline_rbtree_node_t * gds_inline_rbtree_del(
 	int dir = 1;
 	int (*cmp_with_key_callback)(gds_inline_rbtree_node_t *, const void *, void *);
 
-	GDS_CHECK_ARG_NOT_NULL(root);
-	GDS_CHECK_ARG_NOT_NULL(*root);
-	GDS_CHECK_ARG_NOT_NULL(cmp_with_key_cb);
+	gds_assert(root != NULL, NULL);
+	gds_assert(*root != NULL, NULL);
+	gds_assert(cmp_with_key_cb != NULL, NULL);
 
 	cmp_with_key_callback = cmp_with_key_cb;
 
@@ -395,7 +395,7 @@ gds_iterator_t * gds_inline_rbtree_iterator_new(
 	gds_inline_rbtree_iterator_data_t *it_data;
 	gds_iterator_t *it;
 
-	GDS_CHECK_ARG_NOT_NULL(root);
+	gds_assert(root != NULL, NULL);
 
 	it_data = gds_malloc(sizeof(gds_inline_rbtree_iterator_data_t));
 	it_data->root = root;

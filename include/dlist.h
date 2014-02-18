@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2013 Julian Maurice
+ * Copyright 2010-2014 Julian Maurice
  *
  * This file is part of libgends
  *
@@ -181,8 +181,12 @@ gds_dlist_get(
  *   callback_data: Data to pass to callback as 2nd parameter.
  *   replacement: Pointer to the list to insert at given offset. This list is
  *                not modified.
+ *
+ * Returns
+ *   0 on success
+ *   a negative value on failure
  */
-void
+int
 gds_dlist_splice(
 	gds_dlist_t *list,
 	unsigned int offset,
@@ -229,7 +233,7 @@ gds_dlist_slice(
  *             - (void *) callback_data
  *   callback_data: Data to pass to callback as 3rd parameter.
  */
-void
+int
 gds_dlist_map(
 	gds_dlist_t *list,
 	void *callback,

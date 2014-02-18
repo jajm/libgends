@@ -26,7 +26,7 @@
 #include <stdlib.h>
 #include "slist.h"
 #include "malloc.h"
-#include "check_arg.h"
+#include "assert.h"
 #include "log.h"
 #include "rbtree_keyin_fast.h"
 #include "hash_map_keyin_fast.h"
@@ -45,10 +45,10 @@ gds_hash_map_keyin_fast_t * gds_hash_map_keyin_fast_new(unsigned long size,
 {
 	gds_hash_map_keyin_fast_t *h;
 
-	GDS_CHECK_ARG_NOT_ZERO(size);
-	GDS_CHECK_ARG_NOT_NULL(hash_cb)
-	GDS_CHECK_ARG_NOT_NULL(getkey_cb)
-	GDS_CHECK_ARG_NOT_NULL(cmpkey_cb)
+	gds_assert(size > 0, NULL);
+	gds_assert(hash_cb != NULL, NULL);
+	gds_assert(getkey_cb != NULL, NULL);
+	gds_assert(cmpkey_cb != NULL, NULL);
 
 	h = gds_malloc(sizeof(gds_hash_map_keyin_fast_t));
 	h->map = gds_calloc(size, sizeof(gds_rbtree_keyin_fast_node_t *));
@@ -71,7 +71,7 @@ int gds_hash_map_keyin_fast_set(gds_hash_map_keyin_fast_t *h, void *data)
 {
 	unsigned long hash;
 
-	GDS_CHECK_ARG_NOT_NULL(h);
+	gds_assert(h != NULL, -1);
 
 	hash = gds_hash_map_keyin_fast_hash(h, h->getkey_cb(data));
 	return gds_rbtree_keyin_fast_set(&(h->map[hash]), data, h->getkey_cb,
@@ -83,7 +83,7 @@ void * gds_hash_map_keyin_fast_get(gds_hash_map_keyin_fast_t *h, const void *key
 	unsigned long hash;
 	void *data;
 
-	GDS_CHECK_ARG_NOT_NULL(h);
+	gds_assert(h != NULL, NULL);
 
 	hash = gds_hash_map_keyin_fast_hash(h, key);
 	data = h->map[hash]
@@ -98,7 +98,7 @@ int gds_hash_map_keyin_fast_unset(gds_hash_map_keyin_fast_t *h, const void *key)
 	unsigned long hash;
 	int rv;
 
-	GDS_CHECK_ARG_NOT_NULL(h);
+	gds_assert(h != NULL, -1);
 
 	hash = gds_hash_map_keyin_fast_hash(h, key);
 	rv = gds_rbtree_keyin_fast_del(&(h->map[hash]), key, h->getkey_cb,
@@ -112,7 +112,7 @@ void * gds_hash_map_keyin_fast_pop(gds_hash_map_keyin_fast_t *h, const void *key
 	unsigned long hash;
 	void *data;
 
-	GDS_CHECK_ARG_NOT_NULL(h);
+	gds_assert(h != NULL, NULL);
 
 	hash = gds_hash_map_keyin_fast_hash(h, key);
 	data = gds_rbtree_keyin_fast_pop(&(h->map[hash]), key, h->getkey_cb,
@@ -226,7 +226,7 @@ gds_slist_t * gds_hash_map_keyin_fast_values(gds_hash_map_keyin_fast_t *h)
 	gds_slist_t *list;
 	unsigned long i;
 
-	GDS_CHECK_ARG_NOT_NULL(h);
+	gds_assert(h != NULL, NULL);
 
 	for (i = h->size; i > 0; i--) {
 		list = gds_rbtree_keyin_fast_values(h->map[i-1]);
@@ -263,12 +263,12 @@ gds_rbtree_keyin_fast_node_t ** gds_hash_map_keyin_fast_build_map(gds_hash_map_k
 	return map;
 }
 
-void gds_hash_map_keyin_fast_change_size(gds_hash_map_keyin_fast_t *h, unsigned long new_size)
+int gds_hash_map_keyin_fast_change_size(gds_hash_map_keyin_fast_t *h, unsigned long new_size)
 {
 	gds_rbtree_keyin_fast_node_t **map;
 
-	GDS_CHECK_ARG_NOT_NULL(h);
-	GDS_CHECK_ARG_NOT_ZERO(new_size);
+	gds_assert(h != NULL, -1);
+	gds_assert(new_size > 0, -1);
 
 	map = gds_hash_map_keyin_fast_build_map(h, new_size);
 	for (unsigned long i = 0; i < h->size; i++) {
@@ -277,6 +277,8 @@ void gds_hash_map_keyin_fast_change_size(gds_hash_map_keyin_fast_t *h, unsigned 
 	free(h->map);
 	h->map = map;
 	h->size = new_size;
+
+	return 0;
 }
 
 void gds_hash_map_keyin_fast_free(gds_hash_map_keyin_fast_t *h)

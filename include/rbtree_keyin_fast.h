@@ -82,6 +82,7 @@ gds_rbtree_keyin_fast_add(
  * Returns
  *   0 if key was not in the tree (node added)
  *   1 if key was already in the tree (node replaced)
+ *   a negative value on failure
  */
 int
 gds_rbtree_keyin_fast_set(
@@ -141,6 +142,7 @@ gds_rbtree_keyin_fast_get(
  * Returns
  *   0 if node was successfully deleted.
  *   1 if key was not in tree.
+ *   a negative value on failure.
  */
 int
 gds_rbtree_keyin_fast_del(
@@ -202,6 +204,7 @@ gds_rbtree_keyin_fast_free(
  *
  * Returns
  *   Pointer to iterator.
+ *   NULL on failure.
  */
 gds_iterator_t *
 gds_rbtree_keyin_fast_iterator_new(

@@ -79,6 +79,7 @@ gds_hash_map_new(
  * Returns
  *   0: key was just added
  *   1: key was already in the hash
+ *   a negative value on failure
  */
 int
 gds_hash_map_set(
@@ -113,6 +114,7 @@ gds_hash_map_get(
  * Returns
  *   0: key was correctly unset
  *   1: key was not in the hash map
+ *   a negative value on failure
  */
 int
 gds_hash_map_unset(
@@ -184,7 +186,7 @@ gds_hash_map_values(
  *   h        : pointer to the hash map
  *   new_size : New size (number of buckets)
  */
-void
+int
 gds_hash_map_change_size(
 	gds_hash_map_t *h,
 	unsigned long new_size
