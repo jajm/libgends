@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <libtap13/tap.h>
 #include "inline/rbtree_fast.h"
-#include "../tap.h"
 
 typedef struct {
 	int data;
@@ -104,35 +104,35 @@ void t_gds_inline_rbtree_fast_add(void)
 	trfn = test_rbtree_fast_node_new(1);
 	rc = gds_inline_rbtree_fast_add(&root, &(trfn->inline_node),
 		test_rbtree_fast_node_cmp, NULL);
-	is(rc, 0, NULL);
+	is(rc, 0);
 	rc = gds_inline_rbtree_fast_add(&root, &(trfn->inline_node),
 		test_rbtree_fast_node_cmp, NULL);
-	is(rc, 1, NULL);
+	is(rc, 1);
 	trfn = test_rbtree_fast_node_new(0);
 	rc = gds_inline_rbtree_fast_add(&root, &(trfn->inline_node),
 		test_rbtree_fast_node_cmp, NULL);
-	is(rc, 0, NULL);
+	is(rc, 0);
 	rc = gds_inline_rbtree_fast_add(&root, &(trfn->inline_node),
 		test_rbtree_fast_node_cmp, NULL);
-	is(rc, 1, NULL);
+	is(rc, 1);
 	trfn = test_rbtree_fast_node_new(2);
 	rc = gds_inline_rbtree_fast_add(&root, &(trfn->inline_node),
 		test_rbtree_fast_node_cmp, NULL);
-	is(rc, 0, NULL);
+	is(rc, 0);
 	rc = gds_inline_rbtree_fast_add(&root, &(trfn->inline_node),
 		test_rbtree_fast_node_cmp, NULL);
-	is(rc, 1, NULL);
+	is(rc, 1);
 
-	isntnull(root, NULL);
+	isnt(root, NULL);
 	trfn = test_rbtree_fast_node_get_container(root);
-	isntnull(trfn, NULL);
-	is(trfn->data, 1, NULL);
+	isnt(trfn, NULL);
+	is(trfn->data, 1);
 	trfn = test_rbtree_fast_node_get_container(root->left);
-	isntnull(trfn, NULL);
-	is(trfn->data, 0, NULL);
+	isnt(trfn, NULL);
+	is(trfn->data, 0);
 	trfn = test_rbtree_fast_node_get_container(root->right);
-	isntnull(trfn, NULL);
-	is(trfn->data, 2, NULL);
+	isnt(trfn, NULL);
+	is(trfn->data, 2);
 
 	test_rbtree_fast_free(test_rbtree_fast_node_get_container(root));
 }
@@ -155,22 +155,22 @@ void t_gds_inline_rbtree_fast_del(void)
 	int i = 1;
 	inode = gds_inline_rbtree_fast_del(&root, &i,
 		test_rbtree_fast_node_cmp_with_key, NULL);
-	isntnull(inode, NULL);
+	isnt(inode, NULL);
 	trfn = test_rbtree_fast_node_get_container(inode);
-	is(trfn->data, 1, NULL);
+	is(trfn->data, 1);
 	test_rbtree_fast_node_free(trfn);
 	
 	trfn = test_rbtree_fast_node_get_container(root);
 	if (trfn->data == 0) {
-		isnull(root->left, NULL);
-		isntnull(root->right, NULL);
+		is(root->left, NULL);
+		isnt(root->right, NULL);
 		trfn = test_rbtree_fast_node_get_container(root->right);
-		is(trfn->data, 2, NULL);
+		is(trfn->data, 2);
 	} else {
-		isnull(root->right, NULL);
-		isntnull(root->left, NULL);
+		is(root->right, NULL);
+		isnt(root->left, NULL);
 		trfn = test_rbtree_fast_node_get_container(root->left);
-		is(trfn->data, 0, NULL);
+		is(trfn->data, 0);
 	}
 
 	test_rbtree_fast_free(test_rbtree_fast_node_get_container(root));
@@ -194,21 +194,21 @@ void t_gds_inline_rbtree_fast_get_node(void)
 	int i = 0;
 	node_inline = gds_inline_rbtree_fast_get_node(root, &i,
 		test_rbtree_fast_node_cmp_with_key, NULL);
-	isntnull(node_inline, NULL);
+	isnt(node_inline, NULL);
 	trfn = test_rbtree_fast_node_get_container(node_inline);
-	is(trfn->data, i, NULL);
+	is(trfn->data, i);
 	i = 1;
 	node_inline = gds_inline_rbtree_fast_get_node(root, &i,
 		test_rbtree_fast_node_cmp_with_key, NULL);
-	isntnull(node_inline, NULL);
+	isnt(node_inline, NULL);
 	trfn = test_rbtree_fast_node_get_container(node_inline);
-	is(trfn->data, i, NULL);
+	is(trfn->data, i);
 	i = 2;
 	node_inline = gds_inline_rbtree_fast_get_node(root, &i,
 		test_rbtree_fast_node_cmp_with_key, NULL);
-	isntnull(node_inline, NULL);
+	isnt(node_inline, NULL);
 	trfn = test_rbtree_fast_node_get_container(node_inline);
-	is(trfn->data, i, NULL);
+	is(trfn->data, i);
 
 	test_rbtree_fast_free(test_rbtree_fast_node_get_container(root));
 }
@@ -231,25 +231,25 @@ void t_gds_inline_rbtree_fast_iterator(void)
 
 	it = gds_inline_rbtree_fast_iterator_new(root);
 
-	ok(0 == gds_iterator_step(it), NULL);
+	ok(0 == gds_iterator_step(it));
 	node_inline = gds_iterator_get(it);
 	trfn = test_rbtree_fast_node_get_container(node_inline);
-	isntnull(trfn, NULL);
-	is(trfn->data, 0, NULL);
+	isnt(trfn, NULL);
+	is(trfn->data, 0);
 
-	ok(0 == gds_iterator_step(it), NULL);
+	ok(0 == gds_iterator_step(it));
 	node_inline = gds_iterator_get(it);
 	trfn = test_rbtree_fast_node_get_container(node_inline);
-	isntnull(trfn, NULL);
-	is(trfn->data, 1, NULL);
+	isnt(trfn, NULL);
+	is(trfn->data, 1);
 
-	ok(0 == gds_iterator_step(it), NULL);
+	ok(0 == gds_iterator_step(it));
 	node_inline = gds_iterator_get(it);
 	trfn = test_rbtree_fast_node_get_container(node_inline);
-	isntnull(trfn, NULL);
-	is(trfn->data, 2, NULL);
+	isnt(trfn, NULL);
+	is(trfn->data, 2);
 
-	ok(0 < gds_iterator_step(it), NULL);
+	ok(0 < gds_iterator_step(it));
 
 	gds_iterator_free(it);
 	test_rbtree_fast_free(test_rbtree_fast_node_get_container(root));

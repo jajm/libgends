@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <libtap13/tap.h>
 #include "inline/slist.h"
-#include "../tap.h"
 
 typedef struct {
 	int data;
@@ -44,12 +44,12 @@ void assert_list_equal(test_list_node_t *head, int size, int compare[])
 	i = 0;
 	while (it != NULL && i < size) {
 		tln = test_list_node_get_container(it);
-		is(tln->data, compare[i], NULL);
+		is(tln->data, compare[i]);
 		it = gds_inline_slist_node_get_next(it);
 		i++;
 	}
-	is(i, size, NULL);
-	isnull(it, NULL);
+	is(i, size);
+	is(it, NULL);
 }
 
 void t_gds_inline_slist_insert(void)
@@ -115,27 +115,27 @@ void t_gds_inline_slist_remove(void)
 	gds_inline_slist_remove(fi, 0, 0, test_list_node_inline_free,
 		NULL, &fi, &li);
 	assert_list_equal(test_list_node_get_container(fi), 10, (int[]) {0,1,2,3,4,5,6,7,8,9});
-	isnull(li, NULL);
+	is(li, NULL);
 
 	gds_inline_slist_remove(fi, 0, 1, test_list_node_inline_free,
 		NULL, &fi, &li);
 	assert_list_equal(test_list_node_get_container(fi), 9, (int[]) {1,2,3,4,5,6,7,8,9});
-	isnull(li, NULL);
+	is(li, NULL);
 
 	gds_inline_slist_remove(fi, 3, 3, test_list_node_inline_free,
 		NULL, &fi, &li);
 	assert_list_equal(test_list_node_get_container(fi), 6, (int[]) {1,2,3,7,8,9});
-	isnull(li, NULL);
+	is(li, NULL);
 
 	gds_inline_slist_remove(fi, 3, 10, test_list_node_inline_free,
 		NULL, &fi, &li);
 	assert_list_equal(test_list_node_get_container(fi), 3, (int[]) {1,2,3});
-	is(li, &(nodes[3]->inline_node), NULL);
+	is(li, &(nodes[3]->inline_node));
 
 	gds_inline_slist_remove(fi, 0, 10, test_list_node_inline_free,
 		NULL, &fi, &li);
 	assert_list_equal(test_list_node_get_container(fi), 0, (int[]) {});
-	isnull(li, NULL);
+	is(li, NULL);
 }
 
 void t_gds_inline_slist_get(void)
@@ -156,10 +156,10 @@ void t_gds_inline_slist_get(void)
 
 	for (i = 0; i < 10; i++) {
 		node_inline = gds_inline_slist_get(fi, i);
-		isntnull(node_inline, NULL);
+		isnt(node_inline, NULL);
 		tln = test_list_node_get_container(node_inline);
-		isntnull(tln, NULL);
-		is(tln->data, i, NULL);
+		isnt(tln, NULL);
+		is(tln->data, i);
 	}
 
 	for (i = 0; i < 10; i++) {

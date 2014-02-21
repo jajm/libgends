@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <libtap13/tap.h>
 #include "slist.h"
 #include "lambda.h"
-#include "tap.h"
 
 void assert_list_equals(gds_slist_t *list, unsigned int size, void *compare[])
 {
@@ -13,11 +13,11 @@ void assert_list_equals(gds_slist_t *list, unsigned int size, void *compare[])
 	gds_iterator_reset(it);
 	while (!gds_iterator_step(it) && i < size) {
 		void *d = gds_iterator_get(it);
-		is(d, compare[i], NULL);
+		is(d, compare[i]);
 		i++;
 	}
-	is(i, size, NULL);
-	is(i, gds_slist_size(list), NULL);
+	is(i, size);
+	is(i, gds_slist_size(list));
 	isnt(gds_iterator_step(it), 0, NULL);
 
 
@@ -30,7 +30,7 @@ void t_gds_slist_unshift(void)
 	int a[] = {1, 2, 3};
 
 	list = gds_slist();
-	isntnull(list, NULL);
+	isnt(list, NULL);
 
 	assert_list_equals(list, 0, (void *[]){});
 
@@ -52,7 +52,7 @@ void t_gds_slist_push(void)
 	int a[] = {1, 2, 3};
 
 	list = gds_slist();
-	isntnull(list, NULL);
+	isnt(list, NULL);
 
 	assert_list_equals(list, 0, (void *[]){});
 
@@ -75,24 +75,24 @@ void t_gds_slist_shift(void)
 	int *b;
 
 	list = gds_slist(&a[0], &a[1], &a[2]);
-	isntnull(list, NULL);
+	isnt(list, NULL);
 	assert_list_equals(list, 3, (void *[]){&a[0], &a[1], &a[2]});
 
 	b = gds_slist_shift(list);
 	assert_list_equals(list, 2, (void *[]){&a[1], &a[2]});
-	is(b, &a[0], NULL);
+	is(b, &a[0]);
 
 	b = gds_slist_shift(list);
 	assert_list_equals(list, 1, (void *[]){&a[2]});
-	is(b, &a[1], NULL);
+	is(b, &a[1]);
 
 	b = gds_slist_shift(list);
 	assert_list_equals(list, 0, (void *[]){});
-	is(b, &a[2], NULL);
+	is(b, &a[2]);
 
 	b = gds_slist_shift(list);
 	assert_list_equals(list, 0, (void *[]){});
-	is(b, NULL, NULL);
+	is(b, NULL);
 
 	gds_slist_free(list, NULL, NULL);
 }
@@ -104,24 +104,24 @@ void t_gds_slist_pop(void)
 	int *b;
 
 	list = gds_slist(&a[0], &a[1], &a[2]);
-	isntnull(list, NULL);
+	isnt(list, NULL);
 	assert_list_equals(list, 3, (void *[]){&a[0], &a[1], &a[2]});
 
 	b = gds_slist_pop(list);
 	assert_list_equals(list, 2, (void *[]){&a[0], &a[1]});
-	is(b, &a[2], NULL);
+	is(b, &a[2]);
 
 	b = gds_slist_pop(list);
 	assert_list_equals(list, 1, (void *[]){&a[0]});
-	is(b, &a[1], NULL);
+	is(b, &a[1]);
 
 	b = gds_slist_pop(list);
 	assert_list_equals(list, 0, (void *[]){});
-	is(b, &a[0], NULL);
+	is(b, &a[0]);
 
 	b = gds_slist_pop(list);
 	assert_list_equals(list, 0, (void *[]){});
-	is(b, NULL, NULL);
+	is(b, NULL);
 
 	gds_slist_free(list, NULL, NULL);
 }
@@ -134,9 +134,9 @@ void t_gds_slist_get(void)
 
 	list = gds_slist(&a[0], &a[1], &a[2]);
 	for (i = 0; i < 3; i++) {
-		is(gds_slist_get(list, i), &a[i], NULL);
+		is(gds_slist_get(list, i), &a[i]);
 	}
-	is(gds_slist_get(list, i), NULL, NULL);
+	is(gds_slist_get(list, i), NULL);
 	gds_slist_free(list, NULL, NULL);
 }
 
@@ -147,7 +147,7 @@ void t_gds_slist_splice(void)
 	int i;
 
 	list = gds_slist();
-	isntnull(list, NULL);
+	isnt(list, NULL);
 	for (i=0; i<10; i++) {
 		a[i] = malloc(sizeof(int));
 		*(a[i]) = i;
@@ -243,7 +243,7 @@ void t_gds_slist_slice(void)
 	int i;
 
 	list = gds_slist();
-	isntnull(list, NULL);
+	isnt(list, NULL);
 	for (i=0; i<10; i++) {
 		a[i] = malloc(sizeof(int));
 		*(a[i]) = i;
@@ -280,10 +280,10 @@ void t_gds_slist_slice(void)
 	i = 0;
 	gds_slist_foreach(b, list2) {
 		isnt(b, a[i+2], NULL);
-		is(*b, *(a[i+2]), NULL);
+		is(*b, *(a[i+2]));
 		i++;
 	}
-	is(i, 4, NULL);
+	is(i, 4);
 	gds_slist_free(list, free, NULL);
 	gds_slist_free(list2, free, NULL);
 }
@@ -297,9 +297,9 @@ void t_gds_slist_map(void)
 	gds_slist_map(list, lambda(void, (int *a) {
 		*a = *a + *a;
 	}), NULL);
-	is(a[0], 2, NULL);
-	is(a[1], 4, NULL);
-	is(a[2], 6, NULL);
+	is(a[0], 2);
+	is(a[1], 4);
+	is(a[2], 6);
 
 	gds_slist_free(list, NULL, NULL);
 }
@@ -311,7 +311,7 @@ void t_gds_slist_filter(void)
 	int i;
 
 	list = gds_slist();
-	isntnull(list, NULL);
+	isnt(list, NULL);
 	for (i=0; i<10; i++) {
 		a[i] = malloc(sizeof(int));
 		*(a[i]) = i;
@@ -361,10 +361,10 @@ void t_gds_slist_reduce(void)
 	}
 
 	result = gds_slist_reduce(list, string_reduce_join, NULL);
-	str_eq(result, "Hello,splittedworld!", NULL);
+	str_eq(result, "Hello,splittedworld!");
 	free(result);
 	result = gds_slist_reduce(list, string_reduce_join, &sep);
-	str_eq(result, "Hello, splitted world!", NULL);
+	str_eq(result, "Hello, splitted world!");
 	free(result);
 
 	gds_slist_free(list, NULL, NULL);

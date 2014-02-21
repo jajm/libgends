@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <libtap13/tap.h>
 #include "test_macros.h"
 #include "rbtree_keyin.h"
 #include "iterator.h"
 #include "slist.h"
 #include "test.h"
-#include "tap.h"
 
 int init_suite(void)
 {
@@ -156,22 +156,22 @@ void t_rbtree_keyin_add(void)
 		gds_rbtree_keyin_add(&root, t   , test_getkey, NULL     ));
 
 	/* Tree is unchanged */
-	isnull(root, NULL);
-	ok(gds_rbtree_keyin_is_valid(root, test_getkey, test_cmpkey), NULL);
+	is(root, NULL);
+	ok(gds_rbtree_keyin_is_valid(root, test_getkey, test_cmpkey));
 
 	/* Add NULL as data, first call should success, others must return a
 	 * positive value, meaning that data is already in the tree */
-	ok(0 == gds_rbtree_keyin_add(&root, NULL, test_getkey, test_cmpkey), NULL);
-	ok(gds_rbtree_keyin_is_valid(root, test_getkey, test_cmpkey), NULL);
-	ok(0 < gds_rbtree_keyin_add(&root, NULL, test_getkey, test_cmpkey), NULL);
-	ok(gds_rbtree_keyin_is_valid(root, test_getkey, test_cmpkey), NULL);
+	ok(0 == gds_rbtree_keyin_add(&root, NULL, test_getkey, test_cmpkey));
+	ok(gds_rbtree_keyin_is_valid(root, test_getkey, test_cmpkey));
+	ok(0 < gds_rbtree_keyin_add(&root, NULL, test_getkey, test_cmpkey));
+	ok(gds_rbtree_keyin_is_valid(root, test_getkey, test_cmpkey));
 
 	/* Add t as data, first call should success, others must return a
 	 * positive value, meaning that data is already in the tree */
-	ok(0 == gds_rbtree_keyin_add(&root, t, test_getkey, test_cmpkey), NULL);
-	ok(gds_rbtree_keyin_is_valid(root, test_getkey, test_cmpkey), NULL);
-	ok(0 < gds_rbtree_keyin_add(&root, t, test_getkey, test_cmpkey), NULL);
-	ok(gds_rbtree_keyin_is_valid(root, test_getkey, test_cmpkey), NULL);
+	ok(0 == gds_rbtree_keyin_add(&root, t, test_getkey, test_cmpkey));
+	ok(gds_rbtree_keyin_is_valid(root, test_getkey, test_cmpkey));
+	ok(0 < gds_rbtree_keyin_add(&root, t, test_getkey, test_cmpkey));
+	ok(gds_rbtree_keyin_is_valid(root, test_getkey, test_cmpkey));
 
 	gds_rbtree_keyin_free(root, NULL);
 	test_free(t);
@@ -268,31 +268,31 @@ void t_rbtree_keyin_set(void)
 		gds_rbtree_keyin_set(&root, t   , NULL     , NULL     , free));
 
 	/* Tree is unchanged */
-	isnull(root, NULL);
-	ok(gds_rbtree_keyin_is_valid(root, test_getkey, test_cmpkey), NULL);
+	is(root, NULL);
+	ok(gds_rbtree_keyin_is_valid(root, test_getkey, test_cmpkey));
 
 	/* Add NULL as data, first call should success, others must
 	 * return a positive value, meaning that key is already in the tree. */
-	ok(0 == gds_rbtree_keyin_set(&root, NULL, test_getkey, test_cmpkey, NULL), NULL);
-	ok(0 <  gds_rbtree_keyin_set(&root, NULL, test_getkey, test_cmpkey, NULL), NULL);
-	ok(0 <  gds_rbtree_keyin_set(&root, NULL, test_getkey, test_cmpkey, NULL), NULL);
+	ok(0 == gds_rbtree_keyin_set(&root, NULL, test_getkey, test_cmpkey, NULL));
+	ok(0 <  gds_rbtree_keyin_set(&root, NULL, test_getkey, test_cmpkey, NULL));
+	ok(0 <  gds_rbtree_keyin_set(&root, NULL, test_getkey, test_cmpkey, NULL));
 
-	ok(gds_rbtree_keyin_is_valid(root, test_getkey, test_cmpkey), NULL);
+	ok(gds_rbtree_keyin_is_valid(root, test_getkey, test_cmpkey));
 
 	/* Add t as data, first call should success, others must
 	 * return a positive value, meaning that key is already in the tree. */
-	ok(0 == gds_rbtree_keyin_set(&root, t, test_getkey, test_cmpkey, NULL), NULL);
-	ok(0 <  gds_rbtree_keyin_set(&root, t, test_getkey, test_cmpkey, NULL), NULL);
+	ok(0 == gds_rbtree_keyin_set(&root, t, test_getkey, test_cmpkey, NULL));
+	ok(0 <  gds_rbtree_keyin_set(&root, t, test_getkey, test_cmpkey, NULL));
 
-	ok(gds_rbtree_keyin_is_valid(root, test_getkey, test_cmpkey), NULL);
+	ok(gds_rbtree_keyin_is_valid(root, test_getkey, test_cmpkey));
 
 	gds_rbtree_keyin_free(root, NULL);
 	root = NULL;
 
 	for (int i=0; i<100; i++) {
 		sprintf(buf, "key %02d", i);
-		ok(0 == gds_rbtree_keyin_set(&root, test_new(buf, i), test_getkey, test_cmpkey, NULL), NULL);
-		ok(gds_rbtree_keyin_is_valid(root, test_getkey, test_cmpkey), NULL);
+		ok(0 == gds_rbtree_keyin_set(&root, test_new(buf, i), test_getkey, test_cmpkey, NULL));
+		ok(gds_rbtree_keyin_is_valid(root, test_getkey, test_cmpkey));
 	}
 
 	gds_rbtree_keyin_free(root, test_free);
@@ -300,8 +300,8 @@ void t_rbtree_keyin_set(void)
 
 	for (int i=100; i>0; i--) {
 		sprintf(buf, "key %02d", i);
-		ok(0 == gds_rbtree_keyin_set(&root, test_new(buf, i), test_getkey, test_cmpkey, NULL), NULL);
-		ok(gds_rbtree_keyin_is_valid(root, test_getkey, test_cmpkey), NULL);
+		ok(0 == gds_rbtree_keyin_set(&root, test_new(buf, i), test_getkey, test_cmpkey, NULL));
+		ok(gds_rbtree_keyin_is_valid(root, test_getkey, test_cmpkey));
 	}
 
 	gds_rbtree_keyin_free(root, test_free);
@@ -311,8 +311,8 @@ void t_rbtree_keyin_set(void)
 	for (int i=0; i<100; i++) {
 		int j = rand();
 		sprintf(buf, "key %02d", j);
-		ok(0 <= gds_rbtree_keyin_set(&root, test_new(buf, i), test_getkey, test_cmpkey, test_free), NULL);
-		ok(gds_rbtree_keyin_is_valid(root, test_getkey, test_cmpkey), NULL);
+		ok(0 <= gds_rbtree_keyin_set(&root, test_new(buf, i), test_getkey, test_cmpkey, test_free));
+		ok(gds_rbtree_keyin_is_valid(root, test_getkey, test_cmpkey));
 	}
 
 	gds_rbtree_keyin_free(root, test_free);
@@ -335,21 +335,21 @@ void t_rbtree_keyin_get(void)
 		gds_rbtree_keyin_get(NULL, NULL, NULL, test_cmpkey));
 	GDS_ASSERT_THROW(BadArgumentException,
 		gds_rbtree_keyin_get(NULL, NULL, test_getkey, NULL));
-	isnull(gds_rbtree_keyin_get(NULL, NULL, test_getkey, test_cmpkey), NULL);
+	is(gds_rbtree_keyin_get(NULL, NULL, test_getkey, test_cmpkey), NULL);
 	GDS_ASSERT_THROW(BadArgumentException,
 		gds_rbtree_keyin_get(NULL, "key", NULL, NULL));
 	GDS_ASSERT_THROW(BadArgumentException,
 		gds_rbtree_keyin_get(NULL, "key", NULL, test_cmpkey));
 	GDS_ASSERT_THROW(BadArgumentException,
 		gds_rbtree_keyin_get(NULL, "key", test_getkey, NULL));
-	isnull(gds_rbtree_keyin_get(NULL, "key", test_getkey, test_cmpkey), NULL);
+	is(gds_rbtree_keyin_get(NULL, "key", test_getkey, test_cmpkey), NULL);
 	GDS_ASSERT_THROW(BadArgumentException,
 		gds_rbtree_keyin_get(root, NULL, NULL, NULL));
 	GDS_ASSERT_THROW(BadArgumentException,
 		gds_rbtree_keyin_get(root, NULL, NULL, test_cmpkey));
 	GDS_ASSERT_THROW(BadArgumentException,
 		gds_rbtree_keyin_get(root, NULL, test_getkey, NULL));
-	isnull(gds_rbtree_keyin_get(root, NULL, test_getkey, test_cmpkey), NULL);
+	is(gds_rbtree_keyin_get(root, NULL, test_getkey, test_cmpkey), NULL);
 	GDS_ASSERT_THROW(BadArgumentException,
 		gds_rbtree_keyin_get(root, "key", NULL, NULL));
 	GDS_ASSERT_THROW(BadArgumentException,
@@ -357,8 +357,8 @@ void t_rbtree_keyin_get(void)
 	GDS_ASSERT_THROW(BadArgumentException,
 		gds_rbtree_keyin_get(root, "key", test_getkey, NULL));
 
-	isntnull(gds_rbtree_keyin_get(root, "key", test_getkey, test_cmpkey), NULL);
-	isntnull((data = gds_rbtree_keyin_get(root, "key", test_getkey, test_cmpkey)), NULL);
+	isnt(gds_rbtree_keyin_get(root, "key", test_getkey, test_cmpkey), NULL);
+	isnt((data = gds_rbtree_keyin_get(root, "key", test_getkey, test_cmpkey)), NULL);
 
 	gds_rbtree_keyin_free(root, test_free);
 	root = NULL;
@@ -372,9 +372,9 @@ void t_rbtree_keyin_get(void)
 		sprintf(buf, "key %d", i);
 		data = gds_rbtree_keyin_get(root, buf,
 			test_getkey, test_cmpkey);
-		isntnull(data, NULL);
-		is(i, test_getvalue(data), NULL);
-		ok(0 == test_cmpkey(buf, test_getkey(data)), NULL);
+		isnt(data, NULL);
+		is(i, test_getvalue(data));
+		ok(0 == test_cmpkey(buf, test_getkey(data)));
 	}
 	gds_rbtree_keyin_free(root, test_free);
 }
@@ -444,10 +444,10 @@ void t_rbtree_keyin_del(void)
 	GDS_ASSERT_THROW(BadArgumentException,
 		gds_rbtree_keyin_del(&root, "key", test_getkey, NULL, test_free));
 
-	ok(0 < gds_rbtree_keyin_del(&root, NULL, test_getkey, test_cmpkey, NULL), NULL);
-	ok(0 < gds_rbtree_keyin_del(&root, NULL, test_getkey, test_cmpkey, test_free), NULL);
-	ok(0 == gds_rbtree_keyin_del(&root, "key", test_getkey, test_cmpkey, NULL), NULL);
-	ok(0 < gds_rbtree_keyin_del(&root, "key", test_getkey, test_cmpkey, test_free), NULL);
+	ok(0 < gds_rbtree_keyin_del(&root, NULL, test_getkey, test_cmpkey, NULL));
+	ok(0 < gds_rbtree_keyin_del(&root, NULL, test_getkey, test_cmpkey, test_free));
+	ok(0 == gds_rbtree_keyin_del(&root, "key", test_getkey, test_cmpkey, NULL));
+	ok(0 < gds_rbtree_keyin_del(&root, "key", test_getkey, test_cmpkey, test_free));
 
 	test_free(t);
 
@@ -508,12 +508,12 @@ void t_rbtree_keyin_pop(void)
 	GDS_ASSERT_THROW(BadArgumentException,
 		gds_rbtree_keyin_pop(&root, "key", test_getkey, NULL));
 
-	isnull(gds_rbtree_keyin_pop(&root, NULL, test_getkey, test_cmpkey), NULL);
+	is(gds_rbtree_keyin_pop(&root, NULL, test_getkey, test_cmpkey), NULL);
 	t2 = gds_rbtree_keyin_pop(&root, "key", test_getkey, test_cmpkey);
-	isntnull(t2, NULL);
-	is(t2, t, NULL);
+	isnt(t2, NULL);
+	is(t2, t);
 	test_free(t2);
-	isnull(gds_rbtree_keyin_pop(&root, "key", test_getkey, test_cmpkey), NULL);
+	is(gds_rbtree_keyin_pop(&root, "key", test_getkey, test_cmpkey), NULL);
 
 	for (int i=0; i<100; i++) {
 		sprintf(buf, "key %d", i);
@@ -524,14 +524,14 @@ void t_rbtree_keyin_pop(void)
 		sprintf(buf, "key %d", i);
 		t2 = gds_rbtree_keyin_pop(&root, buf, test_getkey,
 			test_cmpkey);
-		str_eq(t2->key, buf, NULL);
+		str_eq(t2->key, buf);
 		test_free(t2);
 		ok(gds_rbtree_keyin_is_valid(root, test_getkey,
 			test_cmpkey), NULL);
 	}
 	for (int i=0; i<100; i++) {
 		sprintf(buf, "key %d", i);
-		isnull(gds_rbtree_keyin_pop(&root, buf, test_getkey,
+		is(gds_rbtree_keyin_pop(&root, buf, test_getkey,
 			test_cmpkey), NULL);
 	}
 }
@@ -552,47 +552,47 @@ void t_rbtree_keyin_iterator(void)
 	}
 
 	it = gds_rbtree_keyin_iterator_new(root, test_getkey);
-	isntnull(it, NULL);
+	isnt(it, NULL);
 
-	isnull(gds_iterator_get(it), NULL);
-	isnull(gds_iterator_getkey(it), NULL);
+	is(gds_iterator_get(it), NULL);
+	is(gds_iterator_getkey(it), NULL);
 
-	ok(0 == gds_iterator_step(it), NULL);
+	ok(0 == gds_iterator_step(it));
 	t = gds_iterator_get(it);
 	key = gds_iterator_getkey(it);
-	isntnull(t, NULL);
-	isntnull(key, NULL);
-	str_eq(key, "key 00", NULL);
+	isnt(t, NULL);
+	isnt(key, NULL);
+	str_eq(key, "key 00");
 
-	ok(0 == gds_iterator_step(it), NULL);
+	ok(0 == gds_iterator_step(it));
 	t = gds_iterator_get(it);
 	key = gds_iterator_getkey(it);
-	isntnull(t, NULL);
-	isntnull(key, NULL);
-	str_eq(key, "key 01", NULL);
+	isnt(t, NULL);
+	isnt(key, NULL);
+	str_eq(key, "key 01");
 
-	ok(0 == gds_iterator_step(it), NULL);
+	ok(0 == gds_iterator_step(it));
 	t = gds_iterator_get(it);
 	key = gds_iterator_getkey(it);
-	isntnull(t, NULL);
-	isntnull(key, NULL);
-	str_eq(key, "key 02", NULL);
+	isnt(t, NULL);
+	isnt(key, NULL);
+	str_eq(key, "key 02");
 
-	ok(0 == gds_iterator_step(it), NULL);
+	ok(0 == gds_iterator_step(it));
 	t = gds_iterator_get(it);
 	key = gds_iterator_getkey(it);
-	isntnull(t, NULL);
-	isntnull(key, NULL);
-	str_eq(key, "key 03", NULL);
+	isnt(t, NULL);
+	isnt(key, NULL);
+	str_eq(key, "key 03");
 
-	ok(0 == gds_iterator_step(it), NULL);
+	ok(0 == gds_iterator_step(it));
 	t = gds_iterator_get(it);
 	key = gds_iterator_getkey(it);
-	isntnull(t, NULL);
-	isntnull(key, NULL);
-	str_eq(key, "key 04", NULL);
+	isnt(t, NULL);
+	isnt(key, NULL);
+	str_eq(key, "key 04");
 
-	ok(0 < gds_iterator_step(it), NULL);
+	ok(0 < gds_iterator_step(it));
 
 	gds_iterator_free(it);
 	gds_rbtree_keyin_free(root, test_free);
@@ -614,15 +614,15 @@ void t_rbtree_keyin_values(void)
 	}
 
 	slist = gds_rbtree_keyin_values(root);
-	isntnull(slist, NULL);
+	isnt(slist, NULL);
 	it = gds_slist_iterator_new(slist);
 	i = 0;
 	while(gds_iterator_step(it) == 0) {
 		t = gds_iterator_get(it);
-		isntnull(t, NULL);
+		isnt(t, NULL);
 		sprintf(buf, "key %02d", i);
-		str_eq(t->key, buf, NULL);
-		is(i, t->value, NULL);
+		str_eq(t->key, buf);
+		is(i, t->value);
 		i++;
 	}
 	gds_iterator_free(it);

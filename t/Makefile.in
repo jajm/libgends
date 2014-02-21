@@ -1,8 +1,8 @@
 include ../config.mk
 
 CFLAGS := -Wall -Wextra -Werror -g -std=c99 $(CFLAGS)
-CPPFLAGS := -I../include $(CPPFLAGS)
-LDFLAGS := $(shell pkg-config --libs libexception) $(LDFLAGS)
+CPPFLAGS := -I../include $(CPPFLAGS) $(shell pkg-config --cflags libexception libtap13)
+LDFLAGS := $(shell pkg-config --libs libexception libtap13) $(LDFLAGS)
 
 PROGRAMS := $(patsubst %.c,%,$(wildcard *.t.c) $(wildcard inline/*.t.c))
 

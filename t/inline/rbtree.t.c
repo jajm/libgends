@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <libtap13/tap.h>
 #include "inline/rbtree.h"
-#include "../tap.h"
 
 typedef struct {
 	int data;
@@ -83,33 +83,33 @@ void t_gds_inline_rbtree_add(void)
 	root_inline = &(root->inline_node);
 	trn = test_rbtree_node_new(-1);
 	rc = gds_inline_rbtree_add(&root_inline, &(trn->inline_node), test_rbtree_node_compare, NULL);
-	is(rc, 0, NULL);
+	is(rc, 0);
 	trn = test_rbtree_node_new(1);
 	rc = gds_inline_rbtree_add(&root_inline, &(trn->inline_node), test_rbtree_node_compare, NULL);
-	is(rc, 0, NULL);
+	is(rc, 0);
 
 	root = test_rbtree_node_get_container(root_inline);
-	isntnull(root, NULL);
-	is(root->data, 0, NULL);
+	isnt(root, NULL);
+	is(root->data, 0);
 	trn = test_rbtree_node_get_container(root->inline_node.son[0]);
-	isntnull(trn, NULL);
-	is(trn->data, -1, NULL);
+	isnt(trn, NULL);
+	is(trn->data, -1);
 	trn = test_rbtree_node_get_container(root->inline_node.son[1]);
-	isntnull(trn, NULL);
-	is(trn->data, 1, NULL);
+	isnt(trn, NULL);
+	is(trn->data, 1);
 
 	rc = gds_inline_rbtree_add(&root_inline, &(trn->inline_node), test_rbtree_node_compare, NULL);
-	is(rc, 1, NULL);
+	is(rc, 1);
 
 	root = test_rbtree_node_get_container(root_inline);
-	isntnull(root, NULL);
-	is(root->data, 0, NULL);
+	isnt(root, NULL);
+	is(root->data, 0);
 	trn = test_rbtree_node_get_container(root->inline_node.son[0]);
-	isntnull(trn, NULL);
-	is(trn->data, -1, NULL);
+	isnt(trn, NULL);
+	is(trn->data, -1);
 	trn = test_rbtree_node_get_container(root->inline_node.son[1]);
-	isntnull(trn, NULL);
-	is(trn->data, 1, NULL);
+	isnt(trn, NULL);
+	is(trn->data, 1);
 
 	test_rbtree_free(root);
 }
@@ -126,64 +126,64 @@ void t_gds_inline_rbtree_set(void)
 	trn = test_rbtree_node_new(-1);
 	rc = gds_inline_rbtree_set(&root_inline, &(trn->inline_node),
 		test_rbtree_node_compare, NULL, &removed);
-	is(rc, 0, NULL);
-	isnull(removed, NULL);
+	is(rc, 0);
+	is(removed, NULL);
 	trn = test_rbtree_node_new(1);
 	rc = gds_inline_rbtree_set(&root_inline, &(trn->inline_node),
 		test_rbtree_node_compare, NULL, &removed);
-	is(rc, 0, NULL);
-	isnull(removed, NULL);
+	is(rc, 0);
+	is(removed, NULL);
 
 	root = test_rbtree_node_get_container(root_inline);
-	isntnull(root, NULL);
-	is(root->data, 0, NULL);
+	isnt(root, NULL);
+	is(root->data, 0);
 	trn = test_rbtree_node_get_container(root->inline_node.son[0]);
-	isntnull(trn, NULL);
-	is(trn->data, -1, NULL);
+	isnt(trn, NULL);
+	is(trn->data, -1);
 	trn = test_rbtree_node_get_container(root->inline_node.son[1]);
-	isntnull(trn, NULL);
-	is(trn->data, 1, NULL);
+	isnt(trn, NULL);
+	is(trn->data, 1);
 
 	rc = gds_inline_rbtree_set(&root_inline, &(trn->inline_node),
 		test_rbtree_node_compare, NULL, &removed);
-	is(rc, 1, NULL);
-	isnull(removed, NULL);
+	is(rc, 1);
+	is(removed, NULL);
 
 	root = test_rbtree_node_get_container(root_inline);
-	isntnull(root, NULL);
-	is(root->data, 0, NULL);
+	isnt(root, NULL);
+	is(root->data, 0);
 	trn = test_rbtree_node_get_container(root->inline_node.son[0]);
-	isntnull(trn, NULL);
-	is(trn->data, -1, NULL);
+	isnt(trn, NULL);
+	is(trn->data, -1);
 	trn = test_rbtree_node_get_container(root->inline_node.son[1]);
-	isntnull(trn, NULL);
-	is(trn->data, 1, NULL);
+	isnt(trn, NULL);
+	is(trn->data, 1);
 
 	trn = test_rbtree_node_new(1);
 	rc = gds_inline_rbtree_set(&root_inline, &(trn->inline_node),
 		test_rbtree_node_compare, NULL, &removed);
-	is(rc, 2, NULL);
-	isntnull(removed, NULL);
+	is(rc, 2);
+	isnt(removed, NULL);
 	trn = test_rbtree_node_get_container(removed);
 	test_rbtree_node_free(trn);
 
 	trn = test_rbtree_node_new(0);
 	rc = gds_inline_rbtree_set(&root_inline, &(trn->inline_node),
 		test_rbtree_node_compare, NULL, &removed);
-	is(rc, 2, NULL);
-	isntnull(removed, NULL);
+	is(rc, 2);
+	isnt(removed, NULL);
 	trn = test_rbtree_node_get_container(removed);
 	test_rbtree_node_free(trn);
 
 	root = test_rbtree_node_get_container(root_inline);
-	isntnull(root, NULL);
-	is(root->data, 0, NULL);
+	isnt(root, NULL);
+	is(root->data, 0);
 	trn = test_rbtree_node_get_container(root->inline_node.son[0]);
-	isntnull(trn, NULL);
-	is(trn->data, -1, NULL);
+	isnt(trn, NULL);
+	is(trn->data, -1);
 	trn = test_rbtree_node_get_container(root->inline_node.son[1]);
-	isntnull(trn, NULL);
-	is(trn->data, 1, NULL);
+	isnt(trn, NULL);
+	is(trn->data, 1);
 
 	test_rbtree_free(root);
 }
@@ -204,21 +204,21 @@ void t_gds_inline_rbtree_del(void)
 	i = 1;
 	inode = gds_inline_rbtree_del(&root_inline, &i,
 		test_rbtree_node_compare_with_key, NULL);
-	isntnull(inode, NULL);
+	isnt(inode, NULL);
 	trn = test_rbtree_node_get_container(inode);
 	test_rbtree_node_free(trn);
 	
 	root = test_rbtree_node_get_container(root_inline);
 	if (root->data == -1) {
-		isnull(root_inline->son[0], NULL);
-		isntnull(root_inline->son[1], NULL);
+		is(root_inline->son[0], NULL);
+		isnt(root_inline->son[1], NULL);
 		trn = test_rbtree_node_get_container(root_inline->son[1]);
-		is(trn->data, 1, NULL);
+		is(trn->data, 1);
 	} else {
-		isnull(root_inline->son[1], NULL);
-		isntnull(root_inline->son[0], NULL);
+		is(root_inline->son[1], NULL);
+		isnt(root_inline->son[0], NULL);
 		trn = test_rbtree_node_get_container(root_inline->son[0]);
-		is(trn->data, -1, NULL);
+		is(trn->data, -1);
 	}
 
 	test_rbtree_free(root);
@@ -240,21 +240,21 @@ void t_gds_inline_rbtree_get_node(void)
 	i = 1;
 	node_inline = gds_inline_rbtree_get_node(root_inline, &i,
 		test_rbtree_node_compare_with_key, NULL);
-	isntnull(node_inline, NULL);
+	isnt(node_inline, NULL);
 	trn = test_rbtree_node_get_container(node_inline);
-	is(trn->data, i, NULL);
+	is(trn->data, i);
 	i = -1;
 	node_inline = gds_inline_rbtree_get_node(root_inline, &i,
 		test_rbtree_node_compare_with_key, NULL);
-	isntnull(node_inline, NULL);
+	isnt(node_inline, NULL);
 	trn = test_rbtree_node_get_container(node_inline);
-	is(trn->data, i, NULL);
+	is(trn->data, i);
 	i = 0;
 	node_inline = gds_inline_rbtree_get_node(root_inline, &i,
 		test_rbtree_node_compare_with_key, NULL);
-	isntnull(node_inline, NULL);
+	isnt(node_inline, NULL);
 	trn = test_rbtree_node_get_container(node_inline);
-	is(trn->data, i, NULL);
+	is(trn->data, i);
 
 	test_rbtree_free(root);
 }
@@ -274,25 +274,25 @@ void t_gds_inline_rbtree_iterator(void)
 
 	it = gds_inline_rbtree_iterator_new(root_inline);
 
-	ok(0 == gds_iterator_step(it), NULL);
+	ok(0 == gds_iterator_step(it));
 	node_inline = gds_iterator_get(it);
 	trn = test_rbtree_node_get_container(node_inline);
-	isntnull(trn, NULL);
-	is(trn->data, -1, NULL);
+	isnt(trn, NULL);
+	is(trn->data, -1);
 
-	ok(0 == gds_iterator_step(it), NULL);
+	ok(0 == gds_iterator_step(it));
 	node_inline = gds_iterator_get(it);
 	trn = test_rbtree_node_get_container(node_inline);
-	isntnull(trn, NULL);
-	is(trn->data, 0, NULL);
+	isnt(trn, NULL);
+	is(trn->data, 0);
 
-	ok(0 == gds_iterator_step(it), NULL);
+	ok(0 == gds_iterator_step(it));
 	node_inline = gds_iterator_get(it);
 	trn = test_rbtree_node_get_container(node_inline);
-	isntnull(trn, NULL);
-	is(trn->data, 1, NULL);
+	isnt(trn, NULL);
+	is(trn->data, 1);
 
-	ok(0 < gds_iterator_step(it), NULL);
+	ok(0 < gds_iterator_step(it));
 
 	gds_iterator_free(it);
 	test_rbtree_free(root);
