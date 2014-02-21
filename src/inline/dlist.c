@@ -20,7 +20,6 @@
 #include <stdlib.h>
 #include "../check_arg.h"
 #include "inline/dlist.h"
-#include "undefined.h"
 
 /* INTERNAL FUNCTIONS */
 
@@ -181,34 +180,52 @@ void gds_inline_dlist_node_init(gds_inline_dlist_node_t *node)
 	node->next = node->prev = NULL;
 }
 
-gds_inline_dlist_node_t * gds_inline_dlist_node_prev(
-	gds_inline_dlist_node_t *node, gds_inline_dlist_node_t *prev)
+int gds_inline_dlist_node_set_prev(gds_inline_dlist_node_t *node,
+	gds_inline_dlist_node_t *prev)
 {
-	gds_inline_dlist_node_t *_prev = UNDEFINED;
-
-	if (isset(node)) {
-		if (isdef(prev)) {
-			node->prev = prev;
-		}
-		_prev = node->prev;
+	if (node == NULL) {
+		return -1;
 	}
 
-	return _prev;
+	node->prev = prev;
+
+	return 0;
 }
 
-gds_inline_dlist_node_t * gds_inline_dlist_node_next(
-	gds_inline_dlist_node_t *node, gds_inline_dlist_node_t *next)
+gds_inline_dlist_node_t * gds_inline_dlist_node_get_prev(
+	gds_inline_dlist_node_t *node)
 {
-	gds_inline_dlist_node_t *_next = UNDEFINED;
+	gds_inline_dlist_node_t *prev = NULL;
 
-	if (isset(node)) {
-		if (isdef(next)) {
-			node->next = next;
-		}
-		_next = node->next;
+	if (node != NULL) {
+		prev = node->prev;
 	}
 
-	return _next;
+	return prev;
+}
+
+int gds_inline_dlist_node_set_next(gds_inline_dlist_node_t *node,
+	gds_inline_dlist_node_t *next)
+{
+	if (node == NULL) {
+		return -1;
+	}
+
+	node->next = next;
+
+	return 0;
+}
+
+gds_inline_dlist_node_t * gds_inline_dlist_node_get_next(
+	gds_inline_dlist_node_t *node)
+{
+	gds_inline_dlist_node_t *next = NULL;
+
+	if (node != NULL) {
+		next = node->next;
+	}
+
+	return next;
 }
 
 int gds_inline_dlist_node_prepend(gds_inline_dlist_node_t *node,
@@ -304,7 +321,7 @@ int gds_inline_dlist_splice(gds_inline_dlist_node_t *node, int offset,
 	gds_inline_dlist_node_t *list, gds_inline_dlist_node_t **newhead,
 	gds_inline_dlist_node_t **newtail)
 {
-	gds_inline_dlist_node_t *before_rm = UNDEFINED, *after_rm = UNDEFINED;
+	gds_inline_dlist_node_t *before_rm = NULL, *after_rm = NULL;
 	int removed = 0, added = 0, ret;
 
 	if (length != 0) {

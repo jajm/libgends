@@ -92,7 +92,7 @@ void t_gds_slist_shift(void)
 
 	b = gds_slist_shift(list);
 	assert_list_equals(list, 0, (void *[]){});
-	is(b, UNDEFINED, NULL);
+	is(b, NULL, NULL);
 
 	gds_slist_free(list, NULL, NULL);
 }
@@ -121,7 +121,7 @@ void t_gds_slist_pop(void)
 
 	b = gds_slist_pop(list);
 	assert_list_equals(list, 0, (void *[]){});
-	is(b, UNDEFINED, NULL);
+	is(b, NULL, NULL);
 
 	gds_slist_free(list, NULL, NULL);
 }
@@ -136,7 +136,7 @@ void t_gds_slist_get(void)
 	for (i = 0; i < 3; i++) {
 		is(gds_slist_get(list, i), &a[i], NULL);
 	}
-	is(gds_slist_get(list, i), UNDEFINED, NULL);
+	is(gds_slist_get(list, i), NULL, NULL);
 	gds_slist_free(list, NULL, NULL);
 }
 

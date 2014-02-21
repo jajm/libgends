@@ -20,8 +20,6 @@
 #ifndef gds_inline_slist_h_included
 #define gds_inline_slist_h_included
 
-#include "undefined.h"
-
 typedef struct gds_inline_slist_node_s {
 	struct gds_inline_slist_node_s *next;
 } gds_inline_slist_node_t;
@@ -35,24 +33,35 @@ gds_inline_slist_node_init(
 );
 
 /*
- * Get or set the next node
+ * Set the next node
  *
  * Parameters
  *   node: The node to modify
- *   next: Node to set as the next node, or UNDEFINED to only get the next node
+ *   next: Node to set as the next node
  *
  * Returns:
- *   The next node, if it exists, NULL if it doesn't, or UNDEFINED if node
- *   is invalid (NULL or UNDEFINED).
+ *   0 on success
+ *   a negative value on failure
  */
-gds_inline_slist_node_t *
-gds_inline_slist_node_next(
+int
+gds_inline_slist_node_set_next(
 	gds_inline_slist_node_t *node,
 	gds_inline_slist_node_t *next
 );
 
-#define gds_inline_slist_node_get_next(node) \
-	gds_inline_slist_node_next(node, UNDEFINED)
+/*
+ * Get the next node
+ *
+ * Parameters
+ *   node: Pointer to node
+ *
+ * Returns:
+ *   pointer to the next node.
+ */
+gds_inline_slist_node_t *
+gds_inline_slist_node_get_next(
+	gds_inline_slist_node_t *node
+);
 
 /*
  * Insert <list> immediately after <node>.

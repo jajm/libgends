@@ -25,7 +25,6 @@
 #ifndef gds_dlist_h_included
 #define gds_dlist_h_included
 
-#include "undefined.h"
 #include "iterator.h"
 
 #ifdef __cplusplus
@@ -125,7 +124,7 @@ gds_dlist_push(
  *
  * Returns:
  *   data that was just removed from list
- *   UNDEFINED if list is empty
+ *   NULL if list is empty
  */
 void *
 gds_dlist_shift(
@@ -140,7 +139,7 @@ gds_dlist_shift(
  *
  * Returns:
  *   data that was just removed from list
- *   UNDEFINED if list is empty
+ *   NULL if list is empty
  */
 void *
 gds_dlist_pop(
@@ -156,7 +155,7 @@ gds_dlist_pop(
  *
  * Returns:
  *   data contained in node at the given offset
- *   UNDEFINED if offset is greater or equal to list size
+ *   NULL if offset is greater or equal to list size
  *
  * Hints:
  *   To get the last element, use gds_dlist_size:

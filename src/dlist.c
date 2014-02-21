@@ -23,7 +23,6 @@
 #include "log.h"
 #include "inline/dlist.h"
 #include "dlist.h"
-#include "undefined.h"
 #include "lambda.h"
 #include "container_of.h"
 
@@ -101,8 +100,8 @@ gds_dlist_node_t * gds_dlist_node_copy(gds_dlist_node_t *node)
 		tmp2 = gds_dlist_node_get_container_of(t2i);
 		n = gds_dlist_node_new(tmp2->data);
 		i = gds_dlist_node_get_inline(n);
-		gds_inline_dlist_node_next(ti, i);
-		gds_inline_dlist_node_prev(i, ti);
+		gds_inline_dlist_node_set_next(ti, i);
+		gds_inline_dlist_node_set_prev(i, ti);
 
 		ti = gds_inline_dlist_node_get_next(ti);
 	}
@@ -222,7 +221,7 @@ void * gds_dlist_shift(gds_dlist_t *list)
 {
 	gds_inline_dlist_node_t *head, *tail;
 	void *callback = _gds_dlist_remove_callback;
-	void *d = UNDEFINED;
+	void *d = NULL;
 
 	GDS_CHECK_ARG_NOT_NULL(list);
 
@@ -244,7 +243,7 @@ void * gds_dlist_pop(gds_dlist_t *list)
 {
 	gds_inline_dlist_node_t *head, *tail;
 	void *callback = _gds_dlist_remove_callback;
-	void *d = UNDEFINED;
+	void *d = NULL;
 
 	GDS_CHECK_ARG_NOT_NULL(list);
 
@@ -264,7 +263,7 @@ void * gds_dlist_pop(gds_dlist_t *list)
 
 void * gds_dlist_get(gds_dlist_t *list, unsigned int offset)
 {
-	void *d = UNDEFINED;
+	void *d = NULL;
 	gds_dlist_node_t *n;
 	gds_inline_dlist_node_t *i;
 	GDS_CHECK_ARG_NOT_NULL(list);

@@ -23,7 +23,6 @@
 #include "log.h"
 #include "inline/slist.h"
 #include "slist.h"
-#include "undefined.h"
 #include "container_of.h"
 
 typedef struct {
@@ -106,7 +105,7 @@ gds_slist_node_t * gds_slist_node_copy(gds_slist_node_t *node)
 		tmp2 = gds_slist_node_get_container_of(t2i);
 		n = gds_slist_node_new(tmp2->data);
 		i = gds_slist_node_get_inline(n);
-		gds_inline_slist_node_next(ti, i);
+		gds_inline_slist_node_set_next(ti, i);
 
 		ti = gds_inline_slist_node_get_next(ti);
 	}
@@ -225,7 +224,7 @@ void * gds_slist_shift(gds_slist_t *list)
 {
 	gds_inline_slist_node_t *head, *tail;
 	int removed;
-	void *d = UNDEFINED;
+	void *d = NULL;
 
 	GDS_CHECK_ARG_NOT_NULL(list);
 
@@ -238,7 +237,7 @@ void * gds_slist_shift(gds_slist_t *list)
 			gds_slist_node_remove_callback, NULL, &head, &tail);
 		if (removed != 1) {
 			gds_log_error("Removal failed");
-			return UNDEFINED;
+			return NULL;
 		}
 
 		list->size -= removed;
@@ -252,7 +251,7 @@ void * gds_slist_shift(gds_slist_t *list)
 void * gds_slist_pop(gds_slist_t *list)
 {
 	gds_inline_slist_node_t *head, *tail;
-	void *d = UNDEFINED;
+	void *d = NULL;
 
 	GDS_CHECK_ARG_NOT_NULL(list);
 
@@ -274,7 +273,7 @@ void * gds_slist_pop(gds_slist_t *list)
 
 void * gds_slist_get(gds_slist_t *list, unsigned int offset)
 {
-	void *d = UNDEFINED;
+	void *d = NULL;
 	gds_slist_node_t *n;
 	gds_inline_slist_node_t *i;
 	GDS_CHECK_ARG_NOT_NULL(list);
