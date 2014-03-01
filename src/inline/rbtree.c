@@ -23,6 +23,7 @@
 #include "slist.h"
 #include "inline/rbtree.h"
 #include "../check_arg.h"
+#include "../malloc.h"
 
 void gds_inline_rbtree_print_dbg_r(gds_inline_rbtree_node_t *root, unsigned int d)
 {
@@ -396,7 +397,7 @@ gds_iterator_t * gds_inline_rbtree_iterator_new(
 
 	GDS_CHECK_ARG_NOT_NULL(root);
 
-	it_data = malloc(sizeof(gds_inline_rbtree_iterator_data_t));
+	it_data = gds_malloc(sizeof(gds_inline_rbtree_iterator_data_t));
 	it_data->root = root;
 	it_data->nodes = NULL;
 	it_data->slist_it = NULL;

@@ -22,6 +22,7 @@
 #include "iterator.h"
 #include "slist.h"
 #include "../check_arg.h"
+#include "../malloc.h"
 #include "inline/rbtree_fast.h"
 
 _Bool gds_inline_rbtree_fast_node_is_red(gds_inline_rbtree_fast_node_t *n)
@@ -632,7 +633,7 @@ gds_iterator_t * gds_inline_rbtree_fast_iterator_new(
 
 	GDS_CHECK_ARG_NOT_NULL(root);
 
-	it_data = malloc(sizeof(gds_inline_rbtree_fast_iterator_data_t));
+	it_data = gds_malloc(sizeof(gds_inline_rbtree_fast_iterator_data_t));
 	it_data->root = root;
 	it_data->nodes = NULL;
 	it_data->slist_it = NULL;
