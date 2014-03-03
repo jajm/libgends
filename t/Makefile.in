@@ -18,7 +18,7 @@ rbtree.t: test.o
 hash_map_keyin.t: test.o
 hash_map_keyin_fast.t: test.o
 
-%.o: %.c
+%.o: %.c ../src/$(LIBRARY_NAME)
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
 
 clean:
