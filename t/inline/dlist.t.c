@@ -633,7 +633,7 @@ void t_gds_inline_dlist_map(void)
 	}
 
 	int sum = 0;
-	gds_inline_dlist_map(head, lambda(void, (gds_inline_dlist_node_t *n, int i, int *sum) {
+	gds_inline_dlist_map(head, gds_lambda(void, (gds_inline_dlist_node_t *n, int i, int *sum) {
 		if (i) {} // prevent compiler warnings
 		*sum += test_list_node_get_container(n)->data;
 	}), &sum);

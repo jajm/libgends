@@ -27,12 +27,12 @@
  *
  *   void my_func( int (*callback)(int) );
  *
- *   my_func(lambda(int, (int a) {
+ *   my_func(gds_lambda(int, (int a) {
  *           printf("%d\n", a);
  *           return 0;
  *   }));
  */
-#define lambda(ret_type, args_and_code) ({ \
+#define gds_lambda(ret_type, args_and_code) ({ \
 	ret_type gds_anonymous_function args_and_code \
 	&gds_anonymous_function; \
 })

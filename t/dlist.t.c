@@ -269,7 +269,7 @@ void t_gds_dlist_slice(void)
 	assert_list_equals(list2, 3, (void *[]){a[7], a[8], a[9]});
 	gds_dlist_free(list2, NULL, NULL);
 
-	list2 = gds_dlist_slice(list, 2, 4, lambda(int *, (int *i) {
+	list2 = gds_dlist_slice(list, 2, 4, gds_lambda(int *, (int *i) {
 		int *a = malloc(sizeof(int));
 		*a = *i;
 		return a;
@@ -293,7 +293,7 @@ void t_gds_dlist_map(void)
 	int a[] = {1, 2, 3};
 
 	list = gds_dlist(&a[0], &a[1], &a[2]);
-	gds_dlist_map(list, lambda(void, (int *a) {
+	gds_dlist_map(list, gds_lambda(void, (int *a) {
 		*a = *a + *a;
 	}), NULL);
 	is(a[0], 2);
@@ -319,7 +319,7 @@ void t_gds_dlist_filter(void)
 	assert_list_equals(list, 10, (void *[])
 		{a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]});
 
-	list2 = gds_dlist_filter(list, lambda(int, (int *a) {
+	list2 = gds_dlist_filter(list, gds_lambda(int, (int *a) {
 		return (*a) % 2;
 	}), NULL);
 	assert_list_equals(list, 10, (void *[])
