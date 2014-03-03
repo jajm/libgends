@@ -28,7 +28,7 @@
 #include <stdbool.h>
 #include "iterator.h"
 
-#define foreach(var, iterator) \
+#define gds_foreach(var, iterator) \
 	for(bool _loop_ok = !gds_iterator_reset(iterator); _loop_ok; _loop_ok = false) \
 	while (!gds_iterator_step(iterator) && ((var = gds_iterator_get(iterator)) || !var))
 
