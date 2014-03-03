@@ -12,52 +12,102 @@ int test_cmpkey(const char *key1, const char *key2)
 	return strcmp(key1, key2);
 }
 
+char * test_key_alloc(const char *key)
+{
+	char *k = malloc(strlen(key) + 1);
+	return strcpy(k, key);
+}
+
 void t_hash_map_new(void)
 {
 	gds_hash_map_t *hash;
 
-	ok(NULL == gds_hash_map_new(0, NULL, NULL, NULL, NULL));
-	ok(NULL == gds_hash_map_new(0, NULL, NULL, NULL, free));
-	ok(NULL == gds_hash_map_new(0, NULL, NULL, free, NULL));
-	ok(NULL == gds_hash_map_new(0, NULL, NULL, free, free));
-	ok(NULL == gds_hash_map_new(0, NULL, test_cmpkey, NULL, NULL));
-	ok(NULL == gds_hash_map_new(0, NULL, test_cmpkey, NULL, free));
-	ok(NULL == gds_hash_map_new(0, NULL, test_cmpkey, free, NULL));
-	ok(NULL == gds_hash_map_new(0, NULL, test_cmpkey, free, free));
-	ok(NULL == gds_hash_map_new(0, gds_hash_djb2, NULL, NULL, NULL));
-	ok(NULL == gds_hash_map_new(0, gds_hash_djb2, NULL, NULL, free));
-	ok(NULL == gds_hash_map_new(0, gds_hash_djb2, NULL, free, NULL));
-	ok(NULL == gds_hash_map_new(0, gds_hash_djb2, NULL, free, free));
-	ok(NULL == gds_hash_map_new(0, gds_hash_djb2, test_cmpkey, NULL, NULL));
-	ok(NULL == gds_hash_map_new(0, gds_hash_djb2, test_cmpkey, NULL, free));
-	ok(NULL == gds_hash_map_new(0, gds_hash_djb2, test_cmpkey, free, NULL));
-	ok(NULL == gds_hash_map_new(0, gds_hash_djb2, test_cmpkey, free, free));
-	ok(NULL == gds_hash_map_new(32, NULL, NULL, NULL, NULL));
-	ok(NULL == gds_hash_map_new(32, NULL, NULL, NULL, free));
-	ok(NULL == gds_hash_map_new(32, NULL, NULL, free, NULL));
-	ok(NULL == gds_hash_map_new(32, NULL, NULL, free, free));
-	ok(NULL == gds_hash_map_new(32, NULL, test_cmpkey, NULL, NULL));
-	ok(NULL == gds_hash_map_new(32, NULL, test_cmpkey, NULL, free));
-	ok(NULL == gds_hash_map_new(32, NULL, test_cmpkey, free, NULL));
-	ok(NULL == gds_hash_map_new(32, NULL, test_cmpkey, free, free));
-	ok(NULL == gds_hash_map_new(32, gds_hash_djb2, NULL, NULL, NULL));
-	ok(NULL == gds_hash_map_new(32, gds_hash_djb2, NULL, NULL, free));
-	ok(NULL == gds_hash_map_new(32, gds_hash_djb2, NULL, free, NULL));
-	ok(NULL == gds_hash_map_new(32, gds_hash_djb2, NULL, free, free));
+	ok(NULL == gds_hash_map_new(0, NULL, NULL, NULL, NULL, NULL));
+	ok(NULL == gds_hash_map_new(0, NULL, NULL, NULL, NULL, free));
+	ok(NULL == gds_hash_map_new(0, NULL, NULL, NULL, free, NULL));
+	ok(NULL == gds_hash_map_new(0, NULL, NULL, NULL, free, free));
+	ok(NULL == gds_hash_map_new(0, NULL, NULL, test_key_alloc, NULL, NULL));
+	ok(NULL == gds_hash_map_new(0, NULL, NULL, test_key_alloc, NULL, free));
+	ok(NULL == gds_hash_map_new(0, NULL, NULL, test_key_alloc, free, NULL));
+	ok(NULL == gds_hash_map_new(0, NULL, NULL, test_key_alloc, free, free));
+	ok(NULL == gds_hash_map_new(0, NULL, test_cmpkey, NULL, NULL, NULL));
+	ok(NULL == gds_hash_map_new(0, NULL, test_cmpkey, NULL, NULL, free));
+	ok(NULL == gds_hash_map_new(0, NULL, test_cmpkey, NULL, free, NULL));
+	ok(NULL == gds_hash_map_new(0, NULL, test_cmpkey, NULL, free, free));
+	ok(NULL == gds_hash_map_new(0, NULL, test_cmpkey, test_key_alloc, NULL, NULL));
+	ok(NULL == gds_hash_map_new(0, NULL, test_cmpkey, test_key_alloc, NULL, free));
+	ok(NULL == gds_hash_map_new(0, NULL, test_cmpkey, test_key_alloc, free, NULL));
+	ok(NULL == gds_hash_map_new(0, NULL, test_cmpkey, test_key_alloc, free, free));
+	ok(NULL == gds_hash_map_new(0, gds_hash_djb2, NULL, NULL, NULL, NULL));
+	ok(NULL == gds_hash_map_new(0, gds_hash_djb2, NULL, NULL, NULL, free));
+	ok(NULL == gds_hash_map_new(0, gds_hash_djb2, NULL, NULL, free, NULL));
+	ok(NULL == gds_hash_map_new(0, gds_hash_djb2, NULL, NULL, free, free));
+	ok(NULL == gds_hash_map_new(0, gds_hash_djb2, NULL, test_key_alloc, NULL, NULL));
+	ok(NULL == gds_hash_map_new(0, gds_hash_djb2, NULL, test_key_alloc, NULL, free));
+	ok(NULL == gds_hash_map_new(0, gds_hash_djb2, NULL, test_key_alloc, free, NULL));
+	ok(NULL == gds_hash_map_new(0, gds_hash_djb2, NULL, test_key_alloc, free, free));
+	ok(NULL == gds_hash_map_new(0, gds_hash_djb2, test_cmpkey, NULL, NULL, NULL));
+	ok(NULL == gds_hash_map_new(0, gds_hash_djb2, test_cmpkey, NULL, NULL, free));
+	ok(NULL == gds_hash_map_new(0, gds_hash_djb2, test_cmpkey, NULL, free, NULL));
+	ok(NULL == gds_hash_map_new(0, gds_hash_djb2, test_cmpkey, NULL, free, free));
+	ok(NULL == gds_hash_map_new(0, gds_hash_djb2, test_cmpkey, test_key_alloc, NULL, NULL));
+	ok(NULL == gds_hash_map_new(0, gds_hash_djb2, test_cmpkey, test_key_alloc, NULL, free));
+	ok(NULL == gds_hash_map_new(0, gds_hash_djb2, test_cmpkey, test_key_alloc, free, NULL));
+	ok(NULL == gds_hash_map_new(0, gds_hash_djb2, test_cmpkey, test_key_alloc, free, free));
+	ok(NULL == gds_hash_map_new(32, NULL, NULL, NULL, NULL, NULL));
+	ok(NULL == gds_hash_map_new(32, NULL, NULL, NULL, NULL, free));
+	ok(NULL == gds_hash_map_new(32, NULL, NULL, NULL, free, NULL));
+	ok(NULL == gds_hash_map_new(32, NULL, NULL, NULL, free, free));
+	ok(NULL == gds_hash_map_new(32, NULL, NULL, test_key_alloc, NULL, NULL));
+	ok(NULL == gds_hash_map_new(32, NULL, NULL, test_key_alloc, NULL, free));
+	ok(NULL == gds_hash_map_new(32, NULL, NULL, test_key_alloc, free, NULL));
+	ok(NULL == gds_hash_map_new(32, NULL, NULL, test_key_alloc, free, free));
+	ok(NULL == gds_hash_map_new(32, NULL, test_cmpkey, NULL, NULL, NULL));
+	ok(NULL == gds_hash_map_new(32, NULL, test_cmpkey, NULL, NULL, free));
+	ok(NULL == gds_hash_map_new(32, NULL, test_cmpkey, NULL, free, NULL));
+	ok(NULL == gds_hash_map_new(32, NULL, test_cmpkey, NULL, free, free));
+	ok(NULL == gds_hash_map_new(32, NULL, test_cmpkey, test_key_alloc, NULL, NULL));
+	ok(NULL == gds_hash_map_new(32, NULL, test_cmpkey, test_key_alloc, NULL, free));
+	ok(NULL == gds_hash_map_new(32, NULL, test_cmpkey, test_key_alloc, free, NULL));
+	ok(NULL == gds_hash_map_new(32, NULL, test_cmpkey, test_key_alloc, free, free));
+	ok(NULL == gds_hash_map_new(32, gds_hash_djb2, NULL, NULL, NULL, NULL));
+	ok(NULL == gds_hash_map_new(32, gds_hash_djb2, NULL, NULL, NULL, free));
+	ok(NULL == gds_hash_map_new(32, gds_hash_djb2, NULL, NULL, free, NULL));
+	ok(NULL == gds_hash_map_new(32, gds_hash_djb2, NULL, NULL, free, free));
+	ok(NULL == gds_hash_map_new(32, gds_hash_djb2, NULL, test_key_alloc, NULL, NULL));
+	ok(NULL == gds_hash_map_new(32, gds_hash_djb2, NULL, test_key_alloc, NULL, free));
+	ok(NULL == gds_hash_map_new(32, gds_hash_djb2, NULL, test_key_alloc, free, NULL));
+	ok(NULL == gds_hash_map_new(32, gds_hash_djb2, NULL, test_key_alloc, free, free));
 
-	hash = gds_hash_map_new(32, gds_hash_djb2, test_cmpkey, NULL, NULL);
+	hash = gds_hash_map_new(32, gds_hash_djb2, test_cmpkey, NULL, NULL, NULL);
 	isnt(hash, NULL, "hash creation succeeded");
 	gds_hash_map_free(hash);
 
-	hash = gds_hash_map_new(32, gds_hash_djb2, test_cmpkey, NULL, free);
+	hash = gds_hash_map_new(32, gds_hash_djb2, test_cmpkey, NULL, NULL, free);
 	isnt(hash, NULL, "hash creation succeeded");
 	gds_hash_map_free(hash);
 
-	hash = gds_hash_map_new(32, gds_hash_djb2, test_cmpkey, free, NULL);
+	hash = gds_hash_map_new(32, gds_hash_djb2, test_cmpkey, NULL, free, NULL);
 	isnt(hash, NULL, "hash creation succeeded");
 	gds_hash_map_free(hash);
 
-	hash = gds_hash_map_new(32, gds_hash_djb2, test_cmpkey, free, free);
+	hash = gds_hash_map_new(32, gds_hash_djb2, test_cmpkey, NULL, free, free);
+	isnt(hash, NULL, "hash creation succeeded");
+	gds_hash_map_free(hash);
+
+	hash = gds_hash_map_new(32, gds_hash_djb2, test_cmpkey, test_key_alloc, NULL, NULL);
+	isnt(hash, NULL, "hash creation succeeded");
+	gds_hash_map_free(hash);
+
+	hash = gds_hash_map_new(32, gds_hash_djb2, test_cmpkey, test_key_alloc, NULL, free);
+	isnt(hash, NULL, "hash creation succeeded");
+	gds_hash_map_free(hash);
+
+	hash = gds_hash_map_new(32, gds_hash_djb2, test_cmpkey, test_key_alloc, free, NULL);
+	isnt(hash, NULL, "hash creation succeeded");
+	gds_hash_map_free(hash);
+
+	hash = gds_hash_map_new(32, gds_hash_djb2, test_cmpkey, test_key_alloc, free, free);
 	isnt(hash, NULL, "hash creation succeeded");
 	gds_hash_map_free(hash);
 }
@@ -70,7 +120,7 @@ void t_hash_map_set(void)
 	char *s;
 	int rc;
 
-	hash = gds_hash_map_new(32, gds_hash_djb2, test_cmpkey, NULL, NULL);
+	hash = gds_hash_map_new(32, gds_hash_djb2, test_cmpkey, test_key_alloc, free, NULL);
 
 	ok(0 > gds_hash_map_set(NULL, NULL, NULL));
 	ok(0 > gds_hash_map_set(NULL, NULL, data[0]));
@@ -109,7 +159,7 @@ void t_hash_map_get(void)
 	char *data[] = {"1", "2", "3"};
 	char *s;
 
-	hash = gds_hash_map_new(32, gds_hash_djb2, test_cmpkey, NULL, NULL);
+	hash = gds_hash_map_new(32, gds_hash_djb2, test_cmpkey, test_key_alloc, free, NULL);
 
 	ok(NULL == gds_hash_map_get(NULL, NULL));
 	ok(NULL == gds_hash_map_get(NULL, keys[0]));
@@ -154,7 +204,7 @@ void t_hash_map_unset(void)
 	char * data[] = {"one", "two", "three"};
 	int rc;
 
-	hash = gds_hash_map_new(32, gds_hash_djb2, test_cmpkey, NULL, NULL);
+	hash = gds_hash_map_new(32, gds_hash_djb2, test_cmpkey, test_key_alloc, free, NULL);
 
 	ok(0 > gds_hash_map_unset(NULL, NULL));
 	ok(0 > gds_hash_map_unset(NULL, keys[0]));
@@ -200,7 +250,7 @@ void t_hash_map_pop(void)
 	char * data[] = {"one", "two", "three"};
 	void *d;
 
-	hash = gds_hash_map_new(32, gds_hash_djb2, test_cmpkey, NULL, NULL);
+	hash = gds_hash_map_new(32, gds_hash_djb2, test_cmpkey, test_key_alloc, free, NULL);
 
 	ok(NULL == gds_hash_map_pop(NULL, NULL));
 	ok(NULL == gds_hash_map_pop(NULL, keys[0]));
@@ -248,7 +298,7 @@ void t_hash_map_iterator(void)
 	char *key, *value;
 	int rc;
 
-	hash = gds_hash_map_new(32, gds_hash_djb2, test_cmpkey, NULL, NULL);
+	hash = gds_hash_map_new(32, gds_hash_djb2, test_cmpkey, test_key_alloc, free, NULL);
 	for (int i = 0; i < 3; i++) {
 		rc = gds_hash_map_set(hash, keys[i], values[i]);
 		is(rc, 0);
@@ -291,7 +341,7 @@ void t_hash_map_keys(void)
 	char *s;
 	int check[] = {0, 0, 0};
 
-	hash = gds_hash_map_new(32, gds_hash_djb2, test_cmpkey, NULL, NULL);
+	hash = gds_hash_map_new(32, gds_hash_djb2, test_cmpkey, test_key_alloc, free, NULL);
 	for (int i = 0; i < 3; i++) {
 		gds_hash_map_set(hash, keys[i], values[i]);
 	}
@@ -299,9 +349,9 @@ void t_hash_map_keys(void)
 	gds_slist_t *k = gds_hash_map_keys(hash);
 	is(gds_slist_size(k), 3);
 	gds_slist_foreach (s, k) {
-		if (s == keys[0]) check[0] = 1;
-		else if (s == keys[1]) check[1] = 1;
-		else if (s == keys[2]) check[2] = 1;
+		if (!strcmp(s, keys[0])) check[0] = 1;
+		else if (!strcmp(s, keys[1])) check[1] = 1;
+		else if (!strcmp(s, keys[2])) check[2] = 1;
 	}
 	is(check[0], 1);
 	is(check[1], 1);
@@ -320,7 +370,7 @@ void t_hash_map_values(void)
 	char *s;
 	int check[] = {0, 0, 0};
 
-	hash = gds_hash_map_new(32, gds_hash_djb2, test_cmpkey, NULL, NULL);
+	hash = gds_hash_map_new(32, gds_hash_djb2, test_cmpkey, test_key_alloc, free, NULL);
 	for (int i = 0; i < 3; i++) {
 		gds_hash_map_set(hash, keys[i], values[i]);
 	}
@@ -343,7 +393,7 @@ void t_hash_map_values(void)
 
 int main()
 {
-	plan(110);
+	plan(142);
 
 	t_hash_map_new();
 	t_hash_map_set();

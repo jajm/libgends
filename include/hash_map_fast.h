@@ -36,23 +36,27 @@ extern "C" {
 /* Create a new hash map
  *
  * Parameters
- *   size        : the number of buckets
- *   hash_cb     : hash callback
- *                 Prototype: unsigned long hash_cb(const void *ptr, unsigned long size)
- *                 It should return the hash of object referenced by ptr.
- *                 size is the number of buckets of hash map.
- *   cmpkey_cb   : cmpkey callback
- *                 Prototype: int cmpkey_cb(const void *key1, const void *key2)
- *                 It should compare key1 to key2 and returns:
- *                 - a negative value if key1 < key2
- *                 - 0 if key1 == key2
- *                 - a positive value if key1 > key2
- *   key_free_cb : key_free callback
- *                 Prototype: void key_free_cb(void *key)
- *                 It should free memory used by object referenced by key
- *   free_cb     : free callback
- *                 Prototype: void free_cb(void *ptr)
- *                 It should free memory used by object referenced by ptr
+ *   size         : the number of buckets
+ *   hash_cb      : hash callback
+ *                  Prototype: unsigned long hash_cb(const void *ptr, unsigned long size)
+ *                  It should return the hash of object referenced by ptr.
+ *                  size is the number of buckets of hash map.
+ *   cmpkey_cb    : cmpkey callback
+ *                  Prototype: int cmpkey_cb(const void *key1, const void *key2)
+ *                  It should compare key1 to key2 and returns:
+ *                  - a negative value if key1 < key2
+ *                  - 0 if key1 == key2
+ *                  - a positive value if key1 > key2
+ *   key_alloc_cb : key_alloc callback
+ *                  Prototype: void * key_alloc_cb(const void *key)
+ *                  If not NULL, it will be called when adding a new key and its
+ *                  return value will be stored instead of original key argument
+ *   key_free_cb  : key_free callback
+ *                  Prototype: void key_free_cb(void *key)
+ *                  It should free memory used by object referenced by key
+ *   free_cb      : free callback
+ *                  Prototype: void free_cb(void *ptr)
+ *                  It should free memory used by object referenced by ptr
  *
  * Returns
  *   a pointer to the new hash map
@@ -62,6 +66,7 @@ gds_hash_map_fast_new(
 	unsigned long size,
 	void *hash_cb,
 	void *cmpkey_cb,
+	void *key_alloc_cb,
 	void *key_free_cb,
 	void *free_cb
 );
@@ -69,6 +74,7 @@ gds_hash_map_fast_new(
 /* Set a key/value pair in the hash map
  *
  * If key already exists, old value is replaced by the new one.
+ * Calls key_alloc_cb.
  * Calls key_free_cb and free_cb if key was already in the hash map.
  *
  * Parameters

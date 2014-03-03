@@ -31,12 +31,13 @@ struct gds_hash_map_fast_s {
 	gds_rbtree_fast_node_t **map;
 	unsigned long (*hash_cb)(const void *ptr, unsigned long size);
 	int (*cmpkey_cb)(const void *key1, const void *key2);
+	void * (*key_alloc_cb)(const void *key);
 	void (*key_free_cb)(void *key);
 	void (*free_cb)(void *ptr);
 };
 
 gds_hash_map_fast_t * gds_hash_map_fast_new(unsigned long size, void *hash_cb,
-	void *cmpkey_cb, void *key_free_cb, void *free_cb)
+	void *cmpkey_cb, void *key_alloc_cb, void *key_free_cb, void *free_cb)
 {
 	gds_hash_map_fast_t *h;
 
@@ -50,6 +51,7 @@ gds_hash_map_fast_t * gds_hash_map_fast_new(unsigned long size, void *hash_cb,
 	h->size = size;
 	h->hash_cb = hash_cb;
 	h->cmpkey_cb = cmpkey_cb;
+	h->key_alloc_cb = key_alloc_cb;
 	h->key_free_cb = key_free_cb;
 	h->free_cb = free_cb;
 
@@ -67,6 +69,10 @@ int gds_hash_map_fast_set(gds_hash_map_fast_t *h, void *key, void *data)
 	int rc;
 
 	gds_assert(h != NULL, -1);
+
+	if (h->key_alloc_cb != NULL) {
+		key = h->key_alloc_cb(key);
+	}
 
 	hash = gds_hash_map_fast_hash(h, key);
 	rc = gds_rbtree_fast_set(&(h->map[hash]), key, data, h->cmpkey_cb,
