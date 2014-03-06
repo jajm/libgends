@@ -44,8 +44,8 @@ typedef struct {
  *
  * Returns
  *   0 on success
+ *   1 if key of data is already in the tree (nothing was done)
  *   a negative value on failure
- *   a positive value if key of data is already in the tree: nothing was done
  */
 int
 gds_rbtree_fast_add(
@@ -75,8 +75,8 @@ gds_rbtree_fast_add(
  *                 It should free memory used by object referenced by ptr
  *
  * Returns
- *   0 if key was already in the hash map
- *   1 if key was just added
+ *   0 if key was just added
+ *   1 if key was already in the hash map
  *   a negative value on failure
  */
 int

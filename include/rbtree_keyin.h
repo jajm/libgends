@@ -46,7 +46,7 @@ typedef struct {
  *
  * Returns
  *   0 on success
- *   a positive value if key of data is already in the tree: nothing done
+ *   1 if key of data is already in the tree (nothing done)
  *   a negative value on failure
  */
 int

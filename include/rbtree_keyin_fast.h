@@ -46,8 +46,8 @@ typedef struct {
  *
  * Returns
  *   0 on success
+ *   1 if key of data is already in the tree (nothing done)
  *   a negative value on failure
- *   a positive value if key of data is already in the tree: nothing done
  */
 int
 gds_rbtree_keyin_fast_add(
