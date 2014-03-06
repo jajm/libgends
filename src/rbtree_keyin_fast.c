@@ -160,11 +160,10 @@ int gds_rbtree_keyin_fast_set(gds_rbtree_keyin_fast_node_t **root, void *data,
 		gds_rbtree_keyin_fast_node_cmp, &cmp_params, &removed_inode);
 	*root = rbt_containerof(iroot);
 
-	if (rc == 2 && removed_inode != NULL) {
+	if (rc == 1 && removed_inode != NULL) {
 		removed_node = rbt_containerof(removed_inode);
 		free_cb = (removed_node->data != data) ? free_cb : NULL;
 		gds_rbtree_keyin_fast_node_free(removed_node, free_cb);
-		rc = 1;
 	}
 
 	return rc;

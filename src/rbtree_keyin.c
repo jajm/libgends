@@ -201,8 +201,7 @@ int gds_rbtree_keyin_set(gds_rbtree_keyin_node_t **root, void *data,
 		gds_rbtree_keyin_node_cmp, &callbacks, &iremoved);
 	*root = rbt_containerof(iroot);
 
-	if (rc == 2 && iremoved != NULL) {
-		rc = 1;
+	if (rc == 1 && iremoved != NULL) {
 		removed = rbt_containerof(iremoved);
 		free_cb = (removed->data != data) ? free_cb : NULL;
 		gds_rbtree_keyin_node_free(removed, free_cb);

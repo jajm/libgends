@@ -91,8 +91,9 @@ gds_inline_rbtree_fast_add(
  *
  * Returns:
  *   0 if node was inserted in the tree
- *   1 if the node is already in the tree (no replacement done)
- *   2 if node has replaced another node in the tree (*removed will be set)
+ *   1 if an equivalent node is already in the tree. If node to be inserted is
+ *     not the same as the node in the tree, replacement is done and *removed is
+ *     set. Otherwise no replacement is done, and *removed is not set.
  *   a negative value on failure
  *
  * NOTE: root will be modified so it will always point to the root of tree after

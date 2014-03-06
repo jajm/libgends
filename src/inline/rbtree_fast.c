@@ -325,13 +325,11 @@ int gds_inline_rbtree_fast_replace_or_insert_bottom(
 	}
 
 	if (tmp != NULL) {
+		rc = 1;
 		if (tmp != node) {
 			gds_inline_rbtree_fast_swap_nodes(tmp, node);
 			if (node->parent == NULL) *root = node;
 			if (removed != NULL) *removed = tmp;
-			rc = 2;
-		} else {
-			rc = 1;
 		}
 	} else {
 		node->left = node->right = NULL;

@@ -116,8 +116,7 @@ int gds_inline_rbtree_insert(gds_inline_rbtree_node_t **root,
 	gds_inline_rbtree_node_t *p, *q;    /* Iterator & parent */
 	int dir = 0, last = 0;
 	int cmp;
-	_Bool inserted = false;
-	int rc = 0;
+	int rc = 1;
 	int (*cmp_callback)(gds_inline_rbtree_node_t *, gds_inline_rbtree_node_t *, void *);
 
 	gds_assert(root != NULL, -1);
@@ -145,7 +144,7 @@ int gds_inline_rbtree_insert(gds_inline_rbtree_node_t **root,
 		if (q == NULL) {
 			/* Insert new node at the bottom */
 			p->son[dir] = q = node;
-			inserted = true;
+			rc = 0;
 		}
 		else if (gds_inline_rbtree_node_is_red(q->son[0])
 		&& gds_inline_rbtree_node_is_red(q->son[1])) {
@@ -173,9 +172,6 @@ int gds_inline_rbtree_insert(gds_inline_rbtree_node_t **root,
 			if (replace && node != q) {
 				gds_inline_rbtree_swap_nodes(node, NULL, q, p);
 				if (removed != NULL) *removed = q;
-				rc = 2;
-			} else if (!inserted) {
-				rc = 1;
 			}
 			break;
 		}
