@@ -222,7 +222,7 @@ gds_iterator_t * gds_hash_map_keyin_fast_iterator_new(gds_hash_map_keyin_fast_t 
 
 gds_slist_t * gds_hash_map_keyin_fast_values(gds_hash_map_keyin_fast_t *h)
 {
-	gds_slist_t *l = gds_slist_new();
+	gds_slist_t *l = gds_slist_new(NULL);
 	gds_slist_t *list;
 	unsigned long i;
 
@@ -231,8 +231,8 @@ gds_slist_t * gds_hash_map_keyin_fast_values(gds_hash_map_keyin_fast_t *h)
 	for (i = h->size; i > 0; i--) {
 		list = gds_rbtree_keyin_fast_values(h->map[i-1]);
 		if (list != NULL) {
-			gds_slist_splice(l, 0, 0, NULL, NULL, list);
-			gds_slist_free(list, NULL, NULL);
+			gds_slist_splice(l, 0, 0, list);
+			gds_slist_free(list);
 		}
 	}
 

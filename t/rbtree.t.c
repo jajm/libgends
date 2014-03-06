@@ -567,7 +567,7 @@ void t_rbtree_keys()
 	ok(0 < gds_iterator_step(it));
 
 	gds_iterator_free(it);
-	gds_slist_free(list, NULL, NULL);
+	gds_slist_free(list);
 	gds_rbtree_free(root, NULL, NULL);
 }
 
@@ -597,7 +597,7 @@ void t_rbtree_values(void)
 		i++;
 	}
 	gds_iterator_free(it);
-	gds_slist_free(slist, NULL, NULL);
+	gds_slist_free(slist);
 	gds_rbtree_free(root, free, test_free);
 }
 

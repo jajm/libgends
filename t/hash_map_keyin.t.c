@@ -311,7 +311,7 @@ void t_hash_map_keyin_values(void)
 	is(check[1], 1);
 	is(check[2], 1);
 
-	gds_slist_free(v, NULL, NULL);
+	gds_slist_free(v);
 
 	gds_hash_map_keyin_free(hash);
 }

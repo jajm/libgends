@@ -345,8 +345,7 @@ gds_iterator_t * gds_rbtree_iterator_new(gds_rbtree_node_t *root)
 	return it;
 }
 
-void gds_rbtree_build_keys_list(gds_rbtree_node_t *root,
-	gds_slist_t *list)
+void gds_rbtree_build_keys_list(gds_rbtree_node_t *root, gds_slist_t *list)
 {
 	if (root != NULL) {
 		gds_rbtree_build_keys_list(rbt_containerof(
@@ -359,15 +358,14 @@ void gds_rbtree_build_keys_list(gds_rbtree_node_t *root,
 
 gds_slist_t * gds_rbtree_keys(gds_rbtree_node_t *root)
 {
-	gds_slist_t *list = gds_slist_new();
+	gds_slist_t *list = gds_slist_new(NULL);
 
 	gds_rbtree_build_keys_list(root, list);
 
 	return list;
 }
 
-void gds_rbtree_build_values_list(gds_rbtree_node_t *root,
-	gds_slist_t *list)
+void gds_rbtree_build_values_list(gds_rbtree_node_t *root, gds_slist_t *list)
 {
 	if (root != NULL) {
 		gds_rbtree_build_values_list(
@@ -380,7 +378,7 @@ void gds_rbtree_build_values_list(gds_rbtree_node_t *root,
 
 gds_slist_t * gds_rbtree_values(gds_rbtree_node_t *root)
 {
-	gds_slist_t *list = gds_slist_new();
+	gds_slist_t *list = gds_slist_new(NULL);
 
 	gds_rbtree_build_values_list(root, list);
 

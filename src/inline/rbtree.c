@@ -351,9 +351,9 @@ void gds_inline_rbtree_iterator_fill_list(gds_slist_t *nodes,
 int gds_inline_rbtree_iterator_reset(gds_inline_rbtree_iterator_data_t *data)
 {
 	gds_iterator_free(data->slist_it);
-	gds_slist_free(data->nodes, NULL, NULL);
+	gds_slist_free(data->nodes);
 
-	data->nodes = gds_slist_new();
+	data->nodes = gds_slist_new(NULL);
 	gds_inline_rbtree_iterator_fill_list(data->nodes, data->root);
 	data->slist_it = gds_slist_iterator_new(data->nodes);
 
@@ -381,7 +381,7 @@ void gds_inline_rbtree_iterator_data_free(
 	gds_inline_rbtree_iterator_data_t *data)
 {
 	gds_iterator_free(data->slist_it);
-	gds_slist_free(data->nodes, NULL, NULL);
+	gds_slist_free(data->nodes);
 	free(data);
 }
 

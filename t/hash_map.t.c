@@ -357,7 +357,7 @@ void t_hash_map_keys(void)
 	is(check[1], 1);
 	is(check[2], 1);
 
-	gds_slist_free(k, NULL, NULL);
+	gds_slist_free(k);
 
 	gds_hash_map_free(hash);
 }
@@ -386,7 +386,7 @@ void t_hash_map_values(void)
 	is(check[1], 1);
 	is(check[2], 1);
 
-	gds_slist_free(v, NULL, NULL);
+	gds_slist_free(v);
 
 	gds_hash_map_free(hash);
 }

@@ -538,7 +538,7 @@ void t_rbtree_keyin_fast_values(void)
 		i++;
 	}
 	gds_iterator_free(it);
-	gds_slist_free(slist, NULL, NULL);
+	gds_slist_free(slist);
 	gds_rbtree_keyin_fast_free(root, test_free);
 }
 
