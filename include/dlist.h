@@ -33,38 +33,46 @@ extern "C" {
 
 typedef struct gds_dlist_s gds_dlist_t;
 
-/*
- * Create a new list
+/* Create a new list
  *
- * Returns:
+ * Parameters
+ *   free_cb : free callback
+ *             Prototype: void free_cb(void *ptr)
+ *             It should free memory used by object referenced by ptr
+ *
+ * Returns
  *   pointer to the new list
  */
 gds_dlist_t *
-gds_dlist_new(void);
+gds_dlist_new(
+	void *free_cb
+);
 
-/*
- * Create a new list from a data array
+/* Create a new list from a data array
  *
- * Parameters:
- *   n: size of data array
- *   data: data array
+ * Parameters
+ *   free_cb : free callback
+ *             Prototype: void free_cb(void *ptr)
+ *             It should free memory used by object referenced by ptr
+ *   n       : size of data array
+ *   data    : data array
  *
- * Returns:
+ * Returns
  *   pointer to the new list
  */
 gds_dlist_t *
 gds_dlist_new_from_array(
+	void *free_cb,
 	unsigned int n,
 	void *data[]
 );
 
-/*
- * Create a new list from the list of parameters
+/* Create a new list from the list of parameters
  *
- * Extra parameters:
+ * Extra parameters
  *   (void *) data to add to the list
  *
- * Examples:
+ * Examples
  *   // Creates an empty list
  *   gds_dlist_t *list = gds_dlist();
  *
@@ -72,15 +80,49 @@ gds_dlist_new_from_array(
  *   void *a, *b, *c;
  *   gds_dlist_t *list = gds_dlist(a, b, c);
  *
- * Returns:
+ * Notes
+ *   free_cb is set to NULL.
+ *
+ * Returns
  *   (gds_dlist_t *) pointer to the new list
  */
 
 #define gds_dlist(...) ({ \
 	void *gds_va_args[] = {__VA_ARGS__}; \
-	gds_dlist_new_from_array(sizeof(gds_va_args) / sizeof(*gds_va_args), \
-		gds_va_args); \
+	gds_dlist_new_from_array(NULL, \
+		sizeof(gds_va_args) / sizeof(*gds_va_args), gds_va_args); \
 })
+
+/* Set free callback.
+ *
+ * Parameters
+ *   list    : Pointer to list.
+ *   free_cb : free callback
+ *             Prototype: void free_cb(void *ptr)
+ *             It should free memory used by object referenced by ptr
+ *
+ * Returns
+ *   0 on success
+ *   a negative value on failure
+ */
+int
+gds_dlist_set_free_callback(
+	gds_dlist_t *list,
+	void *free_cb
+);
+
+/* Get free callback.
+ *
+ * Parameters
+ *   list : Pointer to list.
+ *
+ * Returns
+ *   Pointer to free callback.
+ */
+void *
+gds_dlist_get_free_callback(
+	gds_dlist_t *list
+);
 
 /*
  * Add new data at beginning of list
@@ -167,20 +209,17 @@ gds_dlist_get(
 	unsigned int offset
 );
 
-/*
- * Remove a portion of list and replace it by another list.
+/* Remove a portion of list and replace it by another list.
  *
- * Parameters:
- *   list: Pointer to the list.
- *   offset: Offset of the first node to remove.
- *   length: Number of nodes to remove. 0 to not remove anything
- *           (insertion only)
- *   callback: Function to call on data for removed nodes. Parameters are:
- *             - (void *) data
- *             - (void *) callback_data
- *   callback_data: Data to pass to callback as 2nd parameter.
- *   replacement: Pointer to the list to insert at given offset. This list is
- *                not modified.
+ * Calls free_cb.
+ *
+ * Parameters
+ *   list        : Pointer to the list.
+ *   offset      : Offset of the first node to remove.
+ *   length      : Number of nodes to remove. 0 to not remove anything
+ *                 (insertion only)
+ *   replacement : Pointer to the list to insert at given offset. This list is
+ *                 not modified.
  *
  * Returns
  *   0 on success
@@ -191,26 +230,25 @@ gds_dlist_splice(
 	gds_dlist_t *list,
 	unsigned int offset,
 	unsigned int length,
-	void *callback,
-	void *callback_data,
 	gds_dlist_t *replacement
 );
 
-/*
- * Creates a new list from a portion of another list.
+/* Creates a new list from a portion of another list.
  *
  * Parameters:
- *   list: Pointer to the list.
- *   offset: Offset of the first node to keep for the new list.
- *   length: Number of nodes to copy to the new list.
- *   callback: Function to apply on data. Its return value will be stored into
- *             the new list instead of the original data. Can be NULL.
- *             Parameters are:
- *             - (void *) data
- *             - (void *) callback_data
- *   callback_data: Data to pass to callback as 2nd parameter.
+ *   list          : Pointer to the list.
+ *   offset        : Offset of the first node to keep for the new list.
+ *   length        : Number of nodes to copy to the new list.
+ *   callback      : Function to apply on data. Its return value will be stored
+ *                   into the new list instead of the original data. Can be
+ *                   NULL.
+ *                   Prototype: void * callback(void *data, void *callback_data)
+ *   callback_data : Data to pass to callback as 2nd parameter.
  *
- * Returns:
+ * Notes
+ *   The new list has the same free_cb as the original list.
+ *
+ * Returns
  *   Pointer to the new list.
  */
 gds_dlist_t *
@@ -222,16 +260,15 @@ gds_dlist_slice(
 	void *callback_data
 );
 
-/*
- * Maps a function to data contained in list.
+/* Maps a function to data contained in list.
  *
- * Parameters:
- *   list: Pointer to the list.
- *   callback: Function to apply on data. Parameters are:
- *             - (void *) data
- *             - (unsigned int) offset of node being processed
- *             - (void *) callback_data
- *   callback_data: Data to pass to callback as 3rd parameter.
+ * Parameters
+ *   list          : Pointer to the list.
+ *   callback      : Function to apply on data. Parameters are:
+ *                   - (void *) data
+ *                   - (unsigned int) offset of node being processed
+ *                   - (void *) callback_data
+ *   callback_data : Data to pass to callback as 3rd parameter.
  */
 int
 gds_dlist_map(
@@ -279,6 +316,9 @@ gds_dlist_filter(
  *             This function should reduce 1st and 2nd parameter into a single
  *             value and return this single value.
  *   callback_data: Data passed to callback as 4th parameter.
+ *
+ * Notes
+ *   The new list has the same free_cb as the original list.
  *
  * Returns:
  *   Result of list reduction.
@@ -340,22 +380,33 @@ gds_dlist_iterator_new(
 	while (!gds_iterator_step(gds_dlist_it)                          \
 		&& ((var = gds_iterator_get(gds_dlist_it)) || !var))
 
-/*
- * Free list
+/* Free list
  *
- * Parameters:
- *   list: Pointer to list
- *   callback: Callback function that will be called on data before freeing the
- *             node. Prototype is: void callback(void *, void *)
- *             1st parameter is data of the node being freed.
- *             2nd parameter is <callback_data>.
- *   callback_data : Data passed to callback
+ * Calls free_cb.
+ *
+ * Parameters
+ *   list : Pointer to list
  */
 void
 gds_dlist_free(
-	gds_dlist_t *list,
-	void *callback,
-	void *callback_data
+	gds_dlist_t *list
+);
+
+/* Destroy list
+ *
+ * This function will free memory occupied by the list, but will not call
+ * free_cb on data.
+ * Use gds_dlist_free if you want to free data too.
+ *
+ * This is just an alias for
+ *   gds_dlist_set_free_callback(list, NULL);
+ *   gds_dlist_free(list);
+ *
+ * Parameters
+ *   list : Pointer to list.
+ */
+void gds_dlist_destroy(
+	gds_dlist_t *list
 );
 
 #ifdef __cplusplus

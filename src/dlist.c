@@ -109,13 +109,12 @@ gds_dlist_node_t * gds_dlist_node_copy(gds_dlist_node_t *node)
 	return head;
 }
 
-void gds_dlist_node_free(gds_dlist_node_t *node, void *callback,
-	void *callback_data)
+void gds_dlist_node_free(gds_dlist_node_t *node, void *callback)
 {
-	void (*cb)(void *, void *) = callback;
+	void (*cb)(void *) = callback;
 
 	if (cb != NULL && node != NULL) {
-		cb(node->data, callback_data);
+		cb(node->data);
 	}
 	free(node);
 }
@@ -124,21 +123,24 @@ struct gds_dlist_s {
 	gds_dlist_node_t *head;
 	gds_dlist_node_t *tail;
 	unsigned int size;
+	void *free_cb;
 };
 
-gds_dlist_t * gds_dlist_new(void)
+gds_dlist_t * gds_dlist_new(void *free_cb)
 {
 	gds_dlist_t *list = gds_malloc(sizeof(gds_dlist_t));
 
 	list->head = list->tail = NULL;
 	list->size = 0;
+	list->free_cb = free_cb;
 
 	return list;
 }
 
-gds_dlist_t * gds_dlist_new_from_array(unsigned int n, void *data[])
+gds_dlist_t * gds_dlist_new_from_array(void *free_cb, unsigned int n,
+	void *data[])
 {
-	gds_dlist_t *list = gds_dlist_new();
+	gds_dlist_t *list = gds_dlist_new(free_cb);
 	unsigned int i;
 
 	for(i = 0; i < n; i++) {
@@ -146,6 +148,22 @@ gds_dlist_t * gds_dlist_new_from_array(unsigned int n, void *data[])
 	}
 
 	return list;
+}
+
+int gds_dlist_set_free_callback(gds_dlist_t *list, void *free_cb)
+{
+	gds_assert(list != NULL, -1);
+
+	list->free_cb = free_cb;
+
+	return 0;
+}
+
+void * gds_dlist_get_free_callback(gds_dlist_t *list)
+{
+	gds_assert(list != NULL, NULL);
+
+	return list->free_cb;
 }
 
 int gds_dlist_unshift(gds_dlist_t *list, void *data)
@@ -202,19 +220,12 @@ int gds_dlist_push(gds_dlist_t *list, void *data)
 	return 0;
 }
 
-void _gds_dlist_remove_callback(gds_inline_dlist_node_t *idn,
-	void *params[2])
+void _gds_dlist_remove_callback(gds_inline_dlist_node_t *idn, void *free_cb)
 {
 	gds_dlist_node_t *node;
-	void (*callback)(gds_dlist_node_t *, void *) = NULL;
-	void *callback_data = NULL;
 
-	if (params != NULL) {
-		callback = params[0];
-		callback_data = params[1];
-	}
 	node = gds_dlist_node_get_container_of(idn);
-	gds_dlist_node_free(node, callback, callback_data);
+	gds_dlist_node_free(node, free_cb);
 }
 
 void * gds_dlist_shift(gds_dlist_t *list)
@@ -282,8 +293,7 @@ void * gds_dlist_get(gds_dlist_t *list, unsigned int offset)
 }
 
 int gds_dlist_splice(gds_dlist_t *list, unsigned int offset,
-	unsigned int length, void *callback, void *callback_data,
-	gds_dlist_t *replacement)
+	unsigned int length, gds_dlist_t *replacement)
 {
 	gds_inline_dlist_node_t *head, *tail, *ci = NULL;
 	void *cb = _gds_dlist_remove_callback;
@@ -299,8 +309,7 @@ int gds_dlist_splice(gds_dlist_t *list, unsigned int offset,
 		ci = gds_dlist_node_get_inline(copy);
 	}
 	list->size += gds_inline_dlist_splice(head, offset, length,
-		cb, (void *[]){callback, callback_data}, ci,
-		&head, &tail);
+		cb, list->free_cb, ci, &head, &tail);
 	list->head = gds_dlist_node_get_container_of(head);
 	list->tail = gds_dlist_node_get_container_of(tail);
 
@@ -319,7 +328,7 @@ gds_dlist_t * gds_dlist_slice(gds_dlist_t *list, unsigned int offset,
 
 	gds_assert(list != NULL, NULL);
 
-	slice = gds_dlist_new();
+	slice = gds_dlist_new(list->free_cb);
 
 	if (list->head != NULL) {
 		i = gds_dlist_node_get_inline(list->head);
@@ -378,7 +387,7 @@ gds_dlist_t * gds_dlist_filter(gds_dlist_t *list, void *callback,
 	gds_assert(list != NULL, NULL);
 	gds_assert(callback != NULL, NULL);
 
-	l = gds_dlist_new();
+	l = gds_dlist_new(list->free_cb);
 
 	if (list->head != NULL) {
 		i = gds_dlist_node_get_inline(list->head);
@@ -431,7 +440,7 @@ unsigned int gds_dlist_size(gds_dlist_t *list)
 	return list->size;
 }
 
-void gds_dlist_free(gds_dlist_t *list, void *callback, void *callback_data)
+void gds_dlist_free(gds_dlist_t *list)
 {
 	gds_dlist_node_t *tmp;
 	gds_inline_dlist_node_t *ti, *ti2;
@@ -441,11 +450,17 @@ void gds_dlist_free(gds_dlist_t *list, void *callback, void *callback_data)
 		while (ti != NULL) {
 			ti2 = gds_inline_dlist_node_get_next(ti);
 			tmp = gds_dlist_node_get_container_of(ti);
-			gds_dlist_node_free(tmp, callback, callback_data);
+			gds_dlist_node_free(tmp, list->free_cb);
 			ti = ti2;
 		}
 	}
 	free(list);
+}
+
+void gds_dlist_destroy(gds_dlist_t *list)
+{
+	gds_dlist_set_free_callback(list, NULL);
+	gds_dlist_free(list);
 }
 
 typedef struct {

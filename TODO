@@ -1,4 +1,3 @@
-* Store free callback in gds_dlist_t (like in gds_slist_t)
 * Add getter/setter for free callback for hash maps (and destroy functions)
 * Write tests for gds_hash_map*_change_size
 * Allow slist/dlist unshift/push to take more than one data pointer
