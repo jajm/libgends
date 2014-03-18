@@ -62,6 +62,22 @@ gds_hash_map_keyin_fast_t * gds_hash_map_keyin_fast_new(unsigned long size,
 	return h;
 }
 
+int gds_hash_map_keyin_fast_set_free_callback(gds_hash_map_keyin_fast_t *h,
+	void *free_cb)
+{
+	gds_assert(h != NULL, -1);
+
+	h->free_cb = free_cb;
+	return 0;
+}
+
+void * gds_hash_map_keyin_fast_get_free_callback(gds_hash_map_keyin_fast_t *h)
+{
+	gds_assert(h != NULL, NULL);
+
+	return h->free_cb;
+}
+
 unsigned long gds_hash_map_keyin_fast_hash(gds_hash_map_keyin_fast_t *h, const void *key)
 {
 	return h->hash_cb(key, h->size) % h->size;
@@ -290,5 +306,13 @@ void gds_hash_map_keyin_fast_free(gds_hash_map_keyin_fast_t *h)
 		}
 		free(h->map);
 		free(h);
+	}
+}
+
+void gds_hash_map_keyin_fast_destroy(gds_hash_map_keyin_fast_t *h)
+{
+	if (h != NULL) {
+		gds_hash_map_keyin_fast_set_free_callback(h, NULL);
+		gds_hash_map_keyin_fast_free(h);
 	}
 }

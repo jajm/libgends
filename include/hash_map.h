@@ -71,6 +71,37 @@ gds_hash_map_new(
 	void *free_cb
 );
 
+/* Set free callback.
+ *
+ * Parameters
+ *   h       : Pointer to the hash map.
+ *   free_cb : free callback
+ *             Prototype: void free_cb(void *ptr)
+ *             It should free memory used by object referenced by ptr
+ *
+ * Returns
+ *   0 on success
+ *   a negative value on failure
+ */
+int
+gds_hash_map_set_free_callback(
+	gds_hash_map_t *h,
+	void *free_cb
+);
+
+/* Get free callback.
+ *
+ * Parameters
+ *   h : Pointer to the hash map.
+ *
+ * Returns
+ *   Pointer to free callback.
+ */
+void *
+gds_hash_map_get_free_callback(
+	gds_hash_map_t *h
+);
+
 /* Set a key/value pair in the hash map
  *
  * If key already exists, old value is replaced by the new one.
@@ -207,6 +238,23 @@ gds_hash_map_change_size(
  */
 void
 gds_hash_map_free(
+	gds_hash_map_t *h
+);
+
+/* Destroy hash map
+ *
+ * This function will free memory occupied by the hash map, but will not call
+ * free_cb on data.
+ * Use gds_hash_map_free if you want to free data too.
+ *
+ * This is just an alias for
+ *   gds_hash_map_set_free_callback(h, NULL);
+ *   gds_hash_map_free(h);
+ *
+ * Parameters
+ *   h : Pointer to the hash map.
+ */
+void gds_hash_map_destroy(
 	gds_hash_map_t *h
 );
 
