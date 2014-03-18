@@ -11,3 +11,7 @@
 
 %:
 	dh $@  --with autotools-dev
+
+.PHONY: override_dh_strip
+override_dh_strip:
+	dh_strip --dbg-package=libgends-dbg
