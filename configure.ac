@@ -23,6 +23,9 @@ AC_CHECK_LIB([exception], [exception_throw], , AC_MSG_ERROR([required library li
 AC_CHECK_HEADER([lll/lll.h], , AC_MSG_ERROR([lll/lll.h not found]))
 AC_CHECK_LIB([lll], [lll_vfprint], , AC_MSG_ERROR([required library lll not found!]))
 
+AC_ARG_ENABLE(debug, AS_HELP_STRING([--enable-debug], [enable debugging, default: no]), [], [enable_debug=no])
+AS_IF([test "$enable_debug" = "yes"], AC_SUBST(DEBUG, 1))
+
 AC_CONFIG_FILES([
 	config.mk
 	Makefile

@@ -6,6 +6,8 @@ INSTALL := install
 PACKAGE_NAME := @PACKAGE_NAME@
 LIBRARY_NAME := $(PACKAGE_NAME).la
 
+DEBUG := @DEBUG@
+
 prefix := @prefix@
 exec_prefix := @exec_prefix@
 libdir := @libdir@

@@ -1,6 +1,10 @@
 include ../config.mk
 
-CFLAGS := -Wall -Wextra -Werror -g -std=c99 $(CFLAGS)
+ifdef DEBUG
+DEBUG_CFLAGS := -g
+endif
+
+CFLAGS := -Wall -Wextra -Werror -std=c99 -O2 $(DEBUG_CFLAGS) $(CFLAGS)
 CPPFLAGS := -I../include $(CPPFLAGS) $(shell pkg-config --cflags libexception libtap13)
 LDFLAGS := $(shell pkg-config --libs libexception libtap13) $(LDFLAGS)
 

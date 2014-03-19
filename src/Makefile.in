@@ -1,6 +1,10 @@
 include ../config.mk
 
-CFLAGS := -Wall -Wextra -Werror -g -std=c99 $(CFLAGS)
+ifdef DEBUG
+DEBUG_CFLAGS := -g
+endif
+
+CFLAGS := -Wall -Wextra -Werror -std=c99 -O2 $(DEBUG_CFLAGS) $(CFLAGS)
 CPPFLAGS := -I../include $(shell pkg-config --cflags lll libexception) $(CPPFLAGS)
 LDFLAGS := $(shell pkg-config --libs lll libexception) $(LDFLAGS)
 LIBTOOL_CURRENT := @LIBTOOL_CURRENT@
