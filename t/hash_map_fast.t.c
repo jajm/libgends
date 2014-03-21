@@ -384,9 +384,33 @@ void t_hash_map_fast_values(void)
 	gds_hash_map_fast_free(hash);
 }
 
+void t_hash_map_fast_change_size(void)
+{
+	gds_hash_map_fast_t *hash;
+	char * keys[] = {"1", "2", "3"};
+	char * values[] = {"one", "two", "three"};
+
+	hash = gds_hash_map_fast_new(32, gds_hash_djb2, test_cmpkey, test_key_alloc, free, NULL);
+	for (int i = 0; i < 3; i++) {
+		gds_hash_map_fast_set(hash, keys[i], values[i]);
+	}
+
+	gds_hash_map_fast_change_size(hash, 2);
+	is(gds_hash_map_fast_get(hash, keys[0]), values[0]);
+	is(gds_hash_map_fast_get(hash, keys[1]), values[1]);
+	is(gds_hash_map_fast_get(hash, keys[2]), values[2]);
+
+	gds_hash_map_fast_change_size(hash, 64);
+	is(gds_hash_map_fast_get(hash, keys[0]), values[0]);
+	is(gds_hash_map_fast_get(hash, keys[1]), values[1]);
+	is(gds_hash_map_fast_get(hash, keys[2]), values[2]);
+
+	gds_hash_map_fast_free(hash);
+}
+
 int main()
 {
-	plan(136);
+	plan(142);
 
 	t_hash_map_fast_new();
 	t_hash_map_fast_set();
@@ -396,6 +420,7 @@ int main()
 	t_hash_map_fast_iterator();
 	t_hash_map_fast_keys();
 	t_hash_map_fast_values();
+	t_hash_map_fast_change_size();
 
 	return EXIT_SUCCESS;
 }

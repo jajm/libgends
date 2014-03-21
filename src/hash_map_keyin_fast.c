@@ -259,14 +259,12 @@ gds_rbtree_keyin_fast_node_t ** gds_hash_map_keyin_fast_build_map(gds_hash_map_k
 	unsigned long size)
 {
 	gds_rbtree_keyin_fast_node_t **map;
-	gds_slist_t *l;
 	gds_iterator_t *it;
 	void *data;
 	unsigned long hash;
 
 	map = gds_calloc(size, sizeof(gds_rbtree_keyin_fast_node_t *));
-	l = gds_hash_map_keyin_fast_values(h);
-	it = gds_slist_iterator_new(l);
+	it = gds_hash_map_keyin_fast_iterator_new(h);
 	gds_iterator_reset(it);
 	while (!gds_iterator_step(it)) {
 		data = gds_iterator_get(it);

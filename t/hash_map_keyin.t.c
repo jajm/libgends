@@ -316,9 +316,36 @@ void t_hash_map_keyin_values(void)
 	gds_hash_map_keyin_free(hash);
 }
 
+void t_hash_map_keyin_change_size(void)
+{
+	gds_hash_map_keyin_t *hash;
+	test_t data[] = {
+		{.key = "one", .value = 1},
+		{.key = "two", .value = 2},
+		{.key = "three", .value = 3}
+	};
+
+	hash = gds_hash_map_keyin_new(32, gds_hash_djb2, test_getkey, test_cmpkey, NULL);
+	for (int i = 0; i < 3; i++) {
+		gds_hash_map_keyin_set(hash, &data[i]);
+	}
+
+	gds_hash_map_keyin_change_size(hash, 2);
+	is(gds_hash_map_keyin_get(hash, data[0].key), &data[0]);
+	is(gds_hash_map_keyin_get(hash, data[1].key), &data[1]);
+	is(gds_hash_map_keyin_get(hash, data[2].key), &data[2]);
+
+	gds_hash_map_keyin_change_size(hash, 64);
+	is(gds_hash_map_keyin_get(hash, data[0].key), &data[0]);
+	is(gds_hash_map_keyin_get(hash, data[1].key), &data[1]);
+	is(gds_hash_map_keyin_get(hash, data[2].key), &data[2]);
+
+	gds_hash_map_keyin_free(hash);
+}
+
 int main()
 {
-	plan(105);
+	plan(111);
 
 	t_hash_map_keyin_new();
 	t_hash_map_keyin_set();
@@ -327,6 +354,7 @@ int main()
 	t_hash_map_keyin_pop();
 	t_hash_map_keyin_iterator();
 	t_hash_map_keyin_values();
+	t_hash_map_keyin_change_size();
 
 	return EXIT_SUCCESS;
 }

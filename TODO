@@ -1,4 +1,3 @@
-* Write tests for gds_hash_map*_change_size
 * Allow slist/dlist unshift/push to take more than one data pointer
   (or new functions unshift_array/push_array ?)
 * Callback prototype for gds_slist_map and gds_dlist_map should be
