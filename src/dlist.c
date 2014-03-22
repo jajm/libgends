@@ -166,54 +166,60 @@ void * gds_dlist_get_free_callback(gds_dlist_t *list)
 	return list->free_cb;
 }
 
-int gds_dlist_unshift(gds_dlist_t *list, void *data)
+int gds_dlist_unshift_array(gds_dlist_t *list, size_t size, void *data[])
 {
-	gds_dlist_node_t *n;
-	gds_inline_dlist_node_t *i, *head, *tail;
+	gds_dlist_node_t *node;
+	gds_inline_dlist_node_t *inode, *head, *tail;
 	int added;
+	int i;
 
 	gds_assert(list != NULL, -1);
 
-	n = gds_dlist_node_new(data);
-
 	head = gds_dlist_node_get_inline(list->head);
 	tail = gds_dlist_node_get_inline(list->tail);
-	i = gds_dlist_node_get_inline(n);
 
-	added = gds_inline_dlist_insert(head, 0, i, &head, &tail);
-	if (added != 1) {
-		gds_log_error("Insertion failed");
-		return -1;
+	for (i = size - 1; i >= 0; i--) {
+		node = gds_dlist_node_new(data[i]);
+		inode = gds_dlist_node_get_inline(node);
+
+		added = gds_inline_dlist_insert(head, 0, inode, &head, &tail);
+		if (added != 1) {
+			gds_log_error("Insertion failed");
+			return -1;
+		}
+		list->size++;
 	}
 
-	list->size += added;
 	list->head = gds_dlist_node_get_container_of(head);
 	list->tail = gds_dlist_node_get_container_of(tail);
 
 	return 0;
 }
 
-int gds_dlist_push(gds_dlist_t *list, void *data)
+int gds_dlist_push_array(gds_dlist_t *list, size_t size, void *data[])
 {
-	gds_dlist_node_t *n;
-	gds_inline_dlist_node_t *i, *head, *tail;
+	gds_dlist_node_t *node;
+	gds_inline_dlist_node_t *inode, *head, *tail;
 	int added;
+	unsigned int i;
 
 	gds_assert(list != NULL, -1);
 
-	n = gds_dlist_node_new(data);
-
 	head = gds_dlist_node_get_inline(list->head);
 	tail = gds_dlist_node_get_inline(list->tail);
-	i = gds_dlist_node_get_inline(n);
 
-	added = gds_inline_dlist_insert(tail, 1, i, &head, &tail);
-	if (added != 1) {
-		gds_log_error("Insertion failed");
-		return -1;
+	for (i = 0; i < size; i++) {
+		node = gds_dlist_node_new(data[i]);
+		inode = gds_dlist_node_get_inline(node);
+
+		added = gds_inline_dlist_insert(tail, 1, inode, &head, &tail);
+		if (added != 1) {
+			gds_log_error("Insertion failed");
+			return -1;
+		}
+		list->size++;
 	}
 
-	list->size += added;
 	list->head = gds_dlist_node_get_container_of(head);
 	list->tail = gds_dlist_node_get_container_of(tail);
 
