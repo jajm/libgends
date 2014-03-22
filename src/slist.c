@@ -155,52 +155,59 @@ void * gds_slist_get_free_callback(gds_slist_t *list)
 	return list->free_cb;
 }
 
-int gds_slist_unshift(gds_slist_t *list, void *data)
+int gds_slist_unshift_array(gds_slist_t *list, size_t size, void *data[])
 {
-	gds_slist_node_t *n;
-	gds_inline_slist_node_t *i, *head, *tail;
+	gds_slist_node_t *node;
+	gds_inline_slist_node_t *inode, *head, *tail;
 	int added;
+	int i;
 
 	gds_assert(list != NULL, -1);
 
-	n = gds_slist_node_new(data);
-	i = gds_slist_node_get_inline(n);
 	head = gds_slist_node_get_inline(list->head);
 	tail = gds_slist_node_get_inline(list->tail);
 
-	added = gds_inline_slist_insert(head, 0, i, &head, &tail);
-	if (added != 1) {
-		gds_log_error("Insertion failed");
-		return -1;
+	for (i = size - 1; i >= 0; i--) {
+		node = gds_slist_node_new(data[i]);
+		inode = gds_slist_node_get_inline(node);
+
+		added = gds_inline_slist_insert(head, 0, inode, &head, &tail);
+		if (added != 1) {
+			gds_log_error("Insertion failed");
+			return -1;
+		}
+		list->size++;
 	}
 
-	list->size += added;
 	list->head = gds_slist_node_get_container_of(head);
 	list->tail = gds_slist_node_get_container_of(tail);
 
 	return 0;
 }
 
-int gds_slist_push(gds_slist_t *list, void *data)
+int gds_slist_push_array(gds_slist_t *list, size_t size, void *data[])
 {
-	gds_slist_node_t *n;
-	gds_inline_slist_node_t *i, *head, *tail;
+	gds_slist_node_t *node;
+	gds_inline_slist_node_t *inode, *head, *tail;
 	int added;
+	unsigned int i;
 
 	gds_assert(list != NULL, -1);
 
-	n = gds_slist_node_new(data);
-	i = gds_slist_node_get_inline(n);
 	head = gds_slist_node_get_inline(list->head);
 	tail = gds_slist_node_get_inline(list->tail);
 
-	added = gds_inline_slist_insert(tail, 1, i, &head, &tail);
-	if (added != 1) {
-		gds_log_error("Insertion failed");
-		return -1;
+	for (i = 0; i < size; i++) {
+		node = gds_slist_node_new(data[i]);
+		inode = gds_slist_node_get_inline(node);
+		added = gds_inline_slist_insert(tail, 1, inode, &head, &tail);
+		if (added != 1) {
+			gds_log_error("Insertion failed");
+			return -1;
+		}
+		list->size++;
 	}
 
-	list->size += added;
 	list->head = gds_slist_node_get_container_of(head);
 	list->tail = gds_slist_node_get_container_of(tail);
 
@@ -286,7 +293,6 @@ void * gds_slist_get(gds_slist_t *list, unsigned int offset)
 
 	return d;
 }
-
 
 int gds_slist_splice(gds_slist_t *list, unsigned int offset,
 	unsigned int length, gds_slist_t *replacement)

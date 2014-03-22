@@ -4,25 +4,35 @@
 #include "slist.h"
 #include "lambda.h"
 
-void assert_list_equals(gds_slist_t *list, unsigned int size, void *compare[])
+void assert_list_is(gds_slist_t *list, size_t size, void *data[])
 {
 	gds_iterator_t *it;
 	unsigned int i = 0;
+	int verified = 1;
 
 	it = gds_slist_iterator_new(list);
 	gds_iterator_reset(it);
 	while (!gds_iterator_step(it) && i < size) {
 		void *d = gds_iterator_get(it);
-		is(d, compare[i]);
+		if (d != data[i]) {
+			verified = 0;
+			break;
+		}
 		i++;
 	}
-	is(i, size);
-	is(i, gds_slist_size(list));
-	isnt(gds_iterator_step(it), 0, NULL);
-
+	if (i != size || i != gds_slist_size(list) || gds_iterator_step(it) == 0) {
+		verified = 0;
+	}
 
 	gds_iterator_free(it);
+
+	ok(verified);
 }
+
+#define list_is(list, ...) ({ \
+	void *_va_args[] = { __VA_ARGS__ }; \
+	assert_list_is(list, sizeof(_va_args) / sizeof(*_va_args), _va_args); \
+})
 
 void t_gds_slist_unshift(void)
 {
@@ -32,16 +42,22 @@ void t_gds_slist_unshift(void)
 	list = gds_slist();
 	isnt(list, NULL);
 
-	assert_list_equals(list, 0, (void *[]){});
+	list_is(list);
 
 	gds_slist_unshift(list, &a[0]);
-	assert_list_equals(list, 1, (void *[]){&a[0]});
+	list_is(list, &a[0]);
 
 	gds_slist_unshift(list, &a[1]);
-	assert_list_equals(list, 2, (void *[]){&a[1], &a[0]});
+	list_is(list, &a[1], &a[0]);
 
 	gds_slist_unshift(list, &a[2]);
-	assert_list_equals(list, 3, (void *[]){&a[2], &a[1], &a[0]});
+	list_is(list, &a[2], &a[1], &a[0]);
+
+	gds_slist_unshift(list, &a[0], &a[1], &a[2]);
+	list_is(list, &a[0], &a[1], &a[2], &a[2], &a[1], &a[0]);
+
+	gds_slist_unshift(list);
+	list_is(list, &a[0], &a[1], &a[2], &a[2], &a[1], &a[0]);
 
 	gds_slist_free(list);
 }
@@ -54,16 +70,22 @@ void t_gds_slist_push(void)
 	list = gds_slist();
 	isnt(list, NULL);
 
-	assert_list_equals(list, 0, (void *[]){});
+	list_is(list);
 
 	gds_slist_push(list, &a[0]);
-	assert_list_equals(list, 1, (void *[]){&a[0]});
+	list_is(list, &a[0]);
 
 	gds_slist_push(list, &a[1]);
-	assert_list_equals(list, 2, (void *[]){&a[0], &a[1]});
+	list_is(list, &a[0], &a[1]);
 
 	gds_slist_push(list, &a[2]);
-	assert_list_equals(list, 3, (void *[]){&a[0], &a[1], &a[2]});
+	list_is(list, &a[0], &a[1], &a[2]);
+
+	gds_slist_push(list, &a[2], &a[1], &a[0]);
+	list_is(list, &a[0], &a[1], &a[2], &a[2], &a[1], &a[0]);
+
+	gds_slist_push(list);
+	list_is(list, &a[0], &a[1], &a[2], &a[2], &a[1], &a[0]);
 
 	gds_slist_free(list);
 }
@@ -76,22 +98,22 @@ void t_gds_slist_shift(void)
 
 	list = gds_slist(&a[0], &a[1], &a[2]);
 	isnt(list, NULL, "list != NULL");
-	assert_list_equals(list, 3, (void *[]){&a[0], &a[1], &a[2]});
+	list_is(list, &a[0], &a[1], &a[2]);
 
 	b = gds_slist_shift(list);
-	assert_list_equals(list, 2, (void *[]){&a[1], &a[2]});
+	list_is(list, &a[1], &a[2]);
 	is(b, &a[0]);
 
 	b = gds_slist_shift(list);
-	assert_list_equals(list, 1, (void *[]){&a[2]});
+	list_is(list, &a[2]);
 	is(b, &a[1]);
 
 	b = gds_slist_shift(list);
-	assert_list_equals(list, 0, (void *[]){});
+	list_is(list);
 	is(b, &a[2]);
 
 	b = gds_slist_shift(list);
-	assert_list_equals(list, 0, (void *[]){});
+	list_is(list);
 	is(b, NULL);
 
 	gds_slist_free(list);
@@ -105,22 +127,22 @@ void t_gds_slist_pop(void)
 
 	list = gds_slist(&a[0], &a[1], &a[2]);
 	isnt(list, NULL);
-	assert_list_equals(list, 3, (void *[]){&a[0], &a[1], &a[2]});
+	list_is(list, &a[0], &a[1], &a[2]);
 
 	b = gds_slist_pop(list);
-	assert_list_equals(list, 2, (void *[]){&a[0], &a[1]});
+	list_is(list, &a[0], &a[1]);
 	is(b, &a[2]);
 
 	b = gds_slist_pop(list);
-	assert_list_equals(list, 1, (void *[]){&a[0]});
+	list_is(list, &a[0]);
 	is(b, &a[1]);
 
 	b = gds_slist_pop(list);
-	assert_list_equals(list, 0, (void *[]){});
+	list_is(list);
 	is(b, &a[0]);
 
 	b = gds_slist_pop(list);
-	assert_list_equals(list, 0, (void *[]){});
+	list_is(list);
 	is(b, NULL);
 
 	gds_slist_free(list);
@@ -153,42 +175,36 @@ void t_gds_slist_splice(void)
 		*(a[i]) = i;
 		gds_slist_push(list, a[i]);
 	}
-	assert_list_equals(list, 10, (void *[])
-		{a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]});
+	list_is(list, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]);
 
 	gds_slist_splice(list, 0, 0, NULL);
-	assert_list_equals(list, 10, (void *[])
-		{a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]});
+	list_is(list, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]);
 
 	gds_slist_splice(list, 0, 1, NULL);
-	assert_list_equals(list, 9, (void *[])
-		{a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]});
+	list_is(list, a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]);
 
 	gds_slist_splice(list, 0, 2, NULL);
-	assert_list_equals(list, 7, (void *[])
-		{a[3], a[4], a[5], a[6], a[7], a[8], a[9]});
+	list_is(list, a[3], a[4], a[5], a[6], a[7], a[8], a[9]);
 
 	gds_slist_splice(list, 2, 1, NULL);
-	assert_list_equals(list, 6, (void *[])
-		{a[3], a[4], a[6], a[7], a[8], a[9]});
+	list_is(list, a[3], a[4], a[6], a[7], a[8], a[9]);
 
 	gds_slist_splice(list, 5, 1, NULL);
-	assert_list_equals(list, 5, (void *[]){a[3], a[4], a[6], a[7], a[8]});
+	list_is(list, a[3], a[4], a[6], a[7], a[8]);
 
 	gds_slist_splice(list, 5, 1, NULL);
-	assert_list_equals(list, 5, (void *[]){a[3], a[4], a[6], a[7], a[8]});
+	list_is(list, a[3], a[4], a[6], a[7], a[8]);
 
 	gds_slist_splice(list, 2, 10, NULL);
-	assert_list_equals(list, 2, (void *[]){a[3], a[4]});
+	list_is(list, a[3], a[4]);
 
 	gds_slist_splice(list, 0, 10, NULL);
-	assert_list_equals(list, 0, (void *[]){});
+	list_is(list);
 
 	for (i=0; i<10; i++) {
 		gds_slist_push(list, a[i]);
 	}
-	assert_list_equals(list, 10, (void *[])
-		{a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]});
+	list_is(list, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]);
 
 	list2 = gds_slist();
 	int *b[2];
@@ -197,40 +213,33 @@ void t_gds_slist_splice(void)
 		*(b[i]) = 10+i;
 		gds_slist_push(list2, b[i]);
 	}
-	assert_list_equals(list2, 2, (void *[]){b[0], b[1]});
+	list_is(list2, b[0], b[1]);
 
 	gds_slist_splice(list, 0, 0, list2);
-	assert_list_equals(list, 12, (void *[]){b[0], b[1], a[0], a[1], a[2],
-		a[3], a[4], a[5], a[6], a[7], a[8], a[9]});
+	list_is(list, b[0], b[1], a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]);
 
 	gds_slist_splice(list, 1, 0, list2);
-	assert_list_equals(list, 14, (void *[]){b[0], b[0], b[1], b[1], a[0],
-		a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]});
+	list_is(list, b[0], b[0], b[1], b[1], a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]);
 
 	gds_slist_splice(list, 0, 4, NULL);
-	assert_list_equals(list, 10, (void *[]){a[0], a[1], a[2], a[3], a[4],
-		a[5], a[6], a[7], a[8], a[9]});
+	list_is(list, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]);
 
 	gds_slist_splice(list, 5, 0, list2);
-	assert_list_equals(list, 12, (void *[]){a[0], a[1], a[2], a[3], a[4],
-		b[0], b[1], a[5], a[6], a[7], a[8], a[9]});
+	list_is(list, a[0], a[1], a[2], a[3], a[4], b[0], b[1], a[5], a[6], a[7], a[8], a[9]);
 
 	gds_slist_splice(list, 20, 0, list2);
-	assert_list_equals(list, 14, (void *[]){a[0], a[1], a[2], a[3], a[4],
-		b[0], b[1], a[5], a[6], a[7], a[8], a[9], b[0], b[1]});
+	list_is(list, a[0], a[1], a[2], a[3], a[4], b[0], b[1], a[5], a[6], a[7], a[8], a[9], b[0], b[1]);
 
 	gds_slist_splice(list, 5, 2, NULL);
 	gds_slist_splice(list, 10, 2, NULL);
-	assert_list_equals(list, 10, (void *[]){a[0], a[1], a[2], a[3], a[4],
-		a[5], a[6], a[7], a[8], a[9]});
+	list_is(list, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]);
 
 	gds_slist_set_free_callback(list, free);
 	gds_slist_splice(list, 0, 5, list2);
-	assert_list_equals(list, 7, (void *[]){b[0], b[1], a[5], a[6], a[7],
-		a[8], a[9]});
+	list_is(list, b[0], b[1], a[5], a[6], a[7], a[8], a[9]);
 
 	gds_slist_splice(list, 0, 10, NULL);
-	assert_list_equals(list, 0, (void *[]){});
+	list_is(list);
 
 	gds_slist_set_free_callback(list, NULL);
 	gds_slist_free(list);
@@ -251,25 +260,21 @@ void t_gds_slist_slice(void)
 		*(a[i]) = i;
 		gds_slist_push(list, a[i]);
 	}
-	assert_list_equals(list, 10, (void *[])
-		{a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]});
+	list_is(list, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]);
 
 	list2 = gds_slist_slice(list, 0, 2, NULL, NULL);
-	assert_list_equals(list, 10, (void *[])
-		{a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]});
-	assert_list_equals(list2, 2, (void *[]){a[0], a[1]});
+	list_is(list, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]);
+	list_is(list2, a[0], a[1]);
 	gds_slist_free(list2);
 
 	list2 = gds_slist_slice(list, 2, 5, NULL, NULL);
-	assert_list_equals(list, 10, (void *[])
-		{a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]});
-	assert_list_equals(list2, 5, (void *[]){a[2], a[3], a[4], a[5], a[6]});
+	list_is(list, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]);
+	list_is(list2, a[2], a[3], a[4], a[5], a[6]);
 	gds_slist_free(list2);
 
 	list2 = gds_slist_slice(list, 7, 10, NULL, NULL);
-	assert_list_equals(list, 10, (void *[])
-		{a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]});
-	assert_list_equals(list2, 3, (void *[]){a[7], a[8], a[9]});
+	list_is(list, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]);
+	list_is(list2, a[7], a[8], a[9]);
 	gds_slist_free(list2);
 
 	list2 = gds_slist_slice(list, 2, 4, gds_lambda(int *, (int *i) {
@@ -277,8 +282,7 @@ void t_gds_slist_slice(void)
 		*a = *i;
 		return a;
 	}), NULL);
-	assert_list_equals(list, 10, (void *[])
-		{a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]});
+	list_is(list, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]);
 	i = 0;
 	gds_slist_foreach(b, list2) {
 		isnt(b, a[i+2], NULL);
@@ -321,15 +325,13 @@ void t_gds_slist_filter(void)
 		*(a[i]) = i;
 		gds_slist_push(list, a[i]);
 	}
-	assert_list_equals(list, 10, (void *[])
-		{a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]});
+	list_is(list, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]);
 
 	list2 = gds_slist_filter(list, gds_lambda(int, (int *a) {
 		return (*a) % 2;
 	}), NULL);
-	assert_list_equals(list, 10, (void *[])
-		{a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]});
-	assert_list_equals(list2, 5, (void *[]){a[1], a[3], a[5], a[7], a[9]});
+	list_is(list, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]);
+	list_is(list2, a[1], a[3], a[5], a[7], a[9]);
 
 	gds_slist_free(list);
 	gds_slist_set_free_callback(list2, NULL);
@@ -377,7 +379,7 @@ void t_gds_slist_reduce(void)
 
 int main()
 {
-	plan(431);
+	plan(85);
 
 	t_gds_slist_unshift();
 	t_gds_slist_push();

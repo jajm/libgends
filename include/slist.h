@@ -124,39 +124,53 @@ gds_slist_get_free_callback(
 	gds_slist_t *list
 );
 
-/*
- * Add new data at beginning of list
+/* Add new data at beginning of list
  *
- * Parameters:
- *   list: pointer to list
- *   data: pointer to data
+ * Parameters
+ *   list : pointer to list
+ *   size : size of data array
+ *   data : array of data
  *
- * Returns:
+ * Returns
  *   0 in case of success
  *   a negative value otherwise
  */
 int
-gds_slist_unshift(
+gds_slist_unshift_array(
 	gds_slist_t *list,
-	void *data
+	size_t size,
+	void *data[]
 );
 
-/*
- * Add new data at end of list
+#define gds_slist_unshift(list, ...) ({ \
+	void *gds_va_args[] = {__VA_ARGS__}; \
+	gds_slist_unshift_array(list, \
+		sizeof(gds_va_args) / sizeof(*gds_va_args),  gds_va_args); \
+})
+
+/* Add new data at end of list
  *
- * Parameters:
- *   list: pointer to list
- *   data: pointer to data
+ * Parameters
+ *   list : pointer to list
+ *   size : size of data array
+ *   data : array of data
  *
- * Returns:
+ * Returns
  *   0 in case of success
  *   a negative value otherwise
  */
 int
-gds_slist_push(
+gds_slist_push_array(
 	gds_slist_t *list,
-	void *data
+	size_t size,
+	void *data[]
 );
+
+#define gds_slist_push(list, ...) ({ \
+	void *gds_va_args[] = {__VA_ARGS__}; \
+	gds_slist_push_array(list, \
+		sizeof(gds_va_args) / sizeof(*gds_va_args),  gds_va_args); \
+})
 
 /*
  * Remove the first element of list and return it
