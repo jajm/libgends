@@ -278,11 +278,27 @@ gds_dlist_slice(
  *
  * Parameters
  *   list          : Pointer to the list.
- *   callback      : Function to apply on data. Parameters are:
- *                   - (void *) data
- *                   - (unsigned int) offset of node being processed
- *                   - (void *) callback_data
+ *   callback      : Function to apply on data. Prototype:
+ *                   void * callback(void *data, void *cb_data)
+ *                   - data: data of node being processed
+ *                   - cb_data: callback_data parameter passed to gds_slist_map
+ *                   Return value replaces node's data
  *   callback_data : Data to pass to callback as 3rd parameter.
+ *
+ * Example
+ *
+ *      int a[] = {1, 2, 3};
+ *      gds_dlist_t *list = gds_dlist(&a[0], &a[1], &a[2]);
+ *      // list is 1, 2, 3.
+ *      gds_dlist_map(list, gds_lambda(void *, (int *a) {
+ *              *a = *a + *a;
+ *              return a;
+ *      }), NULL);
+ *      // list is 2, 4, 6.
+ *
+ * Returns
+ *   0 on success
+ *   a negative value on failure
  */
 int
 gds_dlist_map(
@@ -313,23 +329,21 @@ gds_dlist_filter(
 	void *callback_data
 );
 
-/*
- * Reduce a list into a single value.
+/* Reduce a list into a single value.
  *
  * To reduce a list into a single value, a callback function is called on every
  * node's data, with the value of the previous invocation of callback.
  *
- * Parameters:
- *   list: Pointer to the list.
- *   callback: Function to apply on data. Parameters are:
- *             - (void *) return value of previous invocation of callback,
- *               or NULL if this is the first invocation.
- *             - (void *) data of the current node
- *             - (unsigned int) offset of the current node
- *             - (void *) callback_data
- *             This function should reduce 1st and 2nd parameter into a single
- *             value and return this single value.
- *   callback_data: Data passed to callback as 4th parameter.
+ * Parameters
+ *   list          : Pointer to the list.
+ *   callback      : Function to apply on data. Parameters are:
+ *                   - (void *) return value of previous invocation of callback,
+ *                     or NULL if this is the first invocation.
+ *                   - (void *) data of the current node
+ *                   - (void *) callback_data
+ *                   This function should reduce 1st and 2nd parameter into a
+ *                   single value and return this single value.
+ *   callback_data : Data passed to callback as 3rd parameter.
  *
  * Notes
  *   The new list has the same free_cb as the original list.

@@ -315,9 +315,8 @@ gds_inline_dlist_size(
  *   head          : Head of the list.
  *   callback      : Function called on each node. Parameters are:
  *                   - (gds_inline_dlist_node_t *) current node
- *                   - (unsigned int) node offset
  *                   - (void *) callback_data
- *   callback_data : Data to pass to callback as 3rd parameter.
+ *   callback_data : Data to pass to callback as 2nd parameter.
  *
  * Returns
  *   0 on success

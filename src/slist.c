@@ -353,15 +353,14 @@ gds_slist_t * gds_slist_slice(gds_slist_t *list, unsigned int offset,
 	return slice;
 }
 
-void gds_slist_map_callback(gds_inline_slist_node_t *current, unsigned int pos,
-	void *params[2])
+void gds_slist_map_callback(gds_inline_slist_node_t *current, void *params[2])
 {
 	gds_slist_node_t *n = gds_slist_node_get_container_of(current);
 	void *data = gds_slist_node_get_data(n);
-	void *(*callback)(void *, unsigned int, void *) = params[0];
+	void *(*callback)(void *, void *) = params[0];
 	void *callback_data = params[1];
 
-	callback(data, pos, callback_data);
+	n->data = callback(data, callback_data);
 }
 
 int gds_slist_map(gds_slist_t *list, void *callback, void *callback_data)
@@ -410,15 +409,15 @@ gds_slist_t * gds_slist_filter(gds_slist_t *list, void *callback,
 }
 
 void gds_slist_reduce_callback(gds_inline_slist_node_t *current,
-	unsigned int pos, void *params[3])
+	void *params[3])
 {
 	gds_slist_node_t *n = gds_slist_node_get_container_of(current);
 	void *data = gds_slist_node_get_data(n);
-	void *(*callback)(void *, void *, unsigned int, void *) = params[0];
+	void *(*callback)(void *, void *, void *) = params[0];
 	void *callback_data = params[1];
 	void **result = params[2];
 
-	*result = callback(*result, data, pos, callback_data);
+	*result = callback(*result, data, callback_data);
 }
 
 void * gds_slist_reduce(gds_slist_t *list, void *callback, void *callback_data)

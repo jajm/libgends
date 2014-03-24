@@ -314,15 +314,13 @@ int gds_inline_slist_map(gds_inline_slist_node_t *head, void *callback,
 	void *callback_data)
 {
 	gds_inline_slist_node_t *curr = head;
-	void (*cb)(gds_inline_slist_node_t *, unsigned int, void *) = callback;
-	unsigned int i = 0;
+	void (*cb)(gds_inline_slist_node_t *, void *) = callback;
 
 	gds_assert(callback != NULL, -1);
 
 	while (curr != NULL) {
-		cb(curr, i, callback_data);
+		cb(curr, callback_data);
 		curr = curr->next;
-		i++;
 	}
 
 	return 0;

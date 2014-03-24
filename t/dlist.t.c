@@ -301,13 +301,27 @@ void t_gds_dlist_map(void)
 	int a[] = {1, 2, 3};
 
 	list = gds_dlist(&a[0], &a[1], &a[2]);
-	gds_dlist_map(list, gds_lambda(void, (int *a) {
+	gds_dlist_map(list, gds_lambda(void *, (int *a) {
 		*a = *a + *a;
+		return a;
 	}), NULL);
 	is(a[0], 2);
 	is(a[1], 4);
 	is(a[2], 6);
 
+	gds_dlist_map(list, gds_lambda(void *, (int *a) {
+		int *b = malloc(sizeof(int));
+		*b = *a + *a;
+		return b;
+	}), NULL);
+	is(a[0], 2);
+	is(a[1], 4);
+	is(a[2], 6);
+	is(*((int *)gds_dlist_get(list, 0)), 4);
+	is(*((int *)gds_dlist_get(list, 1)), 8);
+	is(*((int *)gds_dlist_get(list, 2)), 12);
+
+	gds_dlist_set_free_callback(list, free);
 	gds_dlist_free(list);
 }
 
@@ -336,9 +350,9 @@ void t_gds_dlist_filter(void)
 	gds_dlist_destroy(list2);
 }
 
-char * string_reduce_join(char *s1, const char *s2, unsigned int i, char *sep)
+char * string_reduce_join(char *s1, const char *s2, char *sep)
 {
-	if (i == 0) {
+	if (s1 == NULL) {
 		s1 = calloc(strlen(s2) + 1, sizeof(char));
 	} else {
 		size_t s1len = strlen(s1);
@@ -377,7 +391,7 @@ void t_gds_dlist_reduce(void)
 
 int main()
 {
-	plan(85);
+	plan(91);
 
 	t_gds_dlist_unshift();
 	t_gds_dlist_push();

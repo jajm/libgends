@@ -274,16 +274,27 @@ gds_slist_slice(
 	void *callback_data
 );
 
-/*
- * Maps a function to data contained in list.
+/* Maps a function to data contained in list.
  *
- * Parameters:
- *   list: Pointer to the list.
- *   callback: Function to apply on data. Parameters are:
- *             - (void *) data
- *             - (unsigned int) offset of node being processed
- *             - (void *) callback_data
- *   callback_data: Data to pass to callback as 3rd parameter.
+ * Parameters
+ *   list          : Pointer to the list.
+ *   callback      : Function to apply on data. Prototype:
+ *                   void * callback(void *data, void *cb_data)
+ *                   - data: data of node being processed
+ *                   - cb_data: callback_data parameter passed to gds_slist_map
+ *                   Return value replaces node's data
+ *   callback_data : Data to pass to callback as 3rd parameter.
+ *
+ * Example
+ *
+ *      int a[] = {1, 2, 3};
+ *      gds_slist_t *list = gds_slist(&a[0], &a[1], &a[2]);
+ *      // list is 1, 2, 3.
+ *      gds_slist_map(list, gds_lambda(void *, (int *a) {
+ *              *a = *a + *a;
+ *              return a;
+ *      }), NULL);
+ *      // list is 2, 4, 6.
  *
  * Returns
  *   0 on success
@@ -326,16 +337,16 @@ gds_slist_filter(
  *
  * Parameters
  *   list          : Pointer to the list.
- *   callback      : Function to apply on data. Parameters are:
- *                   Prototype: void * callback(void *previous, void *data,
- *                              unsigned int offset, void *callback_data)
+ *   callback      : Function to apply on data. Prototype:
+ *                   void * callback(void *previous, void *data, void *cb_data)
  *                   - previous: return value of previous invocation of
  *                     callback, or NULL if this is the first invocation.
  *                   - data: data of the current node
- *                   - offset: offset of the current node
+ *                   - cb_data: callback_data parameter passed to
+ *                     gds_slist_reduce
  *                   This function should reduce 1st and 2nd parameter into a
  *                   single value and return this single value.
- *   callback_data : Data passed to callback as 4th parameter.
+ *   callback_data : Data passed to callback as 3rd parameter.
  *
  * Returns:
  *   Result of list reduction.

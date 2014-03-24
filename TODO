@@ -1,3 +1,0 @@
-* Callback prototype for gds_slist_map and gds_dlist_map should be
-  void * callback(void *data, void *callback_data) and its return value
-  should replace original data.
