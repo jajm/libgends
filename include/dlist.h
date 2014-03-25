@@ -256,8 +256,7 @@ gds_dlist_splice(
  *   callback      : Function to apply on data. Its return value will be stored
  *                   into the new list instead of the original data. Can be
  *                   NULL.
- *                   Prototype: void * callback(void *data, void *callback_data)
- *   callback_data : Data to pass to callback as 2nd parameter.
+ *                   Prototype: void * callback(void *data)
  *
  * Notes
  *   The new list has the same free_cb as the original list.
@@ -270,8 +269,7 @@ gds_dlist_slice(
 	gds_dlist_t *list,
 	unsigned int offset,
 	unsigned int length,
-	void *callback,
-	void *callback_data
+	void *callback
 );
 
 /* Maps a function to data contained in list.
@@ -279,11 +277,9 @@ gds_dlist_slice(
  * Parameters
  *   list          : Pointer to the list.
  *   callback      : Function to apply on data. Prototype:
- *                   void * callback(void *data, void *cb_data)
+ *                   void * callback(void *data)
  *                   - data: data of node being processed
- *                   - cb_data: callback_data parameter passed to gds_slist_map
  *                   Return value replaces node's data
- *   callback_data : Data to pass to callback as 3rd parameter.
  *
  * Example
  *
@@ -293,7 +289,7 @@ gds_dlist_slice(
  *      gds_dlist_map(list, gds_lambda(void *, (int *a) {
  *              *a = *a + *a;
  *              return a;
- *      }), NULL);
+ *      }));
  *      // list is 2, 4, 6.
  *
  * Returns
@@ -303,8 +299,7 @@ gds_dlist_slice(
 int
 gds_dlist_map(
 	gds_dlist_t *list,
-	void *callback,
-	void *callback_data
+	void *callback
 );
 
 /*
@@ -316,8 +311,6 @@ gds_dlist_map(
  *             true (not zero), data is kept for the new list.  Otherwise data
  *             is not kept. Parameters are:
  *             - (void *) data
- *             - (void *) callback_data
- *   callback_data: Data passed to callback as 2nd parameter.
  *
  * Returns:
  *   Pointer to the new list.
@@ -325,8 +318,7 @@ gds_dlist_map(
 gds_dlist_t *
 gds_dlist_filter(
 	gds_dlist_t *list,
-	void *callback,
-	void *callback_data
+	void *callback
 );
 
 /* Reduce a list into a single value.
@@ -340,10 +332,8 @@ gds_dlist_filter(
  *                   - (void *) return value of previous invocation of callback,
  *                     or NULL if this is the first invocation.
  *                   - (void *) data of the current node
- *                   - (void *) callback_data
  *                   This function should reduce 1st and 2nd parameter into a
  *                   single value and return this single value.
- *   callback_data : Data passed to callback as 3rd parameter.
  *
  * Notes
  *   The new list has the same free_cb as the original list.
@@ -354,8 +344,7 @@ gds_dlist_filter(
 void *
 gds_dlist_reduce(
 	gds_dlist_t *list,
-	void *callback,
-	void *callback_data
+	void *callback
 );
 
 /*

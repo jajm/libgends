@@ -262,17 +262,17 @@ void t_gds_slist_slice(void)
 	}
 	list_is(list, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]);
 
-	list2 = gds_slist_slice(list, 0, 2, NULL, NULL);
+	list2 = gds_slist_slice(list, 0, 2, NULL);
 	list_is(list, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]);
 	list_is(list2, a[0], a[1]);
 	gds_slist_free(list2);
 
-	list2 = gds_slist_slice(list, 2, 5, NULL, NULL);
+	list2 = gds_slist_slice(list, 2, 5, NULL);
 	list_is(list, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]);
 	list_is(list2, a[2], a[3], a[4], a[5], a[6]);
 	gds_slist_free(list2);
 
-	list2 = gds_slist_slice(list, 7, 10, NULL, NULL);
+	list2 = gds_slist_slice(list, 7, 10, NULL);
 	list_is(list, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]);
 	list_is(list2, a[7], a[8], a[9]);
 	gds_slist_free(list2);
@@ -281,7 +281,7 @@ void t_gds_slist_slice(void)
 		int *a = malloc(sizeof(int));
 		*a = *i;
 		return a;
-	}), NULL);
+	}));
 	list_is(list, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]);
 	i = 0;
 	gds_slist_foreach(b, list2) {
@@ -305,7 +305,7 @@ void t_gds_slist_map(void)
 	gds_slist_map(list, gds_lambda(void *, (int *a) {
 		*a = *a + *a;
 		return a;
-	}), NULL);
+	}));
 	is(a[0], 2);
 	is(a[1], 4);
 	is(a[2], 6);
@@ -314,7 +314,7 @@ void t_gds_slist_map(void)
 		int *b = malloc(sizeof(int));
 		*b = *a + *a;
 		return b;
-	}), NULL);
+	}));
 	is(a[0], 2);
 	is(a[1], 4);
 	is(a[2], 6);
@@ -343,7 +343,7 @@ void t_gds_slist_filter(void)
 
 	list2 = gds_slist_filter(list, gds_lambda(int, (int *a) {
 		return (*a) % 2;
-	}), NULL);
+	}));
 	list_is(list, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]);
 	list_is(list2, a[1], a[3], a[5], a[7], a[9]);
 
@@ -381,10 +381,14 @@ void t_gds_slist_reduce(void)
 		gds_slist_push(list, s[i]);
 	}
 
-	result = gds_slist_reduce(list, string_reduce_join, NULL);
+	result = gds_slist_reduce(list, gds_lambda(char *, (char *s1, char *s2) {
+		return string_reduce_join(s1, s2, NULL);
+	}));
 	str_eq(result, "Hello,splittedworld!");
 	free(result);
-	result = gds_slist_reduce(list, string_reduce_join, &sep);
+	result = gds_slist_reduce(list, gds_lambda(char *, (char *s1, char *s2) {
+		return string_reduce_join(s1, s2, &sep);
+	}));
 	str_eq(result, "Hello, splitted world!");
 	free(result);
 

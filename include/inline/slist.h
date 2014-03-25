@@ -131,10 +131,8 @@ gds_inline_slist_insert(
  *                   if offset = 0, start removal at <node>
  *   length        : number of nodes to remove
  *   callback      : function called on node before removal
- *                   prototype: void callback(gds_inline_slist_node_t *, void *)
- *                   first parameter is the node that will be removed
- *                   second parameter is <callback_data>
- *   callback_data : data passed to <callback>
+ *                   prototype: void callback(gds_inline_slist_node_t *node)
+ *                   - node: the node that will be removed
  *   newhead       : if not NULL, and if head of list was just removed, address
  *                   of new head is affected to *newhead
  *   newtail       : if not NULL, and if tail of list was just removed, address
@@ -150,7 +148,6 @@ gds_inline_slist_remove(
 	unsigned int offset,
 	unsigned int length,
 	void *callback,
-	void *callback_data,
 	gds_inline_slist_node_t **newhead,
 	gds_inline_slist_node_t **newtail
 );
@@ -160,8 +157,8 @@ gds_inline_slist_remove(
  * Parameters
  *   head          : Head of the list.
  *   callback      : Function called on node before removal. Prototype is
- *                   void callback(gds_inline_slist_node_t *, void *)
- *   callback_data : Data passed to callback as 2nd parameter.
+ *                   void callback(gds_inline_slist_node_t *node)
+ *                   - node: the node that will be removed
  *   newhead       : if not NULL, and if head of list was just removed, address
  *                   of new head is affected to *newhead
  *   newtail       : if not NULL, and if tail of list was just removed, address
@@ -175,7 +172,6 @@ unsigned int
 gds_inline_slist_remove_tail(
 	gds_inline_slist_node_t *head,
 	void *callback,
-	void *callback_data,
 	gds_inline_slist_node_t **newhead,
 	gds_inline_slist_node_t **newtail
 );
@@ -189,10 +185,8 @@ gds_inline_slist_remove_tail(
  *                   if offset = 0, start removal at <node>
  *   length        : number of nodes to remove
  *   callback      : function called on node before removal
- *                   prototype: void callback(gds_inline_slist_node_t *, void *)
- *                   first parameter is the node that will be removed
- *                   second parameter is <callback_data>
- *   callback_data : data passed to <callback>
+ *                   prototype: void callback(gds_inline_slist_node_t *node)
+ *                   - node: the node that will be removed
  *   list          : A node in the list to insert in place.
  *   newhead       : if not NULL, and if head of list was just removed, address
  *                   of new head is affected to *newhead
@@ -210,7 +204,6 @@ gds_inline_slist_splice(
 	unsigned int offset,
 	unsigned int length,
 	void *callback,
-	void *callback_data,
 	gds_inline_slist_node_t *list,
 	gds_inline_slist_node_t **newhead,
 	gds_inline_slist_node_t **newtail
@@ -265,8 +258,6 @@ gds_inline_slist_size(
  *   head          : Head of the list.
  *   callback      : Function called on each node. Parameters are:
  *                   - (gds_inline_slist_node_t *) current node
- *                   - (void *) callback_data
- *   callback_data : Data to pass to callback as 2nd parameter.
  *
  * Returns
  *   0 on success
@@ -275,8 +266,7 @@ gds_inline_slist_size(
 int
 gds_inline_slist_map(
 	gds_inline_slist_node_t *head,
-	void *callback,
-	void *callback_data
+	void *callback
 );
 
 #endif /* ! gds_inline_slist_h_included */

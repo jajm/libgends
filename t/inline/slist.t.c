@@ -234,80 +234,80 @@ void t_gds_inline_slist_remove(void)
 	}
 
 	/* Remove nodes from an empty list, will always return 0 */
-	ok(0 == gds_inline_slist_remove(NULL, 0, 0, NULL, NULL, NULL, NULL));
-	ok(0 == gds_inline_slist_remove(NULL, 0, 0, NULL, NULL, NULL, &tail));
-	ok(0 == gds_inline_slist_remove(NULL, 0, 0, NULL, NULL, &head, NULL));
-	ok(0 == gds_inline_slist_remove(NULL, 0, 0, NULL, NULL, &head, &tail));
-	ok(0 == gds_inline_slist_remove(NULL, 0, 0, free, NULL, NULL, NULL));
-	ok(0 == gds_inline_slist_remove(NULL, 0, 0, free, NULL, NULL, &tail));
-	ok(0 == gds_inline_slist_remove(NULL, 0, 0, free, NULL, &head, NULL));
-	ok(0 == gds_inline_slist_remove(NULL, 0, 0, free, NULL, &head, &tail));
-	ok(0 == gds_inline_slist_remove(NULL, 0, 1, NULL, NULL, NULL, NULL));
-	ok(0 == gds_inline_slist_remove(NULL, 0, 1, NULL, NULL, NULL, &tail));
-	ok(0 == gds_inline_slist_remove(NULL, 0, 1, NULL, NULL, &head, NULL));
-	ok(0 == gds_inline_slist_remove(NULL, 0, 1, NULL, NULL, &head, &tail));
-	ok(0 == gds_inline_slist_remove(NULL, 0, 1, free, NULL, NULL, NULL));
-	ok(0 == gds_inline_slist_remove(NULL, 0, 1, free, NULL, NULL, &tail));
-	ok(0 == gds_inline_slist_remove(NULL, 0, 1, free, NULL, &head, NULL));
-	ok(0 == gds_inline_slist_remove(NULL, 0, 1, free, NULL, &head, &tail));
-	ok(0 == gds_inline_slist_remove(NULL, 1, 0, NULL, NULL, NULL, NULL));
-	ok(0 == gds_inline_slist_remove(NULL, 1, 0, NULL, NULL, NULL, &tail));
-	ok(0 == gds_inline_slist_remove(NULL, 1, 0, NULL, NULL, &head, NULL));
-	ok(0 == gds_inline_slist_remove(NULL, 1, 0, NULL, NULL, &head, &tail));
-	ok(0 == gds_inline_slist_remove(NULL, 1, 0, free, NULL, NULL, NULL));
-	ok(0 == gds_inline_slist_remove(NULL, 1, 0, free, NULL, NULL, &tail));
-	ok(0 == gds_inline_slist_remove(NULL, 1, 0, free, NULL, &head, NULL));
-	ok(0 == gds_inline_slist_remove(NULL, 1, 0, free, NULL, &head, &tail));
-	ok(0 == gds_inline_slist_remove(NULL, 1, 1, NULL, NULL, NULL, NULL));
-	ok(0 == gds_inline_slist_remove(NULL, 1, 1, NULL, NULL, NULL, &tail));
-	ok(0 == gds_inline_slist_remove(NULL, 1, 1, NULL, NULL, &head, NULL));
-	ok(0 == gds_inline_slist_remove(NULL, 1, 1, NULL, NULL, &head, &tail));
-	ok(0 == gds_inline_slist_remove(NULL, 1, 1, free, NULL, NULL, NULL));
-	ok(0 == gds_inline_slist_remove(NULL, 1, 1, free, NULL, NULL, &tail));
-	ok(0 == gds_inline_slist_remove(NULL, 1, 1, free, NULL, &head, NULL));
-	ok(0 == gds_inline_slist_remove(NULL, 1, 1, free, NULL, &head, &tail));
+	ok(0 == gds_inline_slist_remove(NULL, 0, 0, NULL, NULL, NULL));
+	ok(0 == gds_inline_slist_remove(NULL, 0, 0, NULL, NULL, &tail));
+	ok(0 == gds_inline_slist_remove(NULL, 0, 0, NULL, &head, NULL));
+	ok(0 == gds_inline_slist_remove(NULL, 0, 0, NULL, &head, &tail));
+	ok(0 == gds_inline_slist_remove(NULL, 0, 0, free, NULL, NULL));
+	ok(0 == gds_inline_slist_remove(NULL, 0, 0, free, NULL, &tail));
+	ok(0 == gds_inline_slist_remove(NULL, 0, 0, free, &head, NULL));
+	ok(0 == gds_inline_slist_remove(NULL, 0, 0, free, &head, &tail));
+	ok(0 == gds_inline_slist_remove(NULL, 0, 1, NULL, NULL, NULL));
+	ok(0 == gds_inline_slist_remove(NULL, 0, 1, NULL, NULL, &tail));
+	ok(0 == gds_inline_slist_remove(NULL, 0, 1, NULL, &head, NULL));
+	ok(0 == gds_inline_slist_remove(NULL, 0, 1, NULL, &head, &tail));
+	ok(0 == gds_inline_slist_remove(NULL, 0, 1, free, NULL, NULL));
+	ok(0 == gds_inline_slist_remove(NULL, 0, 1, free, NULL, &tail));
+	ok(0 == gds_inline_slist_remove(NULL, 0, 1, free, &head, NULL));
+	ok(0 == gds_inline_slist_remove(NULL, 0, 1, free, &head, &tail));
+	ok(0 == gds_inline_slist_remove(NULL, 1, 0, NULL, NULL, NULL));
+	ok(0 == gds_inline_slist_remove(NULL, 1, 0, NULL, NULL, &tail));
+	ok(0 == gds_inline_slist_remove(NULL, 1, 0, NULL, &head, NULL));
+	ok(0 == gds_inline_slist_remove(NULL, 1, 0, NULL, &head, &tail));
+	ok(0 == gds_inline_slist_remove(NULL, 1, 0, free, NULL, NULL));
+	ok(0 == gds_inline_slist_remove(NULL, 1, 0, free, NULL, &tail));
+	ok(0 == gds_inline_slist_remove(NULL, 1, 0, free, &head, NULL));
+	ok(0 == gds_inline_slist_remove(NULL, 1, 0, free, &head, &tail));
+	ok(0 == gds_inline_slist_remove(NULL, 1, 1, NULL, NULL, NULL));
+	ok(0 == gds_inline_slist_remove(NULL, 1, 1, NULL, NULL, &tail));
+	ok(0 == gds_inline_slist_remove(NULL, 1, 1, NULL, &head, NULL));
+	ok(0 == gds_inline_slist_remove(NULL, 1, 1, NULL, &head, &tail));
+	ok(0 == gds_inline_slist_remove(NULL, 1, 1, free, NULL, NULL));
+	ok(0 == gds_inline_slist_remove(NULL, 1, 1, free, NULL, &tail));
+	ok(0 == gds_inline_slist_remove(NULL, 1, 1, free, &head, NULL));
+	ok(0 == gds_inline_slist_remove(NULL, 1, 1, free, &head, &tail));
 
 	/* Remove 0 nodes, will always return 0 */
-	ok(0 == gds_inline_slist_remove(head, 0, 0, NULL, NULL, NULL, NULL));
-	ok(0 == gds_inline_slist_remove(head, 0, 0, NULL, NULL, NULL, &tail));
-	ok(0 == gds_inline_slist_remove(head, 0, 0, NULL, NULL, &head, NULL));
-	ok(0 == gds_inline_slist_remove(head, 0, 0, NULL, NULL, &head, &tail));
-	ok(0 == gds_inline_slist_remove(head, 0, 0, free, NULL, NULL, NULL));
-	ok(0 == gds_inline_slist_remove(head, 0, 0, free, NULL, NULL, &tail));
-	ok(0 == gds_inline_slist_remove(head, 0, 0, free, NULL, &head, NULL));
-	ok(0 == gds_inline_slist_remove(head, 0, 0, free, NULL, &head, &tail));
-	ok(0 == gds_inline_slist_remove(head, 1, 0, NULL, NULL, NULL, NULL));
-	ok(0 == gds_inline_slist_remove(head, 1, 0, NULL, NULL, NULL, &tail));
-	ok(0 == gds_inline_slist_remove(head, 1, 0, NULL, NULL, &head, NULL));
-	ok(0 == gds_inline_slist_remove(head, 1, 0, NULL, NULL, &head, &tail));
-	ok(0 == gds_inline_slist_remove(head, 1, 0, free, NULL, NULL, NULL));
-	ok(0 == gds_inline_slist_remove(head, 1, 0, free, NULL, NULL, &tail));
-	ok(0 == gds_inline_slist_remove(head, 1, 0, free, NULL, &head, NULL));
-	ok(0 == gds_inline_slist_remove(head, 1, 0, free, NULL, &head, &tail));
+	ok(0 == gds_inline_slist_remove(head, 0, 0, NULL, NULL, NULL));
+	ok(0 == gds_inline_slist_remove(head, 0, 0, NULL, NULL, &tail));
+	ok(0 == gds_inline_slist_remove(head, 0, 0, NULL, &head, NULL));
+	ok(0 == gds_inline_slist_remove(head, 0, 0, NULL, &head, &tail));
+	ok(0 == gds_inline_slist_remove(head, 0, 0, free, NULL, NULL));
+	ok(0 == gds_inline_slist_remove(head, 0, 0, free, NULL, &tail));
+	ok(0 == gds_inline_slist_remove(head, 0, 0, free, &head, NULL));
+	ok(0 == gds_inline_slist_remove(head, 0, 0, free, &head, &tail));
+	ok(0 == gds_inline_slist_remove(head, 1, 0, NULL, NULL, NULL));
+	ok(0 == gds_inline_slist_remove(head, 1, 0, NULL, NULL, &tail));
+	ok(0 == gds_inline_slist_remove(head, 1, 0, NULL, &head, NULL));
+	ok(0 == gds_inline_slist_remove(head, 1, 0, NULL, &head, &tail));
+	ok(0 == gds_inline_slist_remove(head, 1, 0, free, NULL, NULL));
+	ok(0 == gds_inline_slist_remove(head, 1, 0, free, NULL, &tail));
+	ok(0 == gds_inline_slist_remove(head, 1, 0, free, &head, NULL));
+	ok(0 == gds_inline_slist_remove(head, 1, 0, free, &head, &tail));
 
 	list_is(&nodes[0], &nodes[1], &nodes[2], &nodes[3], &nodes[4],
 		&nodes[5], &nodes[6], &nodes[7], &nodes[8], &nodes[9]);
 
-	gds_inline_slist_remove(head, 0, 0, NULL, NULL, &head, &tail);
+	gds_inline_slist_remove(head, 0, 0, NULL, &head, &tail);
 	list_is(&nodes[0], &nodes[1], &nodes[2], &nodes[3], &nodes[4],
 		&nodes[5], &nodes[6], &nodes[7], &nodes[8], &nodes[9]);
 	is(tail, NULL);
 
-	gds_inline_slist_remove(head, 0, 1, NULL, NULL, &head, &tail);
+	gds_inline_slist_remove(head, 0, 1, NULL, &head, &tail);
 	list_is(&nodes[1], &nodes[2], &nodes[3], &nodes[4], &nodes[5],
 		&nodes[6], &nodes[7], &nodes[8], &nodes[9]);
 	is(tail, NULL);
 
-	gds_inline_slist_remove(head, 3, 3, NULL, NULL, &head, &tail);
+	gds_inline_slist_remove(head, 3, 3, NULL, &head, &tail);
 	list_is(&nodes[1], &nodes[2], &nodes[3], &nodes[7], &nodes[8],
 		&nodes[9]);
 	is(tail, NULL);
 
-	gds_inline_slist_remove(head, 3, 10, NULL, NULL, &head, &tail);
+	gds_inline_slist_remove(head, 3, 10, NULL, &head, &tail);
 	list_is(&nodes[1], &nodes[2], &nodes[3]);
 	is(tail, &nodes[3]);
 
-	gds_inline_slist_remove(head, 0, 10, NULL, NULL, &head, &tail);
+	gds_inline_slist_remove(head, 0, 10, NULL, &head, &tail);
 	is(head, NULL);
 	is(tail, NULL);
 }
