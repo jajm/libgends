@@ -1,3 +1,343 @@
+2014-03-25  Julian Maurice  <jajm@jajm.org>
+
+	* inline/slist.[ch] (gds_inline_slist_remove)
+	(gds_inline_slist_remove_tail, gds_inline_slist_splice)
+	(gds_inline_slist_map): Remove 'callback_data' parameter
+	* inline/dlist.[ch] (gds_inline_dlist_remove)
+	(gds_inline_dlist_splice, gds_inline_dlist_map):
+	Remove 'callback_data' parameter
+	* slist.[ch] (gds_slist_slice, gds_slist_map, gds_slist_filter)
+	(gds_slist_reduce): Remove 'callback_data' parameter
+	* dlist.[ch] (gds_dlist_slice, gds_dlist_map, gds_dlist_filter)
+	(gds_dlist_reduce): Remove 'callback_data' parameter
+
+	* inline/slist.t.c: Update tests
+	* inline/dlist.t.c: Update tests
+	* slist.t.c: Update tests
+	* dlist.t.c: Update tests
+
+2014-03-24  Julian Maurice  <jajm@jajm.org>
+
+	* inline/slist.[ch] (gds_inline_slist_map):
+	Remove 'offset' parameter for callback
+	* inline/dlist.[ch] (gds_inline_dlist_map):
+	Remove 'offset' parameter for callback
+	* slist.[ch] (gds_slist_map, gds_slist_reduce):
+	Remove 'offset' parameter for callback
+	* slist.[ch] (gds_slist_map):
+	Return value of callback replaces original data
+	* dlist.[ch] (gds_dlist_map, gds_dlist_reduce):
+	Remove 'offset' parameter for callback
+	* dlist.[ch] (gds_dlist_map):
+	Return value of callback replaces original data
+
+	* slist.t.c: Update tests
+	* dlist.t.c: Update tests
+
+2014-03-22  Julian Maurice  <jajm@jajm.org>
+
+	* dlist.[ch] (gds_dlist_unshift, gds_dlist_push): Can now unshift or
+	push more than one element at a time
+
+	* dlist.t.c: Add tests
+
+2014-03-22  Julian Maurice  <jajm@jajm.org>
+
+	* slist.[ch] (gds_slist_unshift, gds_slist_push): Can now unshift or
+	push more than one element at a time
+
+	* slist.t.c: Add tests
+
+2014-03-21  Julian Maurice  <jajm@jajm.org>
+
+	* hash_map.t.c: Add tests for gds_hash_map_change_size
+	* hash_map_fast.t.c: Add tests for gds_hash_map_fast_change_size
+	* hash_map_keyin.t.c: Add tests for gds_hash_map_keyin_change_size
+	* hash_map_keyin_fast.t.c:
+	Add tests for gds_hash_map_keyin_fast_change_size
+
+	* hash_map_keyin.c (gds_hash_map_keyin_change_size): Fix memory leak
+	* hash_map_keyin_fast.c (gds_hash_map_keyin_fast_change_size):
+	Fix memory leak
+
+2014-03-19  Julian Maurice  <jajm@jajm.org>
+
+	* configure.ac: Add option --enable-debug
+	* config.mk.in: Add DEBUG variable
+	* benchs/Makefile.in: Make debug mode optional and use -O2 flag
+	* src/Makefile.in: Make debug mode optional and use -O2 flag
+	* t/Makefile.in: Make debug mode optional and use -O2 flag
+	* debian/rules: Override dh_autoconfigure to use --enable-debug
+
+2014-03-18  Julian Maurice  <jajm@jajm.org>
+
+	* debian/control: Add Debian debug package
+	* debian/rules: Add Debian debug package
+
+2014-03-18  Julian Maurice  <jajm@jajm.org>
+
+	* hash_map.h (gds_hash_map_set_free_callback)
+	(gds_hash_map_get_free_callback, gds_hash_map_destroy):
+	New functions
+	* hash_map_fast.h (gds_hash_map_fast_set_free_callback)
+	(gds_hash_map_fast_get_free_callback, gds_hash_map_fast_destroy):
+	New functions
+	* hash_map_keyin.h (gds_hash_map_keyin_set_free_callback)
+	(gds_hash_map_keyin_get_free_callback, gds_hash_map_keyin_destroy):
+	New functions
+	* hash_map_keyin_fast.h (gds_hash_map_keyin_fast_set_free_callback)
+	(gds_hash_map_keyin_fast_get_free_callback)
+	(gds_hash_map_keyin_fast_destroy):
+	New functions
+
+2014-03-08  Julian Maurice  <jajm@jajm.org>
+
+	* dlist.[ch] (gds_dlist_t): Add 'free_cb' member
+	* dlist.[ch] (gds_dlist_new, gds_dlist_new_from_array):
+	Add 'free_cb' parameter
+	* dlist.[ch] (gds_dlist_set_free_callback)
+	(gds_dlist_get_free_callback, gds_dlist_destroy): New functions
+	* dlist.[ch] (gds_dlist_splice, gds_dlist_free): Remove 'callback' and
+	'callback_data' parameter
+	* dlist.t.c: Update tests
+
+2014-03-06  Julian Maurice  <jajm@jajm.org>
+
+	* slist.[ch] (gds_slist_t): Add 'free_cb' member
+	* slist.[ch] (gds_slist_new, gds_slist_new_from_array):
+	Add 'free_cb' parameter
+	* slist.[ch] (gds_slist_set_free_callback)
+	(gds_slist_get_free_callback, gds_slist_destroy): New functions
+	* slist.[ch] (gds_slist_splice, gds_slist_free): Remove 'callback' and
+	'callback_data' parameter
+	* slist.t.c: Update tests
+
+2014-03-06  Julian Maurice  <jajm@jajm.org>
+
+	* rbtree_fast.h (gds_rbtree_fast_add, gds_rbtree_fast_set):
+	Fix comments
+	* rbtree_keyin.h (gds_rbtree_keyin_add): Fix comments
+	* rbtree_keyin_fast.h (gds_rbtree_keyin_fast_add): Fix comments
+
+2014-03-06  Julian Maurice  <jajm@jajm.org>
+
+	* inline/rbtree.h (gds_inline_rbtree_set): Return 1 instead of 2
+	* inline/rbtree_fast.h (gds_inline_rbtree_fast_set):
+	Return 1 instead of 2
+	* rbtree.c (gds_rbtree_set): Update code accordingly
+	* rbtree_fast.c (gds_rbtree_fast_set): Update code accordingly
+	* rbtree_keyin.c (gds_rbtree_keyin_set): Update code accordingly
+	* rbtree_keyin_fast.c (gds_rbtree_keyin_fast_set): Update code
+	accordingly
+
+	* inline/rbtree.t.c: Update tests
+	* inline/rbtree_fast.t.c: Update tests
+
+2014-03-03  Julian Maurice  <jajm@jajm.org>
+
+	* lambda.h (lambda): Rename lambda to gds_lambda
+
+	* inline/dlist.t.c: Update tests
+	* dlist.t.c: Update tests
+	* slist.t.c: Update tests
+
+2014-03-03  Julian Maurice  <jajm@jajm.org>
+
+	* foreach.h (foreach): Rename foreach to gds_foreach
+
+2014-03-03  Julian Maurice  <jajm@jajm.org>
+
+	* Add a key allocation callback to hash maps (optional)
+	* hash_map.c (gds_hash_map_t): Add 'key_alloc_cb' member
+	* hash_map.[ch] (gds_hash_map_new): Add 'key_alloc_cb' parameter
+	* hash_map_fast.c (gds_hash_map_fast_t): Add 'key_alloc_cb' member
+	* hash_map_fast.[ch] (gds_hash_map_fast_new): Add 'key_alloc_cb'
+	parameter
+
+	* hash_map.t.c: Update tests
+	* hash_map_fast.t.c: Update tests
+
+2014-03-01  Julian Maurice  <jajm@jajm.org>
+
+	* check_arg.h: File removed
+	* exception.h: File removed
+	* assert.h: File added
+	* assert.h (gds_assert): New macro
+	* all source files (all functions): Replace GDS_CHECK_ARG by gds_assert
+
+2014-03-01  Julian Maurice  <jajm@jajm.org>
+
+	* inline/rbtree.c (gds_inline_rbtree_iterator_new): Use gds_malloc
+	instead of malloc
+	* inline/rbtree_fast.c (gds_inline_rbtree_fast_iterator_new): Use
+	gds_malloc instead of malloc
+
+2014-02-21  Julian Maurice  <jajm@jajm.org>
+
+	* tap.h: File removed
+	* all test files: Use libtap13
+
+2014-02-21  Julian Maurice  <jajm@jajm.org>
+
+	* undefined.h: File removed
+	* slist.[ch]: Replace UNDEFINED by NULL
+	* dlist.[ch]: Replace UNDEFINED by NULL
+	* inline/slist.[ch]: Replace UNDEFINED by NULL
+	* inline/dlist.[ch]: Replace UNDEFINED by NULL
+
+	* dlist.t.c: Update tests
+	* slist.t.c: Update tests
+
+2014-02-21  Julian Maurice  <jajm@jajm.org>
+
+	* valgrind_suppressions: Make valgrind suppressions file less specific
+
+2014-02-21  Julian Maurice  <jajm@jajm.org>
+
+	* t/Makefile.in: clean should clean t/inline
+
+	* inline/rbtree.t.c: Fix tests
+	* inline/rbtree_fast.t.c: Fix tests
+
+2014-02-17  Julian Maurice  <jajm@jajm.org>
+
+	* log.h (GDS_LOG_FATAL): Renamed to gds_log_fatal
+	* log.h (GDS_LOG_ERROR): Renamed to gds_log_error
+	* log.h (GDS_LOG_WARNING): Renamed to gds_log_warning
+	* log.h (GDS_LOG_INFO): Renamed to gds_log_info
+	* log.h (GDS_LOG_DEBUG): Renamed to gds_log_debug
+
+	* src/dlist.c: Update code accordingly
+	* src/exception.h: Update code accordingly
+	* src/inline/dlist.c: Update code accordingly
+	* src/inline/rbtree_fast.c: Update code accordingly
+	* src/inline/slist.c: Update code accordingly
+	* src/rbtree.c: Update code accordingly
+	* src/rbtree_fast.c: Update code accordingly
+	* src/rbtree_keyin.c: Update code accordingly
+	* src/slist.c: Update code accordingly
+
+2014-02-17  Julian Maurice  <jajm@jajm.org>
+
+	* Factorize memory allocation code
+	* exception.h (GDS_THROW_ALLOC_ERROR, GDS_THROW_EMPTY_LIST):
+	Removed macros
+	* malloc.[ch]: Added file
+	* malloc.[ch] (gds_malloc, gds_calloc, gds_realloc): Added functions
+	* all source files: Use gds_malloc instead of malloc, and gds_calloc
+	instead of calloc
+
+2014-02-17  Julian Maurice  <jajm@jajm.org>
+
+	* undefined.h (NULL_OR_UNDEFINED): Renamed to isset
+	* undefined.h (isdef): Added macro
+	* inline/dlist.c: Update code accordingly
+	* inline/slist.c: Update code accordingly
+
+2014-02-16  Julian Maurice  <jajm@jajm.org>
+
+	* hash_map_fast.t.c: Remove duplicate tests
+
+2014-02-16  Julian Maurice  <jajm@jajm.org>
+
+	* hash_map.[ch] (gds_hash_map_pop): Added function
+	* hash_map_fast.[ch] (gds_hash_map_fast_pop): Added function
+	* hash_map_keyin.[ch] (gds_hash_map_keyin_pop): Added function
+	* hash_map_keyin_fast.[ch] (gds_hash_map_keyin_fast_pop): Added
+	function
+
+	* hash_map.t.c: Added tests
+	* hash_map_fast.t.c: Added tests
+	* hash_map_keyin.t.c: Added tests
+	* hash_map_keyin_fast.t.c: Added tests
+
+2014-02-16  Julian Maurice  <jajm@jajm.org>
+
+	* rbtree.[ch] (gds_rbtree_pop): Added function
+	* rbtree_fast.[ch] (gds_rbtree_fast_pop): Added function
+	* rbtree_keyin.[ch] (gds_rbtree_keyin_pop): Added function
+	* rbtree_keyin_fast.[ch] (gds_rbtree_keyin_fast_pop): Added
+	function
+
+	* rbtree.t.c: Added tests
+	* rbtree_fast.t.c: Added tests
+	* rbtree_keyin.t.c: Added tests
+	* rbtree_keyin_fast.t.c: Added tests
+
+2014-02-16  Julian Maurice  <jajm@jajm.org>
+
+	* all source files: Update copyright notices
+
+2014-02-16  Julian Maurice  <jajm@jajm.org>
+
+	* hash_map.[ch]: Hide implementation of hash map structure
+	* hash_map_fast.[ch]: Hide implementation of hash map structure
+	* hash_map_keyin.[ch]: Hide implementation of hash map structure
+	* hash_map_keyin_fast.[ch]: Hide implementation of hash map structure
+
+2014-02-16  Julian Maurice  <jajm@jajm.org>
+
+	* src/Makefile.in: Fix generation of dependencies
+
+2014-02-16  Julian Maurice  <jajm@jajm.org>
+
+	* hash_map.[ch]: Use unsigned long instead of uint32_t
+	* hash_map_fast.[ch]: Use unsigned long instead of uint32_t
+	* hash_map_keyin.[ch]: Use unsigned long instead of uint32_t
+	* hash_map_keyin_fast.[ch]: Use unsigned long instead of uint32_t
+
+	* all source files: Remove #include of stdint.h and stdbool.h if not
+	needed
+
+2014-02-16  Julian Maurice  <jajm@jajm.org>
+
+	* hash_functions.[ch]: Added files
+	Add common hash algorithms implementations (djb2 and sdbm)
+
+	* hash_map.t.c: Use hash algorithms of hash_functions.c in tests
+	* hash_map_fast.t.c: Use hash algorithms of hash_functions.c in tests
+	* hash_map_keyin.t.c: Use hash algorithms of hash_functions.c in tests
+	* hash_map_keyin_fast.t.c: Use hash algorithms of hash_functions.c in
+	tests
+
+2014-02-15  Julian Maurice  <jajm@jajm.org>
+
+	* all source files: Remove function pointer typedefs
+	* callbacks.h: Removed file
+
+2014-02-15  Julian Maurice  <jajm@jajm.org>
+
+	* hash_map.[ch] (gds_hash_map_t):
+	Add 'free_cb' and 'key_free_cb' members
+	* hash_map.[ch] (gds_hash_map_new):
+	Add 'free_cb' and 'key_free_cb' parameters
+	* hash_map.[ch] (gds_hash_map_set, gds_hash_map_unset)
+	(gds_hash_map_free): Remove 'free_cb' and 'key_free_cb' parameters
+
+	* hash_map_fast.[ch] (gds_hash_map_fast_t):
+	Add 'free_cb' and 'key_free_cb' members
+	* hash_map_fast.[ch] (gds_hash_map_fast_new):
+	Add 'free_cb' and 'key_free_cb' parameters
+	* hash_map_fast.[ch] (gds_hash_map_fast_set, gds_hash_map_fast_unset)
+	(gds_hash_map_fast_free):
+	Remove 'free_cb' and 'key_free_cb' parameters
+
+	* hash_map_keyin.[ch] (gds_hash_map_keyin_t):
+	Add 'free_cb' and 'key_free_cb' members
+	* hash_map_keyin.[ch] (gds_hash_map_keyin_new):
+	Add 'free_cb' and 'key_free_cb' parameters
+	* hash_map_keyin.[ch] (gds_hash_map_keyin_set)
+	(gds_hash_map_keyin_unset, gds_hash_map_keyin_free):
+	Remove 'free_cb' and 'key_free_cb' parameters
+
+	* hash_map_keyin_fast.[ch] (gds_hash_map_keyin_fast_t):
+	Add 'free_cb' and 'key_free_cb' members
+	* hash_map_keyin_fast.[ch] (gds_hash_map_keyin_fast_new):
+	Add 'free_cb' and 'key_free_cb' parameters
+	* hash_map_keyin_fast.[ch] (gds_hash_map_keyin_fast_set)
+	(gds_hash_map_keyin_fast_unset, gds_hash_map_keyin_fast_free):
+	Remove 'free_cb' and 'key_free_cb' parameters
+
 2013-10-26  Julian Maurice  <jajm@jajm.org>
 
 	* libgends: Initial release 1.0
