@@ -1,11 +1,12 @@
-AC_INIT([libgends], [0.1], [jajm@jajm.org])
+AC_PREREQ([2.67])
+LT_PREREQ([2.2])
 
-LIBTOOL_CURRENT=0
-LIBTOOL_REVISION=0
-LIBTOOL_AGE=0
-AC_SUBST(LIBTOOL_CURRENT)
-AC_SUBST(LIBTOOL_REVISION)
-AC_SUBST(LIBTOOL_AGE)
+AC_INIT([libgends], [0.1], [jajm@jajm.org])
+LT_INIT()
+
+AC_SUBST(LIBTOOL_CURRENT, 0)
+AC_SUBST(LIBTOOL_REVISION, 0)
+AC_SUBST(LIBTOOL_AGE, 0)
 
 # Check for programs
 AC_PROG_CC
@@ -18,10 +19,8 @@ AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_CHECK_FUNCS([memmove])
 
-AC_CHECK_HEADER([libexception/exception.h], , AC_MSG_ERROR([libexception/exception.h not found]))
-AC_CHECK_LIB([exception], [exception_throw], , AC_MSG_ERROR([required library libexception not found!]))
-AC_CHECK_HEADER([lll/lll.h], , AC_MSG_ERROR([lll/lll.h not found]))
-AC_CHECK_LIB([lll], [lll_vfprint], , AC_MSG_ERROR([required library lll not found!]))
+PKG_CHECK_MODULES(LIBEXCEPTION, [libexception])
+PKG_CHECK_MODULES(LLL, [lll])
 
 AC_ARG_ENABLE(debug, AS_HELP_STRING([--enable-debug], [enable debugging, default: no]), [], [enable_debug=no])
 AS_IF([test "$enable_debug" = "yes"], AC_SUBST(DEBUG, 1))

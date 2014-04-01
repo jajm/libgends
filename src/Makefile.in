@@ -5,8 +5,8 @@ DEBUG_CFLAGS := -g
 endif
 
 CFLAGS := -Wall -Wextra -Werror -std=c99 -O2 $(DEBUG_CFLAGS) $(CFLAGS)
-CPPFLAGS := -I../include $(shell pkg-config --cflags lll libexception) $(CPPFLAGS)
-LDFLAGS := $(shell pkg-config --libs lll libexception) $(LDFLAGS)
+CPPFLAGS := -I../include @LLL_CFLAGS@ @LIBEXCEPTION_CFLAGS@ $(CPPFLAGS)
+LDFLAGS := @LLL_LIBS@ @LIBEXCEPTION_LIBS@ $(LDFLAGS)
 LIBTOOL_CURRENT := @LIBTOOL_CURRENT@
 LIBTOOL_REVISION := @LIBTOOL_REVISION@
 LIBTOOL_AGE := @LIBTOOL_AGE@
