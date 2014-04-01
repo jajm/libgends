@@ -1,5 +1,9 @@
 2014-04-01  Julian Maurice  <jajm@jajm.org>
 
+	* libgends: New release 2.0.0
+
+2014-04-01  Julian Maurice  <jajm@jajm.org>
+
 	* libgends.pc.in: Change VERSION to PACKAGE_VERSION
 
 2014-04-01  Julian Maurice  <jajm@jajm.org>

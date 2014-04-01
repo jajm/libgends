@@ -1,10 +1,10 @@
 AC_PREREQ([2.67])
 LT_PREREQ([2.2])
 
-AC_INIT([libgends], [0.1], [jajm@jajm.org])
+AC_INIT([libgends], [2.0.0], [jajm@jajm.org])
 LT_INIT()
 
-AC_SUBST(LIBTOOL_CURRENT, 0)
+AC_SUBST(LIBTOOL_CURRENT, 1)
 AC_SUBST(LIBTOOL_REVISION, 0)
 AC_SUBST(LIBTOOL_AGE, 0)
 
