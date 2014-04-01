@@ -1,3 +1,7 @@
+2014-04-01  Julian Maurice  <jajm@jajm.org>
+
+	* debian/*: Remove debian files
+
 2014-03-25  Julian Maurice  <jajm@jajm.org>
 
 	* inline/slist.[ch] (gds_inline_slist_remove)
