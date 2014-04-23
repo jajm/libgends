@@ -598,7 +598,7 @@ void t_gds_inline_dlist_size(void)
 {
 	test_list_node_t *nodes[10];
 	gds_inline_dlist_node_t *head;
-	int i;
+	unsigned int i;
 
 	for (i = 0; i < 10; i++) {
 		nodes[i] = test_list_node_new(i);

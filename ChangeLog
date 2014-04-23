@@ -1,3 +1,7 @@
+2014-04-23  Julian Maurice  <jajm@jajm.org>
+
+	* t/inline/dlist.t.c: Fix a compilation warning
+
 2014-04-01  Julian Maurice  <jajm@jajm.org>
 
 	* libgends: New release 2.0.0
