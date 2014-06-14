@@ -25,6 +25,7 @@
 #ifndef gds_slist_h_included
 #define gds_slist_h_included
 
+#include <stddef.h>
 #include "iterator.h"
 
 #ifdef __cplusplus
