@@ -1,5 +1,9 @@
 2014-06-14  Julian Maurice  <jajm@jajm.org>
 
+	* libgends: New release 2.0.2
+
+2014-06-14  Julian Maurice  <jajm@jajm.org>
+
 	* include/slist.h: Include missing header file
 	* include/dlist.h: Include missing header file
 
