@@ -1,3 +1,8 @@
+2014-06-14  Julian Maurice  <jajm@jajm.org>
+
+	* include/slist.h: Include missing header file
+	* include/dlist.h: Include missing header file
+
 2014-04-23  Julian Maurice  <jajm@jajm.org>
 
 	* t/inline/dlist.t.c: Fix a compilation warning
